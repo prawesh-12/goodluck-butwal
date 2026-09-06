@@ -1,13 +1,18 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 
 // The reference runs Lenis. Its wheel curve fits a time-based lerp of about 0.08 (one 600px tick settles in ~1.4s).
 export function SmoothScroll() {
+  const lenisRef = useRef<Lenis | null>(null);
+  const pathname = usePathname();
+
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const lenis = new Lenis({ lerp: 0.08, smoothWheel: true, wheelMultiplier: 1 });
+    lenisRef.current = lenis;
     let raf = 0;
     const loop = (t: number) => { lenis.raf(t); raf = requestAnimationFrame(loop); };
     raf = requestAnimationFrame(loop);
@@ -24,7 +29,14 @@ export function SmoothScroll() {
       history.pushState(null, "", url.hash);
     };
     document.addEventListener("click", onClick);
-    return () => { cancelAnimationFrame(raf); document.removeEventListener("click", onClick); lenis.destroy(); };
+    return () => { cancelAnimationFrame(raf); document.removeEventListener("click", onClick); lenis.destroy(); lenisRef.current = null; };
   }, []);
+
+  // Every page opens at the top, whatever was scrolled before. Without this, Lenis keeps easing from the old position (often the footer link you clicked).
+  useEffect(() => {
+    lenisRef.current?.scrollTo(0, { immediate: true, force: true });
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return null;
 }
