@@ -14,8 +14,8 @@ export default function ServicesPage() {
       <InnerHero badge="Our services" title="Get the right help" lead="We have the perfect solution for international students. Now, they no longer have to worry about education counselling, finding work, obtaining visas, or anything else." width={1260} after={
         <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">
           {services.map((s, i) => (
-            <Appear key={s.slug} delay={0.1 * i} className="h-[328px] md:h-[400px]">
-              <ServiceCard slug={s.slug} label={s.label} title={s.title} image={s.image} imageAlt={s.imageAlt} className="h-full !bg-white" />
+            <Appear key={s.slug} delay={0.1 * i} className="min-w-0">
+              <ServiceCard slug={s.slug} label={s.label} title={s.title} line={s.line} image={s.image} imageAlt={s.imageAlt} />
             </Appear>
           ))}
         </div>

@@ -11,10 +11,10 @@ export const metadata: Metadata = { title: "Study abroad", description: "Study i
 export default function StudyAbroadPage() {
   return (
     <>
-      <InnerHero badge="Study abroad" title="Best countries to study" lead="Study in Australia, the United Kingdom and New Zealand with us." width={1260} after={
+      <InnerHero badge="Study abroad" title="Countries we help you study in" lead="Study in Australia, the United Kingdom and New Zealand with us." width={1260} after={
         <div className="grid w-full gap-[10px] md:grid-cols-3 md:gap-[30px]">
           {destinationCards.map((d, i) => (
-            <div key={d.slug} id={d.slug}><Appear delay={0.1 * i}><DestinationCard slug={d.slug} className="!w-full" /></Appear></div>
+            <div key={d.slug} id={d.slug}><Appear delay={0.1 * i}><DestinationCard slug={d.slug} /></Appear></div>
           ))}
         </div>
       } />

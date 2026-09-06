@@ -7,7 +7,6 @@ export const img = {
   cloud3: "/images/ui/cloud3.png",
   star: "/images/ui/star.svg",
   bolt: "/images/ui/bolt.svg",
-  overviewBg: "/images/backgrounds/why-choose-us.jpg",
   overviewIcons: ["/images/ui/overview-icons-01.svg", "/images/ui/overview-icons-02.svg", "/images/ui/overview-icons-03.svg"],
   chevron: "/images/ui/chevron.svg",
   statIcons: ["/images/ui/stat-icons-01.svg", "/images/ui/stat-icons-02.svg", "/images/ui/stat-icons-03.svg", "/images/ui/stat-icons-04.svg", "/images/ui/stat-icons-05.svg"],
@@ -25,7 +24,6 @@ export const img = {
 export const gl = {
   logo: "/brand/logo.png",
   mark: "/brand/mark.png",
-  statsBg: "/images/backgrounds/stats.jpg",
   plane: "/images/illustrations/plane.png",
   newZealand: "/images/destinations/new-zealand-card.jpg",
   campus: "/images/illustrations/campus.png",
