@@ -22,7 +22,7 @@ export const services: Service[] = [
     line: "Course selection and admission counselling.",
     intro:
       "We step in as the official representative of more than 100 colleges, institutions, universities and TAFE facilities, with certified counsellors who speak over five languages.",
-    image: "/images/services/education-counselling.jpg",
+    image: "/images/services/education-counselling-v2.jpg",
     imageAlt: "Graduation cap on a stack of books beside a globe",
     stepsTitle: "How counselling works",
     steps: [
@@ -50,7 +50,7 @@ export const services: Service[] = [
     line: "Consultation, documents, application and follow-up.",
     intro:
       "Our experienced team provides visa guidance and support so your path to international education stays on track.",
-    image: "/images/services/visa-guidance.jpg",
+    image: "/images/services/visa-guidance-v2.jpg",
     imageAlt: "Passport with a boarding pass, a paper plane and an approved tick",
     stepsTitle: "Our visa services include",
     steps: [
@@ -69,7 +69,7 @@ export const services: Service[] = [
     label: "Funding",
     line: "A step-by-step guide to finding and applying for scholarships.",
     intro: "Securing a scholarship to study in Australia can significantly ease the financial burden of education.",
-    image: "/images/services/scholarship-guidance.jpg",
+    image: "/images/services/scholarship-guidance-v2.jpg",
     imageAlt: "Rolled diploma with a ribbon, gold coins and a trophy",
     stepsTitle: "Step by step",
     steps: [
@@ -102,7 +102,7 @@ export const services: Service[] = [
     line: "Practice tests, study materials and personalised coaching.",
     intro:
       "Goodluck offers affordable IELTS preparation packages that include practice tests, study materials and personalised coaching, plus a free demo class to get started.",
-    image: "/images/services/ielts-coaching.jpg",
+    image: "/images/services/ielts-coaching-v2.jpg",
     imageAlt: "Headphones on an open notebook with a pencil and a speech bubble",
     stepsTitle: "The four modules",
     steps: [
