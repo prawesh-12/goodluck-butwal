@@ -8,15 +8,18 @@ import { Appear } from "@/components/ui/appear";
 import { FlatButton, PillButton } from "@/components/ui/button";
 
 const trust = [
-  { icon: img.bolt, w: 12, text: "Since 2022" },
-  { icon: img.star, w: 19, text: `${googleRating.score} Google rating` },
-  { icon: img.shield, w: 17, text: "Australia, New Zealand and the UK" },
+  { icon: img.bolt, text: "Since 2022" },
+  { icon: img.star, text: `${googleRating.score} Google rating` },
+];
+
+const destinationFlags = [
+  { name: "Australia", flag: "/images/flags/australia.svg" },
+  { name: "New Zealand", flag: "/images/flags/new-zealand.svg" },
+  { name: "United Kingdom", flag: "/images/flags/united-kingdom.svg" },
 ];
 
 export function Hero() {
   const { scrollY } = useScroll();
-  const scale = useTransform(scrollY, [93, 426], [0.64, 1]);
-  const y = useTransform(scrollY, [93, 426], [-190, 0]);
   const grass = useTransform(scrollY, [380, 460], [1, 0], { ease: easeInOut });
   // The reference hero is max(175vh, 1262px) tall and the meadow's scroll rate grows with that height
   // (fitted from 1262 to 2100px: scale 1 + 3.665e-7 * (H + 1264) per scrolled px, sinking 1398px per unit of scale).
@@ -73,17 +76,17 @@ export function Hero() {
                   </div>
                 </div>
               ))}
+              <span aria-hidden className="h-[22px] w-px bg-ink opacity-20" />
+              <div className="flex items-center gap-2">
+                <div className="flex items-center">
+                  {destinationFlags.map((d, i) => (
+                    <img key={d.name} src={d.flag} alt={d.name} className={`size-[22px] rounded-full ring-2 ring-white ${i > 0 ? "-ml-[7px]" : ""}`} />
+                  ))}
+                </div>
+                <p className="t-base leading-[18px] text-muted">Australia, New Zealand and the UK</p>
+              </div>
             </Appear>
           </div>
-
-          <Appear y={50} delay={1.2} className="flex w-full items-center justify-center">
-            <motion.div style={{ scale, y }} className="relative hidden aspect-[1.726] w-full max-w-[1060px] overflow-clip rounded-[20px] ring-1 ring-[#BABABA] lg:block">
-              <img src={gl.heroPhoto} alt={gl.heroPhotoAlt} className="absolute inset-0 h-full w-full object-cover" />
-            </motion.div>
-            <div className="relative aspect-[1.726] w-full overflow-clip rounded-[10px] ring-1 ring-[#BABABA] md:rounded-[20px] lg:hidden">
-              <img src={gl.heroPhoto} alt={gl.heroPhotoAlt} className="absolute inset-0 h-full w-full object-cover" />
-            </div>
-          </Appear>
         </div>
       </div>
 
