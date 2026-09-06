@@ -26,9 +26,9 @@ export const destinations: Destination[] = [
   {
     slug: "australia",
     name: "Australia",
-    flag: "/assets/2022/04/143-australia.svg",
-    card: "/assets/2022/02/beautiful-shot-sydney-harbor-bridge-with-light-pink-blue-sky_181624-16041.avif",
-    hero: "/assets/2024/08/side-view-man-working-eco-friendly-wind-power-project-with-clipboard-scaled.jpg",
+    flag: "/images/flags/australia.svg",
+    card: "/images/destinations/australia-card.avif",
+    hero: "/images/destinations/australia-hero.jpg",
     heroAlt: "Student working on a wind power project with a clipboard",
     overview: "Australian universities are among the most well-known and qualified in the world.",
     highlights: [
@@ -72,9 +72,9 @@ export const destinations: Destination[] = [
   {
     slug: "united-kingdom",
     name: "United Kingdom",
-    flag: "/assets/2022/04/110-united-kingdom.svg",
-    card: "/assets/2022/04/big-ben-westminster-bridge-sunset-london-uk_268835-1395.avif",
-    hero: "/assets/2024/08/female-student-preparing-chemistry-exams_85869-4692.jpg",
+    flag: "/images/flags/united-kingdom.svg",
+    card: "/images/destinations/united-kingdom-card.avif",
+    hero: "/images/destinations/united-kingdom-hero.jpg",
     heroAlt: "Student preparing for exams at a desk full of books",
     overview: "The UK has some of the finest universities in the world.",
     highlights: [

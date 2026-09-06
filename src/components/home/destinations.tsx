@@ -21,7 +21,7 @@ const fromContent = (slug: string, code: string): Card => {
 // New Zealand has no destination page on goodluck_main yet, so its card only invites an enquiry.
 export const destinationCards: Card[] = [
   fromContent("australia", "AU"),
-  { slug: "new-zealand", name: "New Zealand", line: "Ask our counsellors about studying in New Zealand.", photo: gl.newZealand, photoAlt: "Study in New Zealand", bg: gl.newZealand, flag: "/assets/generated/flag-nz.svg", code: "NZ", href: "/contact/book-consultation" },
+  { slug: "new-zealand", name: "New Zealand", line: "Ask our counsellors about studying in New Zealand.", photo: gl.newZealand, photoAlt: "Study in New Zealand", bg: gl.newZealand, flag: "/images/flags/new-zealand.svg", code: "NZ", href: "/contact/book-consultation" },
   fromContent("united-kingdom", "UK"),
 ];
 

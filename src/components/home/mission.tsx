@@ -22,7 +22,7 @@ const vision = {
   text: about.vision,
   items: about.whyChoose.slice(0, 4),
   stats: [[googleRating.score, "Google rating"], [String(googleRating.count), "Client reviews"]],
-  photo: "/assets/2024/08/successful-happy-business-team_53876-25180.jpg",
+  photo: "/images/about/team-hands.jpg",
   photoAlt: "A team stacking hands together",
   caption: "Goodluck Education & Migration, since 2022",
 };

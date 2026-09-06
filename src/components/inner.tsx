@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { img } from "@/lib/assets";
-import { S } from "@/lib/stems";
 import { Appear } from "@/components/ui/appear";
 import { Badge, Chip } from "@/components/ui/bits";
 
@@ -46,7 +45,7 @@ export function InnerHero({
     <section className={cx("relative flex w-full flex-col items-center overflow-clip pt-32 md:pt-[158px] lg:pt-[194px]", pb, className)}>
       <div aria-hidden className="absolute inset-0 z-0 overflow-clip">
         <div className="absolute inset-0 z-[1]" style={{ backgroundImage: overlay }} />
-        <img src={bg === "sky" ? img.heroSky : S("MvIsbu8ZmP32FmMItfwSlvTCzE")} alt="" className="absolute inset-0 size-full object-cover" style={{ objectPosition: "50% 0%" }} />
+        <img src={bg === "sky" ? img.heroSky : img.fieldSky} alt="" className="absolute inset-0 size-full object-cover" style={{ objectPosition: "50% 0%" }} />
       </div>
       {clouds && (
         <>

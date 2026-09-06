@@ -12,16 +12,16 @@ export const reviews = [
 
 // The 12 published success stories (goodluck_main/project). Each is a graphic with the story in the artwork.
 export const successStories = [
-  { image: "/assets/2024/08/SAJMIN-CHAUDHARY-768x768-1.jpg", alt: "Success story: Sajmin Chaudhary" },
-  { image: "/assets/2024/08/SHARMILA-BASNET-SC-500-768x768-1.jpg", alt: "Success story: Sharmila Basnet, subclass 500" },
-  { image: "/assets/2024/08/SIJAN-BHANDARI-408-VISA-GRANT-768x768-1.jpg", alt: "Success story: Sijan Bhandari, subclass 408 visa grant" },
-  { image: "/assets/2024/08/SURAJ-POKHERAL-PTE.jpg", alt: "Success story: Suraj Pokheral, PTE" },
-  { image: "/assets/2024/08/MARK.jpg", alt: "Success story: Mark" },
-  { image: "/assets/2024/08/LOTIS.jpg", alt: "Client review: Lotis Cueno" },
-  { image: "/assets/2024/08/30.jpg", alt: "Congratulations Swornim Maharjan, student dependent visa granted" },
-  { image: "/assets/2024/08/31.png", alt: "Congratulations Angelo John Villas, tourist to student visa grant" },
-  { image: "/assets/2024/08/32.png", alt: "Congratulations Bianda Cathleen Marco and Edmund Caeandang, tourist to student visa grant, dependent case" },
-  { image: "/assets/2024/08/33.png", alt: "Congratulations Robin Sunwar, 485 extension granted" },
-  { image: "/assets/2024/08/34.png", alt: "Congratulations Shila and Bipin, dependent visa granted within 10 days" },
-  { image: "/assets/2024/08/37.png", alt: "Client review: Ajoy Mahorjan" },
+  { image: "/images/success-stories/story-01.jpg", alt: "Success story: Sajmin Chaudhary" },
+  { image: "/images/success-stories/story-02.jpg", alt: "Success story: Sharmila Basnet, subclass 500" },
+  { image: "/images/success-stories/story-03.jpg", alt: "Success story: Sijan Bhandari, subclass 408 visa grant" },
+  { image: "/images/success-stories/story-04.jpg", alt: "Success story: Suraj Pokheral, PTE" },
+  { image: "/images/success-stories/story-05.jpg", alt: "Success story: Mark" },
+  { image: "/images/success-stories/story-06.jpg", alt: "Client review: Lotis Cueno" },
+  { image: "/images/success-stories/story-07.jpg", alt: "Congratulations Swornim Maharjan, student dependent visa granted" },
+  { image: "/images/success-stories/story-08.png", alt: "Congratulations Angelo John Villas, tourist to student visa grant" },
+  { image: "/images/success-stories/story-09.png", alt: "Congratulations Bianda Cathleen Marco and Edmund Caeandang, tourist to student visa grant, dependent case" },
+  { image: "/images/success-stories/story-10.png", alt: "Congratulations Robin Sunwar, 485 extension granted" },
+  { image: "/images/success-stories/story-11.png", alt: "Congratulations Shila and Bipin, dependent visa granted within 10 days" },
+  { image: "/images/success-stories/story-12.png", alt: "Client review: Ajoy Mahorjan" },
 ];

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { gl, img } from "@/lib/assets";
-import { S } from "@/lib/stems";
 import { company, offices } from "@/lib/site";
 import { allFaqs } from "@/content/faqs";
 import { Appear } from "@/components/ui/appear";
@@ -20,7 +19,7 @@ export default function ContactPage() {
       <section className="relative flex w-full flex-col items-center overflow-clip pb-[100px] pt-32 md:pb-[160px] md:pt-[158px] lg:pb-[200px] lg:pt-[194px]">
         <div aria-hidden className="absolute inset-0 z-0 overflow-clip">
           <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgba(255,255,255,0.5)_0%,#fff_50%)]" />
-          <img src={S("MvIsbu8ZmP32FmMItfwSlvTCzE")} alt="" className="absolute inset-0 size-full object-cover" style={{ objectPosition: "50% 0%" }} />
+          <img src={img.fieldSky} alt="" className="absolute inset-0 size-full object-cover" style={{ objectPosition: "50% 0%" }} />
         </div>
         <img aria-hidden src={img.cloud1} alt="" className="pointer-events-none absolute z-[1] hidden w-[602px] max-w-none opacity-80 lg:block" style={{ top: 50, left: -50 }} />
         <img aria-hidden src={img.cloud3} alt="" className="pointer-events-none absolute z-[1] hidden w-[584px] max-w-none opacity-80 lg:block" style={{ top: -150, right: 30 }} />

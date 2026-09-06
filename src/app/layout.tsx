@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(company.url),
   title: { default: company.name, template: `%s – ${company.short}` },
   description: "Education counselling, visa guidance, scholarship guidance and IELTS coaching from offices in Melbourne, Butwal and Cebu.",
-  icons: { icon: "/icon.png" },
+  icons: { icon: "/brand/icon.png" },
   openGraph: { siteName: company.name, type: "website" },
 };
 

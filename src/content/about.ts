@@ -26,9 +26,9 @@ export const about = {
   ],
   csrIntro: "Through sports, we champion physical health and teamwork, driven by our dedicated team members.",
   csr: [
-    { name: "The Himalayan Tigers", line: "Nepalese community sport club formed in 2018 in Melbourne.", logo: "/assets/2024/08/main-himalayan-tiger.png", photo: "/assets/2024/08/Picture2.jpg" },
-    { name: "Youth For Good Nepal", line: "Non-profit founded in June 2020, affiliated with the Social Welfare Council of Nepal.", logo: "/assets/2024/08/main-youth.png" },
-    { name: "Melbourne Chinese Soccer Association", line: "Not-for-profit grassroots football for Melbourne's multicultural communities.", logo: "/assets/2024/08/337111258_950483632744912_4455482091423839268_n-removebg-preview.png", photo: "/assets/2024/08/viber_image_2023-10-10_16-55-47-487-1536x768-1.jpg" },
+    { name: "The Himalayan Tigers", line: "Nepalese community sport club formed in 2018 in Melbourne.", logo: "/images/about/the-himalayan-tigers-logo.png", photo: "/images/about/the-himalayan-tigers.jpg" },
+    { name: "Youth For Good Nepal", line: "Non-profit founded in June 2020, affiliated with the Social Welfare Council of Nepal.", logo: "/images/about/youth-for-good-nepal-logo.png" },
+    { name: "Melbourne Chinese Soccer Association", line: "Not-for-profit grassroots football for Melbourne's multicultural communities.", logo: "/images/about/melbourne-chinese-soccer-association-logo.png", photo: "/images/about/melbourne-chinese-soccer-association.jpg" },
   ],
   careersValues: [
     { title: "Inclusive community", line: "A diverse team working towards a common goal." },

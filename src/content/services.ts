@@ -22,7 +22,7 @@ export const services: Service[] = [
     line: "Course selection and admission counselling.",
     intro:
       "We step in as the official representative of more than 100 colleges, institutions, universities and TAFE facilities, with certified counsellors who speak over five languages.",
-    image: "/assets/2024/08/businesswomen-drinking-coffee-using-tablet-pc-scaled.jpg",
+    image: "/images/services/education-counselling.jpg",
     imageAlt: "Two women talking over a tablet at a cafe table",
     stepsTitle: "How counselling works",
     steps: [
@@ -50,7 +50,7 @@ export const services: Service[] = [
     line: "Consultation, documents, application and follow-up.",
     intro:
       "Our experienced team provides visa guidance and support so your path to international education stays on track.",
-    image: "/assets/2024/08/visa-application-composition-with-europe-america-flag_23-2149117810.jpg",
+    image: "/images/services/visa-guidance.jpg",
     imageAlt: "Visa application form on a desk with a laptop",
     stepsTitle: "Our visa services include",
     steps: [
@@ -69,7 +69,7 @@ export const services: Service[] = [
     label: "Funding",
     line: "A step-by-step guide to finding and applying for scholarships.",
     intro: "Securing a scholarship to study in Australia can significantly ease the financial burden of education.",
-    image: "/assets/2024/08/application-form-information-employment-concept_53876-124972.jpg",
+    image: "/images/services/scholarship-guidance.jpg",
     imageAlt: "Laptop showing an application form",
     stepsTitle: "Step by step",
     steps: [
@@ -102,7 +102,7 @@ export const services: Service[] = [
     line: "Practice tests, study materials and personalised coaching.",
     intro:
       "Goodluck offers affordable IELTS preparation packages that include practice tests, study materials and personalised coaching, plus a free demo class to get started.",
-    image: "/assets/2024/08/friends-joking-class_23-2147659149.jpg",
+    image: "/images/services/ielts-coaching.jpg",
     imageAlt: "Students studying together in a classroom",
     stepsTitle: "The four modules",
     steps: [
