@@ -23,7 +23,7 @@ export const services: Service[] = [
     intro:
       "We step in as the official representative of more than 100 colleges, institutions, universities and TAFE facilities, with certified counsellors who speak over five languages.",
     image: "/images/services/education-counselling.jpg",
-    imageAlt: "Two women talking over a tablet at a cafe table",
+    imageAlt: "Graduation cap on a stack of books beside a globe",
     stepsTitle: "How counselling works",
     steps: [
       { title: "Identifying course and institution", line: "Background research and Genuine Temporary Entrant (GTE) eligibility." },
@@ -51,7 +51,7 @@ export const services: Service[] = [
     intro:
       "Our experienced team provides visa guidance and support so your path to international education stays on track.",
     image: "/images/services/visa-guidance.jpg",
-    imageAlt: "Visa application form on a desk with a laptop",
+    imageAlt: "Passport with a boarding pass, a paper plane and an approved tick",
     stepsTitle: "Our visa services include",
     steps: [
       { title: "Expert consultation", line: "Understand the visa options for your course and destination." },
@@ -70,7 +70,7 @@ export const services: Service[] = [
     line: "A step-by-step guide to finding and applying for scholarships.",
     intro: "Securing a scholarship to study in Australia can significantly ease the financial burden of education.",
     image: "/images/services/scholarship-guidance.jpg",
-    imageAlt: "Laptop showing an application form",
+    imageAlt: "Rolled diploma with a ribbon, gold coins and a trophy",
     stepsTitle: "Step by step",
     steps: [
       { title: "Identify your field and level", line: "Undergraduate, postgraduate or PhD." },
@@ -103,7 +103,7 @@ export const services: Service[] = [
     intro:
       "Goodluck offers affordable IELTS preparation packages that include practice tests, study materials and personalised coaching, plus a free demo class to get started.",
     image: "/images/services/ielts-coaching.jpg",
-    imageAlt: "Students studying together in a classroom",
+    imageAlt: "Headphones on an open notebook with a pencil and a speech bubble",
     stepsTitle: "The four modules",
     steps: [
       { title: "Listening", line: "Four sections, ten questions each. The recording plays once." },

@@ -4,14 +4,6 @@ export const about = {
   vision: "Our vision is to be one of the leading solutions for international students and strive to be the most trusted brand for our clients.",
   values: "We value diversity and inclusivity. We believe in treating every client with respect and providing them with equal opportunities to succeed.",
   ethics: ["Client-centered approach", "Integrity and transparency", "Professionalism", "Diversity and inclusivity", "Continuous improvement"],
-  whyChoose: [
-    "Certified counsellors",
-    "In-house migration agent",
-    "Diverse counsellors who can speak your language",
-    "Global offices in Australia, Philippines and Nepal",
-    "Partnered with nursing agencies, cleaning companies and restaurants for jobs and placement",
-  ],
-  whyHome: ["Direct interviews", "Faster processing", "Visa assistance", "Cost-effective"],
   founderQuote:
     "Witnessing our students succeed academically and professionally is one of the greatest satisfactions we can experience.",
   founders: "Bimal Gurung & Kishor Gharti Magar",

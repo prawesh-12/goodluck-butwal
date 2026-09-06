@@ -31,7 +31,7 @@ function Orbit({ radius, icon, box }: { radius: number; icon: number; box: numbe
 
 export function Offices() {
   return (
-    <section id="visas" className="flex w-full flex-col items-center">
+    <section id="visas" className="pb-section flex w-full flex-col items-center">
       <div className="container-x">
         <Appear className="relative flex w-full flex-col items-center gap-[30px] overflow-clip rounded-[10px] bg-surface p-5 md:gap-[50px] md:rounded-[30px] md:p-[50px] lg:p-[100px]">
           <div className="icon-dark relative z-[2] grid w-full items-center gap-[30px] overflow-clip rounded-[10px] p-5 md:grid-cols-[1.1fr_1fr] md:rounded-[20px] md:p-10 lg:p-[60px]">
