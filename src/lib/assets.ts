@@ -1,7 +1,7 @@
 // Design assets carried over from the FintechX template (icons, clouds, decorations). Files live in public/images.
 export const img = {
   arrow: "/images/ui/arrow.svg",
-  heroSky: "/images/hero/sky.jpg",
+  heroSky: "/images/hero/sky-v2.jpg",
   cloud1: "/images/ui/cloud1.png",
   cloud2: "/images/ui/cloud2.png",
   cloud3: "/images/ui/cloud3.png",
@@ -25,7 +25,7 @@ export const gl = {
   logo: "/brand/logo.png",
   mark: "/brand/mark.png",
   plane: "/images/illustrations/plane.png",
-  newZealand: "/images/destinations/new-zealand-card.jpg",
+  newZealand: "/images/destinations/new-zealand-card-v2.jpg",
   campus: "/images/illustrations/campus.png",
   heroMeadow: "/images/hero/meadow.png",
   teamPhoto: "/images/about/team-photo.jpg",
