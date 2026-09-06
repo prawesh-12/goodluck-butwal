@@ -21,6 +21,7 @@ export type Office = {
   tel: string;
   primary: boolean;
   hours?: string;
+  flag: string;
 };
 
 export const offices: Office[] = [
@@ -33,6 +34,7 @@ export const offices: Office[] = [
     phone: "(03) 9466 4783",
     tel: "tel:0394664783",
     primary: true,
+    flag: "/images/flags/australia.svg",
   },
   {
     id: "np",
@@ -44,6 +46,7 @@ export const offices: Office[] = [
     tel: "tel:+977071560460",
     primary: true,
     hours: "Mon - Fri: 10 am to 5 pm",
+    flag: "/images/flags/nepal.svg",
   },
   {
     id: "ph",
@@ -54,6 +57,7 @@ export const offices: Office[] = [
     phone: "(032) 263-2235",
     tel: "tel:+0322632235",
     primary: false,
+    flag: "/images/flags/philippines.svg",
   },
 ];
 
