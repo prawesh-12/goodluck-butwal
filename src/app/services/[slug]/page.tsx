@@ -27,8 +27,8 @@ export default async function ServicePage({ params }: Props) {
     <>
       <InnerHero badge={s.label} badgeTone="chip-white" title={s.title} lead={s.intro} bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" after={
         <Appear delay={0.1} className="w-full">
-          <div className="aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]">
-            <img src={s.image} alt={s.imageAlt} className="size-full object-cover" />
+          <div className="aspect-[4/3] w-full overflow-clip rounded-[10px] bg-white ring-1 ring-hairline md:aspect-[2/1] md:rounded-[30px]">
+            <img src={s.image} alt={s.imageAlt} className="size-full object-contain p-6 md:p-10" />
           </div>
         </Appear>
       } />
@@ -102,7 +102,7 @@ export default async function ServicePage({ params }: Props) {
             <div className="grid w-full gap-5 md:grid-cols-3 md:gap-[30px]">
               {others.map((o, i) => (
                 <Appear key={o.slug} delay={0.1 * i} className="h-[300px]">
-                  <ServiceCard slug={o.slug} label={o.label} title={o.title} image={o.image} imageAlt={o.imageAlt} className="h-full" />
+                  <ServiceCard slug={o.slug} label={o.label} title={o.title} line={o.line} image={o.image} imageAlt={o.imageAlt} />
                 </Appear>
               ))}
             </div>
