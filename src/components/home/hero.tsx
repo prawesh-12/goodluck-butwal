@@ -10,7 +10,7 @@ import { FlatButton, PillButton } from "@/components/ui/button";
 const trust = [
   { icon: img.bolt, w: 12, text: "Since 2022" },
   { icon: img.star, w: 19, text: `${googleRating.score} Google rating` },
-  { icon: img.shield, w: 17, text: "Australia, Nepal and the Philippines" },
+  { icon: img.shield, w: 17, text: "Australia, New Zealand and the UK" },
 ];
 
 export function Hero() {
@@ -67,11 +67,9 @@ export function Hero() {
               {trust.map((t, i) => (
                 <div key={t.text} className="contents">
                   {i > 0 && <span aria-hidden className="h-[22px] w-px bg-ink opacity-20" />}
-                  <div className="flex items-start gap-[6px]">
-                    <span className="flex h-[22px] items-center">
-                      <img src={t.icon} alt="" style={{ width: t.w, height: 18 }} />
-                    </span>
-                    <p className="t-base text-muted">{t.text}</p>
+                  <div className="flex items-center gap-[6px]">
+                    <img src={t.icon} alt="" className="block h-4 w-auto shrink-0 translate-y-[1px]" />
+                    <p className="t-base leading-[18px] text-muted">{t.text}</p>
                   </div>
                 </div>
               ))}
@@ -100,8 +98,8 @@ export function Hero() {
       </div>
 
       <motion.div aria-hidden style={{ opacity: grass }} className="pointer-events-none absolute inset-0 z-[2] hidden flex-col items-center overflow-clip lg:flex">
-        <Appear y={20} delay={0.7} className="flex h-[98%] w-full items-end justify-center overflow-clip pb-[200px]">
-          <motion.div style={{ scale: grassScale, y: grassY }} className="w-[130%] min-w-[1460px] max-w-none shrink-0">
+        <Appear y={20} delay={0.7} className="flex h-[98%] w-full items-end justify-center overflow-clip pb-[580px]">
+          <motion.div style={{ scale: grassScale, y: grassY }} className="w-[calc(100%+20px)] min-w-[1460px] max-w-none shrink-0">
             <img src={gl.heroMeadow} alt="" className="w-full max-w-none" />
           </motion.div>
         </Appear>
