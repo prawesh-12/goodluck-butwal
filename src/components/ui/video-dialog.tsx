@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 
 // Magic UI's HeroVideoDialog ("from-center"), playing a local mp4 instead of an iframe.
 // The modal is portalled to <body> because the thumbnail lives inside a card link, and the play button stops that link from navigating.
-export function VideoDialog({ src, poster, title, className = "" }: { src: string; poster: string; title: string; className?: string }) {
+export function VideoDialog({ src, poster, title, inline, className = "" }: { src: string; poster: string; title: string; inline?: boolean; className?: string }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -33,7 +33,12 @@ export function VideoDialog({ src, poster, title, className = "" }: { src: strin
         }}
         className={`relative block cursor-pointer ${className}`}
       >
-        <img src={poster} alt="" className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" loading="lazy" decoding="async" />
+        {inline ? (
+          // Muted loop behind the play button. Clicking still opens the dialog, where it plays with sound.
+          <video src={src} poster={poster} autoPlay muted loop playsInline className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" />
+        ) : (
+          <img src={poster} alt="" className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" loading="lazy" decoding="async" />
+        )}
         <span className="absolute inset-0 flex scale-90 items-center justify-center transition-transform duration-200 ease-out group-hover:scale-100">
           <span className="flex size-[68px] items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
             <span className="flex size-12 items-center justify-center rounded-full bg-ink shadow-[0_8px_20px_rgba(0,0,0,0.25)] transition-transform duration-200 ease-out group-hover:scale-110">
