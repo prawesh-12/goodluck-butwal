@@ -85,12 +85,29 @@ export function Hero() {
   const [rolling, setRolling] = useState(false);
   const [warm, setWarm] = useState(false);
   useMotionValueEvent(scrollY, "change", (v) => {
-    const on = grow.rest < 1 && !reduce;
+    // Below the desktop breakpoint the card never grows, so there is no parked window to key off; the
+    // observer below drives it there instead.
+    if (grow.rest === 1 || reduce) return;
     // Start buffering as soon as the page moves, but only play once the card is parked at full size, so the
     // file is already decoded by the time anyone sees it move.
-    if (on && v > 60) setWarm(true);
-    setRolling(on && v >= GROWTH && v <= HOLD);
+    if (v > 60) setWarm(true);
+    setRolling(v >= GROWTH && v <= HOLD);
   });
+  // Phones and tablets: the card is a plain tile, so it plays whenever it is on screen and stops when it is not.
+  useEffect(() => {
+    const el = film.current;
+    if (!el || reduce) return;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (innerWidth >= 1200) return;
+        if (e.isIntersecting) setWarm(true);
+        setRolling(e.isIntersecting);
+      },
+      { rootMargin: "150px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduce]);
 
   return (
     <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
