@@ -15,6 +15,14 @@
   --color-gray-text: #bababa;
   --font-display: var(--font-bricolage), "Bricolage Grotesque", sans-serif;
   --font-body: var(--font-inter-display), "Inter Display", "Inter", sans-serif;
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
+  @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
+}
+
+/* inline, so var(--duration) is read on the marquee element instead of :root where it is unset. */
+@theme inline {
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
 }
 
 @layer base {
@@ -101,9 +109,9 @@
 @keyframes orbit { to { transform: rotate(360deg); } }
 @keyframes orbit-back { to { transform: rotate(-360deg); } }
 .animate-float { animation: float 7s ease-in-out infinite; }
-.animate-orbit { animation: orbit 140s linear infinite; }
-.animate-orbit-back { animation: orbit-back 140s linear infinite; }
-@media (prefers-reduced-motion: reduce) { .ticker-track, .animate-float, .animate-orbit, .animate-orbit-back { animation: none; } }
+.animate-orbit { animation: orbit 70s linear infinite; }
+.animate-orbit-back { animation: orbit-back 70s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ticker-track, .animate-marquee, .animate-marquee-vertical, .animate-float, .animate-orbit, .animate-orbit-back { animation: none; } }
 
 /* Article bodies come from goodluck_main as HTML. */
 .article > * + * { margin-top: 10px; }

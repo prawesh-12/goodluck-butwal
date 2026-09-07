@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { gl, img } from "@/lib/assets";
 import { company, footerLinks, offices } from "@/lib/site";
-import { about } from "@/content/about";
 import { Appear } from "@/components/ui/appear";
 import { useOffice } from "@/components/office";
 
@@ -30,10 +29,7 @@ export function Footer() {
             <Link href="/" aria-label="Goodluck Education and Migration, home" className="block h-10">
               <img src={gl.logo} alt="Goodluck Education and Migration" className="h-full w-auto object-contain" />
             </Link>
-            <div className="flex flex-col gap-3">
-              <h2 className="t-h3">Ready to create your luck?</h2>
-              <p className="t-body text-muted">{about.established}</p>
-            </div>
+            <h2 className="t-h3">Ready to create your luck?</h2>
             <a href={`mailto:${company.email}`} className="t-lead font-semibold text-ink transition-colors hover:text-muted">
               {company.email}
             </a>
