@@ -64,6 +64,12 @@ export const offices: Office[] = [
 export const primaryOffices = offices.filter((o) => o.primary);
 export const officeById = (id: OfficeId) => offices.find((o) => o.id === id)!;
 
+// Fill in the real profile URLs; the icons render from these.
+export const social = [
+  { label: "Facebook", href: "#", icon: "/images/social/facebook.webp" },
+  { label: "Instagram", href: "#", icon: "/images/social/instagram.webp" },
+];
+
 export const nav = [
   { label: "About", href: "/about" },
   { label: "Study abroad", href: "/study-abroad" },

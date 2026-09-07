@@ -4,7 +4,7 @@ import { company, offices } from "@/lib/site";
 import { allFaqs } from "@/content/faqs";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton } from "@/components/ui/button";
-import { Badge } from "@/components/ui/bits";
+import { Badge, SocialLinks } from "@/components/ui/bits";
 import { SectionHead } from "@/components/inner";
 import { EnquiryForm } from "@/components/forms";
 import { OfficeContactCards } from "@/components/contact-cards";
@@ -31,7 +31,10 @@ export default function ContactPage() {
                 <h1 className="t-h1-md">Don&rsquo;t hesitate to contact us</h1>
                 <p className="t-body text-muted">Let&rsquo;s connect. Make a free consultation with our expert team.</p>
               </div>
-              <FlatButton href={`mailto:${company.email}`}>{company.email}</FlatButton>
+              <div className="flex flex-wrap items-center gap-5">
+                <FlatButton href={`mailto:${company.email}`}>{company.email}</FlatButton>
+                <SocialLinks />
+              </div>
               <OfficeContactCards />
             </Appear>
             <Appear y={10} delay={0.1} duration={0.6} className="relative flex flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 pb-20 md:rounded-[30px] md:pb-[70px] lg:p-10 lg:pb-[120px]">

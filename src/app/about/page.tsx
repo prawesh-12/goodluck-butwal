@@ -7,6 +7,7 @@ import { googleRating } from "@/content/stories";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg } from "@/components/ui/bits";
+import { VideoDialog } from "@/components/ui/video-dialog";
 import { InnerHero, SectionHead, StatCard, TeamCard } from "@/components/inner";
 import { Partners } from "@/components/home/partners";
 import { TabShoulders } from "@/components/home/steps";
@@ -27,9 +28,7 @@ export default function AboutPage() {
     <>
       <InnerHero badge="About Goodluck" title="About Goodluck Education & Migration" lead={about.established} bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" after={
         <Appear delay={0.1} className="w-full">
-          <div className="aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]">
-            <img src={gl.teamPhoto} alt="The Goodluck team together" className="size-full object-cover" loading="lazy" decoding="async" />
-          </div>
+          <VideoDialog src={gl.film} poster={gl.filmPoster} title="Inside Goodluck Education and Migration" className="group aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]" />
         </Appear>
       } />
 
