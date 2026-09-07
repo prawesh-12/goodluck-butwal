@@ -3,7 +3,8 @@ import { googleRating, reviews } from "@/content/stories";
 import { about } from "@/content/about";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
-import { Badge, SectionBg, Ticker } from "@/components/ui/bits";
+import { Badge, SectionBg } from "@/components/ui/bits";
+import { Marquee } from "@/components/ui/marquee";
 
 const meta = [
   { icon: img.star, w: 19, text: `${googleRating.score} Google rating` },
@@ -28,6 +29,26 @@ export function ReviewCard({ r, className = "" }: { r: (typeof reviews)[number];
     </div>
   );
 }
+
+// Magic UI's testimonial card: photo, name and source up top, stars where the bird icon sits, quote below.
+function ReviewTile({ r }: { r: (typeof reviews)[number] }) {
+  return (
+    <figure className="flex w-[300px] flex-col gap-4 rounded-2xl border border-hairline bg-white p-5 md:w-[400px]">
+      <div className="flex flex-wrap items-center gap-3">
+        <img src={r.avatar} alt="" width={40} height={40} className="size-10 shrink-0 rounded-full bg-surface object-cover" />
+        <figcaption className="flex min-w-[150px] flex-1 flex-col gap-[2px]">
+          <p className="text-[16px] font-medium leading-5 text-ink">{r.name}</p>
+          <p className="t-small whitespace-nowrap text-muted">Google review, {r.date}</p>
+        </figcaption>
+        <img src={img.stars5} alt="Five stars" className="ml-auto h-[14px] w-[85px]" />
+      </div>
+      <blockquote className="t-base text-ink">{r.quote}</blockquote>
+    </figure>
+  );
+}
+
+// Two rows like the Magic UI marquee demo: top drifts right, bottom drifts left. Linear, since it never stops.
+const rows = [reviews.slice(0, 3), reviews.slice(3)];
 
 export function Reviews() {
   return (
@@ -61,20 +82,15 @@ export function Reviews() {
               ))}
             </div>
           </Appear>
-          <Appear delay={0.2} className="flex w-full flex-col gap-5 md:hidden">
-            {reviews.slice(0, 4).map((r) => (
-              <ReviewCard key={r.name} r={r} />
-            ))}
-          </Appear>
-          <Appear delay={0.2} className="hidden w-full md:block">
-            <Ticker gap={20} speed={70} className="w-full !overflow-visible md:[--gap-override:20px] lg:[--gap-override:50px]">
-              {reviews.map((r) => (
-                <ReviewCard key={r.name} r={r} className="h-[380px] w-[400px] shrink-0" />
-              ))}
-            </Ticker>
-          </Appear>
         </div>
       </div>
+      <Appear delay={0.2} className="relative z-[1] mt-[30px] flex w-full flex-col gap-5 md:mt-10 lg:mt-[50px]">
+        {rows.map((row, i) => (
+          <Marquee key={i} pauseOnHover reverse={i === 0} className="p-0 [--duration:32s] [--gap:20px]">
+            {row.map((r) => <ReviewTile key={r.name} r={r} />)}
+          </Marquee>
+        ))}
+      </Appear>
     </section>
   );
 }

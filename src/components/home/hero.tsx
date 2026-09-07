@@ -29,9 +29,12 @@ export function Hero() {
   const rate = 3.665e-7 * (height + 1264);
   const grassScale = useTransform(scrollY, (v) => 1 + v * rate);
   const grassY = useTransform(scrollY, (v) => 1398 * v * rate);
+  // The meadow hangs 680px above 98% of the section height, so on a short screen 175vh would lift it over the copy.
+  // The min-height keeps its skyline 336px from the top: (680 + 336 + meadow height) / 0.98, where the meadow is
+  // max(1640px, 112vw) wide at a 698/2172 aspect. That is 1575px on a 1440x900 screen, the same as before.
 
   return (
-    <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[1262px] lg:pb-0 lg:pt-[194px]">
+    <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
       <div aria-hidden className="absolute inset-0 z-0 flex items-center justify-center overflow-clip">
         <img src={img.heroSky} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
       </div>
@@ -58,9 +61,8 @@ export function Hero() {
                   Our qualified migration agents and education counsellors will deal with your application to study in{" "}
                   <span className="inline-flex translate-y-[3px] items-center gap-[3px] align-baseline">
                     {destinationFlags.map((d, i) => (
-                      // The flag SVGs are circles, so scale them past the corners to fill the square tile.
                       <span key={d.name} className={`block size-[22px] overflow-hidden rounded-[6px] ring-1 ring-black/10 ${i % 2 ? "rotate-[6deg]" : "-rotate-[6deg]"}`}>
-                        <img src={d.flag} alt={d.name} className="size-full scale-[1.45]" />
+                        <img src={d.flag} alt={d.name} className="size-full object-cover" />
                       </span>
                     ))}
                   </span>

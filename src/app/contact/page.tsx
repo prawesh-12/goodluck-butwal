@@ -54,7 +54,7 @@ export default function ContactPage() {
                   <Appear key={o.id} delay={0.1 * i} className={`flex flex-col items-start gap-[30px] overflow-hidden rounded-[10px] p-5 md:rounded-[30px] lg:p-[30px] ${t === "surface" ? "bg-surface" : t === "dark" ? "icon-dark" : "bg-[linear-gradient(135deg,#406ae4_0%,#5290f4_100%)]"}`}>
                     <div className="flex flex-col items-start gap-5">
                       <span className="flex size-[50px] items-center justify-center overflow-clip rounded-full bg-white ring-1 ring-inset ring-hairline">
-                        <img src={o.flag} alt="" className="size-[30px]" />
+                        <img src={o.flag} alt="" className="size-[30px] rounded-full" />
                       </span>
                       <div className="flex flex-col items-start gap-[6px]">
                         <p className={`t-small ${white ? "text-white/70" : "text-muted"}`}>{o.label}</p>

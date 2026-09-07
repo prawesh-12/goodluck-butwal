@@ -7,7 +7,8 @@ export type Service = {
   intro: string;
   image: string;
   imageAlt: string;
-  reel?: string; // Instagram reel from @goodluck.butwal, played in the card
+  video?: string; // reel from @goodluck.butwal, saved from extras/video_assets and played in the card
+  poster?: string; // 16:9 frame from the video, shown on the card
   stepsTitle: string;
   steps: { title: string; line: string }[];
   listTitle?: string;
@@ -18,7 +19,8 @@ export type Service = {
 export const services: Service[] = [
   {
     slug: "education-counselling",
-    reel: "https://www.instagram.com/reel/DWjHjyniWZQ/embed/",
+    video: "/videos/education-counselling.mp4",
+    poster: "/images/services/education-counselling-poster.jpg",
     title: "Education Counselling",
     label: "Study",
     line: "Course selection and admission counselling.",
@@ -47,7 +49,8 @@ export const services: Service[] = [
   },
   {
     slug: "visa-guidance",
-    reel: "https://www.instagram.com/reel/DccwaOXDQdZ/embed/",
+    video: "/videos/visa-guidance.mp4",
+    poster: "/images/services/visa-guidance-poster.jpg",
     title: "Visa Guidance",
     label: "Visa",
     line: "Consultation, documents, application and follow-up.",
@@ -68,7 +71,8 @@ export const services: Service[] = [
   },
   {
     slug: "scholarship-guidance",
-    reel: "https://www.instagram.com/reel/DX0beurCXsV/embed/",
+    video: "/videos/scholarship-guidance.mp4",
+    poster: "/images/services/scholarship-guidance-poster.jpg",
     title: "Scholarship Guidance",
     label: "Funding",
     line: "A step-by-step guide to finding and applying for scholarships.",
@@ -101,7 +105,8 @@ export const services: Service[] = [
   },
   {
     slug: "ielts-coaching",
-    reel: "https://www.instagram.com/reel/DWWT3ARDrxg/embed/",
+    video: "/videos/ielts-coaching.mp4",
+    poster: "/images/services/ielts-coaching-poster.jpg",
     title: "IELTS Coaching",
     label: "Test preparation",
     line: "Practice tests, study materials and personalised coaching.",
