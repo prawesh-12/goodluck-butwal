@@ -7,11 +7,6 @@ import { googleRating } from "@/content/stories";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton, PillButton } from "@/components/ui/button";
 
-const trust = [
-  { icon: img.bolt, text: "Since 2022" },
-  { icon: img.star, text: `${googleRating.score} Google rating` },
-];
-
 const destinationFlags = [
   { name: "Australia", flag: "/images/flags/australia.svg" },
   { name: "New Zealand", flag: "/images/flags/new-zealand.svg" },
@@ -58,33 +53,37 @@ export function Hero() {
                   <h1 className="t-h1">luck</h1>
                 </Appear>
               </div>
-              <Appear y={20} delay={0.4} className="max-w-[600px]">
-                <p className="t-lead text-center text-muted">Our qualified migration agents and education counsellors will deal with your application.</p>
+              <Appear y={20} delay={0.4} className="mt-[10px] max-w-[600px] md:mt-5">
+                <p className="t-lead text-center text-muted">
+                  Our qualified migration agents and education counsellors will deal with your application to study in{" "}
+                  <span className="inline-flex translate-y-[3px] items-center gap-[3px] align-baseline">
+                    {destinationFlags.map((d, i) => (
+                      // The flag SVGs are circles, so scale them past the corners to fill the square tile.
+                      <span key={d.name} className={`block size-[22px] overflow-hidden rounded-[6px] ring-1 ring-black/10 ${i % 2 ? "rotate-[6deg]" : "-rotate-[6deg]"}`}>
+                        <img src={d.flag} alt={d.name} className="size-full scale-[1.45]" />
+                      </span>
+                    ))}
+                  </span>
+                </p>
               </Appear>
             </div>
             <Appear y={20} delay={0.5} className="flex flex-wrap items-center justify-center gap-4 md:gap-5">
               <PillButton href="/contact/book-consultation">Book a consultation</PillButton>
               <FlatButton href="/services">Our services</FlatButton>
             </Appear>
-            <Appear y={20} delay={0.6} className="flex flex-wrap items-center justify-center gap-x-[10px] gap-y-[10px] md:gap-5">
-              {trust.map((t, i) => (
-                <div key={t.text} className="contents">
-                  {i > 0 && <span aria-hidden className="h-[22px] w-px bg-ink opacity-20" />}
-                  <div className="flex items-center gap-[6px]">
-                    <img src={t.icon} alt="" className="block h-4 w-auto shrink-0 translate-y-[1px]" />
-                    <p className="t-base leading-[18px] text-muted">{t.text}</p>
-                  </div>
-                </div>
-              ))}
-              <span aria-hidden className="h-[22px] w-px bg-ink opacity-20" />
-              <div className="flex items-center gap-2">
-                <div className="flex items-center">
-                  {destinationFlags.map((d, i) => (
-                    <img key={d.name} src={d.flag} alt={d.name} className={`size-[22px] rounded-full ring-2 ring-white ${i > 0 ? "-ml-[7px]" : ""}`} />
-                  ))}
-                </div>
-                <p className="t-base leading-[18px] text-muted">Australia, New Zealand and the UK</p>
-              </div>
+            <Appear y={20} delay={0.6} className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[15px] font-medium leading-[18px] text-muted">
+              <span className="flex items-center gap-2">
+                <img src={img.stars5} alt="" className="h-[14px] w-auto" />
+                <span className="font-semibold text-ink">{googleRating.score}</span>
+                <span>from {googleRating.count} Google reviews</span>
+              </span>
+              <span aria-hidden className="hidden size-1 rounded-full bg-ink/30 md:block" />
+              <span className="flex items-center gap-[6px]">
+                <img src={img.bolt} alt="" className="h-[14px] w-auto" />
+                <span>
+                  Since <span className="font-semibold text-ink">2022</span>
+                </span>
+              </span>
             </Appear>
           </div>
         </div>
@@ -101,8 +100,8 @@ export function Hero() {
       </div>
 
       <motion.div aria-hidden style={{ opacity: grass }} className="pointer-events-none absolute inset-0 z-[2] hidden flex-col items-center overflow-clip lg:flex">
-        <Appear y={20} delay={0.7} className="flex h-[98%] w-full items-end justify-center overflow-clip pb-[580px]">
-          <motion.div style={{ scale: grassScale, y: grassY }} className="w-[calc(100%+20px)] min-w-[1460px] max-w-none shrink-0">
+        <Appear y={260} delay={0.5} duration={1.6} className="flex h-[98%] w-full items-end justify-center overflow-clip pb-[680px]">
+          <motion.div style={{ scale: grassScale, y: grassY }} className="w-[112%] min-w-[1640px] max-w-none shrink-0">
             <img src={gl.heroMeadow} alt="" className="w-full max-w-none" />
           </motion.div>
         </Appear>
