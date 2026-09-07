@@ -24,7 +24,7 @@ export function Stories() {
   return (
     <section id="success-stories" className="flex w-full flex-col items-center">
       <div className="pb-section relative w-full overflow-clip bg-white pt-[60px] md:pt-[100px]">
-        <SectionBg src={img.storiesBg} top bottom position="50% 50%" />
+        <SectionBg src={img.storiesBg} top bottom soft position="50% 50%" />
         <div className="relative z-[1] flex w-full flex-col items-center gap-[30px] md:gap-10 lg:gap-[60px]">
           <Appear className="container-x flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
             <div className="flex max-w-[620px] flex-col items-start gap-[10px]">

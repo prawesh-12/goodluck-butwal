@@ -16,6 +16,13 @@ export function Footer() {
       <div aria-hidden className="absolute inset-0 z-0 overflow-clip">
         <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,#fff_0%,#fff_0%,rgba(255,255,255,0.3)_14%,rgba(255,255,255,0)_100%)]" />
         <img src={img.footerBg} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 60%" }} />
+        {/* Bokeh along the bottom: a few soft light discs and a haze under the logo. */}
+        <div className="absolute inset-x-0 bottom-0 z-[1] h-[38%] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.35)_100%)]" />
+        <div className="absolute bottom-[4%] left-[8%] z-[1] size-[180px] rounded-full bg-white/50 blur-[40px]" />
+        <div className="absolute bottom-[14%] left-[26%] z-[1] size-[90px] rounded-full bg-[#ffe9a8]/60 blur-[24px]" />
+        <div className="absolute bottom-[8%] right-[14%] z-[1] size-[220px] rounded-full bg-white/45 blur-[50px]" />
+        <div className="absolute bottom-[20%] right-[32%] z-[1] size-[70px] rounded-full bg-white/60 blur-[18px]" />
+        <div className="absolute bottom-[2%] left-[48%] z-[1] size-[120px] rounded-full bg-[#ffe9a8]/45 blur-[32px]" />
       </div>
       <div className="container-x relative z-[1] flex w-full flex-col gap-[50px] md:gap-[70px]">
         <div className="grid w-full gap-[50px] lg:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] lg:gap-[60px]">
@@ -64,9 +71,12 @@ export function Footer() {
           <p className="t-base text-ink">{offices[1].hours}</p>
         </div>
       </div>
-      <p aria-hidden className="relative z-[1] -mb-[4vw] mt-10 w-full select-none whitespace-nowrap text-center font-display text-[20vw] font-semibold leading-[0.8] tracking-[-0.04em] text-white/70">
-        {company.short}
-      </p>
+      <img
+        src={gl.logo}
+        alt=""
+        aria-hidden
+        className="relative z-[1] -mb-[2px] mt-[50px] w-[min(94vw,1320px)] opacity-80 brightness-0 invert select-none md:mt-[70px]"
+      />
     </footer>
   );
 }
