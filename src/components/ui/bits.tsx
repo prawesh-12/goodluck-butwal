@@ -51,12 +51,17 @@ export function Ticker({ children, gap, speed, className, reverse, align = "cent
 }
 
 // Full-bleed background photo with the white fades Framer uses on top and/or bottom.
-export function SectionBg({ src, top, bottom, position = "50% 0%", children, className }: { src: string; top?: boolean; bottom?: boolean; position?: string; children?: ReactNode; className?: string }) {
+// soft: the fade only reaches white at the very edge, for a section that meets another photo instead of a white one.
+export function SectionBg({ src, top, bottom, soft, position = "50% 0%", children, className }: { src: string; top?: boolean; bottom?: boolean; soft?: boolean; position?: string; children?: ReactNode; className?: string }) {
+  // Tailwind only generates classes it can read in full, so the four gradients are spelled out.
+  const fade = "absolute -left-[10px] -right-[10px] z-[2] h-[100px] md:h-[160px] lg:h-[200px]";
+  const topFade = soft ? "bg-[linear-gradient(0deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.5)_55%,#fff_100%)]" : "bg-[linear-gradient(0deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.7)_25%,#fff_50%)]";
+  const bottomFade = soft ? "bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.5)_55%,#fff_100%)]" : "bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.7)_25%,#fff_50%)]";
   return (
     <div aria-hidden className={cx("pointer-events-none absolute inset-0 z-0 overflow-clip", className)}>
       <img src={src} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position }} />
-      {top && <div className="absolute -left-[10px] -right-[10px] -top-[1px] z-[2] h-[100px] md:h-[160px] lg:h-[200px] bg-[linear-gradient(0deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.7)_25%,#fff_50%)]" />}
-      {bottom && <div className="absolute -left-[10px] -right-[10px] -bottom-[1px] z-[2] h-[100px] md:h-[160px] lg:h-[200px] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.7)_25%,#fff_50%)]" />}
+      {top && <div className={cx(fade, "-top-[1px]", topFade)} />}
+      {bottom && <div className={cx(fade, "-bottom-[1px]", bottomFade)} />}
       {children}
     </div>
   );

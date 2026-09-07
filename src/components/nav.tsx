@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { gl } from "@/lib/assets";
 import { nav } from "@/lib/site";
 import { PillButton } from "@/components/ui/button";
-import { OfficeSwitcher } from "@/components/office";
+import { OfficeBadge } from "@/components/office";
 
 // Eight stacked backdrop-blur layers with masks: the progressive blur under the floating nav.
 function BlurTop() {
@@ -47,7 +47,7 @@ export function Nav() {
               })}
             </nav>
             <div className="ml-auto flex shrink-0 items-center justify-end gap-[6px] md:gap-[10px]">
-              <OfficeSwitcher className="hidden md:flex" />
+              <OfficeBadge className="hidden md:inline-flex" />
               <div className="hidden md:block">
                 <PillButton href="/contact/book-consultation" tone="dark" size="sm">
                   Book a consultation
@@ -68,7 +68,7 @@ export function Nav() {
                   </Link>
                 ))}
                 <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-hairline px-2 pt-3 md:hidden">
-                  <OfficeSwitcher />
+                  <OfficeBadge />
                   <PillButton href="/contact/book-consultation" tone="dark" size="sm">
                     Book a consultation
                   </PillButton>
