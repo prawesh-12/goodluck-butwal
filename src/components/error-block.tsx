@@ -19,7 +19,7 @@ export function ErrorBlock() {
             </Appear>
             <PillButton href="/" iconSide="left">Back to home</PillButton>
           </div>
-          <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-[-40px] z-[1] w-[calc(100%+20px)] max-w-none object-contain object-top md:bottom-[-80px]" />
+          <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-[-40px] z-[1] w-[calc(100%+20px)] max-w-none object-contain object-top md:bottom-[-80px]" loading="lazy" decoding="async" />
         </Appear>
       </div>
     </section>

@@ -49,7 +49,7 @@ export function PillButton({
         side === "left" ? (lg ? "left-[6px] lg:left-2" : "left-[7px] lg:left-2") : lg ? "right-[6px] lg:right-2" : "right-[7px] lg:right-2",
       )}
     >
-      <img src={flip ? img.arrowLeft : img.arrow} alt="" className="h-2 w-3" />
+      <img src={flip ? img.arrowLeft : img.arrow} alt="" className="h-2 w-3" loading="lazy" decoding="async" />
     </motion.span>
   );
   const external = href.startsWith("http") || href.startsWith("mailto:");

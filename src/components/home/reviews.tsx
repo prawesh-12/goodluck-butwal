@@ -16,7 +16,7 @@ export function ReviewCard({ r, className = "" }: { r: (typeof reviews)[number];
   return (
     <div className={`flex flex-col items-start justify-between overflow-hidden rounded-[10px] bg-white p-5 md:rounded-[30px] md:p-10 ${className}`}>
       <div className="flex flex-col items-start gap-4 pb-10">
-        <img src={img.stars5} alt="Five stars" className="h-[18px] w-[109px]" />
+        <img src={img.stars5} alt="Five stars" className="h-[18px] w-[109px]" loading="lazy" decoding="async" />
         <p className="t-body line-clamp-7 text-ink">{r.quote}</p>
       </div>
       <div className="flex items-start gap-4">
@@ -35,12 +35,12 @@ function ReviewTile({ r }: { r: (typeof reviews)[number] }) {
   return (
     <figure className="flex w-[300px] flex-col gap-4 rounded-2xl border border-hairline bg-white p-5 md:w-[400px]">
       <div className="flex flex-wrap items-center gap-3">
-        <img src={r.avatar} alt="" width={40} height={40} className="size-10 shrink-0 rounded-full bg-surface object-cover" />
+        <img src={r.avatar} alt="" width={40} height={40} className="size-10 shrink-0 rounded-full bg-surface object-cover" loading="lazy" decoding="async" />
         <figcaption className="flex min-w-[150px] flex-1 flex-col gap-[2px]">
           <p className="text-[16px] font-medium leading-5 text-ink">{r.name}</p>
           <p className="t-small whitespace-nowrap text-muted">Google review, {r.date}</p>
         </figcaption>
-        <img src={img.stars5} alt="Five stars" className="ml-auto h-[14px] w-[85px]" />
+        <img src={img.stars5} alt="Five stars" className="ml-auto h-[14px] w-[85px]" loading="lazy" decoding="async" />
       </div>
       <blockquote className="t-base text-ink">{r.quote}</blockquote>
     </figure>
@@ -74,7 +74,7 @@ export function Reviews() {
                   {i > 0 && <span aria-hidden className="h-[22px] w-px bg-ink opacity-30" />}
                   <div className="flex items-start gap-[6px]">
                     <span className="flex h-[22px] items-center">
-                      <img src={m.icon} alt="" style={{ width: m.w, height: 18 }} />
+                      <img src={m.icon} alt="" style={{ width: m.w, height: 18 }} loading="lazy" decoding="async" />
                     </span>
                     <p className="t-base text-muted">{m.text}</p>
                   </div>

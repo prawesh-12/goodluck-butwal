@@ -23,7 +23,7 @@ export function OfficeBadge({ className = "" }: { className?: string }) {
   const o = primaryOffices.find((x) => x.id === office)!;
   return (
     <span className={`inline-flex h-[34px] items-center gap-2 rounded-full bg-surface pl-[6px] pr-[14px] text-[14px] font-medium text-ink lg:h-[38px] ${className}`}>
-      <img src={o.flag} alt="" className="size-[22px] rounded-full ring-2 ring-white" />
+      <img src={o.flag} alt="" className="size-[22px] rounded-full ring-2 ring-white" loading="lazy" decoding="async" />
       {o.country}
     </span>
   );
