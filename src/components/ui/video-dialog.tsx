@@ -1,14 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Play, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
 // Magic UI's HeroVideoDialog ("from-center"), playing a local mp4 instead of an iframe.
 // The modal is portalled to <body> because the thumbnail lives inside a card link, and the play button stops that link from navigating.
-export function VideoDialog({ src, poster, title, inline, className = "" }: { src: string; poster: string; title: string; inline?: boolean; className?: string }) {
+export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bare, className = "" }: { src: string; loopSrc?: string; poster: string; title: string; inline?: boolean; prefetch?: boolean; bare?: boolean; className?: string }) {
   const [open, setOpen] = useState(false);
+  // `inline` is a live "should be rolling" flag. The element is kept once mounted so scrolling back
+  // and forth does not restart the download; it just plays or rewinds and pauses.
+  // `prefetch` mounts and buffers it; `inline` starts and stops playback. Splitting the two keeps the decode
+  // off the frame where the card arrives, which is what would otherwise show up as a stutter mid-scroll.
+  const [mounted, setMounted] = useState(false);
+  const loop = useRef<HTMLVideoElement>(null);
+  if ((inline || prefetch) && !mounted) setMounted(true);
+  useEffect(() => {
+    const v = loop.current;
+    if (!v) return;
+    if (inline) void v.play().catch(() => {});
+    else v.pause();
+  }, [inline, mounted]);
 
   useEffect(() => {
     if (!open) return;
@@ -33,19 +46,20 @@ export function VideoDialog({ src, poster, title, inline, className = "" }: { sr
         }}
         className={`relative block cursor-pointer ${className}`}
       >
-        {inline ? (
-          // Muted loop behind the play button. Clicking still opens the dialog, where it plays with sound.
-          <video src={src} poster={poster} autoPlay muted loop playsInline className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" />
-        ) : (
-          <img src={poster} alt="" className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" loading="lazy" decoding="async" />
+        <img src={poster} alt="" className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" loading="lazy" decoding="async" />
+        {/* Layered over the poster rather than swapped with it, so buffering and loop restarts cannot flash through. */}
+        {mounted && (
+          <video ref={loop} src={loopSrc ?? src} poster={poster} muted loop playsInline preload="auto" disablePictureInPicture disableRemotePlayback className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" />
         )}
-        <span className="absolute inset-0 flex scale-90 items-center justify-center transition-transform duration-200 ease-out group-hover:scale-100">
-          <span className="flex size-[68px] items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
-            <span className="flex size-12 items-center justify-center rounded-full bg-ink shadow-[0_8px_20px_rgba(0,0,0,0.25)] transition-transform duration-200 ease-out group-hover:scale-110">
-              <Play className="ml-[3px] size-5 fill-white text-white" />
+        {!bare && (
+          <span className="absolute inset-0 flex scale-90 items-center justify-center transition-transform duration-200 ease-out group-hover:scale-100">
+            <span className="flex size-[68px] items-center justify-center rounded-full bg-white/20 backdrop-blur-md">
+              <span className="flex size-12 items-center justify-center rounded-full bg-ink shadow-[0_8px_20px_rgba(0,0,0,0.25)] transition-transform duration-200 ease-out group-hover:scale-110">
+                <Play className="ml-[3px] size-5 fill-white text-white" />
+              </span>
             </span>
           </span>
-        </span>
+        )}
       </button>
       {typeof document !== "undefined" &&
         createPortal(
