@@ -29,12 +29,12 @@ export default async function DestinationPage({ params }: Props) {
       <InnerHero bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" title={`Study in ${d.name}`} lead={d.overview} badge={undefined} className="[&_h1]:order-2 [&_p]:order-3" after={
         <Appear delay={0.1} className="w-full">
           <div className="aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]">
-            <img src={d.hero} alt={d.heroAlt} className="size-full object-cover" />
+            <img src={d.hero} alt={d.heroAlt} className="size-full object-cover" loading="lazy" decoding="async" />
           </div>
         </Appear>
       }>
         <div className="order-1 flex items-center gap-[10px]">
-          <span className="flex size-[38px] items-center justify-center rounded-full bg-white ring-1 ring-hairline"><img src={d.flag} alt="" className="size-5 rounded-full" /></span>
+          <span className="flex size-[38px] items-center justify-center rounded-full bg-white ring-1 ring-hairline"><img src={d.flag} alt="" className="size-5 rounded-full" loading="lazy" decoding="async" /></span>
           <Chip tone="white">Study abroad</Chip>
         </div>
       </InnerHero>
@@ -83,7 +83,7 @@ export default async function DestinationPage({ params }: Props) {
           <div className="flex flex-col gap-[30px] md:flex-row md:items-start lg:gap-[70px]">
             <Appear className="order-2 flex w-full flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 md:order-1 md:w-[517px] md:rounded-[30px] lg:w-[628px] lg:px-[60px] lg:py-[30px]">
               <div className="aspect-[1.27586] w-full overflow-clip rounded-[20px]">
-                <img src={d.card} alt={d.name} className="size-full object-cover" />
+                <img src={d.card} alt={d.name} className="size-full object-cover" loading="lazy" decoding="async" />
               </div>
             </Appear>
             <Appear delay={0.1} className="order-1 flex flex-1 flex-col items-start gap-5 md:order-2 md:gap-10">

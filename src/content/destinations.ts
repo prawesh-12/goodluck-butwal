@@ -27,8 +27,8 @@ export const destinations: Destination[] = [
     slug: "australia",
     name: "Australia",
     flag: "/images/flags/australia.svg",
-    card: "/images/destinations/australia-card-v2.jpg",
-    hero: "/images/destinations/australia-hero.jpg",
+    card: "/images/destinations/australia-card-v2.webp",
+    hero: "/images/destinations/australia-hero.webp",
     heroAlt: "Student working on a wind power project with a clipboard",
     overview: "Australian universities are among the most well-known and qualified in the world.",
     highlights: [
@@ -73,8 +73,8 @@ export const destinations: Destination[] = [
     slug: "united-kingdom",
     name: "United Kingdom",
     flag: "/images/flags/united-kingdom.svg",
-    card: "/images/destinations/united-kingdom-card-v2.jpg",
-    hero: "/images/destinations/united-kingdom-hero.jpg",
+    card: "/images/destinations/united-kingdom-card-v2.webp",
+    hero: "/images/destinations/united-kingdom-hero.webp",
     heroAlt: "Student preparing for exams at a desk full of books",
     overview: "The UK has some of the finest universities in the world.",
     highlights: [

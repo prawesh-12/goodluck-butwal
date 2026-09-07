@@ -31,7 +31,7 @@ export function CheckRow({ children, icon = img.chevron, color = "text-muted", i
   return (
     <div className="flex items-start gap-[6px]">
       <span className="flex h-[22px] items-center">
-        <img src={icon} alt="" style={{ width: iconW, height: 10 }} />
+        <img src={icon} alt="" style={{ width: iconW, height: 10 }} loading="lazy" decoding="async" />
       </span>
       <p className={cx("text-[16px] font-medium leading-[20.8px]", color)}>{children}</p>
     </div>
@@ -59,7 +59,7 @@ export function SectionBg({ src, top, bottom, soft, position = "50% 0%", childre
   const bottomFade = soft ? "bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.5)_55%,#fff_100%)]" : "bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.7)_25%,#fff_50%)]";
   return (
     <div aria-hidden className={cx("pointer-events-none absolute inset-0 z-0 overflow-clip", className)}>
-      <img src={src} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position }} />
+      <img src={src} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: position }} loading="lazy" decoding="async" />
       {top && <div className={cx(fade, "-top-[1px]", topFade)} />}
       {bottom && <div className={cx(fade, "-bottom-[1px]", bottomFade)} />}
       {children}

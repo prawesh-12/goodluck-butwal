@@ -14,7 +14,7 @@ export function Footer() {
     <footer className="relative flex flex-col items-center overflow-clip pt-[50px] md:pt-[100px]">
       <div aria-hidden className="absolute inset-0 z-0 overflow-clip">
         <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,#fff_0%,#fff_0%,rgba(255,255,255,0.3)_14%,rgba(255,255,255,0)_100%)]" />
-        <img src={img.footerBg} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 60%" }} />
+        <img src={img.footerBg} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 60%" }} loading="lazy" decoding="async" />
         {/* Bokeh along the bottom: a few soft light discs and a haze under the logo. */}
         <div className="absolute inset-x-0 bottom-0 z-[1] h-[38%] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.35)_100%)]" />
         <div className="absolute bottom-[4%] left-[8%] z-[1] size-[180px] rounded-full bg-white/50 blur-[40px]" />
@@ -27,7 +27,7 @@ export function Footer() {
         <div className="grid w-full gap-[50px] lg:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] lg:gap-[60px]">
           <Appear className="flex max-w-[420px] flex-col items-start gap-5 md:gap-6">
             <Link href="/" aria-label="Goodluck Education and Migration, home" className="block h-10">
-              <img src={gl.logo} alt="Goodluck Education and Migration" className="h-full w-auto object-contain" />
+              <img src={gl.logo} alt="Goodluck Education and Migration" className="h-full w-auto object-contain" loading="lazy" decoding="async" />
             </Link>
             <h2 className="t-h3">Ready to create your luck?</h2>
             <a href={`mailto:${company.email}`} className="t-lead font-semibold text-ink transition-colors hover:text-muted">
@@ -71,8 +71,7 @@ export function Footer() {
         src={gl.logo}
         alt=""
         aria-hidden
-        className="relative z-[1] -mb-[2px] mt-[50px] w-[min(94vw,1320px)] opacity-80 brightness-0 invert select-none md:mt-[70px]"
-      />
+        className="relative z-[1] -mb-[2px] mt-[50px] w-[min(94vw,1320px)] opacity-80 brightness-0 invert select-none md:mt-[70px]" loading="lazy" decoding="async" />
     </footer>
   );
 }

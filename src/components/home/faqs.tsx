@@ -50,7 +50,7 @@ export function FaqCta({ className = "" }: { className?: string }) {
         <div className="flex items-center pr-[10px]">
           {faces.map((m) => (
             <span key={m.slug} className="block w-[30px]">
-              <img src={m.photo} alt="" className="size-10 max-w-none rounded-full object-cover object-top" />
+              <img src={m.photo} alt="" className="size-10 max-w-none rounded-full object-cover object-top" loading="lazy" decoding="async" />
             </span>
           ))}
         </div>
