@@ -76,7 +76,6 @@ export const footerLinks = {
   Company: [
     { label: "About us", href: "/about" },
     { label: "Our team", href: "/about/team" },
-    { label: "Message from co-founders", href: "/about/message-from-co-founders" },
     { label: "Social responsibility", href: "/about/corporate-social-responsibility" },
     { label: "Careers", href: "/about/careers" },
   ],

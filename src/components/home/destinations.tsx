@@ -4,7 +4,10 @@ import { destinations } from "@/content/destinations";
 import { Appear } from "@/components/ui/appear";
 import { Badge } from "@/components/ui/bits";
 
-type Card = { slug: string; name: string; line: string; fact?: [string, string]; bg: string; flag: string; href: string };
+type Card = { slug: string; name: string; line: string; fact?: [string, string]; bg: string; pos: string; flag: string; href: string };
+
+// Where the landmark sits in each 3:2 photo, so the tall crop keeps it in frame.
+const focus: Record<string, string> = { australia: "60% 50%", "new-zealand": "40% 50%", "united-kingdom": "72% 50%" };
 
 // One verified figure per destination page, taken from the destination copy.
 const facts: Record<string, [string, string]> = {
@@ -14,39 +17,41 @@ const facts: Record<string, [string, string]> = {
 
 const fromContent = (slug: string): Card => {
   const d = destinations.find((x) => x.slug === slug)!;
-  return { slug, name: d.name, line: d.overview, fact: facts[slug], bg: d.card, flag: d.flag, href: `/study-abroad/${slug}` };
+  return { slug, name: d.name, line: d.overview, fact: facts[slug], bg: d.card, pos: focus[slug], flag: d.flag, href: `/study-abroad/${slug}` };
 };
 
 // New Zealand has no destination page on goodluck_main yet, so its card only invites an enquiry.
 export const destinationCards: Card[] = [
   fromContent("australia"),
-  { slug: "new-zealand", name: "New Zealand", line: "Ask our counsellors about studying in New Zealand.", bg: gl.newZealand, flag: "/images/flags/new-zealand.svg", href: "/contact/book-consultation" },
+  { slug: "new-zealand", name: "New Zealand", line: "Ask our counsellors about studying in New Zealand.", bg: gl.newZealand, pos: focus["new-zealand"], flag: "/images/flags/new-zealand.svg", href: "/contact/book-consultation" },
   fromContent("united-kingdom"),
 ];
 
 export function DestinationCard({ slug, phone, className = "" }: { slug: string; phone?: boolean; className?: string }) {
   const d = destinationCards.find((x) => x.slug === slug)!;
   return (
-    <Link href={d.href} className={`group flex h-full w-full flex-col gap-[6px] rounded-[10px] bg-surface p-[6px] md:rounded-[20px] ${className}`}>
-      <div className={`relative w-full overflow-clip rounded-[6px] bg-white md:rounded-[14px] ${phone ? "aspect-[16/10]" : "aspect-[4/3]"}`}>
-        <img src={d.bg} alt={d.name} className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]" />
-        <span className="absolute left-3 top-3 flex size-10 items-center justify-center rounded-full bg-white shadow-[0_4px_12px_rgba(29,29,29,0.15)]">
-          <img src={d.flag} alt="" className="size-5" />
-        </span>
+    <Link
+      href={d.href}
+      className={`group flex h-full w-full flex-col overflow-clip rounded-[20px] bg-white ring-1 ring-hairline shadow-[0_24px_50px_-32px_rgba(29,29,29,0.35)] transition-[transform,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_32px_60px_-30px_rgba(29,29,29,0.45)] md:rounded-[28px] ${className}`}
+    >
+      <div className={`relative w-full overflow-clip bg-surface ${phone ? "aspect-[16/10]" : "aspect-[4/3]"}`}>
+        <img src={d.bg} alt={d.name} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" />
       </div>
-      <div className="flex flex-1 flex-col gap-4 p-4 md:p-5">
-        <div className="flex flex-col gap-[4px]">
+      <div className="relative flex flex-1 flex-col gap-5 p-5 pt-8 md:p-6 md:pt-9">
+        <span className="absolute -top-6 left-5 flex size-12 items-center justify-center rounded-full bg-white shadow-[0_6px_16px_rgba(29,29,29,0.18)] ring-4 ring-white md:left-6">
+          <img src={d.flag} alt="" className="size-6" />
+        </span>
+        <div className="flex flex-col gap-[6px]">
           <h3 className="t-h4">{d.name}</h3>
           <p className="t-base text-muted">{d.line}</p>
         </div>
-        <div className="mt-auto flex items-end justify-between gap-4 border-t border-hairline pt-4">
+        <div className="mt-auto flex items-center justify-between gap-3">
           {d.fact ? (
-            <div className="flex flex-col items-start">
-              <p className="t-h5">{d.fact[0]}</p>
-              <p className="t-small text-muted">{d.fact[1]}</p>
-            </div>
+            <p className="t-small inline-flex h-9 items-center gap-[6px] rounded-full bg-surface px-4 text-muted">
+              <span className="font-semibold text-ink">{d.fact[0]}</span> {d.fact[1].toLowerCase()}
+            </p>
           ) : (
-            <p className="t-base font-semibold text-ink">Book a consultation</p>
+            <p className="t-small inline-flex h-9 items-center rounded-full bg-surface px-4 font-semibold text-ink">Book a consultation</p>
           )}
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ink transition-transform duration-300 group-hover:translate-x-1">
             <img src={img.arrow} alt="" className="h-2 w-3 invert" />

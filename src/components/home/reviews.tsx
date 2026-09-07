@@ -16,7 +16,7 @@ export function ReviewCard({ r, className = "" }: { r: (typeof reviews)[number];
     <div className={`flex flex-col items-start justify-between overflow-hidden rounded-[10px] bg-white p-5 md:rounded-[30px] md:p-10 ${className}`}>
       <div className="flex flex-col items-start gap-4 pb-10">
         <img src={img.stars5} alt="Five stars" className="h-[18px] w-[109px]" />
-        <p className="t-body text-ink">{r.quote}</p>
+        <p className="t-body line-clamp-7 text-ink">{r.quote}</p>
       </div>
       <div className="flex items-start gap-4">
         <span className="flex size-[50px] shrink-0 items-center justify-center rounded-full bg-surface font-display text-[20px] font-semibold text-ink">{r.name[0]}</span>
@@ -67,9 +67,9 @@ export function Reviews() {
             ))}
           </Appear>
           <Appear delay={0.2} className="hidden w-full md:block">
-            <Ticker gap={20} speed={70} align="end" className="w-full !overflow-visible md:[--gap-override:20px] lg:[--gap-override:50px]">
+            <Ticker gap={20} speed={70} className="w-full !overflow-visible md:[--gap-override:20px] lg:[--gap-override:50px]">
               {reviews.map((r) => (
-                <ReviewCard key={r.name} r={r} className="min-h-[300px] w-[400px] shrink-0" />
+                <ReviewCard key={r.name} r={r} className="h-[380px] w-[400px] shrink-0" />
               ))}
             </Ticker>
           </Appear>
