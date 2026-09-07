@@ -16,7 +16,7 @@ export default function SuccessStoriesPage() {
         <div className="grid w-full grid-cols-2 gap-[10px] md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
           {successStories.map((s, i) => (
             <Appear key={s.image} delay={0.05 * (i % 4)} className="aspect-square overflow-clip rounded-[10px] bg-surface ring-1 ring-hairline md:rounded-[20px]">
-              <img src={s.image} alt={s.alt} className="size-full object-cover" />
+              <img src={s.image} alt={s.alt} className="size-full object-cover" loading="lazy" decoding="async" />
             </Appear>
           ))}
         </div>
@@ -30,7 +30,7 @@ export default function SuccessStoriesPage() {
                 <h2 className="t-h2 max-w-[719px]">What our clients say</h2>
                 <div className="flex flex-wrap items-center gap-[10px] md:gap-5">
                   <div className="flex items-start gap-[6px]">
-                    <span className="flex h-[22px] items-center"><img src={img.star} alt="" style={{ width: 19, height: 18 }} /></span>
+                    <span className="flex h-[22px] items-center"><img src={img.star} alt="" style={{ width: 19, height: 18 }} loading="lazy" decoding="async" /></span>
                     <p className="t-base text-muted">{googleRating.score} Google rating</p>
                   </div>
                   <span aria-hidden className="h-[22px] w-px bg-ink opacity-30" />

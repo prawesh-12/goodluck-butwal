@@ -25,7 +25,7 @@ function Orbit({ radius, icon, box }: { radius: number; icon: number; box: numbe
           const y = box / 2 - radius * Math.cos(rad) - icon / 2;
           return (
             <span key={a} className="animate-orbit-back absolute flex items-center justify-center overflow-clip rounded-full bg-white p-3 shadow-[0_8px_20px_-8px_rgba(29,29,29,0.25)] ring-1 ring-hairline" style={{ left: x, top: y, width: icon, height: icon }}>
-              <img src={ring[i]} alt="" className="size-full object-contain" />
+              <img src={ring[i]} alt="" className="size-full object-contain" loading="lazy" decoding="async" />
             </span>
           );
         })}
@@ -64,11 +64,11 @@ export function Offices() {
               <PillButton href="/contact/book-consultation">Book a consultation</PillButton>
             </div>
             <div className="relative flex flex-col items-center gap-4 md:items-end">
-              <img src={gl.plane} alt="" className="animate-float w-full max-w-[520px] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)]" />
+              <img src={gl.plane} alt="" className="animate-float w-full max-w-[520px] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)]" loading="lazy" decoding="async" />
               <p className="flex items-center gap-[10px] rounded-full bg-white/10 py-[6px] pl-[6px] pr-4 text-[14px] font-medium text-white/85 ring-1 ring-inset ring-white/15 backdrop-blur-[6px]">
                 <span className="flex items-center">
                   {flags.map((f, i) => (
-                    <img key={f} src={f} alt="" className={`size-[26px] rounded-full ring-2 ring-[#1a1a1a] ${i ? "-ml-2" : ""}`} />
+                    <img key={f} src={f} alt="" className={`size-[26px] rounded-full ring-2 ring-[#1a1a1a] ${i ? "-ml-2" : ""}`} loading="lazy" decoding="async" />
                   ))}
                 </span>
                 Australia, New Zealand and the UK
@@ -82,14 +82,14 @@ export function Offices() {
               <span className="relative flex size-20 items-center justify-center rounded-full bg-white shadow-[0_12px_30px_rgba(29,29,29,0.18)] md:size-[100px] lg:size-[130px]">
                 <span aria-hidden className="absolute -inset-4 rounded-full ring-1 ring-ink/10 md:-inset-6" />
                 <span aria-hidden className="absolute -inset-8 rounded-full ring-1 ring-ink/[0.06] md:-inset-12" />
-                <img src={gl.mark} alt="" className="size-[55%] object-contain" />
+                <img src={gl.mark} alt="" className="size-[55%] object-contain" loading="lazy" decoding="async" />
               </span>
               <h3 className="t-h4 max-w-[218px] text-center md:max-w-none">
                 Official representative of <span className="text-blue-deep">100+</span> colleges, universities and TAFE facilities
               </h3>
             </div>
           </div>
-          <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-0 z-[1] w-[calc(100%+20px)] max-w-none object-contain object-bottom" />
+          <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-0 z-[1] w-[calc(100%+20px)] max-w-none object-contain object-bottom" loading="lazy" decoding="async" />
         </Appear>
       </div>
     </section>

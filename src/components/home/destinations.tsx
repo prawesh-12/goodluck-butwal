@@ -35,11 +35,11 @@ export function DestinationCard({ slug, phone, className = "" }: { slug: string;
       className={`group flex h-full w-full flex-col overflow-clip rounded-[20px] bg-white ring-1 ring-hairline shadow-[0_24px_50px_-32px_rgba(29,29,29,0.35)] md:rounded-[28px] ${className}`}
     >
       <div className={`relative w-full overflow-clip bg-surface ${phone ? "aspect-[16/10]" : "aspect-[4/3]"}`}>
-        <img src={d.bg} alt={d.name} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover" />
+        <img src={d.bg} alt={d.name} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover" loading="lazy" decoding="async" />
       </div>
       <div className="relative flex flex-1 flex-col gap-5 p-5 pt-8 md:p-6 md:pt-9">
         <span className="absolute -top-6 left-5 flex size-12 items-center justify-center rounded-full bg-white shadow-[0_6px_16px_rgba(29,29,29,0.18)] ring-4 ring-white md:left-6">
-          <img src={d.flag} alt="" className="size-6 rounded-full" />
+          <img src={d.flag} alt="" className="size-6 rounded-full" loading="lazy" decoding="async" />
         </span>
         <div className="flex flex-col gap-[6px]">
           <h3 className="t-h4">{d.name}</h3>
@@ -54,7 +54,7 @@ export function DestinationCard({ slug, phone, className = "" }: { slug: string;
             <p className="t-small inline-flex h-9 items-center rounded-full bg-surface px-4 font-semibold text-ink">Book a consultation</p>
           )}
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ink transition-transform duration-300 group-hover:translate-x-1">
-            <img src={img.arrow} alt="" className="h-2 w-3 invert" />
+            <img src={img.arrow} alt="" className="h-2 w-3 invert" loading="lazy" decoding="async" />
           </span>
         </div>
       </div>

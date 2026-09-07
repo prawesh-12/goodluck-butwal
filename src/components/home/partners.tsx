@@ -20,7 +20,7 @@ export function Partners({ tone = "default", className = "" }: { tone?: "default
           </div>
           <Ticker gap={50} speed={120} className="w-full [--gap-override:30px] md:[--gap-override:50px]">
             {partnerLogos.map((src) => (
-              <img key={src} src={src} alt="Partner logo" className="h-9 w-auto max-w-[120px] shrink-0 object-contain" />
+              <img key={src} src={src} alt="Partner logo" className="h-9 w-auto max-w-[120px] shrink-0 object-contain" loading="lazy" decoding="async" />
             ))}
           </Ticker>
           <div aria-hidden className={`${line} absolute inset-x-0 bottom-0 h-px`} />
