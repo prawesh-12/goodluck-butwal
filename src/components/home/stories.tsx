@@ -14,7 +14,7 @@ function StoryCard({ s, tilt }: { s: (typeof successStories)[number]; tilt: numb
       className="shrink-0 rounded-[18px] bg-white p-2 shadow-[0_18px_40px_-18px_rgba(29,29,29,0.25)] ring-1 ring-hairline transition-transform duration-300 hover:-translate-y-2 hover:!rotate-0 md:rounded-[22px] md:p-[10px]"
     >
       <div className="size-[240px] overflow-clip rounded-[12px] bg-surface md:size-[320px] md:rounded-[14px] lg:size-[380px] lg:rounded-[16px]">
-        <img src={s.image} alt={s.alt} className="size-full object-cover" />
+        <img src={s.image} alt={s.alt} className="size-full object-cover" loading="lazy" decoding="async" />
       </div>
     </div>
   );
@@ -35,7 +35,7 @@ export function Stories() {
             <div className="flex items-center gap-4 rounded-[20px] bg-white p-4 ring-1 ring-hairline md:gap-5 md:rounded-[24px] md:p-5">
               <span className="t-stat">{googleRating.score}</span>
               <div className="flex flex-col gap-[6px]">
-                <img src={img.stars5} alt="Five stars" className="h-[16px] w-[97px]" />
+                <img src={img.stars5} alt="Five stars" className="h-[16px] w-[97px]" loading="lazy" decoding="async" />
                 <p className="t-small text-muted">from {googleRating.count} Google reviews</p>
               </div>
             </div>

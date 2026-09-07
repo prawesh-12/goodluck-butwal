@@ -12,7 +12,7 @@ export function Artwork({ s, className, pad }: { s: Service; className: string; 
     <VideoDialog src={s.video} poster={s.poster} title={s.title} className={className} />
   ) : (
     <div className={`relative ${className}`}>
-      <img src={s.image} alt={s.imageAlt} className={`absolute inset-0 size-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.04] ${pad}`} />
+      <img src={s.image} alt={s.imageAlt} className={`absolute inset-0 size-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.04] ${pad}`} loading="lazy" decoding="async" />
     </div>
   );
 }
@@ -34,7 +34,7 @@ export function ServiceCard({ slug, label, title, line, className = "" }: { slug
           </div>
         </div>
         <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ink transition-transform duration-300 group-hover:translate-x-1">
-          <img src={img.arrow} alt="" className="h-2 w-3 invert" />
+          <img src={img.arrow} alt="" className="h-2 w-3 invert" loading="lazy" decoding="async" />
         </span>
       </div>
     </Link>
@@ -57,7 +57,7 @@ function Tile({ s, icon, t, className = "" }: { s: Service; icon: string; t: Ton
       <div className="flex items-start justify-between gap-4">
         <span className={`inline-flex h-7 items-center rounded-full px-[14px] pb-[6px] pt-1 text-[14px] font-medium leading-[18.2px] ${c.chip}`}>{s.label}</span>
         <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${c.icon}`}>
-          <img src={icon} alt="" className={`size-5 object-contain ${t === "dark" ? "invert" : ""}`} />
+          <img src={icon} alt="" className={`size-5 object-contain ${t === "dark" ? "invert" : ""}`} loading="lazy" decoding="async" />
         </span>
       </div>
       <Artwork s={s} pad="p-3" className="aspect-[16/9] w-full overflow-clip rounded-[10px] bg-white md:rounded-[16px]" />
@@ -67,7 +67,7 @@ function Tile({ s, icon, t, className = "" }: { s: Service; icon: string; t: Ton
           <p className={`t-body ${c.text}`}>{s.line}</p>
         </div>
         <span className={`flex size-10 shrink-0 items-center justify-center rounded-full transition-transform duration-300 group-hover:translate-x-1 ${c.arrow}`}>
-          <img src={img.arrow} alt="" className={`h-2 w-3 ${c.arrowImg}`} />
+          <img src={img.arrow} alt="" className={`h-2 w-3 ${c.arrowImg}`} loading="lazy" decoding="async" />
         </span>
       </div>
     </Link>

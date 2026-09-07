@@ -16,7 +16,7 @@ export default function BookConsultationPage() {
         <Appear y={10} delay={0.1} duration={0.6} className="relative flex w-full flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 pb-[120px] md:rounded-[30px] md:p-[30px] md:pb-20 lg:p-10 lg:pb-[120px]">
           <div className="relative z-[2] w-full"><BookingForm /></div>
           <p className="relative z-[2] t-small text-muted">Questions? Call <a href={au.tel} className="font-semibold text-ink underline underline-offset-4">{au.phone}</a> for help.</p>
-          <img aria-hidden src={img.pricingDeco} alt="" className="pointer-events-none absolute bottom-[-50px] right-[-30px] z-[1] w-[480px] max-w-none object-contain object-top md:w-[632px]" />
+          <img aria-hidden src={img.pricingDeco} alt="" className="pointer-events-none absolute bottom-[-50px] right-[-30px] z-[1] w-[480px] max-w-none object-contain object-top md:w-[632px]" loading="lazy" decoding="async" />
         </Appear>
       } />
       <Partners className="pb-[30px] pt-[60px] md:pt-20 lg:pt-[100px]" />

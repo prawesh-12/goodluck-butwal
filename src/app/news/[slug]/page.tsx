@@ -31,7 +31,7 @@ export default async function ArticlePage({ params }: Props) {
         <div className="container-x">
           <div className="flex flex-col items-center gap-[50px]">
             <Appear y={10} duration={0.6} className="aspect-[1533/458] w-full overflow-clip rounded-[10px] md:rounded-[20px]">
-              <img src={a.image} alt={a.title} className="size-full object-cover" />
+              <img src={a.image} alt={a.title} className="size-full object-cover" loading="lazy" decoding="async" />
             </Appear>
             <div className="article article-scroll w-full max-w-[800px]" dangerouslySetInnerHTML={{ __html: a.html }} />
             <div className="w-full max-w-[800px]"><FaqCta /></div>
