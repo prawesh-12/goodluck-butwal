@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { easeInOut, motion, useScroll, useTransform } from "motion/react";
+import { easeInOut, motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { gl, img } from "@/lib/assets";
 import { googleRating } from "@/content/stories";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton, PillButton } from "@/components/ui/button";
+import { VideoDialog } from "@/components/ui/video-dialog";
 
 const destinationFlags = [
   { name: "Australia", flag: "/images/flags/australia.svg" },
@@ -20,27 +21,53 @@ export function Hero() {
   // (fitted from 1262 to 2100px: scale 1 + 3.665e-7 * (H + 1264) per scrolled px, sinking 1398px per unit of scale).
   const section = useRef<HTMLElement>(null);
   const [height, setHeight] = useState(1575);
+  // The film card grows from its slot in the sky to fill the viewport over the first PIN px of scroll,
+  // held in place by translating it down at the scroll rate. Measured off an untransformed wrapper.
+  const film = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  const [grow, setGrow] = useState({ lift: 0, scale: 1 });
   useEffect(() => {
-    const measure = () => setHeight(section.current?.offsetHeight ?? 1575);
+    const measure = () => {
+      setHeight(section.current?.offsetHeight ?? 1575);
+      const el = film.current;
+      if (!el || innerWidth < 1200) return setGrow({ lift: 0, scale: 1 });
+      // offsetTop, not a bounding rect: the entrance animation still has a transform on an ancestor.
+      let top = 0;
+      for (let node: HTMLElement | null = el; node && node !== section.current; node = node.offsetParent as HTMLElement | null) top += node.offsetTop;
+      const w = el.offsetWidth;
+      const h = el.offsetHeight;
+      setGrow({ lift: innerHeight / 2 - h / 2 - top, scale: Math.max(innerWidth / w, innerHeight / h) * 1.03 });
+    };
     measure();
     addEventListener("resize", measure);
-    return () => removeEventListener("resize", measure);
+    addEventListener("load", measure);
+    return () => {
+      removeEventListener("resize", measure);
+      removeEventListener("load", measure);
+    };
   }, []);
   const rate = 3.665e-7 * (height + 1264);
   const grassScale = useTransform(scrollY, (v) => 1 + v * rate);
   const grassY = useTransform(scrollY, (v) => 1398 * v * rate);
   // The meadow hangs 680px above 98% of the section height, so on a short screen 175vh would lift it over the copy.
-  // The min-height keeps its skyline 336px from the top: (680 + 336 + meadow height) / 0.98, where the meadow is
-  // max(1640px, 112vw) wide at a 698/2172 aspect. That is 1575px on a 1440x900 screen, the same as before.
+  // The min-height keeps its skyline 568px from the top, low enough that only the film card's bottom third sits
+  // behind it: (680 + 568 + meadow height) / 0.98, the meadow being max(1640px, 112vw) wide at a 698/2172 aspect.
+  const PIN = 450;
+  const filmTransform = useTransform(scrollY, (v) => {
+    if (reduce || grow.scale === 1) return "none";
+    const p = Math.min(v / PIN, 1);
+    return `translateY(${Math.min(v, PIN) + grow.lift * p}px) scale(${1 + (grow.scale - 1) * p})`;
+  });
+  const filmRadius = useTransform(scrollY, [0, PIN], [24, 0], { clamp: true });
 
   return (
-    <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
+    <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1248px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
       <div aria-hidden className="absolute inset-0 z-0 flex items-center justify-center overflow-clip">
         <img src={img.heroSky} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
       </div>
 
       <div className="container-x relative z-[1]">
-        <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[120px]">
+        <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[60px]">
           <div className="flex w-full flex-col items-center gap-[30px] md:gap-10">
             <div className="flex flex-col items-center gap-5">
               <div className="flex flex-wrap items-center justify-center gap-x-[10px] gap-y-0 md:gap-[30px]">
@@ -88,6 +115,17 @@ export function Hero() {
               </span>
             </Appear>
           </div>
+
+          <Appear y={30} delay={0.7} className="w-full">
+            <div ref={film} className="mx-auto w-full max-w-[860px]">
+              <motion.div
+                style={{ transform: filmTransform, borderRadius: filmRadius }}
+                className="group relative w-full overflow-hidden bg-ink shadow-[0_40px_90px_-40px_rgba(29,29,29,0.55)] ring-1 ring-white/50 will-change-transform"
+              >
+                <VideoDialog src={gl.film} poster={gl.filmPoster} title="Inside Goodluck Education and Migration" className="aspect-video w-full" />
+              </motion.div>
+            </div>
+          </Appear>
         </div>
       </div>
 
