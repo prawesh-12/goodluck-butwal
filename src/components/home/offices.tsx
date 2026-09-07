@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/bits";
 const flags = ["/images/flags/australia.svg", "/images/flags/new-zealand.svg", "/images/flags/united-kingdom.svg"];
 const pathways = ["Entering & leaving from country", "Visas", "Country citizenship", "Settling in country", "Help & support"];
 
-// Sixteen partner logos fill the whole ring, 22.5° apart, so the slow orbit never shows a gap.
-// The first logo is skipped: it is a solid navy square and fights the white circles.
+// Sixteen partner logos fill the whole ring, 22.5° apart, so the orbit never shows a gap.
+// partner-04 (Canada) is skipped: a solid navy square that fights the white circles.
 const angles = Array.from({ length: 16 }, (_, i) => i * 22.5 - 90);
-const ring = partnerLogos.slice(1, 17);
+const ring = partnerLogos.filter((l) => !l.endsWith("partner-04.png")).slice(0, 16);
 
 function Orbit({ radius, icon, box }: { radius: number; icon: number; box: number }) {
   return (

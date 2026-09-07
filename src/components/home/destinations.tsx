@@ -32,14 +32,14 @@ export function DestinationCard({ slug, phone, className = "" }: { slug: string;
   return (
     <Link
       href={d.href}
-      className={`group flex h-full w-full flex-col overflow-clip rounded-[20px] bg-white ring-1 ring-hairline shadow-[0_24px_50px_-32px_rgba(29,29,29,0.35)] transition-[transform,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_32px_60px_-30px_rgba(29,29,29,0.45)] md:rounded-[28px] ${className}`}
+      className={`group flex h-full w-full flex-col overflow-clip rounded-[20px] bg-white ring-1 ring-hairline shadow-[0_24px_50px_-32px_rgba(29,29,29,0.35)] md:rounded-[28px] ${className}`}
     >
       <div className={`relative w-full overflow-clip bg-surface ${phone ? "aspect-[16/10]" : "aspect-[4/3]"}`}>
-        <img src={d.bg} alt={d.name} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" />
+        <img src={d.bg} alt={d.name} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover" />
       </div>
       <div className="relative flex flex-1 flex-col gap-5 p-5 pt-8 md:p-6 md:pt-9">
         <span className="absolute -top-6 left-5 flex size-12 items-center justify-center rounded-full bg-white shadow-[0_6px_16px_rgba(29,29,29,0.18)] ring-4 ring-white md:left-6">
-          <img src={d.flag} alt="" className="size-6" />
+          <img src={d.flag} alt="" className="size-6 rounded-full" />
         </span>
         <div className="flex flex-col gap-[6px]">
           <h3 className="t-h4">{d.name}</h3>

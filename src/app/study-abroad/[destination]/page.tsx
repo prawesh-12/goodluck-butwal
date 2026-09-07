@@ -34,7 +34,7 @@ export default async function DestinationPage({ params }: Props) {
         </Appear>
       }>
         <div className="order-1 flex items-center gap-[10px]">
-          <span className="flex size-[38px] items-center justify-center rounded-full bg-white ring-1 ring-hairline"><img src={d.flag} alt="" className="size-5" /></span>
+          <span className="flex size-[38px] items-center justify-center rounded-full bg-white ring-1 ring-hairline"><img src={d.flag} alt="" className="size-5 rounded-full" /></span>
           <Chip tone="white">Study abroad</Chip>
         </div>
       </InnerHero>
