@@ -6,7 +6,7 @@ import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Chip } from "@/components/ui/bits";
 import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
-import { ServiceCard } from "@/components/home/services";
+import { Artwork, ServiceCard } from "@/components/home/services";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -26,10 +26,8 @@ export default async function ServicePage({ params }: Props) {
   return (
     <>
       <InnerHero badge={s.label} badgeTone="chip-white" title={s.title} lead={s.intro} bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" after={
-        <Appear delay={0.1} className="w-full">
-          <div className="aspect-[4/3] w-full overflow-clip rounded-[10px] bg-white ring-1 ring-hairline md:aspect-[2/1] md:rounded-[30px]">
-            <img src={s.image} alt={s.imageAlt} className="size-full object-contain p-6 md:p-10" />
-          </div>
+        <Appear delay={0.1} className="group w-full">
+          <Artwork s={s} pad="p-6 md:p-10" className="mx-auto aspect-video w-full max-w-[760px] overflow-clip rounded-[10px] bg-white ring-1 ring-hairline md:rounded-[24px]" />
         </Appear>
       } />
 
