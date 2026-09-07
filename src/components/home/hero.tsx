@@ -21,23 +21,36 @@ export function Hero() {
   // (fitted from 1262 to 2100px: scale 1 + 3.665e-7 * (H + 1264) per scrolled px, sinking 1398px per unit of scale).
   const section = useRef<HTMLElement>(null);
   const [height, setHeight] = useState(1575);
-  // The film card grows from its slot in the sky to fill the viewport over the first PIN px of scroll,
-  // held in place by translating it down at the scroll rate. Measured off an untransformed wrapper.
+  // The film card scrolls up the page with everything else while it grows. Only once it lands centred does
+  // it hold, which is why nothing resists the scroll on the way in or out. Measured off an untransformed wrapper.
   const film = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
-  const [grow, setGrow] = useState({ lift: 0, scale: 1 });
+  const [grow, setGrow] = useState({ rest: 1, tuck: 0, pin: 0 });
   useEffect(() => {
     const measure = () => {
       setHeight(section.current?.offsetHeight ?? 1575);
       const el = film.current;
-      if (!el || innerWidth < 1200) return setGrow({ lift: 0, scale: 1 });
+      if (!el || innerWidth < 1200) return setGrow({ rest: 1, tuck: 0, pin: 0 });
       // offsetTop, not a bounding rect: the entrance animation still has a transform on an ancestor.
       let top = 0;
       for (let node: HTMLElement | null = el; node && node !== section.current; node = node.offsetParent as HTMLElement | null) top += node.offsetTop;
       const w = el.offsetWidth;
       const h = el.offsetHeight;
-      // Grow to a comfortable reading width rather than full bleed, and centre it in the viewport.
-      setGrow({ lift: innerHeight / 2 - h / 2 - top, scale: Math.min(1100, innerWidth - 120) / w });
+      // Laid out at full size and scaled DOWN at rest, so the video is never upscaled and stays sharp.
+      const rest = Math.min(440, w) / w;
+      // Where the skyline turns solid, from the same geometry the layout uses: the meadow is max(1640, 112vw)
+      // wide at a 698/2172 aspect, hangs 680px above 98% of the section, and fills in by 77% of its height.
+      const meadow = Math.max(1640, innerWidth * 1.12) * 0.32136;
+      const roof = 0.98 * (section.current?.offsetHeight ?? 0) - 680 - meadow + meadow * 0.77;
+      // Follow the roofline, but never push the card past the fold on a very wide screen where the
+      // buildings themselves sit below it.
+      const bottom = Math.min(roof + 40, innerHeight - 40);
+      // Offset from the card's layout centre to where the small card rests. Held flat, never ramped away:
+      // ramping it back to zero made the card crawl up at half the scroll speed with its bottom edge nailed
+      // down, which reads as being stretched open rather than moving.
+      const tuck = bottom - (h * rest) / 2 - top - h / 2;
+      // The scroll at which the page carries the resting card's centre to the middle of the screen.
+      setGrow({ rest, tuck, pin: Math.max(1, top + h / 2 + tuck - innerHeight / 2) });
     };
     measure();
     addEventListener("resize", measure);
@@ -53,30 +66,40 @@ export function Hero() {
   // The meadow hangs 680px above 98% of the section height, so on a short screen 175vh would lift it over the copy.
   // The min-height keeps its skyline 568px from the top, low enough that only the film card's bottom third sits
   // behind it: (680 + 568 + meadow height) / 0.98, the meadow being max(1640px, 112vw) wide at a 698/2172 aspect.
-  // The card grows over the first GROW px, then holds in the middle of the screen until HOLD, long enough
-  // for the buildings to fade and the harbour behind them to scroll up into frame.
-  const GROW = 340;
-  const HOLD = 700;
-  const filmTransform = useTransform(scrollY, (v) => {
-    if (reduce || grow.scale === 1) return "none";
-    const p = Math.min(v / GROW, 1);
-    return `translateY(${Math.min(v, HOLD) + grow.lift * p}px) scale(${1 + (grow.scale - 1) * p})`;
+  // Growth settles soon after the card parks, so its bottom edge stops descending early. The hold ends well
+  // before the hero's bottom fade rises to meet it, otherwise the card washes out into the white.
+  const GROWTH = 300;
+  const HOLD = 600;
+  // Transform only, and linear against scroll: the user is driving this, so easing it makes the card feel
+  // like it is dragging behind the input. The radius is a fixed class, since repainting a layer that holds
+  // a video every frame is what flickers.
+  const filmTransform = useTransform(() => {
+    if (reduce || grow.rest === 1) return "none";
+    const v = scrollY.get();
+    const y = grow.tuck + Math.max(0, Math.min(v, HOLD) - grow.pin);
+    const p = Math.min(v / GROWTH, 1);
+    return `translateY(${y}px) scale(${grow.rest + (1 - grow.rest) * p})`;
   });
-  const filmRadius = useTransform(scrollY, [0, GROW], [24, 18], { clamp: true });
-  // The loop is desktop-only and mounts on the first scroll, so nobody downloads it just by landing here.
+  // Desktop only, and only once the card has finished growing: a film cutting scenes while the card is
+  // still being scaled reads as flicker.
   const [rolling, setRolling] = useState(false);
+  const [warm, setWarm] = useState(false);
   useMotionValueEvent(scrollY, "change", (v) => {
-    if (v > 100 && grow.scale > 1 && !reduce) setRolling(true);
+    const on = grow.rest < 1 && !reduce;
+    // Start buffering as soon as the page moves, but only play once the card is parked at full size, so the
+    // file is already decoded by the time anyone sees it move.
+    if (on && v > 60) setWarm(true);
+    setRolling(on && v >= GROWTH && v <= HOLD);
   });
 
   return (
-    <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1248px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
+    <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
       <div aria-hidden className="absolute inset-0 z-0 flex items-center justify-center overflow-clip">
         <img src={img.heroSky} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
       </div>
 
       <div className="container-x relative z-[1]">
-        <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[60px]">
+        <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-5">
           <div className="flex w-full flex-col items-center gap-[30px] md:gap-10">
             <div className="flex flex-col items-center gap-5">
               <div className="flex flex-wrap items-center justify-center gap-x-[10px] gap-y-0 md:gap-[30px]">
@@ -126,12 +149,12 @@ export function Hero() {
           </div>
 
           <Appear y={30} delay={0.7} className="w-full">
-            <div ref={film} className="mx-auto w-full max-w-[860px]">
+            <div ref={film} className="mx-auto w-full max-w-[560px] lg:max-w-[1100px]">
               <motion.div
-                style={{ transform: filmTransform, borderRadius: filmRadius }}
-                className="group relative w-full overflow-hidden bg-ink shadow-[0_40px_90px_-40px_rgba(29,29,29,0.55)] ring-1 ring-white/50 will-change-transform"
+                style={{ transform: filmTransform }}
+                className="group relative w-full overflow-hidden rounded-[22px] bg-ink shadow-[0_40px_90px_-40px_rgba(29,29,29,0.55)] ring-1 ring-white/50 will-change-transform"
               >
-                <VideoDialog src={gl.film} poster={gl.filmPoster} title="Inside Goodluck Education and Migration" inline={rolling} className="aspect-video w-full" />
+                <VideoDialog src={gl.film} loopSrc={gl.filmLoop} poster={gl.filmPoster} title="Inside Goodluck Education and Migration" inline={rolling} prefetch={warm} bare className="aspect-video w-full" />
               </motion.div>
             </div>
           </Appear>
