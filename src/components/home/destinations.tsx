@@ -30,28 +30,31 @@ export const destinationCards: Card[] = [
 export function DestinationCard({ slug, phone, className = "" }: { slug: string; phone?: boolean; className?: string }) {
   const d = destinationCards.find((x) => x.slug === slug)!;
   return (
-    <Link href={d.href} className={`group relative block w-full overflow-clip rounded-[16px] bg-surface md:rounded-[24px] ${phone ? "aspect-square" : "aspect-[4/5]"} ${className}`}>
-      <img src={d.bg} alt={d.name} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" />
-      <div aria-hidden className="absolute inset-x-0 bottom-0 h-[50%] bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.35)_100%)]" />
-      <span className="absolute left-4 top-4 flex size-10 items-center justify-center rounded-full bg-white shadow-[0_4px_12px_rgba(29,29,29,0.15)]">
-        <img src={d.flag} alt="" className="size-5" />
-      </span>
-      <div className="absolute inset-x-3 bottom-3 flex flex-col gap-4 rounded-[14px] bg-white/15 p-4 ring-1 ring-inset ring-white/30 backdrop-blur-[14px] md:inset-x-4 md:bottom-4 md:rounded-[18px] md:p-5">
-        <div className="flex flex-col gap-1">
-          <h3 className="t-h4 text-white">{d.name}</h3>
-          <p className="t-base text-white/85">{d.line}</p>
+    <Link
+      href={d.href}
+      className={`group flex h-full w-full flex-col overflow-clip rounded-[20px] bg-white ring-1 ring-hairline shadow-[0_24px_50px_-32px_rgba(29,29,29,0.35)] transition-[transform,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_32px_60px_-30px_rgba(29,29,29,0.45)] md:rounded-[28px] ${className}`}
+    >
+      <div className={`relative w-full overflow-clip bg-surface ${phone ? "aspect-[16/10]" : "aspect-[4/3]"}`}>
+        <img src={d.bg} alt={d.name} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" />
+      </div>
+      <div className="relative flex flex-1 flex-col gap-5 p-5 pt-8 md:p-6 md:pt-9">
+        <span className="absolute -top-6 left-5 flex size-12 items-center justify-center rounded-full bg-white shadow-[0_6px_16px_rgba(29,29,29,0.18)] ring-4 ring-white md:left-6">
+          <img src={d.flag} alt="" className="size-6" />
+        </span>
+        <div className="flex flex-col gap-[6px]">
+          <h3 className="t-h4">{d.name}</h3>
+          <p className="t-base text-muted">{d.line}</p>
         </div>
-        <div className="flex items-center justify-between gap-3 border-t border-white/25 pt-4">
+        <div className="mt-auto flex items-center justify-between gap-3">
           {d.fact ? (
-            <div className="flex min-w-0 flex-col">
-              <p className="t-base font-semibold text-white">{d.fact[0]}</p>
-              <p className="t-small truncate text-white/75">{d.fact[1]}</p>
-            </div>
+            <p className="t-small inline-flex h-9 items-center gap-[6px] rounded-full bg-surface px-4 text-muted">
+              <span className="font-semibold text-ink">{d.fact[0]}</span> {d.fact[1].toLowerCase()}
+            </p>
           ) : (
-            <p className="t-base truncate font-semibold text-white">Book a consultation</p>
+            <p className="t-small inline-flex h-9 items-center rounded-full bg-surface px-4 font-semibold text-ink">Book a consultation</p>
           )}
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white transition-transform duration-300 group-hover:translate-x-1">
-            <img src={img.arrow} alt="" className="h-2 w-3" />
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ink transition-transform duration-300 group-hover:translate-x-1">
+            <img src={img.arrow} alt="" className="h-2 w-3 invert" />
           </span>
         </div>
       </div>

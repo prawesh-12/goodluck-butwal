@@ -101,8 +101,10 @@ export function Hero() {
 
       <motion.div aria-hidden style={{ opacity: grass }} className="pointer-events-none absolute inset-0 z-[2] hidden flex-col items-center overflow-clip lg:flex">
         <Appear y={260} delay={0.5} duration={1.6} className="flex h-[98%] w-full items-end justify-center overflow-clip pb-[680px]">
-          <motion.div style={{ scale: grassScale, y: grassY }} className="w-[112%] min-w-[1640px] max-w-none shrink-0">
+          <motion.div style={{ scale: grassScale, y: grassY }} className="relative w-[112%] min-w-[1640px] max-w-none shrink-0">
             <img src={gl.heroMeadow} alt="" className="w-full max-w-none" />
+            {/* Cloud band over the cutout's lower edge so it dissolves into mist instead of showing the sky behind it. */}
+            <div aria-hidden className="absolute inset-x-0 -bottom-[220px] h-[62%] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.85)_42%,rgba(255,255,255,0.85)_62%,rgba(255,255,255,0)_100%)]" />
           </motion.div>
         </Appear>
       </motion.div>

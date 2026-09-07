@@ -7,6 +7,7 @@ export type Service = {
   intro: string;
   image: string;
   imageAlt: string;
+  reel?: string; // Instagram reel from @goodluck.butwal, played in the card
   stepsTitle: string;
   steps: { title: string; line: string }[];
   listTitle?: string;
@@ -17,6 +18,7 @@ export type Service = {
 export const services: Service[] = [
   {
     slug: "education-counselling",
+    reel: "https://www.instagram.com/reel/DWjHjyniWZQ/embed/",
     title: "Education Counselling",
     label: "Study",
     line: "Course selection and admission counselling.",
@@ -45,6 +47,7 @@ export const services: Service[] = [
   },
   {
     slug: "visa-guidance",
+    reel: "https://www.instagram.com/reel/DccwaOXDQdZ/embed/",
     title: "Visa Guidance",
     label: "Visa",
     line: "Consultation, documents, application and follow-up.",
@@ -65,6 +68,7 @@ export const services: Service[] = [
   },
   {
     slug: "scholarship-guidance",
+    reel: "https://www.instagram.com/reel/DX0beurCXsV/embed/",
     title: "Scholarship Guidance",
     label: "Funding",
     line: "A step-by-step guide to finding and applying for scholarships.",
@@ -97,6 +101,7 @@ export const services: Service[] = [
   },
   {
     slug: "ielts-coaching",
+    reel: "https://www.instagram.com/reel/DWWT3ARDrxg/embed/",
     title: "IELTS Coaching",
     label: "Test preparation",
     line: "Practice tests, study materials and personalised coaching.",

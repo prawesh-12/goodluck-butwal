@@ -1,17 +1,28 @@
 import Link from "next/link";
 import { img } from "@/lib/assets";
-import { services } from "@/content/services";
+import { serviceBySlug, services } from "@/content/services";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, Chip } from "@/components/ui/bits";
+import { VideoDialog } from "@/components/ui/video-dialog";
+
+// White frame with the service artwork. When the service has a reel the frame doubles as the play thumbnail.
+function Artwork({ image, imageAlt, reel, title, className, pad }: { image: string; imageAlt: string; reel?: string; title: string; className: string; pad: string }) {
+  const art = <img src={image} alt={imageAlt} className={`absolute inset-0 size-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.04] ${pad}`} />;
+  return reel ? (
+    <VideoDialog src={reel} title={title} className={className}>
+      {art}
+    </VideoDialog>
+  ) : (
+    <div className={`relative ${className}`}>{art}</div>
+  );
+}
 
 // Surface tile: artwork on white, then label, title, one line and an arrow. Same family as the office and info cards.
 export function ServiceCard({ slug, label, title, line, image, imageAlt, className = "" }: { slug: string; label: string; title: string; line?: string; image: string; imageAlt: string; className?: string }) {
   return (
     <Link href={`/services/${slug}`} className={`group flex h-full flex-col gap-[6px] rounded-[10px] bg-surface p-[6px] md:rounded-[20px] ${className}`}>
-      <div className="relative aspect-[4/3] w-full overflow-clip rounded-[6px] bg-white md:rounded-[14px]">
-        <img src={image} alt={imageAlt} className="absolute inset-0 size-full object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.04]" />
-      </div>
+      <Artwork image={image} imageAlt={imageAlt} reel={serviceBySlug(slug)?.reel} title={title} pad="p-4" className="aspect-[4/3] w-full overflow-clip rounded-[6px] bg-white md:rounded-[14px]" />
       <div className="flex flex-1 items-start justify-between gap-4 p-4 md:p-5">
         <div className="flex min-w-0 flex-col items-start gap-[10px]">
           <Chip tone="white">{label}</Chip>
@@ -48,9 +59,7 @@ function Tile({ s, icon, t, className = "" }: { s: Service; icon: string; t: Ton
           <img src={icon} alt="" className={`size-5 object-contain ${t === "dark" ? "invert" : ""}`} />
         </span>
       </div>
-      <div className="relative aspect-[16/9] w-full overflow-clip rounded-[10px] bg-white md:rounded-[16px]">
-        <img src={s.image} alt={s.imageAlt} className="absolute inset-0 size-full object-contain p-3 transition-transform duration-700 ease-out group-hover:scale-[1.05]" />
-      </div>
+      <Artwork image={s.image} imageAlt={s.imageAlt} reel={s.reel} title={s.title} pad="p-3" className="aspect-[16/9] w-full overflow-clip rounded-[10px] bg-white md:rounded-[16px]" />
       <div className="flex items-end justify-between gap-4">
         <div className="flex flex-col gap-[6px]">
           <h3 className={`t-h4 ${c.title}`}>{s.title}</h3>
