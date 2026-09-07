@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { easeInOut, motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { easeInOut, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { gl, img } from "@/lib/assets";
 import { googleRating } from "@/content/stories";
 import { Appear } from "@/components/ui/appear";
@@ -36,7 +36,8 @@ export function Hero() {
       for (let node: HTMLElement | null = el; node && node !== section.current; node = node.offsetParent as HTMLElement | null) top += node.offsetTop;
       const w = el.offsetWidth;
       const h = el.offsetHeight;
-      setGrow({ lift: innerHeight / 2 - h / 2 - top, scale: Math.max(innerWidth / w, innerHeight / h) * 1.03 });
+      // Grow to a comfortable reading width rather than full bleed, and centre it in the viewport.
+      setGrow({ lift: innerHeight / 2 - h / 2 - top, scale: Math.min(1100, innerWidth - 120) / w });
     };
     measure();
     addEventListener("resize", measure);
@@ -52,13 +53,21 @@ export function Hero() {
   // The meadow hangs 680px above 98% of the section height, so on a short screen 175vh would lift it over the copy.
   // The min-height keeps its skyline 568px from the top, low enough that only the film card's bottom third sits
   // behind it: (680 + 568 + meadow height) / 0.98, the meadow being max(1640px, 112vw) wide at a 698/2172 aspect.
-  const PIN = 450;
+  // The card grows over the first GROW px, then holds in the middle of the screen until HOLD, long enough
+  // for the buildings to fade and the harbour behind them to scroll up into frame.
+  const GROW = 340;
+  const HOLD = 700;
   const filmTransform = useTransform(scrollY, (v) => {
     if (reduce || grow.scale === 1) return "none";
-    const p = Math.min(v / PIN, 1);
-    return `translateY(${Math.min(v, PIN) + grow.lift * p}px) scale(${1 + (grow.scale - 1) * p})`;
+    const p = Math.min(v / GROW, 1);
+    return `translateY(${Math.min(v, HOLD) + grow.lift * p}px) scale(${1 + (grow.scale - 1) * p})`;
   });
-  const filmRadius = useTransform(scrollY, [0, PIN], [24, 0], { clamp: true });
+  const filmRadius = useTransform(scrollY, [0, GROW], [24, 18], { clamp: true });
+  // The loop is desktop-only and mounts on the first scroll, so nobody downloads it just by landing here.
+  const [rolling, setRolling] = useState(false);
+  useMotionValueEvent(scrollY, "change", (v) => {
+    if (v > 100 && grow.scale > 1 && !reduce) setRolling(true);
+  });
 
   return (
     <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1248px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
@@ -122,7 +131,7 @@ export function Hero() {
                 style={{ transform: filmTransform, borderRadius: filmRadius }}
                 className="group relative w-full overflow-hidden bg-ink shadow-[0_40px_90px_-40px_rgba(29,29,29,0.55)] ring-1 ring-white/50 will-change-transform"
               >
-                <VideoDialog src={gl.film} poster={gl.filmPoster} title="Inside Goodluck Education and Migration" className="aspect-video w-full" />
+                <VideoDialog src={gl.film} poster={gl.filmPoster} title="Inside Goodluck Education and Migration" inline={rolling} className="aspect-video w-full" />
               </motion.div>
             </div>
           </Appear>
