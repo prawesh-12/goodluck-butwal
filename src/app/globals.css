@@ -97,7 +97,13 @@
 .ticker-track { display: flex; width: max-content; gap: var(--gap); animation: ticker var(--speed) linear infinite; }
 .ticker-track.reverse { animation-direction: reverse; }
 .ticker:hover .ticker-track { animation-play-state: paused; }
-@media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-14px) rotate(-1.5deg); } }
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes orbit-back { to { transform: rotate(-360deg); } }
+.animate-float { animation: float 7s ease-in-out infinite; }
+.animate-orbit { animation: orbit 140s linear infinite; }
+.animate-orbit-back { animation: orbit-back 140s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ticker-track, .animate-float, .animate-orbit, .animate-orbit-back { animation: none; } }
 
 /* Article bodies come from goodluck_main as HTML. */
 .article > * + * { margin-top: 10px; }

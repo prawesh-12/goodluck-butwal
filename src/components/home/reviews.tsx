@@ -32,7 +32,7 @@ export function ReviewCard({ r, className = "" }: { r: (typeof reviews)[number];
 export function Reviews() {
   return (
     <section id="why-goodluck" className="pb-section relative flex w-full flex-col items-center overflow-clip">
-      <SectionBg src={img.testimonialBg} top bottom />
+      <SectionBg src={img.testimonialBg} top bottom soft />
       <div className="container-x relative z-[1]">
         <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
           <div className="flex w-full max-w-[800px] flex-col items-center gap-5 lg:gap-10">
