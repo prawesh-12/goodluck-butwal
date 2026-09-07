@@ -74,7 +74,7 @@
   .t-base { font-size: 16px; }
 }
 @media (min-width: 1200px) {
-  .t-h1 { font-size: 100px; }
+  .t-h1 { font-size: 84px; }
   .t-h1-md { font-size: 72px; }
   .t-404 { font-size: 200px; line-height: 140px; }
   .t-h2 { font-size: 48px; }
