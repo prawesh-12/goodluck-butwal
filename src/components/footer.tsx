@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { SocialLinks } from "@/components/ui/bits";
 import { gl, img } from "@/lib/assets";
 import { company, footerLinks, offices } from "@/lib/site";
 import { Appear } from "@/components/ui/appear";
@@ -33,6 +34,7 @@ export function Footer() {
             <a href={`mailto:${company.email}`} className="t-lead font-semibold text-ink transition-colors hover:text-muted">
               {company.email}
             </a>
+            <SocialLinks />
           </Appear>
 
           <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-[30px] lg:col-span-4 lg:grid-cols-subgrid lg:gap-[60px]">

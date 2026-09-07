@@ -7,7 +7,6 @@ import { AnimatePresence, motion } from "motion/react";
 import { gl } from "@/lib/assets";
 import { nav } from "@/lib/site";
 import { PillButton } from "@/components/ui/button";
-import { OfficeBadge } from "@/components/office";
 
 // Eight stacked backdrop-blur layers with masks: the progressive blur under the floating nav.
 function BlurTop() {
@@ -27,16 +26,18 @@ export function Nav() {
   const [open, setOpen] = useState(false);
   const path = usePathname();
   useEffect(() => setOpen(false), [path]);
+  // No point offering the booking CTA to someone already on the contact pages.
+  const onContact = path === "/contact" || path.startsWith("/contact/");
   return (
     <>
       <BlurTop />
       <div className="fixed inset-x-0 top-0 z-[9] flex flex-col items-center py-4 md:py-5">
-        <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:max-w-[1140px] lg:px-[30px]">
-          <div className="flex h-[52px] items-center gap-4 overflow-hidden rounded-full bg-white p-[10px] shadow-[0_0_0_2px_rgba(221,229,237,0.7)] md:h-[54px] md:shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:h-[58px]">
+        <div className="w-full px-4 md:w-auto md:max-w-[860px] md:px-5 lg:max-w-[1140px] lg:px-[30px]">
+          <div className="flex h-[52px] items-center gap-4 overflow-hidden rounded-full bg-white p-[10px] shadow-[0_0_0_2px_rgba(221,229,237,0.7)] md:h-[54px] md:shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:h-[58px] lg:gap-6">
             <Link href="/" aria-label="Goodluck Education and Migration, home" className="block h-7 shrink-0 md:h-8">
               <img src={gl.logo} alt="Goodluck Education and Migration" className="h-full w-auto object-contain" />
             </Link>
-            <nav className="mx-auto hidden items-center gap-1 lg:flex" aria-label="Main">
+            <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
               {nav.map((l) => {
                 const active = path === l.href || path.startsWith(l.href + "/");
                 return (
@@ -47,12 +48,13 @@ export function Nav() {
               })}
             </nav>
             <div className="ml-auto flex shrink-0 items-center justify-end gap-[6px] md:gap-[10px]">
-              <OfficeBadge className="hidden md:inline-flex" />
-              <div className="hidden md:block">
-                <PillButton href="/contact/book-consultation" tone="dark" size="sm">
-                  Book a consultation
-                </PillButton>
-              </div>
+              {!onContact && (
+                <div className="hidden md:block">
+                  <PillButton href="/contact/book-consultation" tone="dark" size="sm">
+                    Book a consultation
+                  </PillButton>
+                </div>
+              )}
               <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"} className="relative flex size-8 items-center justify-center rounded-full bg-ink md:size-[34px] lg:hidden">
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-1"}`} />
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-1"}`} />
@@ -67,12 +69,13 @@ export function Nav() {
                     {l.label}
                   </Link>
                 ))}
-                <div className="mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-hairline px-2 pt-3 md:hidden">
-                  <OfficeBadge />
-                  <PillButton href="/contact/book-consultation" tone="dark" size="sm">
-                    Book a consultation
-                  </PillButton>
-                </div>
+                {!onContact && (
+                  <div className="mt-2 flex items-center justify-center border-t border-hairline px-2 pt-3 md:hidden">
+                    <PillButton href="/contact/book-consultation" tone="dark" size="sm">
+                      Book a consultation
+                    </PillButton>
+                  </div>
+                )}
               </motion.nav>
             )}
           </AnimatePresence>

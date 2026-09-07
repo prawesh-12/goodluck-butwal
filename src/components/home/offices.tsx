@@ -9,9 +9,11 @@ const flags = ["/images/flags/australia.svg", "/images/flags/new-zealand.svg", "
 const pathways = ["Entering & leaving from country", "Visas", "Country citizenship", "Settling in country", "Help & support"];
 
 // Sixteen partner logos fill the whole ring, 22.5° apart, so the orbit never shows a gap.
-// partner-04 (Canada) is skipped: a solid navy square that fights the white circles.
 const angles = Array.from({ length: 16 }, (_, i) => i * 22.5 - 90);
-const ring = partnerLogos.filter((l) => !l.endsWith("partner-04.png")).slice(0, 16);
+const ring = partnerLogos.slice(0, 16);
+// A logo drawn on its own filled square needs no padding: let it fill the tile so the circle crops it round,
+// instead of floating as a square inside the white disc.
+const filled = (src: string) => /partner-04\./.test(src);
 
 function Orbit({ radius, icon, box }: { radius: number; icon: number; box: number }) {
   return (
@@ -24,8 +26,8 @@ function Orbit({ radius, icon, box }: { radius: number; icon: number; box: numbe
           const x = box / 2 + radius * Math.sin(rad) - icon / 2;
           const y = box / 2 - radius * Math.cos(rad) - icon / 2;
           return (
-            <span key={a} className="animate-orbit-back absolute flex items-center justify-center overflow-clip rounded-full bg-white p-3 shadow-[0_8px_20px_-8px_rgba(29,29,29,0.25)] ring-1 ring-hairline" style={{ left: x, top: y, width: icon, height: icon }}>
-              <img src={ring[i]} alt="" className="size-full object-contain" loading="lazy" decoding="async" />
+            <span key={a} className={`animate-orbit-back absolute flex items-center justify-center overflow-clip rounded-full bg-white shadow-[0_8px_20px_-8px_rgba(29,29,29,0.25)] ring-1 ring-hairline ${filled(ring[i]) ? "" : "p-3"}`} style={{ left: x, top: y, width: icon, height: icon }}>
+              <img src={ring[i]} alt="" className={`size-full ${filled(ring[i]) ? "object-cover" : "object-contain"}`} loading="lazy" decoding="async" />
             </span>
           );
         })}
