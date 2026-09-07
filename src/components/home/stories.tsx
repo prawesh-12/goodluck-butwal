@@ -1,36 +1,62 @@
-import { successStories } from "@/content/stories";
+import { img } from "@/lib/assets";
+import { googleRating, successStories } from "@/content/stories";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
-import { Badge, Ticker } from "@/components/ui/bits";
+import { Badge, SectionBg, Ticker } from "@/components/ui/bits";
 
 // The twelve success-story graphics carry their own text, so each sits on a plain white plate and nothing else is added.
+const rows = [successStories.slice(0, 6), successStories.slice(6)];
+
+function StoryCard({ s, tilt }: { s: (typeof successStories)[number]; tilt: number }) {
+  return (
+    <div
+      style={{ rotate: `${tilt}deg` }}
+      className="shrink-0 rounded-[18px] bg-white p-2 shadow-[0_18px_40px_-18px_rgba(29,29,29,0.25)] ring-1 ring-hairline transition-transform duration-300 hover:-translate-y-2 hover:!rotate-0 md:rounded-[22px] md:p-[10px]"
+    >
+      <div className="size-[240px] overflow-clip rounded-[12px] bg-surface md:size-[320px] md:rounded-[14px] lg:size-[380px] lg:rounded-[16px]">
+        <img src={s.image} alt={s.alt} className="size-full object-cover" />
+      </div>
+    </div>
+  );
+}
+
 export function Stories() {
   return (
-    <section id="success-stories" className="pb-section flex w-full flex-col items-center">
-      <div className="flex w-full flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-        <Appear className="flex w-full max-w-[860px] flex-col items-center gap-[10px] px-4 md:px-5 lg:px-[30px]">
-          <Badge className="ring-1 ring-hairline">Success stories</Badge>
-          <h2 className="t-h2 text-center">Highly recommended</h2>
-          <p className="t-body text-center text-muted">Visa grants and reviews shared by our clients.</p>
-        </Appear>
-        <Appear delay={0.1} className="relative w-full">
-          <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-[60px] bg-[linear-gradient(90deg,#fff_0%,rgba(255,255,255,0)_100%)] md:w-[160px]" />
-          <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-[60px] bg-[linear-gradient(270deg,#fff_0%,rgba(255,255,255,0)_100%)] md:w-[160px]" />
-          <Ticker gap={30} speed={140} className="w-full py-2">
-            {successStories.map((s) => (
-              <div key={s.image} className="shrink-0 rounded-[16px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)] md:rounded-[24px]">
-                <div className="size-[240px] overflow-clip rounded-[8px] bg-surface md:size-[320px] md:rounded-[16px]">
-                  <img src={s.image} alt={s.alt} className="size-full object-cover" />
-                </div>
+    <section id="success-stories" className="flex w-full flex-col items-center">
+      <div className="pb-section relative w-full overflow-clip bg-white pt-[60px] md:pt-[100px]">
+        <SectionBg src={img.storiesBg} top bottom position="50% 50%" />
+        <div className="relative z-[1] flex w-full flex-col items-center gap-[30px] md:gap-10 lg:gap-[60px]">
+          <Appear className="container-x flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
+            <div className="flex max-w-[620px] flex-col items-start gap-[10px]">
+              <Badge tone="white" className="ring-1 ring-hairline">Success stories</Badge>
+              <h2 className="t-h2">Highly recommended</h2>
+              <p className="t-body text-muted">Visa grants and reviews shared by our clients.</p>
+            </div>
+            <div className="flex items-center gap-4 rounded-[20px] bg-white p-4 ring-1 ring-hairline md:gap-5 md:rounded-[24px] md:p-5">
+              <span className="t-stat">{googleRating.score}</span>
+              <div className="flex flex-col gap-[6px]">
+                <img src={img.stars5} alt="Five stars" className="h-[16px] w-[97px]" />
+                <p className="t-small text-muted">from {googleRating.count} Google reviews</p>
               </div>
+            </div>
+          </Appear>
+
+          <Appear delay={0.1} className="flex w-full flex-col gap-5 md:gap-[30px]">
+            {rows.map((row, r) => (
+              <Ticker key={r} gap={24} speed={r ? 150 : 120} reverse={r === 1} className="w-full py-4">
+                {row.map((s, i) => (
+                  <StoryCard key={s.image} s={s} tilt={(i + r) % 2 ? 2.5 : -2.5} />
+                ))}
+              </Ticker>
             ))}
-          </Ticker>
-        </Appear>
-        <Appear delay={0.2}>
-          <PillButton href="/success-stories" tone="dark">
-            All success stories
-          </PillButton>
-        </Appear>
+          </Appear>
+
+          <Appear delay={0.2}>
+            <PillButton href="/success-stories" tone="dark">
+              All success stories
+            </PillButton>
+          </Appear>
+        </div>
       </div>
     </section>
   );

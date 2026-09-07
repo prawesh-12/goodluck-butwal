@@ -4,78 +4,69 @@ import Link from "next/link";
 import { gl, img } from "@/lib/assets";
 import { company, footerLinks, offices } from "@/lib/site";
 import { about } from "@/content/about";
-import { FlatButton, PillButton } from "@/components/ui/button";
 import { Appear } from "@/components/ui/appear";
 import { useOffice } from "@/components/office";
 
 export function Footer() {
   const { office } = useOffice();
   const ordered = [...offices].sort((a, b) => Number(b.id === office) - Number(a.id === office));
+  const heading = "text-[18px] font-semibold leading-[23.4px] text-ink md:text-[20px] md:leading-[26px]";
   return (
-    <footer className="relative flex flex-col items-center pb-4 pt-[50px] md:py-[100px]">
+    <footer className="relative flex flex-col items-center overflow-clip pt-[50px] md:pt-[100px]">
       <div aria-hidden className="absolute inset-0 z-0 overflow-clip">
         <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,#fff_0%,#fff_0%,rgba(255,255,255,0.3)_14%,rgba(255,255,255,0)_100%)]" />
-        <img src={img.footerBg} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 0%" }} />
+        <img src={img.footerBg} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 60%" }} />
       </div>
-      <div className="container-x relative z-[1]">
-        <div className="flex flex-col items-center gap-[50px] md:gap-[100px]">
-          <div className="flex w-full max-w-[600px] flex-col items-center gap-5 md:gap-[30px] lg:gap-10">
-            <Appear className="flex flex-col items-center gap-[10px] text-center">
-              <h2 className="t-h2">Ready to create your luck?</h2>
-              <p className="text-[18px] font-medium leading-[23.4px] text-muted md:text-[20px] md:leading-[26px]">Make a free consultation with our expert team.</p>
-            </Appear>
-            <Appear delay={0.1} className="flex flex-wrap items-center justify-center gap-4 md:gap-5">
-              <PillButton href="/contact/book-consultation">Book a consultation</PillButton>
-              <FlatButton href="/contact">Contact us</FlatButton>
-            </Appear>
-          </div>
+      <div className="container-x relative z-[1] flex w-full flex-col gap-[50px] md:gap-[70px]">
+        <div className="grid w-full gap-[50px] lg:grid-cols-[minmax(0,2fr)_repeat(4,minmax(0,1fr))] lg:gap-[60px]">
+          <Appear className="flex max-w-[420px] flex-col items-start gap-5 md:gap-6">
+            <Link href="/" aria-label="Goodluck Education and Migration, home" className="block h-10">
+              <img src={gl.logo} alt="Goodluck Education and Migration" className="h-full w-auto object-contain" />
+            </Link>
+            <div className="flex flex-col gap-3">
+              <h2 className="t-h3">Ready to create your luck?</h2>
+              <p className="t-body text-muted">{about.established}</p>
+            </div>
+            <a href={`mailto:${company.email}`} className="t-lead font-semibold text-ink transition-colors hover:text-muted">
+              {company.email}
+            </a>
+          </Appear>
 
-          <div className="flex w-full flex-col items-center gap-5 overflow-clip rounded-2xl bg-white p-5 md:gap-[30px] md:rounded-[30px] md:p-[30px] lg:gap-[60px] lg:p-[100px]">
-            <div className="grid w-full gap-[50px] lg:grid-cols-[340px_1fr] lg:gap-[100px]">
-              <div className="flex flex-col items-start gap-5 lg:gap-10">
+          <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-[30px] lg:col-span-4 lg:grid-cols-subgrid lg:gap-[60px]">
+            {Object.entries(footerLinks).map(([title, links]) => (
+              <div key={title} className="flex flex-col items-start gap-5 md:gap-6">
+                <p className={heading}>{title}</p>
                 <div className="flex flex-col items-start gap-4 md:gap-5">
-                  <Link href="/" aria-label="Goodluck Education and Migration, home" className="block h-10">
-                    <img src={gl.logo} alt="Goodluck Education and Migration" className="h-full w-auto object-contain" />
-                  </Link>
-                  <p className="t-body text-muted">{about.established}</p>
+                  {links.map((l) => (
+                    <Link key={l.href} href={l.href} className="t-base text-ink/75 transition-colors hover:text-ink">
+                      {l.label}
+                    </Link>
+                  ))}
                 </div>
-                <FlatButton href={`mailto:${company.email}`} tone="dark">
-                  {company.email}
-                </FlatButton>
               </div>
-              <div className="grid gap-10 md:grid-cols-4 md:gap-[30px]">
-                {Object.entries(footerLinks).map(([title, links]) => (
-                  <div key={title} className="flex flex-col items-start gap-4 md:gap-5">
-                    <p className="text-[18px] font-medium leading-[23.4px] text-ink md:text-[20px] md:leading-[26px]">{title}</p>
-                    <div className="flex flex-col items-start gap-3 md:gap-4">
-                      {links.map((l) => (
-                        <Link key={l.href} href={l.href} className="t-base text-muted transition-colors hover:text-ink">
-                          {l.label}
-                        </Link>
-                      ))}
-                    </div>
+            ))}
+            <div className="flex flex-col items-start gap-5 md:gap-6">
+              <p className={heading}>Offices</p>
+              <div className="flex flex-col items-start gap-4 md:gap-5">
+                {ordered.map((o) => (
+                  <div key={o.id} className="flex flex-col gap-[2px]">
+                    <p className="t-base text-ink/75">{o.city}, {o.country}</p>
+                    <a href={o.tel} className="t-base text-ink/75 transition-colors hover:text-ink">{o.phone}</a>
                   </div>
                 ))}
-                <div className="flex flex-col items-start gap-4 md:gap-5">
-                  <p className="text-[18px] font-medium leading-[23.4px] text-ink md:text-[20px] md:leading-[26px]">Offices</p>
-                  <div className="flex flex-col items-start gap-3 md:gap-4">
-                    {ordered.map((o) => (
-                      <div key={o.id} className="flex flex-col gap-[2px]">
-                        <p className="t-base text-ink">{o.city}, {o.country}</p>
-                        <a href={o.tel} className="t-base text-muted transition-colors hover:text-ink">{o.phone}</a>
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
-            </div>
-            <div className="flex w-full flex-col gap-5 border-t border-hairline pt-5 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-6 md:pt-[30px]">
-              <p className="t-base text-muted">© {new Date().getFullYear()} {company.name}. All rights reserved.</p>
-              <p className="t-base text-muted">{offices[1].hours}</p>
             </div>
           </div>
         </div>
+
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <p className="t-base text-ink">© {new Date().getFullYear()} {company.name}. All rights reserved.</p>
+          <p className="t-base text-ink">{offices[1].hours}</p>
+        </div>
       </div>
+      <p aria-hidden className="relative z-[1] -mb-[4vw] mt-10 w-full select-none whitespace-nowrap text-center font-display text-[20vw] font-semibold leading-[0.8] tracking-[-0.04em] text-white/70">
+        {company.short}
+      </p>
     </footer>
   );
 }
