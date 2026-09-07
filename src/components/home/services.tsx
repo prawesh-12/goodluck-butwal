@@ -7,7 +7,7 @@ import { Badge, Chip } from "@/components/ui/bits";
 import { VideoDialog } from "@/components/ui/video-dialog";
 
 // White frame with the service artwork. A service with a reel shows the video's poster frame as the play thumbnail instead.
-function Artwork({ s, className, pad }: { s: Service; className: string; pad: string }) {
+export function Artwork({ s, className, pad }: { s: Service; className: string; pad: string }) {
   return s.video && s.poster ? (
     <VideoDialog src={s.video} poster={s.poster} title={s.title} className={className} />
   ) : (
