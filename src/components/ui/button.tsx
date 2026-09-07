@@ -8,7 +8,7 @@ import { img } from "@/lib/assets";
 const spring = { type: "spring", stiffness: 380, damping: 32 } as const;
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
-// Pill with the arrow chip that swaps sides on hover. lg = hero button (49/51/59px by breakpoint), sm = nav button (34/38px).
+// Pill with the arrow chip that swaps sides on hover. lg = hero button (49/51/55px by breakpoint), sm = nav button (34/38px).
 export function PillButton({
   href,
   children,
@@ -66,7 +66,7 @@ export function PillButton({
         className={cx(
           "relative flex items-center justify-center overflow-clip rounded-full whitespace-nowrap ring-1 ring-inset",
           tone === "blue" ? "ring-[#5290f4]" : "ring-ink",
-          lg ? (flip ? "py-2 pl-11 pr-5 lg:py-3 lg:pl-[54px] lg:pr-[30px]" : "py-2 pl-5 pr-11 lg:py-3 lg:pl-[30px] lg:pr-[54px]") : "py-2 pl-4 pr-[34px] lg:py-[10px] lg:pl-6 lg:pr-10",
+          lg ? (flip ? "py-2 pl-11 pr-5 lg:py-[10px] lg:pl-[50px] lg:pr-[26px]" : "py-2 pl-5 pr-11 lg:py-[10px] lg:pl-[26px] lg:pr-[50px]") : "py-2 pl-4 pr-[34px] lg:py-[10px] lg:pl-6 lg:pr-10",
           tone === "blue" ? "btn-blue" : lg ? "btn-black" : "btn-black-sm",
         )}
       >
@@ -97,7 +97,7 @@ export function FlatButton({
   className?: string;
 }) {
   const cls = cx(
-    "inline-flex items-center justify-center whitespace-nowrap rounded-full px-[26px] text-[16px] font-semibold leading-[20.8px] transition-colors duration-300 md:text-[18px] md:leading-[23.4px] lg:px-11 lg:py-[18px]",
+    "inline-flex items-center justify-center whitespace-nowrap rounded-full px-[26px] text-[16px] font-semibold leading-[20.8px] transition-colors duration-300 md:text-[18px] md:leading-[23.4px] lg:px-9 lg:py-[15px]",
     tone === "white" ? "bg-white py-[13px] text-ink hover:bg-black hover:text-white" : "bg-ink py-[14px] text-white hover:bg-hairline hover:text-ink",
     className,
   );

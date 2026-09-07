@@ -47,8 +47,8 @@ export function Hero() {
                 <Appear y={20} delay={0.1}>
                   <h1 className="t-h1">Create your</h1>
                 </Appear>
-                <div className="flex h-10 w-[37px] items-center justify-center md:h-[60px] md:w-[74px] lg:h-[100px] lg:w-[124px]">
-                  <Appear y={20} delay={0.2} rotate={-16} className="flex size-[37px] shrink-0 items-center justify-center rounded-[8px] bg-white md:size-[74px] md:rounded-[16px] lg:size-[124px] lg:rounded-[28px] [filter:drop-shadow(rgba(0,0,0,0.1)_0px_8px_6px)_drop-shadow(rgba(0,0,0,0.3)_0px_3px_3px)]">
+                <div className="flex h-10 w-[37px] items-center justify-center md:h-[60px] md:w-[74px] lg:h-[84px] lg:w-[104px]">
+                  <Appear y={20} delay={0.2} rotate={-16} className="flex size-[37px] shrink-0 items-center justify-center rounded-[8px] bg-white md:size-[74px] md:rounded-[16px] lg:size-[104px] lg:rounded-[24px] [filter:drop-shadow(rgba(0,0,0,0.1)_0px_8px_6px)_drop-shadow(rgba(0,0,0,0.3)_0px_3px_3px)]">
                     <img src={gl.mark} alt="Goodluck" className="size-[80%] object-contain" />
                   </Appear>
                 </div>
