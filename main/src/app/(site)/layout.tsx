@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "../globals.css";
 import { bricolage, interDisplay } from "@/lib/fonts";
 import { company } from "@/lib/site";
 import { Nav } from "@/components/nav";

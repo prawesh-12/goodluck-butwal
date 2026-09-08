@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { adminUrlForPath } from "@/lib/preview";
@@ -48,12 +49,12 @@ export function StaffBar() {
       <span>
         {session.name} · {session.role}
       </span>
-      <a href={adminUrlForPath(pathname)} style={{ color: "#fff", textDecoration: "underline" }}>
+      <Link href={adminUrlForPath(pathname)} style={{ color: "#fff", textDecoration: "underline" }}>
         Edit this page
-      </a>
-      <a href="/admin" style={{ color: "#fff", textDecoration: "underline" }}>
+      </Link>
+      <Link href="/admin" style={{ color: "#fff", textDecoration: "underline" }}>
         Admin
-      </a>
+      </Link>
     </div>
   );
 }

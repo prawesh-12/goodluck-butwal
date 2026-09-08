@@ -43,7 +43,7 @@ const publicFiles = sourceFiles("src").filter(
 // Wording that stays in the code, each for a reason written down in QUESTIONS.md.
 const ALLOWED = [
   // The 500 screens run after a render has already failed, often because the database did.
-  "src/app/error.tsx",
+  "src/app/(site)/error.tsx",
   "src/app/global-error.tsx",
 ];
 
