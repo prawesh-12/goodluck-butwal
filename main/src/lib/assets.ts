@@ -30,7 +30,6 @@ export const gl = {
   campus: "/images/illustrations/campus.webp",
   heroMeadow: "/images/hero/meadow.webp",
   film: "/videos/goodluck-education.mp4",
-  filmLoop: "/videos/goodluck-education-loop.mp4",
   filmPoster: "/images/hero/film-poster.webp",
   teamPhoto: "/images/about/team-photo.webp",
   founders: "/images/team/co-founders.webp",

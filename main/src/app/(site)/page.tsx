@@ -55,7 +55,6 @@ export default async function Home() {
           titleAfter: t("home.hero.title_after", "luck"),
           bookCta: t("home.hero.cta", "Book a consultation"),
           servicesCta: t("home.hero.services_cta", "Our services"),
-          videoTitle: t("home.hero.video_title", "Inside Goodluck Education and Migration"),
         }}
       />
       <Partners logos={logos} />
