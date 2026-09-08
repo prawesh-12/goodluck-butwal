@@ -26,3 +26,12 @@ test("an emptied value falls back rather than showing a blank space", async () =
   const t = await loadText();
   expect(t("home.hero.title", "The default")).toBe("The default");
 });
+
+// The approved forms carry no note, so the default is blank and nothing renders until an admin
+// writes one.
+test("a key whose default is blank stays blank until someone writes something", async () => {
+  rows.current = [];
+  expect((await loadText())("forms.required_note", "")).toBe("");
+  rows.current = [{ key: "forms.required_note", value: "Fields marked * are needed." }];
+  expect((await loadText())("forms.required_note", "")).toBe("Fields marked * are needed.");
+});

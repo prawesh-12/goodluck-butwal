@@ -11,6 +11,7 @@ import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
 import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 import { RegistrationForm } from "@/components/events/registration-form";
+import { formText } from "@/server/queries/form-text";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -35,7 +36,7 @@ export default async function EventPage({ params }: Props) {
   const event = await getEvent(slug);
   if (!event) notFound();
 
-  const taken = await seatsTaken(event.id);
+  const [taken, forms] = await Promise.all([seatsTaken(event.id), formText()]);
   const closed = registrationRefusal({
     registrationEnabled: event.registrationEnabled,
     registrationDeadline: event.registrationDeadline,
@@ -118,7 +119,7 @@ export default async function EventPage({ params }: Props) {
 
             <div className="flex w-full max-w-[800px] flex-col gap-[30px]">
               <SectionHead align="left" title="Register" lead={closed ? undefined : "Tell us you are coming and we will email you the details."} />
-              <RegistrationForm eventId={event.id} closed={closed} seatsLeft={seatsLeft} />
+              <RegistrationForm eventId={event.id} closed={closed} seatsLeft={seatsLeft} text={forms} />
             </div>
           </div>
         </div>

@@ -40,7 +40,7 @@ function footerRows(): StringRow[] {
 }
 
 export async function seedUiStrings() {
-  const rows = [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows];
+  const rows = [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows];
 
   for (const row of rows) {
     await db
@@ -246,4 +246,50 @@ const errorRows: StringRow[] = [
   { key: "empty.events.upcoming", value: "Nothing is coming up just now. Check back soon.", group: "errors", label: "No upcoming events", help: "Shown on the events page under the Upcoming tab when nothing is planned." },
   { key: "empty.events.past", value: "No past events yet.", group: "errors", label: "No past events", help: "Shown on the events page under the Past tab." },
   { key: "empty.batches", value: "No batches are open for booking yet. Ask us about the next one.", group: "errors", label: "No test preparation batches", help: "Shown where the IELTS and PTE batch table would be when none are open." },
+];
+
+const formRows: StringRow[] = [
+  { key: "forms.required_note", value: "", group: "forms", label: "Note above every form", help: "Shown above every form on the site. Leave it empty and no note appears." },
+  { key: "forms.error", value: "That did not go through. Try again.", group: "forms", label: "Send failed message", help: "Shown under a form when sending fails for a reason we cannot name." },
+  { key: "forms.sending", value: "Sending", group: "forms", label: "Button text while sending", help: "Replaces the button wording while a form is being sent." },
+  { key: "forms.reference", value: "Your reference is", group: "forms", label: "Reference line", help: "Comes before the reference code in the message after an enquiry or booking." },
+
+  { key: "forms.enquiry.intro", value: "", group: "forms", label: "Above the enquiry form", help: "Shown above the enquiry form on the Contact page. Leave it empty and nothing appears." },
+  { key: "forms.enquiry.success", value: "Thanks, we have your enquiry. A counsellor will get back to you.", group: "forms", label: "After sending an enquiry", help: "Replaces the enquiry form once it has been sent." },
+  { key: "forms.enquiry.submit", value: "Submit now", group: "forms", label: "Enquiry form button", help: "The button at the foot of the enquiry form." },
+
+  { key: "forms.consultation.intro", value: "", group: "forms", label: "Above the booking form", help: "Shown above the booking form. Leave it empty and nothing appears." },
+  { key: "forms.consultation.success", value: "Request received. We will confirm by email within one business day.", group: "forms", label: "After requesting an appointment", help: "Replaces the booking form once it has been sent." },
+  { key: "forms.consultation.submit", value: "Book appointment", group: "forms", label: "Booking form button", help: "The button at the foot of the booking form." },
+
+  { key: "forms.event.success", value: "You are registered. We have emailed you the details. Reply to that email if you can no longer make it.", group: "forms", label: "After registering for an event", help: "Replaces the registration form on an event page once it has been sent." },
+  { key: "forms.event.submit", value: "Register", group: "forms", label: "Event registration button", help: "The button at the foot of the form on an event page." },
+
+  { key: "forms.field.name", value: "Full name*", group: "forms", label: "Name field", help: "The label above the name box. A star marks a field someone has to fill in." },
+  { key: "forms.field.name_hint", value: "Your full name", group: "forms", label: "Name field hint", help: "The grey wording inside the empty name box." },
+  { key: "forms.field.email", value: "Email address*", group: "forms", label: "Email field", help: "The label above the email box." },
+  { key: "forms.field.email_hint", value: "you@example.com", group: "forms", label: "Email field hint", help: "The grey wording inside the empty email box." },
+  { key: "forms.field.phone", value: "Phone number", group: "forms", label: "Phone field", help: "The label above the phone box where a phone number is optional." },
+  { key: "forms.field.phone_required", value: "Phone number*", group: "forms", label: "Phone field, required", help: "The label above the phone box on the booking form, where it has to be filled in." },
+  { key: "forms.field.phone_hint", value: "Your contact number", group: "forms", label: "Phone field hint", help: "The grey wording inside the empty phone box." },
+  { key: "forms.field.location", value: "Current location", group: "forms", label: "Location field", help: "The label above the location box on the enquiry form." },
+  { key: "forms.field.location_hint", value: "City, country", group: "forms", label: "Location field hint", help: "The grey wording inside the empty location box." },
+  { key: "forms.field.destination", value: "Interested destination", group: "forms", label: "Destination list", help: "The label above the country list on the enquiry form." },
+  { key: "forms.field.destination_hint", value: "Choose a destination", group: "forms", label: "Destination list, nothing chosen", help: "The first line of the country list, before a country is chosen." },
+  { key: "forms.field.service", value: "Interested service", group: "forms", label: "Service list", help: "The label above the service list on the enquiry form." },
+  { key: "forms.field.service_required", value: "Service*", group: "forms", label: "Service list, required", help: "The label above the service list on the booking form, where one has to be chosen." },
+  { key: "forms.field.service_hint", value: "Choose a service", group: "forms", label: "Service list, nothing chosen", help: "The first line of the service list, before a service is chosen." },
+  { key: "forms.field.message", value: "Message*", group: "forms", label: "Message field", help: "The label above the message box on the enquiry form." },
+  { key: "forms.field.message_hint", value: "How can we help?", group: "forms", label: "Message field hint", help: "The grey wording inside the empty message box." },
+  { key: "forms.field.office", value: "Office*", group: "forms", label: "Office list", help: "The label above the office list on the booking form." },
+  { key: "forms.field.date", value: "Preferred date*", group: "forms", label: "Date field", help: "The label above the date box on the booking form." },
+  { key: "forms.field.time", value: "Preferred time*", group: "forms", label: "Time field", help: "The label above the time box on the booking form." },
+  { key: "forms.field.contact_method", value: "Preferred contact method", group: "forms", label: "Contact method list", help: "The label above the phone or email choice on the booking form." },
+  { key: "forms.field.contact_phone", value: "Phone", group: "forms", label: "Contact method, phone", help: "The phone option in the contact method list." },
+  { key: "forms.field.contact_email", value: "Email", group: "forms", label: "Contact method, email", help: "The email option in the contact method list." },
+  { key: "forms.field.notes", value: "Additional notes", group: "forms", label: "Notes field", help: "The label above the notes box on the booking form." },
+  { key: "forms.field.notes_hint", value: "Anything we should know before we meet?", group: "forms", label: "Notes field hint", help: "The grey wording inside the empty notes box on the booking form." },
+  { key: "forms.field.attendees", value: "How many are coming", group: "forms", label: "Attendee count field", help: "The label above the number of people on an event registration." },
+  { key: "forms.field.event_notes", value: "Anything we should know", group: "forms", label: "Event notes field", help: "The label above the notes box on an event registration." },
+  { key: "forms.field.seats_left", value: "{count} seats left.", group: "forms", label: "Seats left note", help: "Shown under the number of people on an event registration. Write {count} where the number should go." },
 ];

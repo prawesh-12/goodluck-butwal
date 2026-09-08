@@ -15,6 +15,7 @@ import { listAllFaqs, listDestinations } from "@/server/queries/destinations";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 import { loadText } from "@/server/queries/text";
+import { formText } from "@/server/queries/form-text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
@@ -26,12 +27,13 @@ export async function generateMetadata(): Promise<Metadata> {
 const tones = ["surface", "dark", "blue"] as const;
 
 export default async function ContactPage() {
-  const [offices, faces, destinations, allFaqs, t] = await Promise.all([
+  const [offices, faces, destinations, allFaqs, t, forms] = await Promise.all([
     listOffices(),
     listTeam().then((team) => team.slice(0, 3)),
     listDestinations(),
     listAllFaqs(),
     loadText(),
+    formText(),
   ]);
   const openInMaps = t("contact.offices.maps_link", "Open in Maps");
 
@@ -60,7 +62,7 @@ export default async function ContactPage() {
               <OfficeContactCards offices={offices} />
             </Appear>
             <Appear y={10} delay={0.1} duration={0.6} className="relative flex flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 pb-20 md:rounded-[30px] md:pb-[70px] lg:p-10 lg:pb-[120px]">
-              <div className="relative z-[2] w-full"><EnquiryForm destinations={destinations} /></div>
+              <div className="relative z-[2] w-full"><EnquiryForm destinations={destinations} text={forms} /></div>
               <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-[-20px] z-[1] w-[calc(100%+20px)] max-w-none object-contain object-top" loading="lazy" decoding="async" />
             </Appear>
           </div>

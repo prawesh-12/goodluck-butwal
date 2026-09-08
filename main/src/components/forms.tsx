@@ -7,6 +7,7 @@ import { enquirySubjects } from "@/lib/site";
 import type { PublicOffice } from "@/server/queries/offices";
 import type { PublicDestination } from "@/server/queries/destinations";
 import type { PublicService } from "@/server/queries/services";
+import type { FormText } from "@/server/queries/form-text";
 import { Turnstile } from "@/components/turnstile";
 import { trackFormSubmit } from "@/lib/analytics";
 
@@ -54,6 +55,16 @@ function Honeypot() {
   );
 }
 
+function Intro({ lines }: { lines: string[] }) {
+  const shown = lines.filter(Boolean);
+  if (shown.length === 0) return null;
+  return (
+    <div className="flex w-full flex-col gap-[10px] lg:col-span-2">
+      {shown.map((line) => <p key={line} className="t-base text-muted">{line}</p>)}
+    </div>
+  );
+}
+
 // Where the visitor was and how they got there, so a lead can be traced back to a campaign.
 function context() {
   if (typeof window === "undefined") return {};
@@ -86,7 +97,7 @@ function dateRange() {
   return { min: iso(from), max: iso(to) };
 }
 
-export function EnquiryForm({ destinations }: { destinations: PublicDestination[] }) {
+export function EnquiryForm({ destinations, text }: { destinations: PublicDestination[]; text: FormText }) {
   const { office } = useOffice();
   const { ready, check } = useReady(["Name", "Email", "Message"]);
   const [sent, setSent] = useState<string | null>(null);
@@ -118,43 +129,44 @@ export function EnquiryForm({ destinations }: { destinations: PublicDestination[
       trackFormSubmit("enquiry", result.reference);
       setSent(result.reference ?? "");
     } else {
-      setError(result.error ?? "That did not go through. Try again.");
+      setError(result.error ?? text.error);
     }
   };
 
   if (sent)
     return (
       <p className="t-body text-ink">
-        Thanks, we have your enquiry. A counsellor will get back to you.
-        {sent ? <> Your reference is <strong>{sent}</strong>.</> : null}
+        {text.enquiry.success}
+        {sent ? <> {text.reference} <strong>{sent}</strong>.</> : null}
       </p>
     );
   return (
     <form onSubmit={submit} onChange={(e) => check(e.currentTarget)} className="grid w-full gap-5 md:gap-[30px] lg:grid-cols-2">
-      <Field label="Full name*" name="Name" placeholder="Your full name" required />
-      <Field label="Email address*" name="Email" type="email" placeholder="you@example.com" required />
-      <Field label="Phone number" name="Phone" type="tel" placeholder="Your contact number" />
-      <Field label="Current location" name="Location" placeholder="City, country" />
-      <Select label="Interested destination" name="Destination">
-        <option value="">Choose a destination</option>
+      <Intro lines={[text.enquiry.intro, text.note]} />
+      <Field label={text.field.name} name="Name" placeholder={text.field.nameHint} required />
+      <Field label={text.field.email} name="Email" type="email" placeholder={text.field.emailHint} required />
+      <Field label={text.field.phone} name="Phone" type="tel" placeholder={text.field.phoneHint} />
+      <Field label={text.field.location} name="Location" placeholder={text.field.locationHint} />
+      <Select label={text.field.destination} name="Destination">
+        <option value="">{text.field.destinationHint}</option>
         {destinations.map((d) => <option key={d.slug} value={d.slug}>{d.name}</option>)}
       </Select>
-      <Select label="Interested service" name="Subject">
-        <option value="">Choose a service</option>
+      <Select label={text.field.service} name="Subject">
+        <option value="">{text.field.serviceHint}</option>
         {enquirySubjects.map((s) => <option key={s} value={s}>{s}</option>)}
       </Select>
-      <Field label="Message*" name="Message" textarea placeholder="How can we help?" className="lg:col-span-2" required />
+      <Field label={text.field.message} name="Message" textarea placeholder={text.field.messageHint} className="lg:col-span-2" required />
       <Honeypot />
       <div className="lg:col-span-2 flex flex-col gap-4">
         <Turnstile onToken={onToken} />
         {error ? <p role="alert" className="t-base text-[#b42318]">{error}</p> : null}
-        <SubmitButton label={busy ? "Sending" : "Submit now"} ready={ready && !busy} />
+        <SubmitButton label={busy ? text.sending : text.enquiry.submit} ready={ready && !busy} />
       </div>
     </form>
   );
 }
 
-export function BookingForm({ offices, services }: { offices: PublicOffice[]; services: PublicService[] }) {
+export function BookingForm({ offices, services, text }: { offices: PublicOffice[]; services: PublicService[]; text: FormText }) {
   const { office } = useOffice();
   const { ready, check } = useReady(["Name", "Email", "Phone", "Date", "Time", "Service"]);
   const [sent, setSent] = useState<string | null>(null);
@@ -190,41 +202,42 @@ export function BookingForm({ offices, services }: { offices: PublicOffice[]; se
       trackFormSubmit("booking", result.reference);
       setSent(result.reference ?? "");
     } else {
-      setError(result.error ?? "That did not go through. Try again.");
+      setError(result.error ?? text.error);
     }
   };
 
   if (sent)
     return (
       <p className="t-body text-ink">
-        Request received. We will confirm by email within one business day.
-        {sent ? <> Your reference is <strong>{sent}</strong>.</> : null}
+        {text.consultation.success}
+        {sent ? <> {text.reference} <strong>{sent}</strong>.</> : null}
       </p>
     );
   return (
     <form onSubmit={submit} onChange={(e) => check(e.currentTarget)} className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">
-      <Select label="Office*" name="Office" defaultValue={office} required onChange={(v) => setOfficeCode(v as typeof office)}>
+      <Intro lines={[text.consultation.intro, text.note]} />
+      <Select label={text.field.office} name="Office" defaultValue={office} required onChange={(v) => setOfficeCode(v as typeof office)}>
         {offices.map((o) => <option key={o.id} value={o.id}>{o.city}, {o.country}</option>)}
       </Select>
-      <Select label="Service*" name="Service" required>
-        <option value="">Choose a service</option>
+      <Select label={text.field.serviceRequired} name="Service" required>
+        <option value="">{text.field.serviceHint}</option>
         {services.map((s) => <option key={s.slug} value={s.slug}>{s.title}</option>)}
       </Select>
-      <Field label="Preferred date*" name="Date" type="date" required min={min} max={max} />
-      <Field label="Preferred time*" name="Time" type="time" required min="10:00" max="17:00" help={chosen?.hours} />
-      <Field label="Full name*" name="Name" placeholder="Your full name" required />
-      <Field label="Email address*" name="Email" type="email" placeholder="you@example.com" required />
-      <Field label="Phone number*" name="Phone" type="tel" placeholder="Your contact number" required />
-      <Select label="Preferred contact method" name="Contact" defaultValue="phone">
-        <option value="phone">Phone</option>
-        <option value="email">Email</option>
+      <Field label={text.field.date} name="Date" type="date" required min={min} max={max} />
+      <Field label={text.field.time} name="Time" type="time" required min="10:00" max="17:00" help={chosen?.hours} />
+      <Field label={text.field.name} name="Name" placeholder={text.field.nameHint} required />
+      <Field label={text.field.email} name="Email" type="email" placeholder={text.field.emailHint} required />
+      <Field label={text.field.phoneRequired} name="Phone" type="tel" placeholder={text.field.phoneHint} required />
+      <Select label={text.field.contactMethod} name="Contact" defaultValue="phone">
+        <option value="phone">{text.field.contactPhone}</option>
+        <option value="email">{text.field.contactEmail}</option>
       </Select>
-      <Field label="Additional notes" name="Notes" textarea placeholder="Anything we should know before we meet?" className="md:col-span-2" />
+      <Field label={text.field.notes} name="Notes" textarea placeholder={text.field.notesHint} className="md:col-span-2" />
       <Honeypot />
       <div className="md:col-span-2 flex flex-col gap-4">
         <Turnstile onToken={onToken} />
         {error ? <p role="alert" className="t-base text-[#b42318]">{error}</p> : null}
-        <SubmitButton label={busy ? "Sending" : "Book appointment"} ready={ready && !busy} />
+        <SubmitButton label={busy ? text.sending : text.consultation.submit} ready={ready && !busy} />
       </div>
     </form>
   );
