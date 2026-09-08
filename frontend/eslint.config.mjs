@@ -6,5 +6,12 @@ export default defineConfig([
   ...nextVitals,
   ...nextTs,
   { rules: { "@next/next/no-img-element": "off" } },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    ".open-next/**",
+    "bundled/**",
+    "next-env.d.ts",
+  ]),
 ]);
