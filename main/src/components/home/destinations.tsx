@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { gl, img } from "@/lib/assets";
-import { destinations } from "@/content/destinations";
+import type { PublicDestination } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
 import { Badge } from "@/components/ui/bits";
 
@@ -15,20 +15,20 @@ const facts: Record<string, [string, string]> = {
   "united-kingdom": ["3 years", "Most undergraduate courses"],
 };
 
-const fromContent = (slug: string): Card => {
-  const d = destinations.find((x) => x.slug === slug)!;
+const fromRow = (rows: PublicDestination[], slug: string): Card => {
+  const d = rows.find((x) => x.slug === slug)!;
   return { slug, name: d.name, line: d.overview, fact: facts[slug], bg: d.card, pos: focus[slug], flag: d.flag, href: `/study-abroad/${slug}` };
 };
 
 // New Zealand has no destination page on goodluck_main yet, so its card only invites an enquiry.
-export const destinationCards: Card[] = [
-  fromContent("australia"),
+export const destinationCards = (rows: PublicDestination[]): Card[] => [
+  fromRow(rows, "australia"),
   { slug: "new-zealand", name: "New Zealand", line: "Ask our counsellors about studying in New Zealand.", bg: gl.newZealand, pos: focus["new-zealand"], flag: "/images/flags/new-zealand.svg", href: "/contact/book-consultation" },
-  fromContent("united-kingdom"),
+  fromRow(rows, "united-kingdom"),
 ];
 
-export function DestinationCard({ slug, phone, className = "" }: { slug: string; phone?: boolean; className?: string }) {
-  const d = destinationCards.find((x) => x.slug === slug)!;
+export function DestinationCard({ cards, slug, phone, className = "" }: { cards: Card[]; slug: string; phone?: boolean; className?: string }) {
+  const d = cards.find((x) => x.slug === slug)!;
   return (
     <Link
       href={d.href}
@@ -62,7 +62,7 @@ export function DestinationCard({ slug, phone, className = "" }: { slug: string;
   );
 }
 
-export function Destinations() {
+export function Destinations({ cards }: { cards: Card[] }) {
   return (
     <section id="study-abroad" className="pt-section flex w-full flex-col items-center">
       <div className="flex w-full flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
@@ -73,11 +73,11 @@ export function Destinations() {
         </Appear>
         <div className="container-x">
           <div className="grid w-full gap-[10px] md:grid-cols-3 md:gap-[30px]">
-            {destinationCards.map((d, i) => (
-              <Appear key={d.slug} delay={0.1 * i} className="md:hidden"><DestinationCard slug={d.slug} phone /></Appear>
+            {cards.map((d, i) => (
+              <Appear key={d.slug} delay={0.1 * i} className="md:hidden"><DestinationCard cards={cards} slug={d.slug} phone /></Appear>
             ))}
-            {destinationCards.map((d, i) => (
-              <Appear key={d.slug} delay={0.1 * i} className="hidden md:block"><DestinationCard slug={d.slug} /></Appear>
+            {cards.map((d, i) => (
+              <Appear key={d.slug} delay={0.1 * i} className="hidden md:block"><DestinationCard cards={cards} slug={d.slug} /></Appear>
             ))}
           </div>
         </div>

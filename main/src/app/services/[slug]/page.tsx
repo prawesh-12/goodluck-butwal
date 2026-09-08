@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getService, listServices } from "@/server/queries/services";
-import { faqs } from "@/content/faqs";
+import { listServiceFaqs } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Chip } from "@/components/ui/bits";
@@ -23,7 +23,7 @@ export default async function ServicePage({ params }: Props) {
   const { slug } = await params;
   const s = await getService(slug);
   if (!s) notFound();
-  const related = s.slug === "visa-guidance" ? faqs.migration : faqs.education;
+  const related = await listServiceFaqs(s.slug === "visa-guidance" ? "visa-guidance" : "education-counselling");
   const others = (await listServices()).filter((o) => o.slug !== s.slug);
 
   return (

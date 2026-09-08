@@ -5,8 +5,8 @@ import { Field } from "@/components/inner";
 import { useOffice } from "@/components/office";
 import { enquirySubjects } from "@/lib/site";
 import type { PublicOffice } from "@/server/queries/offices";
+import type { PublicDestination } from "@/server/queries/destinations";
 import type { PublicService } from "@/server/queries/services";
-import { destinations } from "@/content/destinations";
 
 // UI only: nothing is sent anywhere yet. The button stays translucent until the required fields are filled.
 function SubmitButton({ label, ready, className = "" }: { label: string; ready: boolean; className?: string }) {
@@ -39,7 +39,7 @@ function useReady(required: string[]) {
   return { ready, check };
 }
 
-export function EnquiryForm() {
+export function EnquiryForm({ destinations }: { destinations: PublicDestination[] }) {
   const { ready, check } = useReady(["Name", "Email", "Message"]);
   const [sent, setSent] = useState(false);
   const submit = (e: FormEvent<HTMLFormElement>) => { e.preventDefault(); setSent(true); };

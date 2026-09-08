@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { gl, img } from "@/lib/assets";
 import { company } from "@/lib/site";
-import { allFaqs } from "@/content/faqs";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton } from "@/components/ui/button";
 import { Badge, SocialLinks } from "@/components/ui/bits";
@@ -9,6 +8,7 @@ import { SectionHead } from "@/components/inner";
 import { EnquiryForm } from "@/components/forms";
 import { OfficeContactCards } from "@/components/contact-cards";
 import { listOffices } from "@/server/queries/offices";
+import { listAllFaqs, listDestinations } from "@/server/queries/destinations";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
@@ -16,7 +16,12 @@ export const metadata: Metadata = { title: "Contact", description: "Talk to our 
 const tones = ["surface", "dark", "blue"] as const;
 
 export default async function ContactPage() {
-  const [offices, faces] = await Promise.all([listOffices(), listTeam().then((t) => t.slice(0, 3))]);
+  const [offices, faces, destinations, allFaqs] = await Promise.all([
+    listOffices(),
+    listTeam().then((t) => t.slice(0, 3)),
+    listDestinations(),
+    listAllFaqs(),
+  ]);
 
   return (
     <>
@@ -42,7 +47,7 @@ export default async function ContactPage() {
               <OfficeContactCards offices={offices} />
             </Appear>
             <Appear y={10} delay={0.1} duration={0.6} className="relative flex flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 pb-20 md:rounded-[30px] md:pb-[70px] lg:p-10 lg:pb-[120px]">
-              <div className="relative z-[2] w-full"><EnquiryForm /></div>
+              <div className="relative z-[2] w-full"><EnquiryForm destinations={destinations} /></div>
               <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-[-20px] z-[1] w-[calc(100%+20px)] max-w-none object-contain object-top" loading="lazy" decoding="async" />
             </Appear>
           </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { listServices } from "@/server/queries/services";
-import { faqs } from "@/content/faqs";
+import { listAllFaqs } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
 import { ServiceCard } from "@/components/home/services";
@@ -10,9 +10,10 @@ import { listTeam } from "@/server/queries/people";
 export const metadata: Metadata = { title: "Our services", description: "Education counselling, visa guidance, scholarship guidance and IELTS coaching." };
 
 export default async function ServicesPage() {
-  const [faces, services] = await Promise.all([
+  const [faces, services, allFaqs] = await Promise.all([
     listTeam().then((t) => t.slice(0, 3)),
     listServices(),
+    listAllFaqs(),
   ]);
 
   return (
@@ -37,7 +38,7 @@ export default async function ServicesPage() {
               <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>
             <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
-              <Accordion items={[...faqs.education, ...faqs.migration]} />
+              <Accordion items={allFaqs} />
             </Appear>
           </div>
         </div>

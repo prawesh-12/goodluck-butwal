@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { gl } from "@/lib/assets";
-import { allFaqs } from "@/content/faqs";
+
 import type { PublicMember } from "@/server/queries/people";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
@@ -69,7 +69,7 @@ export function FaqCta({ faces, className = "" }: { faces: PublicMember[]; class
   );
 }
 
-export function Faqs({ faces }: { faces: PublicMember[] }) {
+export function Faqs({ faces, items }: { faces: PublicMember[]; items: FaqItem[] }) {
   return (
     <section className="flex w-full flex-col items-center pb-[30px] md:pb-[60px] lg:pb-[100px]">
       <div className="container-x">
@@ -82,7 +82,7 @@ export function Faqs({ faces }: { faces: PublicMember[] }) {
             <FaqCta faces={faces} className="order-3 md:order-none" />
           </Appear>
           <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
-            <Accordion items={allFaqs} />
+            <Accordion items={items} />
           </Appear>
         </div>
       </div>

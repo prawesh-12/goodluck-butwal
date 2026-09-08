@@ -1,15 +1,22 @@
 import type { Metadata } from "next";
-import { faqs } from "@/content/faqs";
+import { listServiceFaqs } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
 export const metadata: Metadata = { title: "FAQ" };
-const groups: [string, typeof faqs.education][] = [["Education services", faqs.education], ["Migration services", faqs.migration]];
 
 export default async function FaqPage() {
-  const faces = (await listTeam()).slice(0, 3);
+  const [faces, education, migration] = await Promise.all([
+    listTeam().then((t) => t.slice(0, 3)),
+    listServiceFaqs("education-counselling"),
+    listServiceFaqs("visa-guidance"),
+  ]);
+  const groups: [string, typeof education][] = [
+    ["Education services", education],
+    ["Migration services", migration],
+  ];
 
   return (
     <>

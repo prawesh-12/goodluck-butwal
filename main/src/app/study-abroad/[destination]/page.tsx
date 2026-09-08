@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { destinationBySlug, destinations } from "@/content/destinations";
-import { faqs } from "@/content/faqs";
+import { getDestination, listDestinations, listAllFaqs } from "@/server/queries/destinations";
 import articles from "@/content/articles.json";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
@@ -11,19 +10,23 @@ import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
 type Props = { params: Promise<{ destination: string }> };
-export const generateStaticParams = () => destinations.map((d) => ({ destination: d.slug }));
+export const generateStaticParams = async () =>
+  (await listDestinations()).filter((d) => d.hasPage).map((d) => ({ destination: d.slug }));
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const d = destinationBySlug((await params).destination);
+  const d = await getDestination((await params).destination);
   return d ? { title: `Study in ${d.name}`, description: d.overview } : { title: "Study abroad" };
 }
 
 const keyword: Record<string, RegExp> = { australia: /australia/i, "united-kingdom": /\bUK\b|United Kingdom/i };
 
 export default async function DestinationPage({ params }: Props) {
-  const faces = (await listTeam()).slice(0, 3);
+  const [faces, allFaqs] = await Promise.all([
+    listTeam().then((t) => t.slice(0, 3)),
+    listAllFaqs(),
+  ]);
 
   const { destination } = await params;
-  const d = destinationBySlug(destination);
+  const d = await getDestination(destination);
   if (!d) notFound();
   const news = articles.filter((a) => keyword[d.slug].test(a.title)).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
 
@@ -166,7 +169,7 @@ export default async function DestinationPage({ params }: Props) {
               <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>
             <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
-              <Accordion items={[...faqs.education, ...faqs.migration]} />
+              <Accordion items={allFaqs} />
             </Appear>
           </div>
         </div>

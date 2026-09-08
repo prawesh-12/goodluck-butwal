@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { helpWeProvide } from "@/content/destinations";
-import { faqs } from "@/content/faqs";
+import { helpWeProvide } from "@/lib/site-copy";
+import { listServiceFaqs, listDestinations } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
 import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 import { DestinationCard, destinationCards } from "@/components/home/destinations";
@@ -10,14 +10,18 @@ import { listTeam } from "@/server/queries/people";
 export const metadata: Metadata = { title: "Study abroad", description: "Study in Australia, the United Kingdom and New Zealand with Goodluck." };
 
 export default async function StudyAbroadPage() {
-  const faces = (await listTeam()).slice(0, 3);
+  const [faces, education, cards] = await Promise.all([
+    listTeam().then((t) => t.slice(0, 3)),
+    listServiceFaqs("education-counselling"),
+    listDestinations().then((rows) => destinationCards(rows)),
+  ]);
 
   return (
     <>
       <InnerHero badge="Study abroad" title="Countries we help you study in" lead="Study in Australia, the United Kingdom and New Zealand with us." width={1260} after={
         <div className="grid w-full gap-[10px] md:grid-cols-3 md:gap-[30px]">
-          {destinationCards.map((d, i) => (
-            <div key={d.slug} id={d.slug}><Appear delay={0.1 * i}><DestinationCard slug={d.slug} /></Appear></div>
+          {cards.map((d, i) => (
+            <div key={d.slug} id={d.slug}><Appear delay={0.1 * i}><DestinationCard cards={cards} slug={d.slug} /></Appear></div>
           ))}
         </div>
       } />
@@ -44,7 +48,7 @@ export default async function StudyAbroadPage() {
               <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>
             <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
-              <Accordion items={faqs.education} />
+              <Accordion items={education} />
             </Appear>
           </div>
         </div>
