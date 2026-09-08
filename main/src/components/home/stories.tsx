@@ -3,6 +3,7 @@ import type { GoogleRating } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg, Ticker } from "@/components/ui/bits";
+import { loadText } from "@/server/queries/text";
 
 // The twelve success-story graphics carry their own text, so each sits on a plain white plate and nothing else is added.
 
@@ -20,7 +21,8 @@ function StoryCard({ s, tilt }: { s: { image: string; alt: string }; tilt: numbe
   );
 }
 
-export function Stories({ successStories, googleRating }: { successStories: { image: string; alt: string }[]; googleRating: GoogleRating }) {
+export async function Stories({ successStories, googleRating }: { successStories: { image: string; alt: string }[]; googleRating: GoogleRating }) {
+  const t = await loadText();
   const rows = [successStories.slice(0, 6), successStories.slice(6)];
   return (
     <section id="success-stories" className="flex w-full flex-col items-center">
@@ -29,15 +31,15 @@ export function Stories({ successStories, googleRating }: { successStories: { im
         <div className="relative z-[1] flex w-full flex-col items-center gap-[30px] md:gap-10 lg:gap-[60px]">
           <Appear className="container-x flex flex-col gap-6 md:flex-row md:items-end md:justify-between md:gap-10">
             <div className="flex max-w-[620px] flex-col items-start gap-[10px]">
-              <Badge tone="white" className="ring-1 ring-hairline">Success stories</Badge>
-              <h2 className="t-h2">Highly recommended</h2>
-              <p className="t-body text-muted">Visa grants and reviews shared by our clients.</p>
+              <Badge tone="white" className="ring-1 ring-hairline">{t("home.stories.badge", "Success stories")}</Badge>
+              <h2 className="t-h2">{t("home.stories.title", "Highly recommended")}</h2>
+              <p className="t-body text-muted">{t("home.stories.lead", "Visa grants and reviews shared by our clients.")}</p>
             </div>
             <div className="flex items-center gap-4 rounded-[20px] bg-white p-4 ring-1 ring-hairline md:gap-5 md:rounded-[24px] md:p-5">
               <span className="t-stat">{googleRating.score}</span>
               <div className="flex flex-col gap-[6px]">
                 <img src={img.stars5} alt="Five stars" className="h-[16px] w-[97px]" loading="lazy" decoding="async" />
-                <p className="t-small text-muted">from {googleRating.count} Google reviews</p>
+                <p className="t-small text-muted">{t("home.stories.rating", "from {count} Google reviews").replace("{count}", String(googleRating.count))}</p>
               </div>
             </div>
           </Appear>
@@ -54,7 +56,7 @@ export function Stories({ successStories, googleRating }: { successStories: { im
 
           <Appear delay={0.2}>
             <PillButton href="/success-stories" tone="dark">
-              All success stories
+              {t("home.stories.cta", "All success stories")}
             </PillButton>
           </Appear>
         </div>

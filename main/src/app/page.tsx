@@ -13,6 +13,7 @@ import { listServices } from "@/server/queries/services";
 import { listAllFaqs, listDestinations } from "@/server/queries/destinations";
 import { getGoogleRating, listArticles, listReviews, listSuccessStories } from "@/server/queries/editorial";
 import { getAboutContent } from "@/server/queries/pages";
+import { loadText } from "@/server/queries/text";
 import { destinationCards } from "@/components/home/destinations";
 import { Reviews } from "@/components/home/reviews";
 import { Stories } from "@/components/home/stories";
@@ -42,6 +43,7 @@ export default async function Home() {
 
   const upcomingEvents = await listUpcomingEvents();
   const socials = await getSocialLinks();
+  const t = await loadText();
 
   return (
     <>
@@ -55,7 +57,20 @@ export default async function Home() {
       <Offices logos={logos} />
       <News articles={articles} />
       <Events events={upcomingEvents} />
-      <Faqs faces={faces} items={allFaqs} />
+      <Faqs
+        faces={faces}
+        items={allFaqs}
+        text={{
+          title: t("home.faqs.title", "Frequently asked questions"),
+          lead: t("home.faqs.lead", "Common questions about programmes, scholarships and visas."),
+          still: {
+            title: t("home.faqs.still.title", "Still have questions?"),
+            line: t("home.faqs.still.line", "Book an appointment and our team can assess your case."),
+            cta: t("home.faqs.still.cta", "Book an appointment"),
+            you: t("home.faqs.still.you", "You"),
+          },
+        }}
+      />
     </>
   );
 }

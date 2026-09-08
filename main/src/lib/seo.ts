@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cache } from "react";
 import { eq } from "drizzle-orm";
 import { db } from "@db/client";
+import { allSettings } from "@/server/queries/shared";
 import {
   courses,
   destinations,
@@ -11,7 +12,6 @@ import {
   pages,
   posts,
   services,
-  settings,
   testPrepCourses,
 } from "@db/schema";
 import { company } from "@/lib/site";
@@ -73,8 +73,7 @@ export function buildMetadataFrom(input: SeoInput, defaults: SeoDefaults): Metad
 }
 
 export const getSeoDefaults = cache(async (): Promise<SeoDefaults> => {
-  const rows = await db.select({ key: settings.key, value: settings.value }).from(settings);
-  const byKey = new Map(rows.map((row) => [row.key, row.value]));
+  const byKey = await allSettings();
   const ogImageId = String(byKey.get("default_og_image_id") ?? "");
 
   let ogImage = "";

@@ -14,6 +14,7 @@ import { listOffices } from "@/server/queries/offices";
 import { listAllFaqs, listDestinations } from "@/server/queries/destinations";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
+import { loadText } from "@/server/queries/text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
@@ -25,12 +26,14 @@ export async function generateMetadata(): Promise<Metadata> {
 const tones = ["surface", "dark", "blue"] as const;
 
 export default async function ContactPage() {
-  const [offices, faces, destinations, allFaqs] = await Promise.all([
+  const [offices, faces, destinations, allFaqs, t] = await Promise.all([
     listOffices(),
-    listTeam().then((t) => t.slice(0, 3)),
+    listTeam().then((team) => team.slice(0, 3)),
     listDestinations(),
     listAllFaqs(),
+    loadText(),
   ]);
+  const openInMaps = t("contact.offices.maps_link", "Open in Maps");
 
   return (
     <>
@@ -46,9 +49,9 @@ export default async function ContactPage() {
           <div className="grid gap-[30px] md:grid-cols-2 lg:gap-[70px]">
             <Appear y={10} duration={0.6} className="flex flex-col items-start gap-5 md:gap-10">
               <div className="flex flex-col items-start gap-[10px]">
-                <Badge tone="white" className="ring-1 ring-hairline">Quick contact</Badge>
-                <h1 className="t-h1-md">Don&rsquo;t hesitate to contact us</h1>
-                <p className="t-body text-muted">Let&rsquo;s connect. Make a free consultation with our expert team.</p>
+                <Badge tone="white" className="ring-1 ring-hairline">{t("contact.hero.badge", "Quick contact")}</Badge>
+                <h1 className="t-h1-md">{t("contact.hero.title", "Don’t hesitate to contact us")}</h1>
+                <p className="t-body text-muted">{t("contact.hero.lead", "Let’s connect. Make a free consultation with our expert team.")}</p>
               </div>
               <div className="flex flex-wrap items-center gap-5">
                 <FlatButton href={`mailto:${company.email}`}>{company.email}</FlatButton>
@@ -67,7 +70,7 @@ export default async function ContactPage() {
       <section className="pb-section flex w-full flex-col items-center">
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead badge="Our worldwide offices" title="Explore our office worldwide" />
+            <SectionHead badge={t("contact.offices.badge", "Our worldwide offices")} title={t("contact.offices.title", "Explore our office worldwide")} />
             <div className="grid w-full gap-5 md:grid-cols-3 md:gap-[30px] lg:gap-[50px]">
               {offices.map((o, i) => {
                 const t = tones[i];
@@ -87,7 +90,7 @@ export default async function ContactPage() {
                     </div>
                     <div className="flex flex-wrap gap-x-5 gap-y-2">
                       <a href={o.tel} className={`t-base font-semibold underline underline-offset-4 ${white ? "text-white" : "text-ink"}`}>{o.phone}</a>
-                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${o.address}, ${o.country}`)}`} target="_blank" rel="noopener" className={`t-base font-semibold underline underline-offset-4 ${white ? "text-white" : "text-ink"}`}>Open in Maps</a>
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${o.address}, ${o.country}`)}`} target="_blank" rel="noopener" className={`t-base font-semibold underline underline-offset-4 ${white ? "text-white" : "text-ink"}`}>{openInMaps}</a>
                     </div>
                   </Appear>
                 );
@@ -102,8 +105,8 @@ export default async function ContactPage() {
           <div className="flex flex-col gap-[30px] md:flex-row md:items-start lg:gap-[70px]">
             <Appear className="contents md:flex md:w-[349px] md:flex-col md:items-start md:gap-10 lg:w-[424px] lg:gap-[80px]">
               <div className="order-1 flex flex-col items-start gap-[10px] md:order-none">
-                <h2 className="t-h2">Frequently asked questions</h2>
-                <p className="t-body text-muted">Common questions about programmes, scholarships and visas.</p>
+                <h2 className="t-h2">{t("contact.faq.title", "Frequently asked questions")}</h2>
+                <p className="t-body text-muted">{t("contact.faq.lead", "Common questions about programmes, scholarships and visas.")}</p>
               </div>
               <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>

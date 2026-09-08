@@ -1,18 +1,13 @@
 import Script from "next/script";
-import { eq } from "drizzle-orm";
-import { db } from "@db/client";
-import { settings } from "@db/schema";
 import { gtmId } from "@/lib/analytics";
+import { allSettings } from "@/server/queries/shared";
 
 // The GA4 id is configured inside the container, not here, so changing measurement never needs
 // a deploy. The container id itself comes from settings for the same reason.
 export async function Analytics() {
-  const [row] = await db
-    .select({ value: settings.value })
-    .from(settings)
-    .where(eq(settings.key, "gtm_id"));
+  const configured = (await allSettings()).get("gtm_id");
 
-  const id = gtmId(row?.value);
+  const id = gtmId(configured);
   if (!id) return null;
 
   return (

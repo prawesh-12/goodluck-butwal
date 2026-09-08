@@ -7,26 +7,28 @@ import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
+import { loadText } from "@/server/queries/text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({ path: "/faq", title: "FAQ" });
 }
 
 export default async function FaqPage() {
-  const [faces, education, migration] = await Promise.all([
-    listTeam().then((t) => t.slice(0, 3)),
+  const [faces, education, migration, t] = await Promise.all([
+    listTeam().then((team) => team.slice(0, 3)),
     listServiceFaqs("education-counselling"),
     listServiceFaqs("visa-guidance"),
+    loadText(),
   ]);
   const groups: [string, typeof education][] = [
-    ["Education services", education],
-    ["Migration services", migration],
+    [t("faq.groups.education", "Education services"), education],
+    [t("faq.groups.migration", "Migration services"), migration],
   ];
 
   return (
     <>
       <JsonLd data={faqPage([...education, ...migration])} />
-      <InnerHero title="Frequently asked questions" lead="Any questions? Book an appointment and our team can assess your case." />
+      <InnerHero title={t("faq.hero.title", "Frequently asked questions")} lead={t("faq.hero.lead", "Any questions? Book an appointment and our team can assess your case.")} />
       <section className="flex w-full flex-col items-center pb-[50px] md:pb-20 lg:pb-[100px]">
         <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">
           <div className="flex flex-col items-center gap-[30px] md:gap-[50px]">

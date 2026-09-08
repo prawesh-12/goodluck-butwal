@@ -4,10 +4,11 @@ import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg } from "@/components/ui/bits";
 import { Marquee } from "@/components/ui/marquee";
+import { loadText, type Text } from "@/server/queries/text";
 
-const metaFor = (googleRating: GoogleRating) => [
-  { icon: img.star, w: 19, text: `${googleRating.score} Google rating` },
-  { icon: img.heart, w: 20, text: `${googleRating.count} reviews` },
+const metaFor = (googleRating: GoogleRating, t: Text) => [
+  { icon: img.star, w: 19, text: t("home.reviews.rating", "{score} Google rating").replace("{score}", googleRating.score) },
+  { icon: img.heart, w: 20, text: t("home.reviews.count", "{count} reviews").replace("{count}", String(googleRating.count)) },
 ];
 
 // Google reviews from the goodluck_main widget. Reviewers have no photos there, so an initial stands in.
@@ -30,14 +31,14 @@ export function ReviewCard({ r, className = "" }: { r: PublicReview; className?:
 }
 
 // Magic UI's testimonial card: photo, name and source up top, stars where the bird icon sits, quote below.
-function ReviewTile({ r }: { r: PublicReview }) {
+function ReviewTile({ r, source }: { r: PublicReview; source: string }) {
   return (
     <figure className="flex w-[300px] flex-col gap-4 rounded-2xl border border-hairline bg-white p-5 md:w-[400px]">
       <div className="flex flex-wrap items-center gap-3">
         <img src={r.avatar} alt="" width={40} height={40} className="size-10 shrink-0 rounded-full bg-surface object-cover" loading="lazy" decoding="async" />
         <figcaption className="flex min-w-[150px] flex-1 flex-col gap-[2px]">
           <p className="text-[16px] font-medium leading-5 text-ink">{r.name}</p>
-          <p className="t-small whitespace-nowrap text-muted">Google review, {r.date}</p>
+          <p className="t-small whitespace-nowrap text-muted">{source.replace("{date}", r.date)}</p>
         </figcaption>
         <img src={img.stars5} alt="Five stars" className="ml-auto h-[14px] w-[85px]" loading="lazy" decoding="async" />
       </div>
@@ -49,8 +50,9 @@ function ReviewTile({ r }: { r: PublicReview }) {
 // Two rows like the Magic UI marquee demo: top drifts right, bottom drifts left. Linear, since it never stops.
 
 
-export function Reviews({ reviews, googleRating, values }: { reviews: PublicReview[]; googleRating: GoogleRating; values: string }) {
-  const meta = metaFor(googleRating);
+export async function Reviews({ reviews, googleRating, values }: { reviews: PublicReview[]; googleRating: GoogleRating; values: string }) {
+  const t = await loadText();
+  const meta = metaFor(googleRating, t);
   const rows = [reviews.slice(0, 3), reviews.slice(3)];
   return (
     <section id="why-goodluck" className="pb-section relative flex w-full flex-col items-center overflow-clip">
@@ -59,16 +61,16 @@ export function Reviews({ reviews, googleRating, values }: { reviews: PublicRevi
         <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
           <div className="flex w-full max-w-[800px] flex-col items-center gap-5 lg:gap-10">
             <Appear className="flex flex-col items-center gap-[10px]">
-              <Badge className="ring-1 ring-hairline">Why choose us</Badge>
-              <h2 className="t-h2 text-center">Reason for choosing us</h2>
+              <Badge className="ring-1 ring-hairline">{t("home.reviews.badge", "Why choose us")}</Badge>
+              <h2 className="t-h2 text-center">{t("home.reviews.title", "Reason for choosing us")}</h2>
               <p className="t-body text-center text-muted">{values}</p>
             </Appear>
             <Appear delay={0.1} className="flex flex-wrap items-center justify-center gap-[10px] md:gap-5">
-              <PillButton href="/about">About Goodluck</PillButton>
+              <PillButton href="/about">{t("home.reviews.cta", "About Goodluck")}</PillButton>
             </Appear>
           </div>
           <Appear delay={0.15} className="flex w-full flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <h3 className="t-h4">What our clients say</h3>
+            <h3 className="t-h4">{t("home.reviews.clients_title", "What our clients say")}</h3>
             <div className="flex flex-wrap items-center gap-[10px] md:gap-5">
               {meta.map((m, i) => (
                 <div key={m.text} className="contents">
@@ -88,7 +90,7 @@ export function Reviews({ reviews, googleRating, values }: { reviews: PublicRevi
       <Appear delay={0.2} className="relative z-[1] mt-[30px] flex w-full flex-col gap-5 md:mt-10 lg:mt-[50px]">
         {rows.map((row, i) => (
           <Marquee key={i} pauseOnHover reverse={i === 0} className="p-0 [--duration:32s] [--gap:20px]">
-            {row.map((r) => <ReviewTile key={r.name} r={r} />)}
+            {row.map((r) => <ReviewTile key={r.name} r={r} source={t("home.reviews.source", "Google review, {date}")} />)}
           </Marquee>
         ))}
       </Appear>

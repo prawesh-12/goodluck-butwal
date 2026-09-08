@@ -3,6 +3,7 @@ import { gl, img } from "@/lib/assets";
 import type { PublicDestination } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
 import { Badge } from "@/components/ui/bits";
+import { loadText } from "@/server/queries/text";
 
 type Card = { slug: string; name: string; line: string; fact?: [string, string]; bg: string; pos: string; flag: string; href: string };
 
@@ -27,7 +28,7 @@ export const destinationCards = (rows: PublicDestination[]): Card[] => [
   fromRow(rows, "united-kingdom"),
 ];
 
-export function DestinationCard({ cards, slug, phone, className = "" }: { cards: Card[]; slug: string; phone?: boolean; className?: string }) {
+export function DestinationCard({ cards, slug, phone, className = "", cta = "Book a consultation" }: { cards: Card[]; slug: string; phone?: boolean; className?: string; cta?: string }) {
   const d = cards.find((x) => x.slug === slug)!;
   return (
     <Link
@@ -51,7 +52,7 @@ export function DestinationCard({ cards, slug, phone, className = "" }: { cards:
               <span className="font-semibold text-ink">{d.fact[0]}</span> {d.fact[1].toLowerCase()}
             </p>
           ) : (
-            <p className="t-small inline-flex h-9 items-center rounded-full bg-surface px-4 font-semibold text-ink">Book a consultation</p>
+            <p className="t-small inline-flex h-9 items-center rounded-full bg-surface px-4 font-semibold text-ink">{cta}</p>
           )}
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ink transition-transform duration-300 group-hover:translate-x-1">
             <img src={img.arrow} alt="" className="h-2 w-3 invert" loading="lazy" decoding="async" />
@@ -62,22 +63,24 @@ export function DestinationCard({ cards, slug, phone, className = "" }: { cards:
   );
 }
 
-export function Destinations({ cards }: { cards: Card[] }) {
+export async function Destinations({ cards }: { cards: Card[] }) {
+  const t = await loadText();
+  const cardCta = t("home.destinations.card_cta", "Book a consultation");
   return (
     <section id="study-abroad" className="pt-section flex w-full flex-col items-center">
       <div className="flex w-full flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
         <Appear className="flex w-full max-w-[860px] flex-col items-center gap-[10px] px-4 md:px-5 lg:px-[30px]">
-          <Badge className="ring-1 ring-hairline">Study abroad</Badge>
-          <h2 className="t-h2 text-center">Countries we help you study in</h2>
-          <p className="t-body text-center text-muted">Study in Australia, the United Kingdom and New Zealand with us.</p>
+          <Badge className="ring-1 ring-hairline">{t("home.destinations.badge", "Study abroad")}</Badge>
+          <h2 className="t-h2 text-center">{t("home.destinations.title", "Countries we help you study in")}</h2>
+          <p className="t-body text-center text-muted">{t("home.destinations.lead", "Study in Australia, the United Kingdom and New Zealand with us.")}</p>
         </Appear>
         <div className="container-x">
           <div className="grid w-full gap-[10px] md:grid-cols-3 md:gap-[30px]">
             {cards.map((d, i) => (
-              <Appear key={d.slug} delay={0.1 * i} className="md:hidden"><DestinationCard cards={cards} slug={d.slug} phone /></Appear>
+              <Appear key={d.slug} delay={0.1 * i} className="md:hidden"><DestinationCard cards={cards} slug={d.slug} phone cta={cardCta} /></Appear>
             ))}
             {cards.map((d, i) => (
-              <Appear key={d.slug} delay={0.1 * i} className="hidden md:block"><DestinationCard cards={cards} slug={d.slug} /></Appear>
+              <Appear key={d.slug} delay={0.1 * i} className="hidden md:block"><DestinationCard cards={cards} slug={d.slug} cta={cardCta} /></Appear>
             ))}
           </div>
         </div>

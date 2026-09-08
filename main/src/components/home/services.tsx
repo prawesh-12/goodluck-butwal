@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { img } from "@/lib/assets";
 import type { PublicService } from "@/server/queries/services";
+import { loadText } from "@/server/queries/text";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, Chip } from "@/components/ui/bits";
@@ -74,21 +75,22 @@ function Tile({ s, icon, t, className = "" }: { s: Service; icon: string; t: Ton
   );
 }
 
-export function Services({ services }: { services: Service[] }) {
+export async function Services({ services }: { services: Service[] }) {
   const [counselling, visa, scholarship, ielts] = services;
+  const t = await loadText();
   return (
     <section id="services" className="py-section flex w-full flex-col items-center">
       <div className="container-x">
         <div className="flex flex-col items-start gap-[30px] md:gap-[50px]">
           <div className="flex w-full flex-col gap-[10px] md:flex-row md:items-end md:gap-[30px] lg:gap-[50px]">
             <Appear className="flex flex-1 flex-col items-start gap-[10px]">
-              <Badge className="ring-1 ring-hairline">Our services</Badge>
-              <h2 className="t-h2">Get the right help</h2>
+              <Badge className="ring-1 ring-hairline">{t("home.services.badge", "Our services")}</Badge>
+              <h2 className="t-h2">{t("home.services.title", "Get the right help")}</h2>
             </Appear>
             <Appear delay={0.1} className="flex flex-1 flex-col items-start gap-4 md:items-end md:gap-5">
-              <p className="t-body text-muted md:text-right">Education counselling, visa guidance, scholarship guidance and IELTS coaching.</p>
+              <p className="t-body text-muted md:text-right">{t("home.services.lead", "Education counselling, visa guidance, scholarship guidance and IELTS coaching.")}</p>
               <PillButton href="/services" tone="dark">
-                View all services
+                {t("home.services.cta", "View all services")}
               </PillButton>
             </Appear>
           </div>

@@ -2,7 +2,8 @@ import { cache } from "react";
 import { slugify } from "@/lib/slug";
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
-import { mediaAssets, postCategories, postTags, posts, settings, tags, testimonials } from "@db/schema";
+import { allSettings } from "./shared";
+import { mediaAssets, postCategories, postTags, posts, tags, testimonials } from "@db/schema";
 
 export type PublicArticle = {
   slug: string;
@@ -93,8 +94,7 @@ export const listSuccessStories = cache(async (): Promise<{ image: string; alt: 
 });
 
 export const getGoogleRating = cache(async () => {
-  const rows = await db.select({ key: settings.key, value: settings.value }).from(settings);
-  const byKey = new Map(rows.map((row) => [row.key, row.value]));
+  const byKey = await allSettings();
   return {
     score: String(byKey.get("google_rating") ?? ""),
     count: Number(byKey.get("google_review_count") ?? 0),

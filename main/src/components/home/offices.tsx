@@ -2,6 +2,7 @@ import { gl } from "@/lib/assets";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/bits";
+import { loadText } from "@/server/queries/text";
 
 // The visa pathways listed on the goodluck_main homepage, and the study destinations shown with the plane.
 const flags = ["/images/flags/australia.svg", "/images/flags/new-zealand.svg", "/images/flags/united-kingdom.svg"];
@@ -35,7 +36,8 @@ function Orbit({ radius, icon, box, ring }: { radius: number; icon: number; box:
   );
 }
 
-export function Offices({ logos }: { logos: string[] }) {
+export async function Offices({ logos }: { logos: string[] }) {
+  const t = await loadText();
   const ring = logos.slice(0, 16);
   return (
     <section id="visas" className="pb-section flex w-full flex-col items-center">
@@ -47,23 +49,23 @@ export function Offices({ logos }: { logos: string[] }) {
             <div aria-hidden className="pointer-events-none absolute -bottom-[40%] left-[10%] size-[420px] rounded-full bg-white/10 blur-[120px]" />
             <div className="relative flex flex-col items-start gap-5 md:gap-[30px]">
               <div className="flex flex-col items-start gap-[10px]">
-                <Badge tone="white" className="ring-1 ring-hairline">Migration</Badge>
-                <h2 className="t-h2 !text-white">Fly your dream destination</h2>
-                <p className="t-body text-gray-text">Apply for your visa now!</p>
+                <Badge tone="white" className="ring-1 ring-hairline">{t("home.offices.badge", "Migration")}</Badge>
+                <h2 className="t-h2 !text-white">{t("home.offices.title", "Fly your dream destination")}</h2>
+                <p className="t-body text-gray-text">{t("home.offices.lead", "Apply for your visa now!")}</p>
               </div>
               <div className="grid w-full gap-2 sm:grid-cols-2">
-                {pathways.map((t) => (
-                  <p key={t} className="flex items-center gap-[10px] rounded-full bg-white/[0.08] py-[9px] pl-3 pr-4 text-[15px] font-medium leading-[18px] text-white ring-1 ring-inset ring-white/10">
+                {pathways.map((pathway, i) => (
+                  <p key={pathway} className="flex items-center gap-[10px] rounded-full bg-white/[0.08] py-[9px] pl-3 pr-4 text-[15px] font-medium leading-[18px] text-white ring-1 ring-inset ring-white/10">
                     <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-green/25">
                       <svg aria-hidden viewBox="0 0 12 10" className="h-[8px] w-[10px]">
                         <path d="M1 5l3.5 3.5L11 1.5" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </span>
-                    {t}
+                    {t(`home.offices.pathway.${i + 1}`, pathway)}
                   </p>
                 ))}
               </div>
-              <PillButton href="/contact/book-consultation">Book a consultation</PillButton>
+              <PillButton href="/contact/book-consultation">{t("home.offices.cta", "Book a consultation")}</PillButton>
             </div>
             <div className="relative flex flex-col items-center gap-4 md:items-end">
               <img src={gl.plane} alt="" className="animate-float w-full max-w-[520px] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)]" loading="lazy" decoding="async" />
@@ -73,7 +75,7 @@ export function Offices({ logos }: { logos: string[] }) {
                     <img key={f} src={f} alt="" className={`size-[26px] rounded-full ring-2 ring-[#1a1a1a] ${i ? "-ml-2" : ""}`} loading="lazy" decoding="async" />
                   ))}
                 </span>
-                Australia, New Zealand and the UK
+                {t("home.offices.destinations", "Australia, New Zealand and the UK")}
               </p>
             </div>
           </div>
@@ -87,7 +89,7 @@ export function Offices({ logos }: { logos: string[] }) {
                 <img src={gl.mark} alt="" className="size-[55%] object-contain" loading="lazy" decoding="async" />
               </span>
               <h3 className="t-h4 max-w-[218px] text-center md:max-w-none">
-                Official representative of <span className="text-blue-deep">100+</span> colleges, universities and TAFE facilities
+                {t("home.offices.claim.before", "Official representative of")} <span className="text-blue-deep">{t("home.offices.claim.count", "100+")}</span> {t("home.offices.claim.after", "colleges, universities and TAFE facilities")}
               </h3>
             </div>
           </div>

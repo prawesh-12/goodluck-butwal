@@ -12,6 +12,7 @@ import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 import { Artwork, ServiceCard } from "@/components/home/services";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
+import { loadText } from "@/server/queries/text";
 
 type Props = { params: Promise<{ slug: string }> };
 export const generateStaticParams = async () => (await listServices()).map((s) => ({ slug: s.slug }));
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ServicePage({ params }: Props) {
-  const faces = (await listTeam()).slice(0, 3);
+  const [faces, t] = await Promise.all([listTeam().then((team) => team.slice(0, 3)), loadText()]);
 
   const { slug } = await params;
   const s = await getService(slug);
@@ -47,7 +48,7 @@ export default async function ServicePage({ params }: Props) {
       <section className="flex w-full flex-col items-center">
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead badge="How it works" title={s.stepsTitle} />
+            <SectionHead badge={t("services.detail.steps.badge", "How it works")} title={s.stepsTitle} />
             <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
               {s.steps.map((st, i) => (
                 <InfoCard key={st.title} label={String(i + 1).padStart(2, "0")} title={st.title} line={st.line} tone={i % 4 === 3 ? "dark" : "surface"} delay={0.1 * (i % 3)} className="min-h-[200px] justify-between" />
@@ -61,7 +62,7 @@ export default async function ServicePage({ params }: Props) {
         <section className="pt-section flex w-full flex-col items-center">
           <div className="container-x">
             <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-              <SectionHead badge="At a glance" title="IELTS at a glance" />
+              <SectionHead badge={t("services.detail.facts.badge", "At a glance")} title={t("services.detail.facts.title", "IELTS at a glance")} />
               <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[10px] lg:grid-cols-4">
                 {s.facts.map((f, i) => (
                   <Appear key={f.label} delay={0.1 * i} className={`flex min-h-[200px] flex-col justify-between gap-[30px] overflow-hidden rounded-[10px] p-5 md:rounded-[30px] md:p-[30px] ${i === 1 ? "icon-dark" : i === 3 ? "bg-[linear-gradient(90deg,#406ae4_0%,#3b82f6_100%)]" : "bg-surface"}`}>
@@ -83,7 +84,7 @@ export default async function ServicePage({ params }: Props) {
               <div className="flex flex-wrap justify-center gap-[10px]">
                 {s.list.map((item) => <Chip key={item} tone="white" wrap>{item}</Chip>)}
               </div>
-              <PillButton href="/contact/book-consultation" tone="dark">Book a consultation</PillButton>
+              <PillButton href="/contact/book-consultation" tone="dark">{t("services.detail.list.cta", "Book a consultation")}</PillButton>
             </Appear>
           </div>
         </section>
@@ -94,8 +95,8 @@ export default async function ServicePage({ params }: Props) {
           <div className="flex flex-col gap-[30px] md:flex-row md:items-start lg:gap-[70px]">
             <Appear className="contents md:flex md:w-[349px] md:flex-col md:items-start md:gap-10 lg:w-[424px] lg:gap-[80px]">
               <div className="order-1 flex flex-col items-start gap-[10px] md:order-none">
-                <h2 className="t-h2">Common questions</h2>
-                <p className="t-body text-muted">Answers from the Goodluck team.</p>
+                <h2 className="t-h2">{t("services.detail.faq.title", "Common questions")}</h2>
+                <p className="t-body text-muted">{t("services.detail.faq.lead", "Answers from the Goodluck team.")}</p>
               </div>
               <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>
@@ -109,7 +110,7 @@ export default async function ServicePage({ params }: Props) {
       <section className="pt-section flex w-full flex-col items-center pb-[30px] md:pb-[60px] lg:pb-[100px]">
         <div className="container-x">
           <div className="flex flex-col items-start gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead align="left" badge="More services" title="Other ways we can help" />
+            <SectionHead align="left" badge={t("services.detail.others.badge", "More services")} title={t("services.detail.others.title", "Other ways we can help")} />
             <div className="grid w-full gap-5 md:grid-cols-3 md:gap-[30px]">
               {others.map((o, i) => (
                 <Appear key={o.slug} delay={0.1 * i} className="h-[300px]">

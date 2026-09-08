@@ -1,21 +1,17 @@
 import { cache } from "react";
-import { eq, like } from "drizzle-orm";
-import { db } from "@db/client";
-import { settings, uiStrings } from "@db/schema";
+import { allSettings, allUiStrings } from "./shared";
 
 export type FooterColumn = { title: string; links: { label: string; href: string }[] };
 export type SocialLink = { label: string; href: string; icon: string };
 
 export const getFooterColumns = cache(async (): Promise<FooterColumn[]> => {
-  const rows = await db
-    .select({ key: uiStrings.key, value: uiStrings.value })
-    .from(uiStrings)
-    .where(like(uiStrings.key, "footer.%"));
-
-  const byKey = new Map(rows.map((row) => [row.key, row.value]));
+  const byKey = await allUiStrings();
   const columns = new Map<string, FooterColumn>();
 
   for (const key of byKey.keys()) {
+    // The map now holds every interface string, not just the footer's, so the prefix does the
+    // filtering the query used to do.
+    if (!key.startsWith("footer.")) continue;
     const [, slug] = key.split(".");
     if (!columns.has(slug)) {
       columns.set(slug, { title: byKey.get(`footer.${slug}.title`) ?? slug, links: [] });
@@ -35,11 +31,6 @@ export const getFooterColumns = cache(async (): Promise<FooterColumn[]> => {
 
 // The footer hides a social link that has no real URL yet.
 export const getSocialLinks = cache(async (): Promise<SocialLink[]> => {
-  const [row] = await db
-    .select({ value: settings.value })
-    .from(settings)
-    .where(eq(settings.key, "social_links"));
-
-  const links = (row?.value as SocialLink[] | undefined) ?? [];
+  const links = ((await allSettings()).get("social_links") as SocialLink[] | undefined) ?? [];
   return links.filter((link) => link.href && link.href !== "#");
 });

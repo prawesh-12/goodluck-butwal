@@ -9,6 +9,15 @@ import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 
 export type FaqItem = { q: string; a: string };
+export type FaqCtaText = { title: string; line: string; cta: string; you: string };
+
+// Pages that do not pass their own wording yet keep these.
+const ctaText: FaqCtaText = {
+  title: "Still have questions?",
+  line: "Book an appointment and our team can assess your case.",
+  cta: "Book an appointment",
+  you: "You",
+};
 
 export function Accordion({ items, defaultOpen = 0, variant = "surface" }: { items: FaqItem[]; defaultOpen?: number | null; variant?: "surface" | "white" }) {
   const [open, setOpen] = useState<number | null>(defaultOpen);
@@ -42,7 +51,7 @@ export function Accordion({ items, defaultOpen = 0, variant = "surface" }: { ite
 }
 
 // "Still have questions" card: three counsellors from the team list plus the reader.
-export function FaqCta({ faces, className = "" }: { faces: PublicMember[]; className?: string }) {
+export function FaqCta({ faces, className = "", text = ctaText }: { faces: PublicMember[]; className?: string; text?: FaqCtaText }) {
   return (
     <div className={`flex w-full flex-col items-start gap-5 overflow-clip rounded-[10px] bg-surface p-5 md:rounded-[30px] md:p-10 ${className}`}>
       <div className="flex items-center gap-[10px]">
@@ -54,32 +63,32 @@ export function FaqCta({ faces, className = "" }: { faces: PublicMember[]; class
           ))}
         </div>
         <p className="text-[18px] font-semibold leading-[23.4px] text-ink">+</p>
-        <span className="flex size-10 items-center justify-center rounded-full bg-[linear-gradient(312deg,#3b82f6_0%,#406ae4_100%)] text-[14px] font-semibold leading-[18.2px] text-white">You</span>
+        <span className="flex size-10 items-center justify-center rounded-full bg-[linear-gradient(312deg,#3b82f6_0%,#406ae4_100%)] text-[14px] font-semibold leading-[18.2px] text-white">{text.you}</span>
       </div>
       <div className="flex flex-col items-start gap-4">
         <div className="flex flex-col items-start gap-1">
-          <h3 className="t-h5">Still have questions?</h3>
-          <p className="t-base text-muted">Book an appointment and our team can assess your case.</p>
+          <h3 className="t-h5">{text.title}</h3>
+          <p className="t-base text-muted">{text.line}</p>
         </div>
         <PillButton href="/contact/book-consultation" tone="dark">
-          Book an appointment
+          {text.cta}
         </PillButton>
       </div>
     </div>
   );
 }
 
-export function Faqs({ faces, items }: { faces: PublicMember[]; items: FaqItem[] }) {
+export function Faqs({ faces, items, text }: { faces: PublicMember[]; items: FaqItem[]; text: { title: string; lead: string; still: FaqCtaText } }) {
   return (
     <section className="flex w-full flex-col items-center pb-[30px] md:pb-[60px] lg:pb-[100px]">
       <div className="container-x">
         <div className="flex flex-col gap-[30px] md:flex-row md:items-start lg:gap-[70px]">
           <Appear className="contents md:flex md:w-[349px] md:flex-col md:items-start md:gap-10 lg:w-[424px] lg:gap-[80px]">
             <div className="order-1 flex flex-col items-start gap-[10px] md:order-none">
-              <h2 className="t-h2">Frequently asked questions</h2>
-              <p className="t-body text-muted">Common questions about programmes, scholarships and visas.</p>
+              <h2 className="t-h2">{text.title}</h2>
+              <p className="t-body text-muted">{text.lead}</p>
             </div>
-            <FaqCta faces={faces} className="order-3 md:order-none" />
+            <FaqCta faces={faces} text={text.still} className="order-3 md:order-none" />
           </Appear>
           <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
             <Accordion items={items} />

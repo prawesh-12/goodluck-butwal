@@ -7,6 +7,7 @@ import { InnerHero } from "@/components/inner";
 import { ServiceCard } from "@/components/home/services";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
+import { loadText } from "@/server/queries/text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
@@ -17,15 +18,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ServicesPage() {
-  const [faces, services, allFaqs] = await Promise.all([
-    listTeam().then((t) => t.slice(0, 3)),
+  const [faces, services, allFaqs, t] = await Promise.all([
+    listTeam().then((team) => team.slice(0, 3)),
     listServices(),
     listAllFaqs(),
+    loadText(),
   ]);
 
   return (
     <>
-      <InnerHero badge="Our services" title="Get the right help" lead="We have the perfect solution for international students. Now, they no longer have to worry about education counselling, finding work, obtaining visas, or anything else." width={1260} after={
+      <InnerHero badge={t("services.hero.badge", "Our services")} title={t("services.hero.title", "Get the right help")} lead={t("services.hero.lead", "We have the perfect solution for international students. Now, they no longer have to worry about education counselling, finding work, obtaining visas, or anything else.")} width={1260} after={
         <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">
           {services.map((s, i) => (
             <Appear key={s.slug} delay={0.1 * i} className="min-w-0">
@@ -39,8 +41,8 @@ export default async function ServicesPage() {
           <div className="flex flex-col gap-[30px] md:flex-row md:items-start lg:gap-[70px]">
             <Appear className="contents md:flex md:w-[349px] md:flex-col md:items-start md:gap-10 lg:w-[424px] lg:gap-[80px]">
               <div className="order-1 flex flex-col items-start gap-[10px] md:order-none">
-                <h2 className="t-h2">Frequently asked questions</h2>
-                <p className="t-body text-muted">Common questions about programmes, universities and scholarships.</p>
+                <h2 className="t-h2">{t("services.faq.title", "Frequently asked questions")}</h2>
+                <p className="t-body text-muted">{t("services.faq.lead", "Common questions about programmes, universities and scholarships.")}</p>
               </div>
               <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>

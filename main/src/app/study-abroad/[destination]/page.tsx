@@ -13,6 +13,7 @@ import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 import { listInstitutions } from "@/server/queries/catalogue";
 import { InstitutionCard } from "@/components/catalogue/institution-card";
+import { loadText } from "@/server/queries/text";
 
 type Props = { params: Promise<{ destination: string }> };
 export const generateStaticParams = async () =>
@@ -31,9 +32,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 const keyword: Record<string, RegExp> = { australia: /australia/i, "united-kingdom": /\bUK\b|United Kingdom/i };
 
 export default async function DestinationPage({ params }: Props) {
-  const [faces, allFaqs] = await Promise.all([
-    listTeam().then((t) => t.slice(0, 3)),
+  const [faces, allFaqs, t] = await Promise.all([
+    listTeam().then((team) => team.slice(0, 3)),
     listAllFaqs(),
+    loadText(),
   ]);
 
   const { destination } = await params;
@@ -46,7 +48,7 @@ export default async function DestinationPage({ params }: Props) {
   return (
     <>
       <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "Study abroad", path: "/study-abroad" }, { name: d.name, path: `/study-abroad/${d.slug}` }])} />
-      <InnerHero bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" title={`Study in ${d.name}`} lead={d.overview} badge={undefined} className="[&_h1]:order-2 [&_p]:order-3" after={
+      <InnerHero bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" title={`${t("study.destination.hero.title_prefix", "Study in")} ${d.name}`} lead={d.overview} badge={undefined} className="[&_h1]:order-2 [&_p]:order-3" after={
         <Appear delay={0.1} className="w-full">
           <div className="aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]">
             <img src={d.hero} alt={d.heroAlt} className="size-full object-cover" loading="lazy" decoding="async" />
@@ -55,7 +57,7 @@ export default async function DestinationPage({ params }: Props) {
       }>
         <div className="order-1 flex items-center gap-[10px]">
           <span className="flex size-[38px] items-center justify-center rounded-full bg-white ring-1 ring-hairline"><img src={d.flag} alt="" className="size-5 rounded-full" loading="lazy" decoding="async" /></span>
-          <Chip tone="white">Study abroad</Chip>
+          <Chip tone="white">{t("study.destination.hero.chip", "Study abroad")}</Chip>
         </div>
       </InnerHero>
 
@@ -72,7 +74,7 @@ export default async function DestinationPage({ params }: Props) {
       <section className="pt-section flex w-full flex-col items-center">
         <div className="container-x">
           <div className="grid gap-5 md:grid-cols-2 md:gap-[30px]">
-            {[["Education", "Academic period", d.academic], ["Work", "Work while you study", d.work]].map(([badge, title, text], i) => (
+            {[[t("study.destination.academic.badge", "Education"), t("study.destination.academic.title", "Academic period"), d.academic], [t("study.destination.work.badge", "Work"), t("study.destination.work.title", "Work while you study"), d.work]].map(([badge, title, text], i) => (
               <Appear key={title} delay={0.1 * i} className="flex flex-col items-start gap-5 overflow-hidden rounded-[10px] bg-surface p-5 md:rounded-[30px] md:p-10">
                 <Badge tone="white" className="ring-1 ring-hairline">{badge}</Badge>
                 <div className="flex flex-col items-start gap-[10px]">
@@ -88,7 +90,7 @@ export default async function DestinationPage({ params }: Props) {
       <section className="pt-section flex w-full flex-col items-center">
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead badge="Migration" title={d.migrationTitle} lead="Indicative only. Confirm current visa details with a Goodluck counsellor." />
+            <SectionHead badge={t("study.destination.migration.badge", "Migration")} title={d.migrationTitle} lead={t("study.destination.migration.note", "Indicative only. Confirm current visa details with a Goodluck counsellor.")} />
             <div className="grid w-full gap-5 md:grid-cols-3 md:gap-[30px]">
               {d.migration.map((m, i) => (
                 <InfoCard key={m.title} title={m.title} line={m.line} tone={i === 0 ? "blue" : "surface"} delay={0.1 * i} className="min-h-[200px] justify-between" />
@@ -108,9 +110,9 @@ export default async function DestinationPage({ params }: Props) {
             </Appear>
             <Appear delay={0.1} className="order-1 flex flex-1 flex-col items-start gap-5 md:order-2 md:gap-10">
               <div className="flex flex-col items-start gap-[10px]">
-                <Badge className="ring-1 ring-hairline">Why {d.name}</Badge>
+                <Badge className="ring-1 ring-hairline">{t("study.destination.why.badge_prefix", "Why")} {d.name}</Badge>
                 <h2 className="t-h2">{d.whyTitle}</h2>
-                <PillButton href="/contact/book-consultation" tone="dark">Book a consultation</PillButton>
+                <PillButton href="/contact/book-consultation" tone="dark">{t("study.destination.why.cta", "Book a consultation")}</PillButton>
               </div>
               <div className="flex flex-col items-start gap-[10px]">
                 {d.why.map((w) => <CheckRow key={w}>{w}</CheckRow>)}
@@ -130,7 +132,7 @@ export default async function DestinationPage({ params }: Props) {
               </div>
             </Appear>
             <Appear delay={0.1} className="flex flex-col items-start gap-5 overflow-hidden rounded-[10px] bg-surface p-5 md:rounded-[30px] md:p-10">
-              <h2 className="t-h3">{d.costs ? "Estimated costs" : "How we help"}</h2>
+              <h2 className="t-h3">{d.costs ? t("study.destination.costs.title", "Estimated costs") : t("study.destination.help_card.title", "How we help")}</h2>
               <div className="flex flex-col items-start gap-4">
                 {(d.costs ?? d.help).map((c) => (
                   <div key={c.title} className="flex flex-col gap-[2px]">
@@ -138,7 +140,7 @@ export default async function DestinationPage({ params }: Props) {
                     <p className="t-base text-muted">{c.line}</p>
                   </div>
                 ))}
-                {d.costs && <p className="t-small text-muted">Indicative only. Confirm current figures with a Goodluck counsellor.</p>}
+                {d.costs && <p className="t-small text-muted">{t("study.destination.costs.note", "Indicative only. Confirm current figures with a Goodluck counsellor.")}</p>}
               </div>
             </Appear>
           </div>
@@ -148,13 +150,13 @@ export default async function DestinationPage({ params }: Props) {
       <section className="pt-section flex w-full flex-col items-center">
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead badge="How we help" title="From free consultation to visa" />
+            <SectionHead badge={t("study.destination.help.badge", "How we help")} title={t("study.destination.help.title", "From free consultation to visa")} />
             <div className="grid w-full gap-5 md:grid-cols-3 md:gap-[30px]">
               {d.help.map((h, i) => (
                 <InfoCard key={h.title} label={`0${i + 1}`} title={h.title} line={h.line} tone={i === 0 ? "dark" : "surface"} delay={0.1 * i} className="min-h-[200px] justify-between" />
               ))}
             </div>
-            <Appear><PillButton href="/contact/book-consultation">Book a free consultation</PillButton></Appear>
+            <Appear><PillButton href="/contact/book-consultation">{t("study.destination.help.cta", "Book a free consultation")}</PillButton></Appear>
           </div>
         </div>
       </section>
@@ -163,11 +165,11 @@ export default async function DestinationPage({ params }: Props) {
         <section className="pt-section flex w-full flex-col items-center">
           <div className="container-x">
             <div className="flex flex-col items-start gap-[30px] md:gap-10 lg:gap-[50px]">
-              <SectionHead align="left" badge="Institutions" title={`Relevant institutions in ${d.name}`} />
+              <SectionHead align="left" badge={t("study.destination.institutions.badge", "Institutions")} title={`${t("study.destination.institutions.title_prefix", "Relevant institutions in")} ${d.name}`} />
               <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
                 {relevantInstitutions.map((i, n) => <InstitutionCard key={i.slug} institution={i} delay={0.05 * n} />)}
               </div>
-              <Appear><PillButton href="/institutions" tone="dark">See all institutions</PillButton></Appear>
+              <Appear><PillButton href="/institutions" tone="dark">{t("study.destination.institutions.cta", "See all institutions")}</PillButton></Appear>
             </div>
           </div>
         </section>
@@ -177,7 +179,7 @@ export default async function DestinationPage({ params }: Props) {
         <section className="pt-section flex w-full flex-col items-center">
           <div className="container-x">
             <div className="flex flex-col items-start gap-[30px] md:gap-10 lg:gap-[50px]">
-              <SectionHead align="left" badge="News" title={`Latest on ${d.name}`} />
+              <SectionHead align="left" badge={t("study.destination.news.badge", "News")} title={`${t("study.destination.news.title_prefix", "Latest on")} ${d.name}`} />
               <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
                 {news.map((a, i) => <NewsCard key={a.slug} article={a} delay={0.05 * i} className={i === 2 ? "md:col-span-2 lg:col-span-1" : ""} />)}
               </div>
@@ -191,8 +193,8 @@ export default async function DestinationPage({ params }: Props) {
           <div className="flex flex-col gap-[30px] md:flex-row md:items-start lg:gap-[70px]">
             <Appear className="contents md:flex md:w-[349px] md:flex-col md:items-start md:gap-10 lg:w-[424px] lg:gap-[80px]">
               <div className="order-1 flex flex-col items-start gap-[10px] md:order-none">
-                <h2 className="t-h2">Frequently asked questions</h2>
-                <p className="t-body text-muted">Common questions about programmes, scholarships and visas.</p>
+                <h2 className="t-h2">{t("study.destination.faq.title", "Frequently asked questions")}</h2>
+                <p className="t-body text-muted">{t("study.destination.faq.lead", "Common questions about programmes, scholarships and visas.")}</p>
               </div>
               <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>
