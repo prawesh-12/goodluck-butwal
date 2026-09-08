@@ -6,7 +6,7 @@ export const metadata = { title: "Goodluck admin", robots: { index: false, follo
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${interDisplay.variable} ${bricolage.variable}`}>
+    <html lang="en" className={`admin-root ${interDisplay.variable} ${bricolage.variable}`}>
       <body>{children}</body>
     </html>
   );
