@@ -1,3 +1,5 @@
+import { reportError } from "./sentry";
+
 type Message = {
   to: string | string[];
   subject: string;
@@ -57,7 +59,10 @@ export async function sendEmailQuietly(message: Message) {
     await sendEmail(message);
     return true;
   } catch (error) {
-    console.error("email failed", { subject: message.subject, error });
+    // The row is already saved, so a failed send must not fail the request. It is reported
+    // instead, with the subject only: the body carries the enquirer's own words.
+    console.error("email failed", { subject: message.subject });
+    void reportError(error, { route: "email" });
     return false;
   }
 }
