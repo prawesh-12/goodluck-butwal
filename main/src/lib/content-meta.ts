@@ -71,3 +71,20 @@ export type SettingsValues = {
   google_rating: string;
   google_review_count: number;
 };
+
+export const eventTypes = [
+  "seminar",
+  "education_fair",
+  "webinar",
+  "workshop",
+  "info_session",
+] as const;
+export type EventType = (typeof eventTypes)[number];
+
+export const eventTypeLabels: Record<EventType, string> = {
+  seminar: "Seminar",
+  education_fair: "Education fair",
+  webinar: "Webinar",
+  workshop: "Workshop",
+  info_session: "Info session",
+};

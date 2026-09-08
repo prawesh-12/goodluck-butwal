@@ -76,6 +76,7 @@ export const nav = [
   { label: "Institutions", href: "/institutions" },
   { label: "Services", href: "/services" },
   { label: "News", href: "/news" },
+  { label: "Events", href: "/events" },
   { label: "Contact", href: "/contact" },
 ];
 

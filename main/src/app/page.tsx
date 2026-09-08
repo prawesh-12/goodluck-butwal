@@ -13,6 +13,8 @@ import { Reviews } from "@/components/home/reviews";
 import { Stories } from "@/components/home/stories";
 import { News } from "@/components/home/news";
 import { Faqs } from "@/components/home/faqs";
+import { Events } from "@/components/home/events";
+import { listUpcomingEvents } from "@/server/queries/events";
 
 export default async function Home() {
   const [logos, faces, services, allFaqs, cards, articles, reviews, successStories, googleRating, about] =
@@ -29,6 +31,8 @@ export default async function Home() {
     getAboutContent(),
   ]);
 
+  const upcomingEvents = await listUpcomingEvents();
+
   return (
     <>
       <Hero googleRating={googleRating} />
@@ -39,6 +43,7 @@ export default async function Home() {
       <Stories successStories={successStories} googleRating={googleRating} />
       <Offices logos={logos} />
       <News articles={articles} />
+      <Events events={upcomingEvents} />
       <Faqs faces={faces} items={allFaqs} />
     </>
   );

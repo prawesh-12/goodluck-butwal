@@ -4,14 +4,17 @@ import { can, type Actor, type Entity } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { csvResponse, toCsv } from "@/lib/csv";
 import { exportConsultations, exportEnquiries, type LeadFilters } from "@/server/queries/leads";
+import { exportEventRegistrations } from "@/server/queries/admin-events";
 
 export const dynamic = "force-dynamic";
 
-type Export = { entity: Entity; run: (actor: Actor, f: LeadFilters) => Promise<Record<string, unknown>[]> };
+type Filters = LeadFilters & { event?: string };
+type Export = { entity: Entity; run: (actor: Actor, f: Filters) => Promise<Record<string, unknown>[]> };
 
 const EXPORTS: Record<string, Export> = {
   enquiries: { entity: "enquiries", run: exportEnquiries },
   consultations: { entity: "consultations", run: exportConsultations },
+  "event-registrations": { entity: "registrations", run: exportEventRegistrations },
 };
 
 export async function GET(request: Request, { params }: { params: Promise<{ entity: string }> }) {
@@ -31,7 +34,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ enti
   }
 
   const url = new URL(request.url);
-  const filters: LeadFilters = {
+  const filters: Filters = {
+    event: url.searchParams.get("event") ?? undefined,
     q: url.searchParams.get("q") ?? undefined,
     status: url.searchParams.get("status") ?? undefined,
     from: url.searchParams.get("from") ?? undefined,
