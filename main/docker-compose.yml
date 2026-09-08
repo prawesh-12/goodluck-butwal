@@ -15,5 +15,17 @@ services:
       timeout: 3s
       retries: 20
 
+  # The app only speaks Neon's HTTP protocol. This serves it in front of the local Postgres so
+  # local and production run the same driver and the same client code.
+  neon-http:
+    image: ghcr.io/timowilhelm/local-neon-http-proxy:main
+    environment:
+      PG_CONNECTION_STRING: postgres://postgres:postgres@postgres:5432/goodluck
+    ports:
+      - "4444:4444"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   pgdata:

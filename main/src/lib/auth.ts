@@ -3,11 +3,12 @@ import { redirect } from "next/navigation";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { APIError } from "better-auth/api";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { users, sessions, accounts, verifications } from "@db/schema";
 import { sendEmail } from "./email";
+import { writeAudit } from "./audit";
 import type { Actor, UserRole } from "./rbac";
 
 const WEEK = 60 * 60 * 24 * 7;
@@ -74,6 +75,21 @@ export const auth = betterAuth({
         },
       },
     },
+  },
+
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path !== "/sign-in/email") return;
+
+      const signedIn = ctx.context.newSession?.user;
+      await writeAudit({
+        userId: signedIn?.id ?? null,
+        action: signedIn ? "login" : "login_failed",
+        entityType: "users",
+        entityId: signedIn?.id,
+        summary: signedIn ? `${signedIn.email} signed in` : `failed sign in for ${ctx.body?.email}`,
+      });
+    }),
   },
 
   plugins: [nextCookies()],
