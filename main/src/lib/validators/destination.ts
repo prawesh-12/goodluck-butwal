@@ -1,3 +1,4 @@
+import { destinationPath } from "../content-meta";
 import { z } from "zod";
 import { contentStatuses, mediaId, seoFields, slugField } from "./page";
 
@@ -73,9 +74,7 @@ export const updateDestinationSchema = z.object({ id: z.uuid(), ...destinationFi
 
 export type DestinationInput = z.infer<typeof createDestinationSchema>;
 
-export function destinationPath(slug: string) {
-  return `/study-abroad/${slug}`;
-}
+
 
 export function destinationPublishProblems(d: {
   name: string;
@@ -112,3 +111,4 @@ export function destinationPublishProblems(d: {
   if (d.help.length === 0) problems.push("There are no help blocks.");
   return problems;
 }
+export { destinationPath };

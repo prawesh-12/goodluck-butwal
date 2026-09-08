@@ -1,7 +1,7 @@
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { db } from "@db/client";
 import { auditLog, users } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { formatInOfficeTz } from "@/lib/datetime";
 

@@ -5,7 +5,7 @@ import { count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
 import { postCategories, postTags, posts, tags } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { requirePermission } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { uniqueSlug } from "@/lib/slug";

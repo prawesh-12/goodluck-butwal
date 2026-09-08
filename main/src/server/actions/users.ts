@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { and, count, eq, ne } from "drizzle-orm";
 import { db } from "@db/client";
 import { users } from "@db/schema";
-import { auth, requireActor } from "@/lib/auth";
+// The only place outside the auth route that needs the full server: creating an account
+// has to hash the password.
+import { auth } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { requirePermission } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { refusalReason } from "@/lib/user-rules";

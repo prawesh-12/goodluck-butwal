@@ -1,4 +1,4 @@
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
 import { PostCategoryManager } from "@/components/admin/post-category-manager";

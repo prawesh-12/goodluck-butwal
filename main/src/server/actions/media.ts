@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { requireOwnership, requirePermission } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { findInRichText, findUsage } from "@/server/queries/media";

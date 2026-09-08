@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateOffice } from "@/server/actions/offices";
-import { DAY_NAMES } from "@/lib/validators/office";
+import { DAY_NAMES } from "@/lib/content-meta";
 import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import { Field, SeoSection } from "@/components/admin/seo-section";
 

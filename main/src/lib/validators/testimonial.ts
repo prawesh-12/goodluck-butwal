@@ -1,12 +1,17 @@
 import { z } from "zod";
 import { contentStatuses, httpsUrl, mediaId, text } from "./office";
+import {
+  CONSENT_REQUIRED,
+  requiredFieldsFor,
+  testimonialTypes,
+  videoProviders,
+  type RequiredField,
+  type Requirement,
+  type TestimonialType,
+} from "../content-meta";
 
-export const CONSENT_REQUIRED = "Record consent before publishing.";
-
-export const testimonialTypes = ["text", "image", "video"] as const;
-export const videoProviders = ["youtube", "vimeo", "local"] as const;
-
-export type TestimonialType = (typeof testimonialTypes)[number];
+export { CONSENT_REQUIRED, requiredFieldsFor, testimonialTypes, videoProviders };
+export type { RequiredField, Requirement, TestimonialType };
 
 const optionalId = z.union([z.literal(""), z.uuid("Choose one from the list.")]).default("");
 
@@ -16,30 +21,8 @@ const goLiveAt = z
   .refine((v) => v === "" || !Number.isNaN(Date.parse(v)), "Choose a date and a time.")
   .default("");
 
-type RequiredField = "quote" | "imageId" | "videoUrl" | "videoProvider";
-
-export type Requirement = { field: RequiredField; label: string; message: string };
-
 // The type selector decides what the record must carry. One list, read by the form, the schema
 // and the publish check.
-export function requiredFieldsFor(type: TestimonialType): Requirement[] {
-  if (type === "text") {
-    return [{ field: "quote", label: "Quote", message: "A written testimonial needs the quote." }];
-  }
-  if (type === "image") {
-    return [
-      { field: "imageId", label: "Image", message: "An image testimonial needs the image." },
-    ];
-  }
-  return [
-    { field: "videoUrl", label: "Video link", message: "A video testimonial needs the video link." },
-    {
-      field: "videoProvider",
-      label: "Video provider",
-      message: "Say whether the video is on YouTube, Vimeo or hosted here.",
-    },
-  ];
-}
 
 const fields = {
   type: z.enum(testimonialTypes),
@@ -87,7 +70,7 @@ function valueOf(data: Core, field: RequiredField) {
 }
 
 export function missingForType(data: Core): Requirement[] {
-  return requiredFieldsFor(data.type).filter((need) => !valueOf(data, need.field).trim());
+  return requiredFieldsFor(data.type).filter((need) => !(valueOf(data, need.field) ?? "").trim());
 }
 
 function checkFields(

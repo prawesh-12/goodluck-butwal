@@ -10,7 +10,7 @@ import {
   testimonialTypes,
   videoProviders,
   type TestimonialType,
-} from "@/lib/validators/testimonial";
+} from "@/lib/content-meta";
 import {
   archiveTestimonial,
   createTestimonial,

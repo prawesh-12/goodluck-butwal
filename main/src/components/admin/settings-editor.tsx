@@ -3,11 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateSettings } from "@/server/actions/settings";
-import type { SettingsInput } from "@/lib/validators/settings";
+import type { SettingsValues } from "@/lib/content-meta";
 
 type FieldErrors = Record<string, string[] | undefined>;
 
-export function SettingsEditor({ values, readOnly }: { values: SettingsInput; readOnly: boolean }) {
+export function SettingsEditor({ values, readOnly }: { values: SettingsValues; readOnly: boolean }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);

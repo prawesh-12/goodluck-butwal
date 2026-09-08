@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow, allowOwn } from "@/lib/guard";
 import { formatInOfficeTz } from "@/lib/datetime";
 import { getEnquiry } from "@/server/queries/leads";

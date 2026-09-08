@@ -1,7 +1,7 @@
 import { asc } from "drizzle-orm";
 import { db } from "@db/client";
 import { uiStrings } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { SiteTextEditor, type SiteTextGroup } from "@/components/admin/site-text-editor";
 

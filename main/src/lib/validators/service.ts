@@ -1,8 +1,8 @@
+import { tones } from "../content-meta";
 import { z } from "zod";
 import { contentStatuses, mediaId, seoFields, slugField } from "./page";
 
 // The four bento colours the homepage already paints these cards in. Nothing else renders.
-export const tones = ["blue", "dark", "surface", "white"] as const;
 export const serviceCategories = ["education", "study_abroad", "test_prep", "migration"] as const;
 export const officeScopes = ["both", "au", "np"] as const;
 
@@ -84,3 +84,4 @@ export function servicePublishProblems(s: {
   if (s.documents.length > 0 && !s.listTitle.trim()) problems.push("The documents list has no heading.");
   return problems;
 }
+export { tones };

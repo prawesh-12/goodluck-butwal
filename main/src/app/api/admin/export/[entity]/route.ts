@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { can, type Actor, type Entity } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { csvResponse, toCsv } from "@/lib/csv";

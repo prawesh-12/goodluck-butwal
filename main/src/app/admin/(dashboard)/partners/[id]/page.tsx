@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
 import { getAdminPartner, pickedMedia } from "@/server/queries/admin-people";

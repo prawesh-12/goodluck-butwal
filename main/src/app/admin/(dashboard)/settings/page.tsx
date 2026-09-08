@@ -1,6 +1,6 @@
 import { db } from "@db/client";
 import { settings } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
 import { SettingsEditor } from "@/components/admin/settings-editor";

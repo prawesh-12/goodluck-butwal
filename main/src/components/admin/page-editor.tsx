@@ -6,7 +6,7 @@ import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import { Field, Repeater, SaveBar, Select, TextArea, Toggle } from "@/components/admin/repeater";
 import { SeoFields, type SeoValue } from "@/components/admin/page-seo-fields";
 import { createPage, deletePage, updatePage } from "@/server/actions/pages";
-import { pagePath } from "@/lib/validators/page";
+import { pagePath } from "@/lib/content-meta";
 
 type Blocks = Record<string, unknown>;
 

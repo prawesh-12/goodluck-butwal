@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow, allowOwn } from "@/lib/guard";
 import { can } from "@/lib/rbac";
 import { TestimonialForm } from "@/components/admin/testimonial-form";

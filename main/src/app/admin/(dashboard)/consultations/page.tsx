@@ -1,4 +1,4 @@
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { LeadFilters } from "@/components/admin/lead-filters";
 import { ConfirmButton } from "@/components/admin/confirm-button";

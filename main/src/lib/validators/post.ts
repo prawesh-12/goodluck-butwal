@@ -1,7 +1,7 @@
+import { EXCERPT_MAX } from "../content-meta";
 import { z } from "zod";
 import { contentStatuses, httpsUrl, mediaId, slugField, text } from "./office";
 
-export const EXCERPT_MAX = 200;
 
 const slugOrBlank = z.union([z.literal(""), slugField]).default("");
 
@@ -128,3 +128,4 @@ const tagFields = {
 
 export const createTagSchema = z.object(tagFields);
 export const updateTagSchema = z.object({ id: z.uuid(), ...tagFields });
+export { EXCERPT_MAX };

@@ -6,7 +6,7 @@ import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import { Field, Repeater, SaveBar, Select, TextArea, Toggle } from "@/components/admin/repeater";
 import { SeoFields, type SeoValue } from "@/components/admin/page-seo-fields";
 import { createService, deleteService, updateService } from "@/server/actions/services";
-import { servicePath, tones } from "@/lib/validators/service";
+import { servicePath, tones } from "@/lib/content-meta";
 
 type Step = { title: string; body: string };
 type Fact = { label: string; value: string };

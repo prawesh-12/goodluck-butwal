@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { desc, ilike, or } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { can } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { ForbiddenError, requirePermission } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { sniffImageType, uploadImage } from "@/lib/cloudinary";

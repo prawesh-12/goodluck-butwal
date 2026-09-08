@@ -1,5 +1,3 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
@@ -9,7 +7,6 @@ import { db } from "@db/client";
 import { users, sessions, accounts, verifications } from "@db/schema";
 import { sendEmail } from "./email";
 import { writeAudit } from "./audit";
-import type { Actor, UserRole } from "./rbac";
 
 const WEEK = 60 * 60 * 24 * 7;
 const DAY = 60 * 60 * 24;
@@ -94,21 +91,3 @@ export const auth = betterAuth({
 
   plugins: [nextCookies()],
 });
-
-export async function currentActor(): Promise<Actor | null> {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session?.user) return null;
-
-  const { id, role, officeId, isActive } = session.user as typeof session.user & {
-    role: UserRole;
-    officeId: string | null;
-    isActive: boolean;
-  };
-  return { id, role, officeId, isActive };
-}
-
-export async function requireActor(): Promise<Actor> {
-  const actor = await currentActor();
-  if (!actor?.isActive) redirect("/admin/login");
-  return actor;
-}

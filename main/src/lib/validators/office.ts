@@ -1,3 +1,4 @@
+import { DAY_NAMES } from "../content-meta";
 import { z } from "zod";
 
 export const contentStatuses = ["draft", "scheduled", "published", "archived"] as const;
@@ -34,7 +35,6 @@ export const slugField = z
 
 const time = /^([01]\d|2[0-3]):[0-5]\d$/;
 
-export const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export const openingHoursSchema = z
   .array(
@@ -105,3 +105,4 @@ export function officePublishProblems(data: OfficeInput, alt: AltText): string[]
   if (data.seoOgImageId && !alt.shareImage) missing.push("Alt text on the share image");
   return missing;
 }
+export { DAY_NAMES };

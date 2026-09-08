@@ -6,7 +6,7 @@ import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import { Field, Repeater, SaveBar, Select, TextArea, Toggle } from "@/components/admin/repeater";
 import { SeoFields, type SeoValue } from "@/components/admin/page-seo-fields";
 import { createDestination, deleteDestination, updateDestination } from "@/server/actions/destinations";
-import { destinationPath } from "@/lib/validators/destination";
+import { destinationPath } from "@/lib/content-meta";
 
 type Highlight = { label: string; value: string; note: string };
 type Line = { text: string };

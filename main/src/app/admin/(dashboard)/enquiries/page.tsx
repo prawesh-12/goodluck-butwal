@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { formatInOfficeTz } from "@/lib/datetime";
 import { LeadFilters } from "@/components/admin/lead-filters";

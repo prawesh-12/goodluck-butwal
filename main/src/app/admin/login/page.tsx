@@ -20,9 +20,9 @@ export default function LoginPage() {
       password: String(form.get("password")),
     });
 
-    if (result.error) {
+    if (!result.ok) {
       // Never say which half was wrong, it tells an attacker which emails exist.
-      setError(result.error.message ?? "That email and password did not match.");
+      setError("That email and password did not match.");
       setBusy(false);
       return;
     }

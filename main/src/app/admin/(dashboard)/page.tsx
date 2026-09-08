@@ -1,7 +1,7 @@
 import { and, count, eq, gte, inArray } from "drizzle-orm";
 import { db } from "@db/client";
 import { consultations, enquiries, events, posts, testPrepBatches } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { can, scopedWhere, type Actor } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";

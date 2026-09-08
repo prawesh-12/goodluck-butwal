@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { FaqEditor } from "@/components/admin/repeater-faqs";
 import { getAdminDestination, listDestinationFaqs } from "@/server/queries/admin-content";

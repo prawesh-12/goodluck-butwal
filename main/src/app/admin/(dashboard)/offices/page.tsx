@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { ContentFilters } from "@/components/admin/content-filters";
 import { listAdminOffices, PAGE_SIZE, type AdminFilters } from "@/server/queries/admin-people";

@@ -1,3 +1,4 @@
+import { pagePath } from "../content-meta";
 import { z } from "zod";
 
 export const contentStatuses = ["draft", "scheduled", "published", "archived"] as const;
@@ -117,10 +118,7 @@ export const updatePageSchema = z.object({ id: z.uuid(), ...pageFields }).superR
 export type PageInput = z.infer<typeof createPageSchema>;
 
 // The About page lives at /about, its children hang off it, legal pages sit under /legal.
-export function pagePath(parent: string, slug: string) {
-  if (parent === "legal") return `/legal/${slug}`;
-  return slug === "about" ? "/about" : `/about/${slug}`;
-}
+
 
 export type AttachedImage = { label: string; id: string | null; altText: string | null };
 
@@ -211,3 +209,4 @@ export function publishRefusal(problems: string[]) {
     fieldErrors: { publish: problems },
   };
 }
+export { pagePath };

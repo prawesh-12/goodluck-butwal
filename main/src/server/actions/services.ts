@@ -5,7 +5,7 @@ import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
 import { mediaAssets, redirects, serviceFaqs, services, uiStrings } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { ForbiddenError, requirePermission, type Actor } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { sanitize } from "@/lib/sanitize";

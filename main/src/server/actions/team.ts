@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@db/client";
 import { redirects, teamMembers } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { can, requireOwnership, requirePermission, type Actor } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { sanitize } from "@/lib/sanitize";

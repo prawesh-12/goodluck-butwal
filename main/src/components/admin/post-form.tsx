@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { company } from "@/lib/site";
 import { slugify } from "@/lib/slug";
-import { EXCERPT_MAX } from "@/lib/validators/post";
+import { EXCERPT_MAX } from "@/lib/content-meta";
 import { archivePost, createPost, updatePost } from "@/server/actions/posts";
 import { MediaPicker, type PickedMedia } from "./media-picker";
 import { SeoFields, type SeoValue } from "./page-seo-fields";

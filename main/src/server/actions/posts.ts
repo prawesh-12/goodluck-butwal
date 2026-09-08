@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
 import { postTags, posts, redirects } from "@db/schema";
-import { requireActor } from "@/lib/auth";
+import { requireActor } from "@/lib/session";
 import { can, requireOwnership, requirePermission } from "@/lib/rbac";
 import { writeAudit } from "@/lib/audit";
 import { sanitize } from "@/lib/sanitize";
