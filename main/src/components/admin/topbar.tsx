@@ -15,21 +15,23 @@ export function TopBar({ name, role }: { name: string; role: string }) {
 
   return (
     <header className="admin-topbar">
-      <div className="admin-identity">
-        <span className="t-base">{name}</span>
-        <span className="admin-badge">{ROLE_LABEL[role] ?? role}</span>
-      </div>
+      <div className="admin-topbar-inner">
+        <div className="admin-identity">
+          <span className="t-base">{name}</span>
+          <span className="admin-badge">{ROLE_LABEL[role] ?? role}</span>
+        </div>
 
-      <button
-        type="button"
-        className="admin-btn"
-        onClick={async () => {
-          await signOut();
-          router.replace("/admin/login");
-        }}
-      >
-        Sign out
-      </button>
+        <button
+          type="button"
+          className="admin-btn"
+          onClick={async () => {
+            await signOut();
+            router.replace("/admin/login");
+          }}
+        >
+          Sign out
+        </button>
+      </div>
     </header>
   );
 }

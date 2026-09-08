@@ -139,7 +139,7 @@
 
 /* Admin panel. Every rule is scoped under .admin so the public pages cannot be reached. */
 .admin { display: flex; min-height: 100vh; background: var(--color-surface); font-family: var(--font-body); }
-.admin-sidebar { width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid var(--color-hairline); padding: 20px 0; overflow-y: auto; }
+.admin-sidebar { position: sticky; top: 0; align-self: flex-start; width: 240px; height: 100vh; flex-shrink: 0; background: #fff; border-right: 1px solid var(--color-hairline); padding: 20px 0; overflow-y: auto; }
 .admin-brand { display: block; padding: 0 20px 20px; font-family: var(--font-display); font-weight: 600; font-size: 20px; color: var(--color-ink); }
 .admin-nav-group { padding: 12px 0; }
 .admin-nav-heading { padding: 0 20px 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--color-gray-text); }
@@ -148,10 +148,12 @@
 .admin-nav-link[aria-current="page"] { color: var(--color-blue-deep); background: var(--color-surface); box-shadow: inset 3px 0 0 var(--color-blue-deep); }
 
 .admin-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.admin-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 28px; background: #fff; border-bottom: 1px solid var(--color-hairline); }
+/* The bar spans the width so its rule does, but its contents line up with the column below. */
+.admin-topbar { position: sticky; top: 0; z-index: 4; padding: 14px 28px; background: #fff; border-bottom: 1px solid var(--color-hairline); }
+.admin-topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; max-width: 1044px; margin: 0 auto; }
 .admin-identity { display: flex; align-items: center; gap: 10px; }
 .admin-badge { padding: 3px 9px; border-radius: 999px; background: var(--color-surface); border: 1px solid var(--color-hairline); font-size: 12px; font-weight: 600; color: var(--color-muted); }
-.admin-content { padding: 28px; flex: 1; }
+.admin-content { width: 100%; max-width: 1100px; margin: 0 auto; padding: 28px; flex: 1; }
 
 .admin-tiles { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); margin-top: 18px; }
 .admin-tile { display: flex; flex-direction: column; gap: 4px; padding: 18px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; color: var(--color-muted); }
@@ -160,11 +162,22 @@
 .admin-login { align-items: center; justify-content: center; }
 .admin-login-card { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 360px; padding: 28px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 12px; }
 .admin-field { display: flex; flex-direction: column; gap: 5px; color: var(--color-muted); }
-.admin-field input { padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; color: var(--color-ink); background: #fff; }
-.admin-field input:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
+/* One box for every field. A select keeps its own arrow on each operating system otherwise, so
+   appearance is cleared and the chevron is drawn here instead. */
+.admin input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin select,
+.admin textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; color: var(--color-ink); background: #fff; }
+.admin textarea { min-height: 84px; resize: vertical; }
+.admin select { appearance: none; padding-right: 34px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%234d585f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+/* A multiple select is a list box, not a dropdown, so it gets no chevron. */
+.admin select[multiple] { background-image: none; padding-right: 11px; cursor: default; }
+.admin input:focus-visible,
+.admin select:focus-visible,
+.admin textarea:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
 .admin-error { color: #b42318; }
 .admin-empty { color: var(--color-muted); margin-top: 16px; }
-.admin-filters { display: flex; align-items: flex-end; gap: 12px; margin: 18px 0; }
+.admin-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin: 18px 0; }
+.admin-filters .admin-field { flex: 1 1 180px; min-width: 160px; }
 .admin-table { width: 100%; margin-top: 18px; border-collapse: collapse; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; overflow: hidden; font-size: 15px; }
 .admin-table th { text-align: left; padding: 10px 14px; background: var(--color-surface); font-weight: 600; color: var(--color-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
 .admin-table td { padding: 10px 14px; border-top: 1px solid var(--color-hairline); color: var(--color-ink); }
@@ -174,8 +187,7 @@
 .admin-facts dt { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-text); }
 .admin-facts dd { margin: 2px 0 0; color: var(--color-ink); }
 .admin-message { margin-top: 10px; padding: 16px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; white-space: pre-wrap; }
-.admin-editor { display: flex; flex-direction: column; gap: 12px; max-width: 460px; }
-.admin-editor select, .admin-editor textarea { padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; background: #fff; }
+.admin-editor { display: flex; flex-direction: column; gap: 12px; max-width: 620px; }
 .admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
 /* The public pill, minus the arrow chip. btn-black-sm carries only a background and a shadow, so
@@ -200,7 +212,6 @@
 
 .admin-pager { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
 .admin-clash { display: block; font-size: 12px; font-weight: 600; color: #b42318; }
-.admin-filters select, .admin-filters input { padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; background: #fff; }
 .admin-media-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-top: 18px; }
 .admin-media-tile { margin: 0; padding: 10px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; }
 .admin-media-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--color-surface); border-radius: 6px; }
