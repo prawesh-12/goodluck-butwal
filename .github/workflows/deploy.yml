@@ -32,6 +32,8 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - run: pnpm build:worker
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - run: pnpm exec wrangler deploy
         env:
