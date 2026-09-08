@@ -1,10 +1,5 @@
 import { test, expect } from "vitest";
-import {
-  OFFICE_COOKIE_MAX_AGE,
-  officeCookie,
-  readOfficeCookie,
-  resolveOffice,
-} from "@/lib/office-cookie";
+import { readOfficeCookie, resolveOffice } from "@/lib/office-cookie";
 
 const known = ["au", "np", "ph"];
 
@@ -26,11 +21,6 @@ test("australia is the answer with no cookie and no timezone", () => {
 test("a cookie naming an office the site does not publish is ignored", () => {
   expect(resolveOffice("xx", "Asia/Kathmandu", known)).toBe("np");
   expect(resolveOffice("ph", "Europe/London", ["au", "np"])).toBe("au");
-});
-
-test("the cookie lasts a year and is scoped to the whole site", () => {
-  expect(OFFICE_COOKIE_MAX_AGE).toBe(31536000);
-  expect(officeCookie("np")).toBe("gem_office=np; path=/; max-age=31536000; samesite=lax");
 });
 
 test("the office is read back out of a document cookie string", () => {

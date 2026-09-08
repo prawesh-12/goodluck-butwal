@@ -39,7 +39,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Nav
             text={{
               bookCta: t("nav.book_cta", "Book a consultation"),
-              officeSelector: t("nav.office_selector_label", "Choose your office"),
               menuOpen: t("nav.menu_open", "Open menu"),
               menuClose: t("nav.menu_close", "Close menu"),
             }}
