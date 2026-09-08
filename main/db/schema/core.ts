@@ -10,6 +10,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -138,5 +139,10 @@ export const mediaAssets = pgTable(
     officeId: uuid("office_id").references(() => offices.id),
     uploadedBy: text("uploaded_by").references(() => users.id),
   },
-  (t) => [index("media_assets_kind_folder_created_idx").on(t.kind, t.folder, t.createdAt.desc())],
+  (t) => [
+    index("media_assets_kind_folder_created_idx").on(t.kind, t.folder, t.createdAt.desc()),
+    // The natural key for a file already in public/. Postgres allows many nulls, so Cloudinary
+    // rows are unaffected.
+    uniqueIndex("media_assets_static_path_idx").on(t.staticPath),
+  ],
 );
