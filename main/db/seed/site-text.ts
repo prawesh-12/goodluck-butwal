@@ -40,7 +40,7 @@ function footerRows(): StringRow[] {
 }
 
 export function uiStringRows(): StringRow[] {
-  return [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows, ...chromeRows, ...pageRows];
+  return [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows, ...chromeRows, ...pageRows, ...lastRows];
 }
 
 export async function seedUiStrings() {
@@ -403,4 +403,19 @@ const pageRows: StringRow[] = [
   { key: "team.expertise.title", value: "Areas of expertise", group: "team", label: "Expertise heading", help: "Sits above what a staff member handles, on their page." },
 
   { key: "preview.lead", value: "This is a preview. Only signed-in staff can see it, and search engines are told to ignore it.", group: "system", label: "Preview banner", help: "Shown to staff previewing a draft. Visitors never see it." },
+];
+
+const lastRows: StringRow[] = [
+  { key: "home.partners.badge", value: "Our partners", group: "home", label: "Partner strip badge", help: "The pill above the drifting row of partner logos." },
+  { key: "home.partners.logo_alt", value: "Partner logo", group: "home", label: "Partner logo description", help: "Read aloud for each logo in that row. Not seen on screen." },
+  { key: "home.hero.video_title", value: "Inside Goodluck Education and Migration", group: "home", label: "Homepage video title", help: "Read aloud for the video under the homepage headline." },
+
+  { key: "search.hero.title", value: "Search", group: "search", label: "Search page heading", help: "The heading on the search page before anything has been searched for." },
+  { key: "search.hero.lead", value: "Courses, institutions, destinations, services, events and news.", group: "search", label: "Search page intro", help: "The line under that heading before anything has been searched for." },
+  { key: "search.results.title", value: "Results for \u201c{q}\u201d", group: "search", label: "Results heading", help: "The heading once a search has run. Write {q} where the words searched for should go." },
+  { key: "search.results.count", value: "{count} matches across the site.", group: "search", label: "Results count", help: "The line under that heading. Write {count} where the number should go." },
+  { key: "search.results.count_one", value: "1 match across the site.", group: "search", label: "Results count, one match", help: "Used instead of the line above when exactly one thing matched." },
+  { key: "search.field.label", value: "Search", group: "search", label: "Search box", help: "The label above the search box." },
+  { key: "search.field.hint", value: "Course, institution, country or keyword", group: "search", label: "Search box hint", help: "The grey wording inside the empty search box." },
+  { key: "search.field.submit", value: "Search", group: "search", label: "Search button", help: "The button beside the search box." },
 ];

@@ -14,7 +14,7 @@ const destinationFlags = [
   { name: "United Kingdom", flag: "/images/flags/united-kingdom.svg" },
 ];
 
-export type HeroText = { titleBefore: string; titleAfter: string; bookCta: string; servicesCta: string };
+export type HeroText = { titleBefore: string; titleAfter: string; bookCta: string; servicesCta: string; videoTitle: string };
 
 export function Hero({ googleRating, text }: { googleRating: GoogleRating; text: HeroText }) {
   const { scrollY } = useScroll();
@@ -173,7 +173,7 @@ export function Hero({ googleRating, text }: { googleRating: GoogleRating; text:
                 style={{ transform: filmTransform }}
                 className="group relative w-full overflow-hidden rounded-[22px] bg-ink shadow-[0_40px_90px_-40px_rgba(29,29,29,0.55)] ring-1 ring-white/50 will-change-transform"
               >
-                <VideoDialog src={gl.film} loopSrc={gl.filmLoop} poster={gl.filmPoster} title="Inside Goodluck Education and Migration" inline={rolling} prefetch={warm} bare className="aspect-video w-full" />
+                <VideoDialog src={gl.film} loopSrc={gl.filmLoop} poster={gl.filmPoster} title={text.videoTitle} inline={rolling} prefetch={warm} bare className="aspect-video w-full" />
               </motion.div>
             </div>
           </Appear>

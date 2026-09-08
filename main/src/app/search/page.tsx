@@ -22,22 +22,26 @@ export default async function SearchPage({ searchParams }: Props) {
   const term = searchTerm(raw);
   const [groups, t] = await Promise.all([search(raw), loadText()]);
   const total = groups.reduce((sum, group) => sum + group.count, 0);
+  const found =
+    total === 1
+      ? t("search.results.count_one", "1 match across the site.")
+      : t("search.results.count", "{count} matches across the site.").replace("{count}", String(total));
 
   return (
     <>
       <InnerHero
         badge={t("search.hero.badge", "Search")}
         badgeTone="chip"
-        title={term ? `Results for “${term.q}”` : "Search"}
+        title={term ? t("search.results.title", "Results for “{q}”").replace("{q}", term.q) : t("search.hero.title", "Search")}
         size="md"
-        lead={term ? `${total} ${total === 1 ? "match" : "matches"} across the site.` : "Courses, institutions, destinations, services, events and news."}
+        lead={term ? found : t("search.hero.lead", "Courses, institutions, destinations, services, events and news.")}
         clouds={false}
         after={
           <form method="get" action="/search" className="w-full">
             <div className="flex flex-col items-stretch gap-5 md:flex-row md:items-end">
-              <Field label="Search" name="q" placeholder="Course, institution, country or keyword" className="w-full" />
+              <Field label={t("search.field.label", "Search")} name="q" placeholder={t("search.field.hint", "Course, institution, country or keyword")} className="w-full" />
               <button type="submit" className="btn-black inline-flex h-[50px] shrink-0 items-center justify-center rounded-full px-[26px] text-[16px] font-semibold leading-[20.8px] text-white">
-                Search
+                {t("search.field.submit", "Search")}
               </button>
             </div>
           </form>
