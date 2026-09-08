@@ -11,8 +11,8 @@ import {
 
 const tags = z
   .array(z.string())
-  .default([])
-  .transform((list) => list.map((item) => item.trim()).filter(Boolean));
+  .transform((list) => list.map((item) => item.trim()).filter(Boolean))
+  .default([]);
 
 const fields = {
   officeId: z.union([z.literal(""), z.uuid()]).default(""),

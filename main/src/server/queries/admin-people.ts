@@ -27,7 +27,7 @@ export async function altTextByIds(ids: (string | null | undefined)[]) {
 
 export async function officeOptions() {
   return db
-    .select({ id: offices.id, name: offices.name, code: offices.code })
+    .select({ id: offices.id, name: offices.name })
     .from(offices)
     .orderBy(asc(offices.name));
 }
@@ -157,10 +157,8 @@ export async function listAdminPartners(f: AdminFilters) {
         status: partners.status,
         sortOrder: partners.sortOrder,
         isFeatured: partners.isFeatured,
-        logo: mediaAssets.staticPath,
       })
       .from(partners)
-      .leftJoin(mediaAssets, eq(partners.logoId, mediaAssets.id))
       .where(where)
       .orderBy(asc(partners.sortOrder), asc(partners.name))
       .limit(PAGE_SIZE)
