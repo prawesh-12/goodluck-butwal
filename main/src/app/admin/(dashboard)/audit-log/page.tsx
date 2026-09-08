@@ -2,7 +2,7 @@ import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { db } from "@db/client";
 import { auditLog, users } from "@db/schema";
 import { requireActor } from "@/lib/auth";
-import { requirePermission } from "@/lib/rbac";
+import { allow } from "@/lib/guard";
 import { formatInOfficeTz } from "@/lib/datetime";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,7 @@ export default async function AuditLogPage({
   searchParams: Promise<{ from?: string; to?: string }>;
 }) {
   const actor = await requireActor();
-  requirePermission(actor, "auditLog", "read");
+  allow(actor, "auditLog", "read");
 
   const { from, to } = await searchParams;
   const filters = [

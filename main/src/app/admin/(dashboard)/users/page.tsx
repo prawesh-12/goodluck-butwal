@@ -2,7 +2,7 @@ import { asc } from "drizzle-orm";
 import { db } from "@db/client";
 import { offices, users } from "@db/schema";
 import { requireActor } from "@/lib/auth";
-import { requirePermission } from "@/lib/rbac";
+import { allow } from "@/lib/guard";
 import { eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ const ROLE_LABEL: Record<string, string> = {
 
 export default async function UsersPage() {
   const actor = await requireActor();
-  requirePermission(actor, "users", "read");
+  allow(actor, "users", "read");
 
   const rows = await db
     .select({

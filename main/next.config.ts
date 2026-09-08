@@ -6,6 +6,8 @@ const immutableCache = [
 
 const nextConfig: NextConfig = {
   images: { unoptimized: true },
+  // Turns on forbidden(), the only way a page can answer with a real 403 status.
+  experimental: { authInterrupts: true },
   async headers() {
     return [
       { source: "/images/:path*", headers: immutableCache },
