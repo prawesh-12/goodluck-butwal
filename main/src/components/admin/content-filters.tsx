@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Select } from "./repeater";
 
 const STATUSES = ["draft", "scheduled", "published", "archived"];
 
@@ -50,30 +51,23 @@ export function ContentFilters({
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={placeholder} />
       </label>
 
-      <label className="admin-field">
-        <span className="t-small">Status</span>
-        <select defaultValue={params.get("status") ?? ""} onChange={(e) => set("status", e.target.value)}>
-          <option value="">Any</option>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-      </label>
+      <Select
+        label="Status"
+        defaultValue={params.get("status") ?? ""}
+        onChange={(value) => set("status", value)}
+        options={[{ value: "", label: "Any" }, ...STATUSES.map((s) => ({ value: s, label: s }))]}
+      />
 
       {offices ? (
-        <label className="admin-field">
-          <span className="t-small">Office</span>
-          <select defaultValue={params.get("office") ?? ""} onChange={(e) => set("office", e.target.value)}>
-            <option value="">Any</option>
-            {offices.map((office) => (
-              <option key={office.id} value={office.id}>
-                {office.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          label="Office"
+          defaultValue={params.get("office") ?? ""}
+          onChange={(value) => set("office", value)}
+          options={[
+            { value: "", label: "Any" },
+            ...offices.map((office) => ({ value: office.id, label: office.name })),
+          ]}
+        />
       ) : null}
     </form>
   );

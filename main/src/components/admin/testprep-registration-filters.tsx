@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Select } from "./repeater";
 
 export type BatchOption = { id: string; label: string };
 
@@ -49,29 +50,22 @@ export function RegistrationFilters({
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, email or phone" />
       </label>
 
-      <label className="admin-field">
-        <span className="t-small">Batch</span>
-        <select defaultValue={params.get("batch") ?? ""} onChange={(e) => set("batch", e.target.value)}>
-          <option value="">Every batch</option>
-          {batches.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      <Select
+        label="Batch"
+        defaultValue={params.get("batch") ?? ""}
+        onChange={(value) => set("batch", value)}
+        options={[
+          { value: "", label: "Every batch" },
+          ...batches.map((b) => ({ value: b.id, label: b.label })),
+        ]}
+      />
 
-      <label className="admin-field">
-        <span className="t-small">Status</span>
-        <select defaultValue={params.get("status") ?? ""} onChange={(e) => set("status", e.target.value)}>
-          <option value="">Any</option>
-          {statuses.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-      </label>
+      <Select
+        label="Status"
+        defaultValue={params.get("status") ?? ""}
+        onChange={(value) => set("status", value)}
+        options={[{ value: "", label: "Any" }, ...statuses.map((s) => ({ value: s, label: s }))]}
+      />
 
       <label className="admin-field">
         <span className="t-small">From</span>

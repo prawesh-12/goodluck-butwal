@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { describeMedia, deleteMedia } from "@/server/actions/media";
+import { Select } from "./repeater";
 
 type Row = {
   id: string;
@@ -68,23 +69,22 @@ export function MediaGrid({
             onChange={(e) => set("q", e.target.value)}
           />
         </label>
-        <label className="admin-field">
-          <span className="t-small">Folder</span>
-          <select defaultValue={params.get("folder") ?? ""} onChange={(e) => set("folder", e.target.value)}>
-            <option value="">All</option>
-            {folders.map((f) => (
-              <option key={f} value={f}>{f}</option>
-            ))}
-          </select>
-        </label>
-        <label className="admin-field">
-          <span className="t-small">Type</span>
-          <select defaultValue={params.get("type") ?? ""} onChange={(e) => set("type", e.target.value)}>
-            <option value="">All</option>
-            <option value="image">Image</option>
-            <option value="video">Video</option>
-          </select>
-        </label>
+        <Select
+          label="Folder"
+          defaultValue={params.get("folder") ?? ""}
+          onChange={(value) => set("folder", value)}
+          options={[{ value: "", label: "All" }, ...folders.map((f) => ({ value: f, label: f }))]}
+        />
+        <Select
+          label="Type"
+          defaultValue={params.get("type") ?? ""}
+          onChange={(value) => set("type", value)}
+          options={[
+            { value: "", label: "All" },
+            { value: "image", label: "Image" },
+            { value: "video", label: "Video" },
+          ]}
+        />
         <button
           type="button"
           className="admin-btn"

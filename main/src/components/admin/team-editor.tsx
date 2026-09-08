@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createTeamMember, deleteTeamMember, updateTeamMember } from "@/server/actions/team";
 import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import { Field, SeoSection } from "@/components/admin/seo-section";
+import { Select } from "@/components/admin/repeater";
 import type { OfficeOption } from "@/components/admin/content-filters";
 
 export type TeamValues = {
@@ -101,21 +102,17 @@ export function TeamEditor({
       <Field name="slug" label="Address on the site" defaultValue={values.slug} error={errors.slug?.[0]}
         help="The last part of this person's own web address. Leave empty and it is made from the name." />
 
-      <label className="admin-field">
-        <span className="t-small">Office</span>
-        <select name="officeId" defaultValue={values.officeId}>
-          <option value="">No office</option>
-          {offices.map((office) => (
-            <option key={office.id} value={office.id}>
-              {office.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">
-          Which office the person is listed under on the team page.
-        </span>
-        {errors.officeId ? <span className="admin-clash">{errors.officeId[0]}</span> : null}
-      </label>
+      <Select
+        label="Office"
+        name="officeId"
+        defaultValue={values.officeId}
+        help="Which office the person is listed under on the team page."
+        error={errors.officeId?.[0]}
+        options={[
+          { value: "", label: "No office" },
+          ...offices.map((office) => ({ value: office.id, label: office.name })),
+        ]}
+      />
 
       <MediaPicker
         label="Photo"
@@ -157,18 +154,17 @@ export function TeamEditor({
       <h2 className="t-h5 admin-subhead">Publishing</h2>
 
       {canPublish ? (
-        <label className="admin-field">
-          <span className="t-small">Status</span>
-          <select name="status" defaultValue={values.status || "draft"}>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
-          </select>
-          <span className="t-small admin-help">
-            Only published people appear on the team page. Publishing is refused while anything
-            above is missing.
-          </span>
-        </label>
+        <Select
+          label="Status"
+          name="status"
+          defaultValue={values.status || "draft"}
+          help="Only published people appear on the team page. Publishing is refused while anything above is missing."
+          options={[
+            { value: "draft", label: "Draft" },
+            { value: "published", label: "Published" },
+            { value: "archived", label: "Archived" },
+          ]}
+        />
       ) : (
         <p className="t-small admin-help">Your role can save this person but not publish them.</p>
       )}

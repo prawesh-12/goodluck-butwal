@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Select } from "./repeater";
 
 export type FilterSelect = {
   name: string;
@@ -47,17 +48,13 @@ export function ContentFilters({ placeholder, selects }: { placeholder: string; 
       </label>
 
       {selects.map((select) => (
-        <label key={select.name} className="admin-field">
-          <span className="t-small">{select.label}</span>
-          <select defaultValue={params.get(select.name) ?? ""} onChange={(e) => set(select.name, e.target.value)}>
-            <option value="">{select.anyLabel}</option>
-            {select.options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <Select
+          key={select.name}
+          label={select.label}
+          defaultValue={params.get(select.name) ?? ""}
+          onChange={(value) => set(select.name, value)}
+          options={[{ value: "", label: select.anyLabel }, ...select.options]}
+        />
       ))}
     </form>
   );

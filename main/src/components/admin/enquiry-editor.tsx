@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateEnquiry } from "@/server/actions/leads";
+import { Select } from "./repeater";
 
 const STATUSES = ["new", "in_progress", "contacted", "converted", "closed", "spam"];
 
@@ -30,16 +31,12 @@ export function EnquiryEditor({ id, status, notes }: { id: string; status: strin
     >
       <h2 className="t-h5 admin-subhead">Handling</h2>
 
-      <label className="admin-field">
-        <span className="t-small">Status</span>
-        <select name="status" defaultValue={status}>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s.replace(/_/g, " ")}
-            </option>
-          ))}
-        </select>
-      </label>
+      <Select
+        label="Status"
+        name="status"
+        defaultValue={status}
+        options={STATUSES.map((s) => ({ value: s, label: s.replace(/_/g, " ") }))}
+      />
 
       <label className="admin-field">
         <span className="t-small">Internal notes</span>

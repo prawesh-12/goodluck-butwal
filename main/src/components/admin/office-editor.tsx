@@ -6,6 +6,7 @@ import { updateOffice } from "@/server/actions/offices";
 import { DAY_NAMES } from "@/lib/content-meta";
 import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import { Field, SeoSection } from "@/components/admin/seo-section";
+import { Select } from "@/components/admin/repeater";
 
 type Hours = { day: number; open: string; close: string; closed: boolean };
 
@@ -243,18 +244,17 @@ export function OfficeEditor({
       <h2 className="t-h5 admin-subhead">Publishing</h2>
 
       {canPublish ? (
-        <label className="admin-field">
-          <span className="t-small">Status</span>
-          <select name="status" defaultValue={values.status}>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
-          </select>
-          <span className="t-small admin-help">
-            Only a published office appears on the site. An office cannot be published while
-            anything above is missing.
-          </span>
-        </label>
+        <Select
+          label="Status"
+          name="status"
+          defaultValue={values.status}
+          help="Only a published office appears on the site. An office cannot be published while anything above is missing."
+          options={[
+            { value: "draft", label: "Draft" },
+            { value: "published", label: "Published" },
+            { value: "archived", label: "Archived" },
+          ]}
+        />
       ) : (
         <p className="t-small admin-help">
           This office is {values.status}. Only a super admin can change that.

@@ -19,6 +19,7 @@ import {
 import { MediaPicker, type PickedMedia } from "./media-picker";
 import type { EditorialOptions } from "@/server/queries/admin-editorial";
 import { UnsavedGuard } from "@/components/admin/unsaved-guard";
+import { Select } from "@/components/admin/repeater";
 
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
 
@@ -125,20 +126,17 @@ export function TestimonialForm({
       }}
     >
       <UnsavedGuard formId="admin-testimonial-form" />
-      <label className="admin-field">
-        <span className="t-small">Kind of story</span>
-        <select value={type} onChange={(event) => setType(event.target.value as TestimonialType)}>
-          {testimonialTypes.map((option) => (
-            <option key={option} value={option}>
-              {option === "text" ? "Written review" : option === "image" ? "Success graphic" : "Video"}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">
-          Written reviews sit on the home page. Graphics and videos sit on the success stories page.
-          This kind needs {needed}.
-        </span>
-      </label>
+      <Select
+        label="Kind of story"
+        value={type}
+        onChange={(value) => setType(value as TestimonialType)}
+        help={`Written reviews sit on the home page. Graphics and videos sit on the success stories page. This kind needs ${needed}.`}
+        options={testimonialTypes.map((option) => ({
+          value: option,
+          label:
+            option === "text" ? "Written review" : option === "image" ? "Success graphic" : "Video",
+        }))}
+      />
 
       <label className="admin-field">
         <span className="t-small">Real name</span>
@@ -218,21 +216,17 @@ export function TestimonialForm({
             {errors.videoUrl ? <span className="t-small admin-error">{errors.videoUrl[0]}</span> : null}
           </label>
 
-          <label className="admin-field">
-            <span className="t-small">Where the video lives</span>
-            <select name="videoProvider" defaultValue={values.videoProvider}>
-              <option value="">Not set</option>
-              {videoProviders.map((provider) => (
-                <option key={provider} value={provider}>
-                  {provider}
-                </option>
-              ))}
-            </select>
-            <span className="t-small admin-help">Decides how the player is embedded.</span>
-            {errors.videoProvider ? (
-              <span className="t-small admin-error">{errors.videoProvider[0]}</span>
-            ) : null}
-          </label>
+          <Select
+            label="Where the video lives"
+            name="videoProvider"
+            defaultValue={values.videoProvider}
+            help="Decides how the player is embedded."
+            error={errors.videoProvider?.[0]}
+            options={[
+              { value: "", label: "Not set" },
+              ...videoProviders.map((provider) => ({ value: provider, label: provider })),
+            ]}
+          />
         </>
       ) : null}
 
@@ -243,70 +237,60 @@ export function TestimonialForm({
         onChange={setBody}
       />
 
-      <label className="admin-field">
-        <span className="t-small">Destination</span>
-        <select name="destinationId" defaultValue={values.destinationId}>
-          <option value="">Not set</option>
-          {options.destinations.map((row) => (
-            <option key={row.id} value={row.id}>
-              {row.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">Shows the story on that study destination page.</span>
-      </label>
+      <Select
+        label="Destination"
+        name="destinationId"
+        defaultValue={values.destinationId}
+        help="Shows the story on that study destination page."
+        options={[
+          { value: "", label: "Not set" },
+          ...options.destinations.map((row) => ({ value: row.id, label: row.name })),
+        ]}
+      />
 
-      <label className="admin-field">
-        <span className="t-small">Institution</span>
-        <select name="institutionId" defaultValue={values.institutionId}>
-          <option value="">Not set</option>
-          {options.institutions.map((row) => (
-            <option key={row.id} value={row.id}>
-              {row.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">Shows the story on that institution page.</span>
-      </label>
+      <Select
+        label="Institution"
+        name="institutionId"
+        defaultValue={values.institutionId}
+        help="Shows the story on that institution page."
+        options={[
+          { value: "", label: "Not set" },
+          ...options.institutions.map((row) => ({ value: row.id, label: row.name })),
+        ]}
+      />
 
-      <label className="admin-field">
-        <span className="t-small">Service</span>
-        <select name="serviceId" defaultValue={values.serviceId}>
-          <option value="">Not set</option>
-          {options.services.map((row) => (
-            <option key={row.id} value={row.id}>
-              {row.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">Shows the story on that service page.</span>
-      </label>
+      <Select
+        label="Service"
+        name="serviceId"
+        defaultValue={values.serviceId}
+        help="Shows the story on that service page."
+        options={[
+          { value: "", label: "Not set" },
+          ...options.services.map((row) => ({ value: row.id, label: row.name })),
+        ]}
+      />
 
-      <label className="admin-field">
-        <span className="t-small">Office</span>
-        <select name="officeId" defaultValue={values.officeId}>
-          <option value="">Both offices</option>
-          {options.offices.map((office) => (
-            <option key={office.id} value={office.id}>
-              {office.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">Leave it on both unless only one office should show it.</span>
-      </label>
+      <Select
+        label="Office"
+        name="officeId"
+        defaultValue={values.officeId}
+        help="Leave it on both unless only one office should show it."
+        options={[
+          { value: "", label: "Both offices" },
+          ...options.offices.map((office) => ({ value: office.id, label: office.name })),
+        ]}
+      />
 
-      <label className="admin-field">
-        <span className="t-small">Rating</span>
-        <select name="rating" defaultValue={values.rating ? String(values.rating) : ""}>
-          <option value="">Not set</option>
-          {[1, 2, 3, 4, 5].map((n) => (
-            <option key={n} value={n}>
-              {n}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">The stars on the review card.</span>
-      </label>
+      <Select
+        label="Rating"
+        name="rating"
+        defaultValue={values.rating ? String(values.rating) : ""}
+        help="The stars on the review card."
+        options={[
+          { value: "", label: "Not set" },
+          ...[1, 2, 3, 4, 5].map((n) => ({ value: String(n), label: String(n) })),
+        ]}
+      />
 
       <label className="admin-field">
         <span className="t-small">
@@ -342,21 +326,17 @@ export function TestimonialForm({
 
       <h2 className="t-h5 admin-subhead">Publishing</h2>
 
-      <label className="admin-field">
-        <span className="t-small">Status</span>
-        <select value={status} onChange={(event) => setStatus(event.target.value)}>
-          {statuses.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">
-          {canPublish
+      <Select
+        label="Status"
+        value={status}
+        onChange={setStatus}
+        help={
+          canPublish
             ? "Draft is invisible. Scheduled goes live on its own. Archived comes off the site."
-            : "You can save drafts. An admin puts the story live."}
-        </span>
-      </label>
+            : "You can save drafts. An admin puts the story live."
+        }
+        options={statuses.map((option) => ({ value: option, label: option }))}
+      />
 
       <label className="admin-field">
         <span className="t-small">Go live at</span>

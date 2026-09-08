@@ -12,6 +12,7 @@ import { MediaPicker, type PickedMedia } from "./media-picker";
 import { SeoFields, type SeoValue } from "./page-seo-fields";
 import type { EditorialOptions } from "@/server/queries/admin-editorial";
 import { UnsavedGuard } from "@/components/admin/unsaved-guard";
+import { Select } from "@/components/admin/repeater";
 
 // Tiptap is a large dependency and belongs only in the browser, so the Worker never bundles it.
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
@@ -167,18 +168,16 @@ export function PostForm({
         help="The wide picture at the top of the article and on its news card."
       />
 
-      <label className="admin-field">
-        <span className="t-small">Category</span>
-        <select name="categoryId" defaultValue={values.categoryId}>
-          <option value="">Not set</option>
-          {options.categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">The label on the news card and the filter it sits under.</span>
-      </label>
+      <Select
+        label="Category"
+        name="categoryId"
+        defaultValue={values.categoryId}
+        help="The label on the news card and the filter it sits under."
+        options={[
+          { value: "", label: "Not set" },
+          ...options.categories.map((category) => ({ value: category.id, label: category.name })),
+        ]}
+      />
 
       <label className="admin-field">
         <span className="t-small">Tags</span>
@@ -194,31 +193,27 @@ export function PostForm({
         </span>
       </label>
 
-      <label className="admin-field">
-        <span className="t-small">Office</span>
-        <select name="officeId" defaultValue={values.officeId}>
-          <option value="">Both offices</option>
-          {options.offices.map((office) => (
-            <option key={office.id} value={office.id}>
-              {office.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">Leave it on both unless the article is only about one office.</span>
-      </label>
+      <Select
+        label="Office"
+        name="officeId"
+        defaultValue={values.officeId}
+        help="Leave it on both unless the article is only about one office."
+        options={[
+          { value: "", label: "Both offices" },
+          ...options.offices.map((office) => ({ value: office.id, label: office.name })),
+        ]}
+      />
 
-      <label className="admin-field">
-        <span className="t-small">Destination</span>
-        <select name="destinationId" defaultValue={values.destinationId}>
-          <option value="">Not about one country</option>
-          {options.destinations.map((destination) => (
-            <option key={destination.id} value={destination.id}>
-              {destination.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">Links the article to that study destination page.</span>
-      </label>
+      <Select
+        label="Destination"
+        name="destinationId"
+        defaultValue={values.destinationId}
+        help="Links the article to that study destination page."
+        options={[
+          { value: "", label: "Not about one country" },
+          ...options.destinations.map((d) => ({ value: d.id, label: d.name })),
+        ]}
+      />
 
       <label className="admin-field">
         <span className="t-small">Author shown</span>
@@ -238,21 +233,17 @@ export function PostForm({
 
       <h2 className="t-h5 admin-subhead">Publishing</h2>
 
-      <label className="admin-field">
-        <span className="t-small">Status</span>
-        <select value={status} onChange={(event) => setStatus(event.target.value)}>
-          {statuses.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">
-          {canPublish
+      <Select
+        label="Status"
+        value={status}
+        onChange={setStatus}
+        help={
+          canPublish
             ? "Draft is invisible. Scheduled goes live on its own. Archived comes off the site."
-            : "You can save drafts. An admin puts the article live."}
-        </span>
-      </label>
+            : "You can save drafts. An admin puts the article live."
+        }
+        options={statuses.map((option) => ({ value: option, label: option }))}
+      />
 
       <label className="admin-field">
         <span className="t-small">Go live at</span>

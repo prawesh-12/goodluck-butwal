@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateRegistration } from "@/server/actions/test-prep";
+import { Dropdown } from "./dropdown";
 
 const STATUSES = ["registered", "attended", "cancelled"];
 
@@ -13,23 +14,19 @@ export function RegistrationStatus({ id, status }: { id: string; status: string 
 
   return (
     <>
-      <select
+      <Dropdown
+        ariaLabel="Registration status"
         value={status}
         disabled={busy}
-        onChange={async (event) => {
+        options={STATUSES.map((s) => ({ value: s, label: s }))}
+        onChange={async (next) => {
           setBusy(true);
-          const result = await updateRegistration({ id, status: event.target.value });
+          const result = await updateRegistration({ id, status: next });
           setBusy(false);
           setError(result.ok ? null : result.error);
           if (result.ok) router.refresh();
         }}
-      >
-        {STATUSES.map((s) => (
-          <option key={s} value={s}>
-            {s}
-          </option>
-        ))}
-      </select>
+      />
       {error ? <span className="admin-clash">{error}</span> : null}
     </>
   );

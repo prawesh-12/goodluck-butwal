@@ -165,15 +165,28 @@
 .admin-login { align-items: center; justify-content: center; }
 .admin-login-card { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 360px; padding: 28px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 12px; }
 .admin-field { display: flex; flex-direction: column; gap: 5px; color: var(--color-muted); }
-/* One box for every field. A select keeps its own arrow on each operating system otherwise, so
-   appearance is cleared and the chevron is drawn here instead. */
+/* One box for every field. */
 .admin input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 .admin select,
 .admin textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; color: var(--color-ink); background: #fff; }
 .admin textarea { min-height: 84px; resize: vertical; }
-.admin select { appearance: none; padding-right: 34px; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%234d585f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
-/* A multiple select is a list box, not a dropdown, so it gets no chevron. */
-.admin select[multiple] { background-image: none; padding-right: 11px; cursor: default; }
+/* The only select left is the multiple one on the post form, which is a list box in the page
+   rather than a dropdown the operating system draws. */
+.admin select { appearance: none; cursor: default; }
+
+/* The dropdown replacing the native select. The closed button copies the field box above so a
+   form reads as one set of controls. */
+.admin-dropdown { display: flex; align-items: center; width: 100%; min-height: 38px; padding: 9px 34px 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; text-align: left; color: var(--color-ink); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%234d585f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center; cursor: pointer; }
+.admin-dropdown:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
+.admin-dropdown:disabled { cursor: not-allowed; opacity: .55; }
+.admin-dropdown-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Fixed, so a list opening from the last row of a table is not cut off by its clipped corners.
+   Above the media picker, which is the highest thing an admin can open under it. */
+.admin-dropdown-list { position: fixed; z-index: 60; max-height: 264px; margin: 0; padding: 4px; overflow-y: auto; list-style: none; background: #fff; border: 1px solid var(--color-hairline); border-radius: 8px; box-shadow: 0 10px 30px rgba(29,29,29,.14); }
+.admin-dropdown-option { padding: 8px 10px; border-radius: 6px; font-size: 15px; color: var(--color-ink); cursor: pointer; }
+.admin-dropdown-option[data-active] { background: var(--color-surface); }
+.admin-dropdown-option[aria-selected="true"] { font-weight: 600; color: var(--color-blue-deep); }
+.admin-dropdown-option[aria-disabled] { color: var(--color-gray-text); cursor: not-allowed; }
 .admin input:focus-visible,
 .admin select:focus-visible,
 .admin textarea:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }

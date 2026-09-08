@@ -12,6 +12,7 @@ import { MediaPicker, type PickedMedia } from "./media-picker";
 import { SeoFields, type SeoValue } from "./page-seo-fields";
 import type { OfficeZone } from "@/server/queries/admin-events";
 import { UnsavedGuard } from "@/components/admin/unsaved-guard";
+import { Select } from "@/components/admin/repeater";
 
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
 
@@ -164,33 +165,24 @@ export function EventForm({
         {errors.slug ? <span className="t-small admin-error">{errors.slug[0]}</span> : null}
       </label>
 
-      <label className="admin-field">
-        <span className="t-small">Kind of event</span>
-        <select name="eventType" defaultValue={values.eventType}>
-          {eventTypes.map((type) => (
-            <option key={type} value={type}>
-              {eventTypeLabels[type]}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">The label on the event card and the filter it sits under.</span>
-      </label>
+      <Select
+        label="Kind of event"
+        name="eventType"
+        defaultValue={values.eventType}
+        help="The label on the event card and the filter it sits under."
+        options={eventTypes.map((type) => ({ value: type, label: eventTypeLabels[type] }))}
+      />
 
-      <label className="admin-field">
-        <span className="t-small">Office</span>
-        <select value={officeId} onChange={(event) => setOfficeId(event.target.value)}>
-          <option value="">Not set</option>
-          {offices.map((office) => (
-            <option key={office.id} value={office.id}>
-              {office.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">
-          Whose event it is. Every time below is read and shown in that office&apos;s time zone, and the
-          event only appears on the home page for visitors seeing that office.
-        </span>
-      </label>
+      <Select
+        label="Office"
+        value={officeId}
+        onChange={setOfficeId}
+        help="Whose event it is. Every time below is read and shown in that office's time zone, and the event only appears on the home page for visitors seeing that office."
+        options={[
+          { value: "", label: "Not set" },
+          ...offices.map((office) => ({ value: office.id, label: office.name })),
+        ]}
+      />
 
       <label className="admin-field">
         <span className="t-small">Summary</span>
@@ -343,21 +335,17 @@ export function EventForm({
 
       <h2 className="t-h5 admin-subhead">Publishing</h2>
 
-      <label className="admin-field">
-        <span className="t-small">Status</span>
-        <select value={status} onChange={(event) => setStatus(event.target.value)}>
-          {statuses.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">
-          {canPublish
+      <Select
+        label="Status"
+        value={status}
+        onChange={setStatus}
+        help={
+          canPublish
             ? "Draft is invisible. Scheduled goes live on its own. Archived comes off the site."
-            : "You can save drafts. An admin puts the event live."}
-        </span>
-      </label>
+            : "You can save drafts. An admin puts the event live."
+        }
+        options={statuses.map((option) => ({ value: option, label: option }))}
+      />
 
       <label className="admin-field">
         <span className="t-small">Go live at</span>

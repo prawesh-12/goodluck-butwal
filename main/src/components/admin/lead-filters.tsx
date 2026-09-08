@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Select } from "./repeater";
 
 // Search waits for a pause in typing, so a long name is one query rather than twelve.
 export function LeadFilters({ statuses, exportPath }: { statuses: string[]; exportPath: string }) {
@@ -43,17 +44,15 @@ export function LeadFilters({ statuses, exportPath }: { statuses: string[]; expo
         />
       </label>
 
-      <label className="admin-field">
-        <span className="t-small">Status</span>
-        <select defaultValue={params.get("status") ?? ""} onChange={(e) => set("status", e.target.value)}>
-          <option value="">Any</option>
-          {statuses.map((s) => (
-            <option key={s} value={s}>
-              {s.replace(/_/g, " ")}
-            </option>
-          ))}
-        </select>
-      </label>
+      <Select
+        label="Status"
+        defaultValue={params.get("status") ?? ""}
+        onChange={(value) => set("status", value)}
+        options={[
+          { value: "", label: "Any" },
+          ...statuses.map((s) => ({ value: s, label: s.replace(/_/g, " ") })),
+        ]}
+      />
 
       <label className="admin-field">
         <span className="t-small">From</span>

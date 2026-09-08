@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
+import { Dropdown, type DropdownOption } from "./dropdown";
 
 export function Field({
   label,
@@ -59,29 +60,42 @@ export function Select({
   help,
   error,
   value,
+  defaultValue,
   onChange,
+  name,
+  disabled,
   options,
 }: {
   label: string;
-  help?: string;
+  help?: ReactNode;
   error?: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: { value: string; label: string; disabled?: boolean }[];
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  name?: string;
+  disabled?: boolean;
+  options: DropdownOption[];
 }) {
+  const labelId = useId();
+
+  // A div, not a label: the control is a button and a label names nothing that a button answers to.
   return (
-    <label className="admin-field">
-      <span className="t-small">{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((option) => (
-          <option key={option.value} value={option.value} disabled={option.disabled}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+    <div className="admin-field">
+      <span className="t-small" id={labelId}>
+        {label}
+      </span>
+      <Dropdown
+        options={options}
+        value={value}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        name={name}
+        disabled={disabled}
+        labelledBy={labelId}
+      />
       {help ? <span className="t-small admin-help">{help}</span> : null}
       {error ? <span className="admin-clash">{error}</span> : null}
-    </label>
+    </div>
   );
 }
 

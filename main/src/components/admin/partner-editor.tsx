@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createPartner, deletePartner, updatePartner } from "@/server/actions/partners";
 import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import { Field } from "@/components/admin/seo-section";
+import { Select } from "@/components/admin/repeater";
 
 export type PartnerValues = {
   id: string;
@@ -71,17 +72,17 @@ export function PartnerEditor({
       />
 
       {canPublish ? (
-        <label className="admin-field">
-          <span className="t-small">Status</span>
-          <select name="status" defaultValue={values.status || "draft"}>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="archived">Archived</option>
-          </select>
-          <span className="t-small admin-help">
-            Only published partners appear on the home page.
-          </span>
-        </label>
+        <Select
+          label="Status"
+          name="status"
+          defaultValue={values.status || "draft"}
+          help="Only published partners appear on the home page."
+          options={[
+            { value: "draft", label: "Draft" },
+            { value: "published", label: "Published" },
+            { value: "archived", label: "Archived" },
+          ]}
+        />
       ) : (
         <p className="t-small admin-help">Your role can save this partner but not publish it.</p>
       )}
