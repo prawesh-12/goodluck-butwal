@@ -2,3 +2,7 @@ extras/
 designs/
 Website Requirements_GEM.docx
 plan.md
+node_modules
+.mcp.json
+package.json
+package-lock.json
