@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { gl, img } from "@/lib/assets";
 import { company } from "@/lib/site";
 import { Appear } from "@/components/ui/appear";
@@ -12,7 +13,13 @@ import { listAllFaqs, listDestinations } from "@/server/queries/destinations";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
-export const metadata: Metadata = { title: "Contact", description: "Talk to our experts in Melbourne, Butwal or Cebu." };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({
+    path: "/contact",
+    title: "Contact",
+    description: "Talk to our experts in Melbourne, Butwal or Cebu.",
+  });
+}
 const tones = ["surface", "dark", "blue"] as const;
 
 export default async function ContactPage() {

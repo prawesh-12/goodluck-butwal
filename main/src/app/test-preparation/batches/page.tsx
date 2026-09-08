@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { listUpcomingBatches } from "@/server/queries/test-prep";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { InnerHero } from "@/components/inner";
 import { BatchTable } from "@/components/test-prep/batch-table";
 
-export const metadata: Metadata = { title: "Upcoming batches" };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({ path: "/test-preparation/batches", title: "Upcoming batches" });
+}
 
 export default async function BatchesPage() {
   // Past batches never appear: the query only asks for the ones that have not started.

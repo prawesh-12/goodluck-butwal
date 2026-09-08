@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getDestination, listDestinations, listAllFaqs } from "@/server/queries/destinations";
 import { listArticles } from "@/server/queries/editorial";
@@ -15,8 +16,14 @@ type Props = { params: Promise<{ destination: string }> };
 export const generateStaticParams = async () =>
   (await listDestinations()).filter((d) => d.hasPage).map((d) => ({ destination: d.slug }));
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const d = await getDestination((await params).destination);
-  return d ? { title: `Study in ${d.name}`, description: d.overview } : { title: "Study abroad" };
+  const { destination } = await params;
+  const d = await getDestination(destination);
+  if (!d) return buildMetadata({ path: "/study-abroad", title: "Study abroad", noindex: true });
+  return buildEntityMetadata("destination", destination, {
+    path: `/study-abroad/${destination}`,
+    title: `Study in ${d.name}`,
+    description: d.overview,
+  });
 }
 
 const keyword: Record<string, RegExp> = { australia: /australia/i, "united-kingdom": /\bUK\b|United Kingdom/i };

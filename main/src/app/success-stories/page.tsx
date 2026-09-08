@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { img } from "@/lib/assets";
 import { getGoogleRating, listReviews, listSuccessStories } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
@@ -7,7 +8,13 @@ import { SectionBg } from "@/components/ui/bits";
 import { InnerHero } from "@/components/inner";
 import { ReviewCard } from "@/components/home/reviews";
 
-export const metadata: Metadata = { title: "Success stories", description: "Visa grants and reviews shared by our clients." };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({
+    path: "/success-stories",
+    title: "Success stories",
+    description: "Visa grants and reviews shared by our clients.",
+  });
+}
 
 export default async function SuccessStoriesPage() {
   const [successStories, reviews, googleRating] = await Promise.all([

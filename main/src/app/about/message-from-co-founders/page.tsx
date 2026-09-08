@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata } from "@/lib/seo";
 import { gl } from "@/lib/assets";
 import { getAboutContent } from "@/server/queries/pages";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { InnerHero } from "@/components/inner";
 
-export const metadata: Metadata = { title: "Message from co-founders" };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildEntityMetadata("page", "message-from-co-founders", {
+    path: "/about/message-from-co-founders",
+    title: "Message from co-founders",
+  });
+}
 
 export default async function CoFoundersPage() {
   const about = await getAboutContent();

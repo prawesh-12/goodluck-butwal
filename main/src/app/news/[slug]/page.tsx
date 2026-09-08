@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getArticle, listArticles } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
@@ -13,7 +14,14 @@ export const generateStaticParams = async () => (await listArticles()).map((a) =
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const a = await getArticle(slug);
-  return a ? { title: a.title, description: a.excerpt, openGraph: { images: [a.image], type: "article", publishedTime: a.date } } : { title: "News" };
+  if (!a) return buildMetadata({ path: "/news", title: "News", noindex: true });
+  return buildEntityMetadata("post", slug, {
+    path: `/news/${slug}`,
+    title: a.title,
+    description: a.excerpt,
+    image: a.image,
+    publishedTime: a.date,
+  });
 }
 
 export default async function ArticlePage({ params }: Props) {

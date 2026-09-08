@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
 import { listTestPrepCourses } from "@/server/queries/test-prep";
 import { listServiceFaqs } from "@/server/queries/destinations";
@@ -14,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     .map((course) => course.summary)
     .filter(Boolean)
     .join(" ");
-  return { title: "Test preparation", ...(description ? { description } : {}) };
+  return buildMetadata({ path: "/test-preparation", title: "Test preparation", description });
 }
 
 const TONES = ["blue", "surface"] as const;

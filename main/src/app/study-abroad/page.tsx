@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { helpWeProvide } from "@/lib/site-copy";
 import { listServiceFaqs, listDestinations } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
@@ -7,7 +8,13 @@ import { DestinationCard, destinationCards } from "@/components/home/destination
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
-export const metadata: Metadata = { title: "Study abroad", description: "Study in Australia, the United Kingdom and New Zealand with Goodluck." };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({
+    path: "/study-abroad",
+    title: "Study abroad",
+    description: "Study in Australia, the United Kingdom and New Zealand with Goodluck.",
+  });
+}
 
 export default async function StudyAbroadPage() {
   const [faces, education, cards] = await Promise.all([

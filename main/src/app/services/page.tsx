@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { listServices } from "@/server/queries/services";
 import { listAllFaqs } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
@@ -7,7 +8,13 @@ import { ServiceCard } from "@/components/home/services";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
-export const metadata: Metadata = { title: "Our services", description: "Education counselling, visa guidance, scholarship guidance and IELTS coaching." };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({
+    path: "/services",
+    title: "Our services",
+    description: "Education counselling, visa guidance, scholarship guidance and IELTS coaching.",
+  });
+}
 
 export default async function ServicesPage() {
   const [faces, services, allFaqs] = await Promise.all([

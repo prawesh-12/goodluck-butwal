@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { InnerHero } from "@/components/inner";
 import { TeamGrid } from "@/components/team-grid";
 import { listTeam } from "@/server/queries/people";
 
 export async function generateMetadata(): Promise<Metadata> {
   const team = await listTeam();
-  return {
+  return buildMetadata({
+    path: "/about/team",
     title: "Our team",
     description: `${team.length} people across Australia, Nepal and the Philippines.`,
-  };
+  });
 }
 
 export default async function TeamPage() {

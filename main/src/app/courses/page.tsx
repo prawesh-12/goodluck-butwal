@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { listCourseFilterOptions, listCourses } from "@/server/queries/catalogue";
 import { filterHref, pageCount, parseCourseFilters, type SearchParams } from "@/components/catalogue/filters";
 import { InnerHero, SectionHead } from "@/components/inner";
@@ -7,10 +8,13 @@ import { CourseRow } from "@/components/catalogue/course-row";
 import { Pager } from "@/components/catalogue/pager";
 import { Empty } from "@/components/catalogue/empty";
 
-export const metadata: Metadata = {
-  title: "Courses",
-  description: "Search courses by destination, qualification level, category, institution and intake.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({
+    path: "/courses",
+    title: "Courses",
+    description: "Search courses by destination, qualification level, category, institution and intake.",
+  });
+}
 
 type Props = { searchParams: Promise<SearchParams> };
 

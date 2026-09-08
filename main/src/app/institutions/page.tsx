@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { listInstitutions } from "@/server/queries/catalogue";
 import { InnerHero } from "@/components/inner";
 import { InstitutionList } from "@/components/catalogue/institution-list";
@@ -6,10 +7,11 @@ import { Empty } from "@/components/catalogue/empty";
 
 export async function generateMetadata(): Promise<Metadata> {
   const institutions = await listInstitutions();
-  return {
+  return buildMetadata({
+    path: "/institutions",
     title: "Institutions",
     description: `${institutions.length} universities and colleges we work with.`,
-  };
+  });
 }
 
 export default async function InstitutionsPage() {

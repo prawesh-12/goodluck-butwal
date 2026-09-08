@@ -78,6 +78,7 @@ export const nav = [
   { label: "News", href: "/news" },
   { label: "Events", href: "/events" },
   { label: "Contact", href: "/contact" },
+  { label: "Search", href: "/search" },
 ];
 
 export const footerLinks = {

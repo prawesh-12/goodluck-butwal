@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata } from "@/lib/seo";
 import { getAboutContent } from "@/server/queries/pages";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
 
 export async function generateMetadata(): Promise<Metadata> {
   const about = await getAboutContent();
-  return { title: "Corporate social responsibility", description: about.csrIntro };
+  return buildEntityMetadata("page", "corporate-social-responsibility", {
+    path: "/about/corporate-social-responsibility",
+    title: "Corporate social responsibility",
+    description: about.csrIntro,
+  });
 }
 
 export default async function CsrPage() {

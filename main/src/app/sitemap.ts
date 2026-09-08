@@ -1,20 +1,92 @@
 import type { MetadataRoute } from "next";
+import { and, asc, eq } from "drizzle-orm";
+import { db } from "@db/client";
+import {
+  courses,
+  destinations,
+  events,
+  institutions,
+  pages,
+  postCategories,
+  posts,
+  services,
+  tags,
+  testPrepCourses,
+} from "@db/schema";
 import { company } from "@/lib/site";
-import { listServices } from "@/server/queries/services";
-import { listDestinations } from "@/server/queries/destinations";
-import { listArticles } from "@/server/queries/editorial";
+
+type Frequency = "weekly" | "monthly" | "yearly";
+
+const url = (path: string) => `${company.url}${path}`;
+
+const fixed = [
+  "",
+  "/about",
+  "/about/team",
+  "/about/message-from-co-founders",
+  "/about/corporate-social-responsibility",
+  "/about/careers",
+  "/study-abroad",
+  "/institutions",
+  "/courses",
+  "/services",
+  "/test-preparation",
+  "/test-preparation/batches",
+  "/events",
+  "/success-stories",
+  "/news",
+  "/faq",
+  "/contact",
+  "/contact/book-consultation",
+];
+
+const sources = [
+  { table: destinations, prefix: "/study-abroad", frequency: "monthly" as Frequency, extra: eq(destinations.hasPage, true) },
+  { table: services, prefix: "/services", frequency: "monthly" as Frequency, extra: undefined },
+  { table: posts, prefix: "/news", frequency: "yearly" as Frequency, extra: undefined },
+  { table: institutions, prefix: "/institutions", frequency: "monthly" as Frequency, extra: undefined },
+  { table: courses, prefix: "/courses", frequency: "monthly" as Frequency, extra: undefined },
+  { table: testPrepCourses, prefix: "/test-preparation", frequency: "monthly" as Frequency, extra: undefined },
+  { table: events, prefix: "/events", frequency: "weekly" as Frequency, extra: undefined },
+  { table: pages, prefix: "/legal", frequency: "yearly" as Frequency, extra: eq(pages.parent, "legal") },
+];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [services, destinations, articles] = await Promise.all([
-    listServices(),
-    listDestinations(),
-    listArticles(),
+  const [records, categories, tagRows] = await Promise.all([
+    Promise.all(
+      sources.map(async ({ table, prefix, frequency, extra }) => {
+        const rows = await db
+          .select({ slug: table.slug, updatedAt: table.updatedAt, noindex: table.seoNoindex })
+          .from(table)
+          .where(and(eq(table.status, "published"), extra));
+        return rows
+          .filter((row) => !row.noindex)
+          .map((row) => ({
+            url: url(`${prefix}/${row.slug}`),
+            lastModified: row.updatedAt,
+            changeFrequency: frequency,
+          }));
+      }),
+    ),
+    db
+      .select({ slug: postCategories.slug, updatedAt: postCategories.updatedAt })
+      .from(postCategories)
+      .orderBy(asc(postCategories.sortOrder)),
+    db.select({ slug: tags.slug, updatedAt: tags.updatedAt }).from(tags),
   ]);
-  const fixed = ["", "/about", "/about/team", "/about/message-from-co-founders", "/about/corporate-social-responsibility", "/about/careers", "/study-abroad", "/services", "/success-stories", "/news", "/faq", "/contact", "/contact/book-consultation"];
+
   return [
-    ...fixed.map((p) => ({ url: `${company.url}${p}`, changeFrequency: "monthly" as const })),
-    ...destinations.map((d) => ({ url: `${company.url}/study-abroad/${d.slug}`, changeFrequency: "monthly" as const })),
-    ...services.map((s) => ({ url: `${company.url}/services/${s.slug}`, changeFrequency: "monthly" as const })),
-    ...articles.map((a) => ({ url: `${company.url}/news/${a.slug}`, lastModified: a.date, changeFrequency: "yearly" as const })),
+    ...fixed.map((path) => ({ url: url(path), changeFrequency: "monthly" as const })),
+    ...records.flat(),
+    ...categories.map((row) => ({
+      url: url(`/news/category/${row.slug}`),
+      lastModified: row.updatedAt,
+      changeFrequency: "weekly" as const,
+    })),
+    ...tagRows.map((row) => ({
+      url: url(`/news/tag/${row.slug}`),
+      lastModified: row.updatedAt,
+      changeFrequency: "weekly" as const,
+    })),
   ];
 }

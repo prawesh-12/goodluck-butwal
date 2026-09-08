@@ -3,6 +3,7 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { Field } from "@/components/inner";
 import { Turnstile } from "@/components/turnstile";
+import { trackFormSubmit } from "@/lib/analytics";
 
 export function RegistrationForm({
   eventId,
@@ -52,7 +53,10 @@ export function RegistrationForm({
     });
     const result = (await res.json()) as { ok: boolean; error?: string };
     setBusy(false);
-    if (result.ok) setDone(true);
+    if (result.ok) {
+      trackFormSubmit("event_registration");
+      setDone(true);
+    }
     else setError(result.error ?? "That did not go through. Try again.");
   };
 

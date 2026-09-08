@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { cache } from "react";
@@ -22,8 +23,14 @@ const getLegalPage = cache(async (slug: string) => {
 export const generateStaticParams = () => SLUGS.map((slug) => ({ slug }));
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const page = await getLegalPage((await params).slug);
-  return page ? { title: page.title, description: page.intro ?? undefined } : { title: "Not found" };
+  const { slug } = await params;
+  const page = await getLegalPage(slug);
+  if (!page) return buildMetadata({ path: "/legal", title: "Not found", noindex: true });
+  return buildEntityMetadata("page", slug, {
+    path: `/legal/${slug}`,
+    title: page.title,
+    description: page.intro,
+  });
 }
 
 export default async function LegalPage({ params }: { params: Promise<{ slug: string }> }) {

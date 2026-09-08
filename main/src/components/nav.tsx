@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { gl } from "@/lib/assets";
 import { nav } from "@/lib/site";
 import { PillButton } from "@/components/ui/button";
+import { OfficeBadge, useOffice } from "@/components/office";
 
 // Eight stacked backdrop-blur layers with masks: the progressive blur under the floating nav.
 function BlurTop() {
@@ -24,8 +25,13 @@ function BlurTop() {
 
 export function Nav() {
   const [open, setOpen] = useState(false);
+  const [officeOpen, setOfficeOpen] = useState(false);
+  const { office, offices, choose } = useOffice();
   const path = usePathname();
-  useEffect(() => setOpen(false), [path]);
+  useEffect(() => {
+    setOpen(false);
+    setOfficeOpen(false);
+  }, [path]);
   // No point offering the booking CTA to someone already on the contact pages.
   const onContact = path === "/contact" || path.startsWith("/contact/");
   return (
@@ -48,6 +54,12 @@ export function Nav() {
               })}
             </nav>
             <div className="ml-auto flex shrink-0 items-center justify-end gap-[6px] md:gap-[10px]">
+              {offices.length > 0 && (
+                <button type="button" onClick={() => { setOfficeOpen((v) => !v); setOpen(false); }} aria-expanded={officeOpen} aria-haspopup="menu" className="shrink-0 rounded-full transition-opacity duration-200 hover:opacity-70">
+                  <span className="sr-only">Choose your office</span>
+                  <OfficeBadge />
+                </button>
+              )}
               {!onContact && (
                 <div className="hidden md:block">
                   <PillButton href="/contact/book-consultation" tone="dark" size="sm">
@@ -55,7 +67,7 @@ export function Nav() {
                   </PillButton>
                 </div>
               )}
-              <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"} className="relative flex size-8 items-center justify-center rounded-full bg-ink md:size-[34px] lg:hidden">
+              <button type="button" onClick={() => { setOpen((v) => !v); setOfficeOpen(false); }} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"} className="relative flex size-8 items-center justify-center rounded-full bg-ink md:size-[34px] lg:hidden">
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-1"}`} />
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-1"}`} />
               </button>
@@ -79,8 +91,21 @@ export function Nav() {
               </motion.nav>
             )}
           </AnimatePresence>
+          <AnimatePresence>
+            {officeOpen && (
+              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} role="menu" aria-label="Offices" className="ml-auto mt-[10px] flex w-[240px] flex-col gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)]">
+                {offices.map((o) => (
+                  <button key={o.id} type="button" role="menuitem" aria-current={o.id === office} onClick={() => { choose(o.id); setOfficeOpen(false); }} className={`flex items-center gap-2 rounded-full px-4 py-2 text-left text-[16px] font-semibold leading-[20.8px] hover:bg-surface hover:text-ink ${o.id === office ? "bg-surface text-ink" : "text-muted"}`}>
+                    <img src={o.flag} alt="" className="size-[22px] rounded-full ring-2 ring-white" loading="lazy" decoding="async" />
+                    {o.country}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
+      {officeOpen && <div className="fixed inset-0 z-[7]" onClick={() => setOfficeOpen(false)} />}
       <AnimatePresence>
         {open && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} className="fixed inset-0 z-[7] bg-black/30 backdrop-blur-[10px] lg:hidden" />}
       </AnimatePresence>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { listEventCards } from "@/server/queries/events";
 import { InnerHero } from "@/components/inner";
 import { EventTabs } from "@/components/events/event-tabs";
@@ -7,10 +8,11 @@ export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const upcoming = (await listEventCards()).filter((card) => !card.past).length;
-  return {
+  return buildMetadata({
+    path: "/events",
     title: "Events",
     description: `${upcoming} seminars, fairs and information sessions coming up.`,
-  };
+  });
 }
 
 export default async function EventsPage() {

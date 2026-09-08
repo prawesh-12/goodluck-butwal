@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { listArticles } from "@/server/queries/editorial";
 import { InnerHero } from "@/components/inner";
 import { NewsList } from "@/components/news-list";
 
 export async function generateMetadata(): Promise<Metadata> {
   const articles = await listArticles();
-  return {
+  return buildMetadata({
+    path: "/news",
     title: "News and updates",
     description: `${articles.length} articles from the Goodluck team.`,
-  };
+  });
 }
 
 export default async function NewsPage() {

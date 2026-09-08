@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getTag, listArticlesByTag } from "@/server/queries/editorial";
 import { InnerHero } from "@/components/inner";
@@ -7,8 +8,11 @@ import { NewsList } from "@/components/news-list";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const tag = await getTag((await params).slug);
-  return tag ? { title: `Articles tagged ${tag.name}` } : { title: "News" };
+  const { slug } = await params;
+  const tag = await getTag(slug);
+  return tag
+    ? buildMetadata({ path: `/news/tag/${slug}`, title: `Articles tagged ${tag.name}` })
+    : buildMetadata({ path: "/news", title: "News", noindex: true });
 }
 
 export default async function TagPage({ params }: Props) {

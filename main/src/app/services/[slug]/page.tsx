@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getService, listServices } from "@/server/queries/services";
 import { listServiceFaqs } from "@/server/queries/destinations";
@@ -13,8 +14,14 @@ import { listTeam } from "@/server/queries/people";
 type Props = { params: Promise<{ slug: string }> };
 export const generateStaticParams = async () => (await listServices()).map((s) => ({ slug: s.slug }));
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const s = await getService((await params).slug);
-  return s ? { title: s.title, description: s.intro } : { title: "Service" };
+  const { slug } = await params;
+  const s = await getService(slug);
+  if (!s) return buildMetadata({ path: "/services", title: "Service", noindex: true });
+  return buildEntityMetadata("service", slug, {
+    path: `/services/${slug}`,
+    title: s.title,
+    description: s.intro,
+  });
 }
 
 export default async function ServicePage({ params }: Props) {

@@ -89,9 +89,9 @@ export function NewsCard({ article, delay = 0, className, href }: { article: Art
 }
 
 // Team member: round portrait, name and role, as on the reference team grid.
-export function TeamCard({ name, role, photo, office, delay = 0 }: { name: string; role: string; photo: string; office?: string; delay?: number }) {
-  return (
-    <Appear delay={delay} className="flex flex-col items-center gap-4">
+export function TeamCard({ name, role, photo, office, delay = 0, href }: { name: string; role: string; photo: string; office?: string; delay?: number; href?: string }) {
+  const body = (
+    <>
       <div className="aspect-[345/400] w-full overflow-clip rounded-[10px] bg-surface md:rounded-[20px]">
         <img src={photo} alt={name} className="size-full object-cover object-top transition-transform duration-500 hover:scale-[1.03]" loading="lazy" decoding="async" />
       </div>
@@ -100,6 +100,15 @@ export function TeamCard({ name, role, photo, office, delay = 0 }: { name: strin
         <p className="t-small text-center text-muted">{role}</p>
         {office && <p className="t-small text-center text-muted">{office}</p>}
       </div>
+    </>
+  );
+  return (
+    <Appear delay={delay} className="flex flex-col items-center gap-4">
+      {href ? (
+        <Link href={href} aria-label={name} className="flex w-full flex-col items-center gap-4">{body}</Link>
+      ) : (
+        body
+      )}
     </Appear>
   );
 }

@@ -30,7 +30,7 @@ export function TeamGrid({ team }: { team: PublicMember[] }) {
       <motion.div layout className="grid w-full grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-[30px] md:gap-y-10 lg:grid-cols-4">
         {shown.map((m, i) => (
           <motion.div key={m.slug} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", bounce: 0, duration: 0.6, delay: Math.min(i * 0.04, 0.4) }}>
-            <TeamCard name={m.name} role={m.role} photo={m.photo} office={tab === "all" ? officeName(m.office) : undefined} />
+            <TeamCard name={m.name} role={m.role} photo={m.photo} office={tab === "all" ? officeName(m.office) : undefined} href={`/team/${m.slug}`} />
           </motion.div>
         ))}
       </motion.div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata } from "@/lib/seo";
 import { gl, img } from "@/lib/assets";
 import { offices } from "@/lib/site";
 import { getAboutContent } from "@/server/queries/pages";
@@ -14,7 +15,11 @@ import { TabShoulders } from "@/components/home/steps";
 
 export async function generateMetadata(): Promise<Metadata> {
   const about = await getAboutContent();
-  return { title: "About us", description: about.established };
+  return buildEntityMetadata("page", "about", {
+    path: "/about",
+    title: "About us",
+    description: about.established,
+  });
 }
 
 
@@ -138,7 +143,7 @@ export default async function AboutPage() {
             <div className="grid w-full grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-3 md:gap-x-[30px] md:gap-y-10 lg:grid-cols-5">
               {team.slice(0, 5).map((m, i) => (
                 <div key={m.slug} className={i === 4 ? "col-span-2 md:col-span-1" : ""}>
-                  <TeamCard name={m.name} role={m.role} photo={m.photo} delay={0.08 * i} />
+                  <TeamCard name={m.name} role={m.role} photo={m.photo} delay={0.08 * i} href={`/team/${m.slug}`} />
                 </div>
               ))}
             </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getCourse, getInstitution } from "@/server/queries/catalogue";
 import { Appear } from "@/components/ui/appear";
@@ -10,8 +11,14 @@ import { InstitutionCard } from "@/components/catalogue/institution-card";
 type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const course = await getCourse((await params).slug);
-  return course ? { title: course.name, description: `${course.name} at ${course.institution}.` } : { title: "Course" };
+  const { slug } = await params;
+  const course = await getCourse(slug);
+  if (!course) return buildMetadata({ path: "/courses", title: "Course", noindex: true });
+  return buildEntityMetadata("course", slug, {
+    path: `/courses/${slug}`,
+    title: course.name,
+    description: `${course.name} at ${course.institution}.`,
+  });
 }
 
 export default async function CoursePage({ params }: Props) {

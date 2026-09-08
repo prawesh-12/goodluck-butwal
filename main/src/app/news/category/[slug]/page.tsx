@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { listArticlesByCategory, listCategories } from "@/server/queries/editorial";
 import { InnerHero } from "@/components/inner";
@@ -12,7 +13,9 @@ export const generateStaticParams = async () =>
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const category = (await listCategories()).find((c) => c.slug === slug);
-  return category ? { title: `${category.name} articles` } : { title: "News" };
+  return category
+    ? buildMetadata({ path: `/news/category/${slug}`, title: `${category.name} articles` })
+    : buildMetadata({ path: "/news", title: "News", noindex: true });
 }
 
 export default async function CategoryPage({ params }: Props) {

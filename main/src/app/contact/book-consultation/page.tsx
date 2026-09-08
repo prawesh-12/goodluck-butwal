@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { img } from "@/lib/assets";
 import { officeById } from "@/lib/site";
 import { Appear } from "@/components/ui/appear";
@@ -9,7 +10,13 @@ import { listPartnerLogos } from "@/server/queries/people";
 import { listOffices } from "@/server/queries/offices";
 import { listServices } from "@/server/queries/services";
 
-export const metadata: Metadata = { title: "Book an appointment", description: "Choose an office, a service and a time that suits you." };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({
+    path: "/contact/book-consultation",
+    title: "Book an appointment",
+    description: "Choose an office, a service and a time that suits you.",
+  });
+}
 
 export default async function BookConsultationPage() {
   const [logos, offices, services] = await Promise.all([

@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
 import { listServiceFaqs } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
-export const metadata: Metadata = { title: "FAQ" };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({ path: "/faq", title: "Frequently asked questions" });
+}
 
 export default async function FaqPage() {
   const [faces, education, migration] = await Promise.all([

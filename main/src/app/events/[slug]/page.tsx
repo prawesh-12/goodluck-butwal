@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getEvent, listEvents, seatsTaken } from "@/server/queries/events";
 import { eventTypeLabels } from "@/lib/content-meta";
@@ -18,9 +19,13 @@ export const generateStaticParams = async () => (await listEvents()).map((e) => 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const event = await getEvent(slug);
-  return event
-    ? { title: event.title, description: event.summary, openGraph: { images: [event.image] } }
-    : { title: "Events" };
+  if (!event) return buildMetadata({ path: "/events", title: "Events", noindex: true });
+  return buildEntityMetadata("event", slug, {
+    path: `/events/${slug}`,
+    title: event.title,
+    description: event.summary,
+    image: event.image,
+  });
 }
 
 export default async function EventPage({ params }: Props) {

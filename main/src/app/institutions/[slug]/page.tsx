@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getInstitution, listCourses, listInstitutionImages } from "@/server/queries/catalogue";
 import { pageCount, type SearchParams } from "@/components/catalogue/filters";
@@ -13,10 +14,14 @@ import { Empty } from "@/components/catalogue/empty";
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<SearchParams> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const institution = await getInstitution((await params).slug);
-  return institution
-    ? { title: institution.name, description: [institution.city, institution.country].filter(Boolean).join(", ") }
-    : { title: "Institution" };
+  const { slug } = await params;
+  const institution = await getInstitution(slug);
+  if (!institution) return buildMetadata({ path: "/institutions", title: "Institution", noindex: true });
+  return buildEntityMetadata("institution", slug, {
+    path: `/institutions/${slug}`,
+    title: institution.name,
+    description: [institution.city, institution.country].filter(Boolean).join(", "),
+  });
 }
 
 export default async function InstitutionPage({ params, searchParams }: Props) {

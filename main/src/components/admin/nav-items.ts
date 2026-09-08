@@ -51,6 +51,7 @@ export const NAV: NavGroup[] = [
       { href: "/admin/redirects", label: "Redirects", entity: "redirects" },
       { href: "/admin/users", label: "Users", entity: "users" },
       { href: "/admin/audit-log", label: "Audit log", entity: "auditLog" },
+      { href: "/admin/help", label: "Help", entity: "auditLog" },
     ],
   },
 ];

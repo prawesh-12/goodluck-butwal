@@ -6,6 +6,8 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { OfficeProvider } from "@/components/office";
+import { Analytics } from "@/components/analytics";
+import { StaffBar } from "@/components/admin/staff-bar";
 import { listOffices } from "@/server/queries/offices";
 import { getFooterColumns, getSocialLinks } from "@/server/queries/site";
 
@@ -36,7 +38,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Nav />
           <main className="flex flex-col items-start">{children}</main>
           <Footer columns={columns} socials={socials} />
+          <StaffBar />
         </OfficeProvider>
+        <Analytics />
       </body>
     </html>
   );

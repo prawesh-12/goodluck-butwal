@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
 import { getTestPrepCourse, listTestPrepCourses, upcomingBatchesForCourse } from "@/server/queries/test-prep";
 import { Appear } from "@/components/ui/appear";
@@ -13,8 +14,14 @@ export const generateStaticParams = async () =>
   (await listTestPrepCourses()).map((course) => ({ slug: course.slug }));
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const course = await getTestPrepCourse((await params).slug);
-  return course ? { title: course.name, description: course.summary } : { title: "Test preparation" };
+  const { slug } = await params;
+  const course = await getTestPrepCourse(slug);
+  if (!course) return buildMetadata({ path: "/test-preparation", title: "Test preparation", noindex: true });
+  return buildEntityMetadata("testPrepCourse", slug, {
+    path: `/test-preparation/${slug}`,
+    title: course.name,
+    description: course.summary,
+  });
 }
 
 export default async function TestPrepCoursePage({ params }: Props) {

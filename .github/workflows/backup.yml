@@ -1,0 +1,102 @@
+name: Backup
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+    - cron: "0 19 * * 1"
+  workflow_dispatch:
+
+defaults:
+  run:
+    working-directory: main
+
+permissions:
+  contents: read
+  issues: write
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: auto
+  AWS_ENDPOINT_URL: https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+  # R2 rejects the extra checksum headers the AWS CLI adds by default.
+  AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+  AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+  BUCKET: s3://gem-backups
+
+jobs:
+  backup:
+    if: github.event.schedule != '0 19 * * 1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # The runner ships pg_dump 16 and Neon runs 17, and pg_dump refuses a newer server.
+      - name: Install pg_dump 17
+        run: |
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Dump and upload
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +%Y-%m-%d)
+          KEY="db/$(date -u +%Y)/$(date -u +%m)/gem-$DATE.dump.gz"
+          pg_dump --format=custom --no-owner --no-acl "$DATABASE_URL" | gzip > dump.gz
+          ls -l dump.gz
+          aws s3 cp dump.gz "$BUCKET/$KEY"
+          echo "$KEY" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Delete backups older than 30 days
+        run: |
+          set -euo pipefail
+          CUTOFF=$(date -u -d '30 days ago' +%Y-%m-%d)
+          KEYS=$(aws s3api list-objects-v2 --bucket gem-backups --prefix db/ \
+            --query "Contents[?LastModified<'$CUTOFF'].Key" --output text)
+          for key in $KEYS; do
+            case "$key" in None|*last_success) continue ;; esac
+            aws s3 rm "$BUCKET/$key"
+          done
+
+      - name: Write the last_success marker
+        run: date -u +%Y-%m-%dT%H:%M:%SZ | aws s3 cp - "$BUCKET/db/last_success"
+
+      - name: Report the failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create backup-failure --color B60205 --description "Nightly database backup" || true
+          gh issue create --label backup-failure \
+            --title "Backup failed on $(date -u +%Y-%m-%d)" \
+            --body "The nightly database backup did not finish. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+  freshness:
+    if: github.event.schedule == '0 19 * * 1' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail if the last backup is over 48 hours old
+        run: |
+          set -euo pipefail
+          MARKER=$(aws s3 cp "$BUCKET/db/last_success" -)
+          AGE=$(( ( $(date -u +%s) - $(date -u -d "$MARKER" +%s) ) / 3600 ))
+          echo "Last backup succeeded $AGE hours ago, at $MARKER."
+          [ "$AGE" -le 48 ]
+
+      - name: Report the stale backup
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create backup-failure --color B60205 --description "Nightly database backup" || true
+          gh issue create --label backup-failure \
+            --title "No successful backup in 48 hours" \
+            --body "The weekly freshness check could not find a backup from the last 48 hours. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

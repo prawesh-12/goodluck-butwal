@@ -8,6 +8,7 @@ import type { PublicOffice } from "@/server/queries/offices";
 import type { PublicDestination } from "@/server/queries/destinations";
 import type { PublicService } from "@/server/queries/services";
 import { Turnstile } from "@/components/turnstile";
+import { trackFormSubmit } from "@/lib/analytics";
 
 // The button stays translucent until the required fields are filled.
 function SubmitButton({ label, ready, className = "" }: { label: string; ready: boolean; className?: string }) {
@@ -113,8 +114,12 @@ export function EnquiryForm({ destinations }: { destinations: PublicDestination[
       ...context(),
     });
     setBusy(false);
-    if (result.ok) setSent(result.reference ?? "");
-    else setError(result.error ?? "That did not go through. Try again.");
+    if (result.ok) {
+      trackFormSubmit("enquiry", result.reference);
+      setSent(result.reference ?? "");
+    } else {
+      setError(result.error ?? "That did not go through. Try again.");
+    }
   };
 
   if (sent)
@@ -181,8 +186,12 @@ export function BookingForm({ offices, services }: { offices: PublicOffice[]; se
       ...context(),
     });
     setBusy(false);
-    if (result.ok) setSent(result.reference ?? "");
-    else setError(result.error ?? "That did not go through. Try again.");
+    if (result.ok) {
+      trackFormSubmit("booking", result.reference);
+      setSent(result.reference ?? "");
+    } else {
+      setError(result.error ?? "That did not go through. Try again.");
+    }
   };
 
   if (sent)
