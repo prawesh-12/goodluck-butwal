@@ -3,7 +3,7 @@
 
 Rules for working in this repo. Read this before anything else.
 
-`plan.md (don't commit this one and if committed then remove from repo history)` is the spec. If something is not in it, ask. Do not decide it yourself.
+`plan.md` is the spec. If something is not in it, ask. Do not decide it yourself.
 
 ---
 
@@ -155,7 +155,39 @@ change), say so and move on. Do not invent a test to have one.
 
 ---
 
-## 6. Commits
+## 6. Keep the codebase clean
+
+Do not add anything the task did not ask for. If you are not sure whether something is needed,
+it is not needed, ask instead.
+
+Never add:
+
+- a function, variable, config flag, or file that nothing calls or uses
+- an abstraction, wrapper, or "helper" for a single use case that plain code would handle
+- a library or pattern not already used in this repo, to solve a problem the repo already has a
+  way to solve
+- fields, parameters, or config options "for later" or "in case we need it"
+- renamed copies of a file or function left next to the original ("old", "v2", "backup")
+- made-up terminology, layers, or patterns that are not in `plan.md` and not already in the
+  codebase. If you invent a name for a concept, that is a sign you are inventing the concept
+  too. Ask instead.
+
+When you finish a task, before moving on:
+
+- delete code you replaced, do not leave it commented out or renamed aside
+- delete files, exports, or dependencies nothing imports anymore
+- check `git diff` for anything not directly needed for the task. Remove it.
+
+The codebase should look like it was written by someone who only ever wrote exactly what was
+needed, in the style already used here. Not like it grew extra parts nobody asked for.
+
+If you think something in the existing code is genuinely wrong or messy and needs fixing, that
+is a refactor. It goes in `BACKLOG.md` per Section 9, rule 5. It does not get fixed quietly
+inside an unrelated task.
+
+---
+
+## 7. Commits
 
 Commit as soon as a piece works. Do not batch a day of work into one commit.
 
@@ -261,7 +293,7 @@ feat(forms): add enquiry endpoint (Phase 2, Q-002)
 
 ---
 
-## 7. Commands
+## 8. Commands
 
 ```bash
 pnpm install          # never npm or yarn
@@ -277,7 +309,7 @@ pnpm only. Never create `package-lock.json` or `yarn.lock`.
 
 ---
 
-## 8. Never
+## 9. Never
 
 1. Change how an existing page looks. The UI is approved and frozen.
 2. Add a table, column or route that is not in `plan.md`.
@@ -292,23 +324,15 @@ pnpm only. Never create `package-lock.json` or `yarn.lock`.
 11. Reference `plan.md` sections, phases, or `QUESTIONS.md` ticket IDs anywhere in code,
     comments, or commits. Those IDs live only in `plan.md` and `QUESTIONS.md`.
 12. Start the next module, part, or phase before the current one has passing tests in `tests/`.
+13. Add unused code, invented terminology, or speculative options nothing in `plan.md` asked
+    for. Leave replaced code lying around instead of deleting it.
 
 ---
 
-## 9. When you are stuck
+## 10. When you are stuck
 
 Stop. Write the question in `QUESTIONS.md`. Pick the option that deletes nothing and changes no
-URL or schema. Tell me at the end of the session. Do not invent an answer and keep going.
+URL or schema. Mark it `// PENDING-DECISION: Q-nnn`. Tell me at the end of the session.
 
-**Leave no marker in the code.** No `PENDING-DECISION`, no ticket number, no comment naming the
-question. Record the file and line in the `QUESTIONS.md` entry instead, so there is one place to
-look and one place to clean up when the answer lands.
-
-If the choice needs explaining where it sits, write the reason in plain English and leave the
-question out of it:
-
-```ts
-// Cebu is not one of the two offices in the requirements, so it gets a row but no page.
-```
-
-Code should read the same whether or not `QUESTIONS.md` exists.
+Do not invent an answer and keep going. Once the decision is made, remove the
+`PENDING-DECISION` marker from the code entirely, it was a flag for you, not documentation.
