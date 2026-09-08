@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { gl } from "@/lib/assets";
 
 import type { PublicMember } from "@/server/queries/people";
 import { Appear } from "@/components/ui/appear";

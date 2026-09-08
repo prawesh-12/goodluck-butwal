@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import type { PublicMember } from "@/server/queries/people";
 import { offices, type OfficeId } from "@/lib/site";
@@ -13,8 +13,14 @@ const tabs: { id: Tab; label: string }[] = [{ id: "all", label: "Whole team" }, 
 // Team by office, as the brief asks, with the whole team one tap away. Starts on the office chosen in the header.
 export function TeamGrid({ team }: { team: PublicMember[] }) {
   const { office } = useOffice();
-  const [tab, setTab] = useState<Tab>("all");
-  useEffect(() => setTab(office), [office]);
+  const [tab, setTab] = useState<Tab>(office);
+  const [lastOffice, setLastOffice] = useState(office);
+  // Follows the header selector. Adjusted during render rather than in an effect so the right tab
+  // is on screen for the first paint instead of one frame later.
+  if (office !== lastOffice) {
+    setLastOffice(office);
+    setTab(office);
+  }
   const shown = tab === "all" ? team : team.filter((m) => m.office === tab);
   const officeName = (id: OfficeId | null) => (id ? `${offices.find((o) => o.id === id)!.city}, ${offices.find((o) => o.id === id)!.country}` : undefined);
   return (

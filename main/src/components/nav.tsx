@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { gl } from "@/lib/assets";
 import { nav } from "@/lib/site";
@@ -28,10 +28,13 @@ export function Nav() {
   const [officeOpen, setOfficeOpen] = useState(false);
   const { office, offices, choose } = useOffice();
   const path = usePathname();
-  useEffect(() => {
+  const [lastPath, setLastPath] = useState(path);
+  // Closing in an effect left the menu open over the new page for a frame.
+  if (path !== lastPath) {
+    setLastPath(path);
     setOpen(false);
     setOfficeOpen(false);
-  }, [path]);
+  }
   // No point offering the booking CTA to someone already on the contact pages.
   const onContact = path === "/contact" || path.startsWith("/contact/");
   return (

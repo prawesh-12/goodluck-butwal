@@ -3,10 +3,31 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
+import type { Variants } from "motion/react";
 import { img } from "@/lib/assets";
 
 const spring = { type: "spring", stiffness: 380, damping: 32 } as const;
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
+// Hoisted, because motion(Link) inside the body would be a new component type on every render
+// and React would remount the link instead of updating it.
+const MotionLink = motion(Link);
+
+function ArrowChip({ side, lg, flip, variants }: { side: "left" | "right"; lg: boolean; flip: boolean; variants: Variants }) {
+  return (
+    <motion.span
+      aria-hidden
+      variants={variants}
+      transition={spring}
+      className={cx(
+        "absolute top-1/2 flex -translate-y-1/2 items-center justify-center rounded-full bg-white",
+        lg ? "size-[25px] md:size-[27px] lg:size-[31px]" : "size-[18px] lg:size-[22px]",
+        side === "left" ? (lg ? "left-[6px] lg:left-2" : "left-[7px] lg:left-2") : lg ? "right-[6px] lg:right-2" : "right-[7px] lg:right-2",
+      )}
+    >
+      <img src={flip ? img.arrowLeft : img.arrow} alt="" className="h-2 w-3" loading="lazy" decoding="async" />
+    </motion.span>
+  );
+}
 
 // Pill with the arrow chip that swaps sides on hover. lg = hero button (49/51/55px by breakpoint), sm = nav button (34/38px).
 export function PillButton({
@@ -38,22 +59,8 @@ export function PillButton({
         left: { rest: { x: -shift, rotate: -45, scale: big }, hover: { x: 0, rotate: 0, scale: 1 } },
         right: { rest: { x: 0, rotate: 0, scale: 1 }, hover: { x: shift, rotate: 45, scale: big } },
       };
-  const Chip = ({ side }: { side: "left" | "right" }) => (
-    <motion.span
-      aria-hidden
-      variants={chipVariants[side]}
-      transition={spring}
-      className={cx(
-        "absolute top-1/2 flex -translate-y-1/2 items-center justify-center rounded-full bg-white",
-        lg ? "size-[25px] md:size-[27px] lg:size-[31px]" : "size-[18px] lg:size-[22px]",
-        side === "left" ? (lg ? "left-[6px] lg:left-2" : "left-[7px] lg:left-2") : lg ? "right-[6px] lg:right-2" : "right-[7px] lg:right-2",
-      )}
-    >
-      <img src={flip ? img.arrowLeft : img.arrow} alt="" className="h-2 w-3" loading="lazy" decoding="async" />
-    </motion.span>
-  );
   const external = href.startsWith("http") || href.startsWith("mailto:");
-  const A = external ? motion.a : motion(Link);
+  const A = external ? motion.a : MotionLink;
   return (
     <A
       href={href}
@@ -70,7 +77,7 @@ export function PillButton({
           tone === "blue" ? "btn-blue" : lg ? "btn-black" : "btn-black-sm",
         )}
       >
-        <Chip side="left" />
+        <ArrowChip side="left" lg={lg} flip={flip} variants={chipVariants.left} />
         <motion.span
           variants={{ rest: { x: 0 }, hover: { x: (flip ? -1 : 1) * (lg ? 24 : 16) } }}
           transition={spring}
@@ -78,7 +85,7 @@ export function PillButton({
         >
           {children}
         </motion.span>
-        <Chip side="right" />
+        <ArrowChip side="right" lg={lg} flip={flip} variants={chipVariants.right} />
       </span>
     </A>
   );
