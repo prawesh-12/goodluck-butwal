@@ -13,6 +13,7 @@ import {
   qualificationLevels,
 } from "@/components/admin/course-meta";
 import { createCourse, deleteCourse, updateCourse } from "@/server/actions/courses";
+import { UnsavedGuard } from "@/components/admin/unsaved-guard";
 
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
 
@@ -82,7 +83,7 @@ export function CourseEditor({
     });
 
   return (
-    <form
+    <form id="admin-course-form"
       className="admin-editor"
       onSubmit={async (event) => {
         event.preventDefault();
@@ -95,6 +96,7 @@ export function CourseEditor({
         else if (result.ok) router.refresh();
       }}
     >
+      <UnsavedGuard formId="admin-course-form" />
       <Field
         label="Name"
         help="The course name on the course card and at the top of its page."

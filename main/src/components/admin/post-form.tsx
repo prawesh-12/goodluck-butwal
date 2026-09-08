@@ -11,6 +11,7 @@ import { archivePost, createPost, updatePost } from "@/server/actions/posts";
 import { MediaPicker, type PickedMedia } from "./media-picker";
 import { SeoFields, type SeoValue } from "./page-seo-fields";
 import type { EditorialOptions } from "@/server/queries/admin-editorial";
+import { UnsavedGuard } from "@/components/admin/unsaved-guard";
 
 // Tiptap is a large dependency and belongs only in the browser, so the Worker never bundles it.
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
@@ -76,7 +77,7 @@ export function PostForm({
     : ["draft", "archived"];
 
   return (
-    <form
+    <form id="admin-post-form"
       className="admin-editor"
       onSubmit={async (event) => {
         event.preventDefault();
@@ -112,6 +113,7 @@ export function PostForm({
         else router.push(`/admin/posts/${result.data.id}`);
       }}
     >
+      <UnsavedGuard formId="admin-post-form" />
       <label className="admin-field">
         <span className="t-small">Title</span>
         <input

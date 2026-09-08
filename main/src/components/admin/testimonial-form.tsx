@@ -18,6 +18,7 @@ import {
 } from "@/server/actions/testimonials";
 import { MediaPicker, type PickedMedia } from "./media-picker";
 import type { EditorialOptions } from "@/server/queries/admin-editorial";
+import { UnsavedGuard } from "@/components/admin/unsaved-guard";
 
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
 
@@ -82,7 +83,7 @@ export function TestimonialForm({
     .join(" and ");
 
   return (
-    <form
+    <form id="admin-testimonial-form"
       className="admin-editor"
       onSubmit={async (event) => {
         event.preventDefault();
@@ -123,6 +124,7 @@ export function TestimonialForm({
         else router.push(`/admin/testimonials/${result.data.id}`);
       }}
     >
+      <UnsavedGuard formId="admin-testimonial-form" />
       <label className="admin-field">
         <span className="t-small">Kind of story</span>
         <select value={type} onChange={(event) => setType(event.target.value as TestimonialType)}>

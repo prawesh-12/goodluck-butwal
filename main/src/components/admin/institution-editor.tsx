@@ -8,6 +8,7 @@ import { Field, SaveBar, Select, Toggle } from "@/components/admin/repeater";
 import { SeoFields, type SeoValue } from "@/components/admin/page-seo-fields";
 import { institutionPath } from "@/components/admin/course-meta";
 import { createInstitution, deleteInstitution, updateInstitution } from "@/server/actions/institutions";
+import { UnsavedGuard } from "@/components/admin/unsaved-guard";
 
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
 
@@ -51,7 +52,7 @@ export function InstitutionEditor({
   const path = institutionPath(row.slug);
 
   return (
-    <form
+    <form id="admin-institution-form"
       className="admin-editor"
       onSubmit={async (event) => {
         event.preventDefault();
@@ -64,6 +65,7 @@ export function InstitutionEditor({
         else if (result.ok) router.refresh();
       }}
     >
+      <UnsavedGuard formId="admin-institution-form" />
       <Field
         label="Name"
         help="The name on the institution card, at the top of its page and on every course it runs."

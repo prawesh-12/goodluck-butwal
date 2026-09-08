@@ -11,6 +11,7 @@ import { archiveEvent, createEvent, updateEvent } from "@/server/actions/events"
 import { MediaPicker, type PickedMedia } from "./media-picker";
 import { SeoFields, type SeoValue } from "./page-seo-fields";
 import type { OfficeZone } from "@/server/queries/admin-events";
+import { UnsavedGuard } from "@/components/admin/unsaved-guard";
 
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
 
@@ -89,7 +90,7 @@ export function EventForm({
   const seatsLeft = capacity ? Number(capacity) - seatsTaken : null;
 
   return (
-    <form
+    <form id="admin-event-form"
       className="admin-editor"
       onSubmit={async (event) => {
         event.preventDefault();
@@ -133,6 +134,7 @@ export function EventForm({
         else router.push(`/admin/events/${result.data.id}`);
       }}
     >
+      <UnsavedGuard formId="admin-event-form" />
       <label className="admin-field">
         <span className="t-small">Title</span>
         <input

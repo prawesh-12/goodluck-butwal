@@ -34,7 +34,11 @@ export const listArticles = cache(async (): Promise<PublicArticle[]> => {
     .leftJoin(postCategories, eq(posts.categoryId, postCategories.id))
     .leftJoin(mediaAssets, eq(posts.bannerImageId, mediaAssets.id))
     .where(eq(posts.status, "published"))
-    .orderBy(asc(posts.sortOrder));
+    .orderBy(asc(posts.sortOrder))
+    // The news page filters by category in the browser, so it genuinely wants every article,
+    // and two other pages search the titles. This is the guard that stops an unbounded table
+    // from taking a page down. Well above the 31 articles that exist.
+    .limit(500);
 
   return rows.map((row) => ({
     slug: row.slug,
