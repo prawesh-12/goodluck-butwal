@@ -8,14 +8,13 @@ export const getFooterColumns = cache(async (): Promise<FooterColumn[]> => {
   const byKey = await allUiStrings();
   const columns = new Map<string, FooterColumn>();
 
+  // A column is a list of links, so its first link is what proves it is one. Taking every
+  // footer.* key instead built empty columns headed "tagline" and "copyright", and a second
+  // "Offices" beside the one the footer lays out itself from the offices table.
   for (const key of byKey.keys()) {
-    // The map now holds every interface string, not just the footer's, so the prefix does the
-    // filtering the query used to do.
-    if (!key.startsWith("footer.")) continue;
-    const [, slug] = key.split(".");
-    if (!columns.has(slug)) {
-      columns.set(slug, { title: byKey.get(`footer.${slug}.title`) ?? slug, links: [] });
-    }
+    const slug = /^footer\.([^.]+)\.0\.label$/.exec(key)?.[1];
+    if (!slug) continue;
+    columns.set(slug, { title: byKey.get(`footer.${slug}.title`) ?? slug, links: [] });
   }
 
   for (const [slug, column] of columns) {
