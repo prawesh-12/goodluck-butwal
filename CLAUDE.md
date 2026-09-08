@@ -1,8 +1,9 @@
+
 # CLAUDE.md
 
 Rules for working in this repo. Read this before anything else.
 
-`plan.md` is the spec. If something is not in it, ask. Do not decide it yourself.
+`plan.md (don't commit this one and if committed then remove from repo history)` is the spec. If something is not in it, ask. Do not decide it yourself.
 
 ---
 
@@ -41,8 +42,11 @@ Never write:
 - JSDoc on functions whose name and types already say everything
 - comments explaining what you changed, that is what commits are for
 - `TODO`, `FIXME`, or commented-out code
-
-Keep comments one line, plain English, no fluff.
+- references to `plan.md` sections or phases, or to `QUESTIONS.md` ticket IDs (`Q-002`,
+  `Phase 3`, `PENDING-DECISION`, etc). Those markers belong only in `plan.md` and
+  `QUESTIONS.md`. Code should read the same whether or not those files exist. If a decision
+  from `QUESTIONS.md` affects the code, write the decision itself in plain English, never the
+  ticket number.
 
 ```ts
 // Neon HTTP driver has no pooling, so a long-lived pool would keep compute awake.
@@ -90,7 +94,68 @@ Read `.claude/skills/` at the start of every session.
 
 ---
 
-## 5. Commits
+## 5. Testing
+
+Tests live in `tests/`. Mirror the structure of the code you are testing, so a test file is easy
+to find from the file it covers.
+
+**After finishing a module, a part, or a phase from `plan.md`, before moving to the next one:**
+
+1. Write test cases for what you just built.
+2. Run them.
+3. If they fail, fix the code or the test, then run again.
+4. Only move to the next part once they pass.
+
+Do not build three modules and then write tests for all three at the end. One part, its tests,
+green, then the next part.
+
+### What a test case looks like
+
+Plain English, one behaviour per test, name says what it checks. No AI-sounding filler, no
+padding the count, no testing the framework or the language itself.
+
+Write a test for:
+
+- the normal case (it works with valid input)
+- the edge cases that actually matter (empty input, duplicate entry, wrong type, boundary
+  numbers) for that specific feature, not a generic checklist
+- a bug you just fixed, so it cannot come back
+
+Do not write a test for:
+
+- something the compiler or type system already guarantees
+- a getter or setter with no logic in it
+- the same behaviour twice with different variable names
+- a case that cannot happen given how the function is called elsewhere in the code
+
+Good:
+
+```ts
+test("rejects enquiry with missing email", async () => {
+  const res = await postEnquiry({ name: "Sam", email: "" });
+  expect(res.status).toBe(400);
+});
+```
+
+Bad:
+
+```ts
+test("comprehensive validation test suite for enquiry endpoint edge cases", async () => {
+  // TC-014: verify robust error handling
+  ...
+});
+```
+
+The bad example is wrong for three reasons: the name is padded with words that say nothing,
+there is a fake ticket ID in a comment, and "comprehensive" and "robust" are on the banned word
+list from Section 1 anyway.
+
+If a part of `plan.md` has no meaningful behaviour to test (a config file, a static content
+change), say so and move on. Do not invent a test to have one.
+
+---
+
+## 6. Commits
 
 Commit as soon as a piece works. Do not batch a day of work into one commit.
 
@@ -108,16 +173,16 @@ type(scope): short subject in plain English
 
 **Types:**
 
-| Type | Use for |
-|---|---|
-| `feat` | new behaviour a user or admin can see |
-| `fix` | something was broken, now it is not |
+| Type         | Use for                                         |
+| ------------ | ----------------------------------------------- |
+| `feat`     | new behaviour a user or admin can see           |
+| `fix`      | something was broken, now it is not             |
 | `refactor` | code moved or restructured, behaviour unchanged |
-| `chore` | config, deps, tooling, scripts |
-| `docs` | markdown and comments only |
-| `test` | tests only |
-| `ci` | workflows and pipelines |
-| `perf` | measurably faster, say the number in the body |
+| `chore`    | config, deps, tooling, scripts                  |
+| `docs`     | markdown and comments only                      |
+| `test`     | tests only                                      |
+| `ci`       | workflows and pipelines                         |
+| `perf`     | measurably faster, say the number in the body   |
 
 **Scope** is the area you touched, one word or a hyphenated pair. Use the same scope every time
 for the same area so history stays greppable:
@@ -131,6 +196,10 @@ Say what changed, not what you did. "add enquiry endpoint", not "added the enqui
 
 **Body:** bullet points only. Max 5. One line each. Plain English. Skip it entirely if the title
 already says everything.
+
+Never put `plan.md` section numbers, phase names, or `QUESTIONS.md` ticket IDs (`Q-002`,
+`PENDING-DECISION`) in a commit title or body. Say what changed in the code, not which planning
+document it came from. Those documents already have their own history.
 
 ### Good
 
@@ -177,16 +246,22 @@ fix various issues
 WIP
 ```
 
+```
+feat(forms): add enquiry endpoint (Phase 2, Q-002)
+```
+
 ### Before every commit
 
 - `pnpm typecheck` passes
 - `pnpm lint` passes
 - no secrets, `.env`, `node_modules` or build output staged
+- no `plan.md` section/phase references or `QUESTIONS.md` ticket IDs in the title or body
+- tests for the part you just built exist in `tests/` and pass
 - `git diff --staged` reviewed, nothing unrelated in it
 
 ---
 
-## 6. Commands
+## 7. Commands
 
 ```bash
 pnpm install          # never npm or yarn
@@ -202,7 +277,7 @@ pnpm only. Never create `package-lock.json` or `yarn.lock`.
 
 ---
 
-## 7. Never
+## 8. Never
 
 1. Change how an existing page looks. The UI is approved and frozen.
 2. Add a table, column or route that is not in `plan.md`.
@@ -214,12 +289,26 @@ pnpm only. Never create `package-lock.json` or `yarn.lock`.
 8. Commit a secret, key or `.env` file.
 9. Delete production data.
 10. Guess at business rules or write real page copy. Ask instead.
+11. Reference `plan.md` sections, phases, or `QUESTIONS.md` ticket IDs anywhere in code,
+    comments, or commits. Those IDs live only in `plan.md` and `QUESTIONS.md`.
+12. Start the next module, part, or phase before the current one has passing tests in `tests/`.
 
 ---
 
-## 8. When you are stuck
+## 9. When you are stuck
 
 Stop. Write the question in `QUESTIONS.md`. Pick the option that deletes nothing and changes no
-URL or schema. Mark it `// PENDING-DECISION: Q-nnn`. Tell me at the end of the session.
+URL or schema. Tell me at the end of the session. Do not invent an answer and keep going.
 
-Do not invent an answer and keep going.
+**Leave no marker in the code.** No `PENDING-DECISION`, no ticket number, no comment naming the
+question. Record the file and line in the `QUESTIONS.md` entry instead, so there is one place to
+look and one place to clean up when the answer lands.
+
+If the choice needs explaining where it sits, write the reason in plain English and leave the
+question out of it:
+
+```ts
+// Cebu is not one of the two offices in the requirements, so it gets a row but no page.
+```
+
+Code should read the same whether or not `QUESTIONS.md` exists.
