@@ -13,7 +13,6 @@ import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 import { RegistrationForm } from "@/components/events/registration-form";
 import { formText } from "@/server/queries/form-text";
 import { loadText } from "@/server/queries/text";
-import { mapsEmbedSrc } from "@/lib/maps";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -40,7 +39,6 @@ export default async function EventPage({ params }: Props) {
   if (!event) notFound();
 
   const [taken, forms] = await Promise.all([seatsTaken(event.id), formText()]);
-  const mapsEmbed = mapsEmbedSrc(event.mapsEmbedUrl, [event.venueName, event.venueAddress].filter(Boolean).join(", "));
   const closed = registrationRefusal({
     registrationEnabled: event.registrationEnabled,
     registrationDeadline: event.registrationDeadline,
@@ -109,11 +107,11 @@ export default async function EventPage({ params }: Props) {
               )}
             </div>
 
-            {!event.isOnline && mapsEmbed ? (
+            {!event.isOnline && event.mapsEmbedUrl?.startsWith("https://") ? (
               <Appear className="w-full max-w-[800px] overflow-clip rounded-[10px] md:rounded-[20px]">
                 <iframe
                   title={`Map to ${event.venueName ?? event.title}`}
-                  src={mapsEmbed}
+                  src={event.mapsEmbedUrl}
                   className="h-[320px] w-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"

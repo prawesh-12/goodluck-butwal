@@ -6,7 +6,6 @@ import { updateOffice } from "@/server/actions/offices";
 import { DAY_NAMES } from "@/lib/content-meta";
 import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import { Field, SeoSection } from "@/components/admin/seo-section";
-import { mapsEmbedSrc } from "@/lib/maps";
 
 type Hours = { day: number; open: string; close: string; closed: boolean };
 
@@ -59,7 +58,6 @@ export function OfficeEditor({
     values.openingHours.length === 7 ? values.openingHours : emptyWeek,
   );
   const [embed, setEmbed] = useState(values.mapsEmbedUrl);
-  const preview = mapsEmbedSrc(embed, [values.addressLine1, values.city, values.country].filter(Boolean).join(", "));
 
   const setDay = (day: number, patch: Partial<Hours>) =>
     setHours((rows) => rows.map((row) => (row.day === day ? { ...row, ...patch } : row)));
@@ -203,17 +201,17 @@ export function OfficeEditor({
         <span className="t-small">Map to show on the page</span>
         <input name="mapsEmbedUrl" value={embed} onChange={(e) => setEmbed(e.target.value)} />
         <span className="t-small admin-help">
-          Leave this empty and the map is built from the address above. To pin somewhere else, choose
-          Share in Google Maps, then Embed a map, then copy the address inside src=&quot;...&quot;.
+          In Google Maps choose Share, then Embed a map, then copy the address inside src=&quot;...&quot;.
           The map below is what visitors will see.
+          Without this there is no map on the page, only the Get directions link.
         </span>
         {errors.mapsEmbedUrl ? <span className="admin-clash">{errors.mapsEmbedUrl[0]}</span> : null}
       </label>
 
-      {preview ? (
-        <iframe title="Map preview" src={preview} width="100%" height="260" loading="lazy" />
+      {embed.startsWith("https://") ? (
+        <iframe title="Map preview" src={embed} width="100%" height="260" loading="lazy" />
       ) : (
-        <p className="t-small admin-empty">No map yet. Fill in the address above, or paste a map address here.</p>
+        <p className="t-small admin-empty">No map yet. Paste an address above to see it here.</p>
       )}
 
       <h2 className="t-h5 admin-subhead">About this office</h2>

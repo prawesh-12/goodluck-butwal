@@ -9,7 +9,6 @@ import { OfficeContactCards } from "@/components/contact-cards";
 import { getOfficeProfile, listOfficeProfiles, listOffices, listServiceLinks } from "@/server/queries/offices";
 import { listTeam } from "@/server/queries/people";
 import { loadText } from "@/server/queries/text";
-import { mapsEmbedSrc } from "@/lib/maps";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -36,9 +35,9 @@ export default async function OfficePage({ params }: Props) {
   const [allOffices, team, services] = await Promise.all([listOffices(), listTeam(), listServiceLinks()]);
   const staff = team.filter((m) => m.office === office.id);
   const hours = [...(office.openingHours ?? [])].sort((a, b) => weekOrder(a.day) - weekOrder(b.day));
-  const place = [office.address, office.city, office.country].filter(Boolean).join(", ");
-  const mapsLink = office.mapsUrl ?? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
-  const mapsEmbed = mapsEmbedSrc(office.mapsEmbedUrl, place);
+  const mapsLink =
+    office.mapsUrl ??
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${office.address}, ${office.city}, ${office.country}`)}`;
 
   return (
     <>
@@ -61,11 +60,11 @@ export default async function OfficePage({ params }: Props) {
                   </a>
                 </div>
               </Appear>
-              {mapsEmbed && (
+              {office.mapsEmbedUrl?.startsWith("https://") && (
                 <Appear delay={0.1} className="min-h-[320px] overflow-clip rounded-[10px] md:rounded-[20px]">
                   <iframe
                     title={`Map to the ${office.label} in ${office.city}`}
-                    src={mapsEmbed}
+                    src={office.mapsEmbedUrl}
                     className="size-full min-h-[320px] w-full border-0"
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"

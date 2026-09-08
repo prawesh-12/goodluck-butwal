@@ -12,7 +12,6 @@ import { MediaPicker, type PickedMedia } from "./media-picker";
 import { SeoFields, type SeoValue } from "./page-seo-fields";
 import type { OfficeZone } from "@/server/queries/admin-events";
 import { UnsavedGuard } from "@/components/admin/unsaved-guard";
-import { mapsEmbedSrc } from "@/lib/maps";
 
 const RichText = dynamic(() => import("./editor-rich-text"), { ssr: false });
 
@@ -72,7 +71,6 @@ export function EventForm({
   const [officeId, setOfficeId] = useState(values.officeId);
   const [isOnline, setIsOnline] = useState(values.isOnline);
   const [embed, setEmbed] = useState(values.mapsEmbedUrl);
-  const preview = mapsEmbedSrc(embed, [values.venueName, values.venueAddress].filter(Boolean).join(", "));
   const [capacity, setCapacity] = useState(values.capacity === null ? "" : String(values.capacity));
   const [status, setStatus] = useState(values.status);
   const [seo, setSeo] = useState<SeoValue>({
@@ -273,17 +271,17 @@ export function EventForm({
             <span className="t-small">Map to show on the page</span>
             <input name="mapsEmbedUrl" value={embed} onChange={(event) => setEmbed(event.target.value)} />
             <span className="t-small admin-help">
-              Leave this empty and the map is built from the address above. To pin somewhere else,
-              choose Share in Google Maps, then Embed a map, then copy the address inside src=&quot;...&quot;.
+              In Google Maps choose Share, then Embed a map, then copy the address inside src=&quot;...&quot;.
               The map below is what visitors will see.
+              Without this there is no map on the page.
             </span>
             {errors.mapsEmbedUrl ? <span className="t-small admin-error">{errors.mapsEmbedUrl[0]}</span> : null}
           </label>
 
-          {preview ? (
-            <iframe title="Map preview" src={preview} width="100%" height="260" loading="lazy" />
+          {embed.startsWith("https://") ? (
+            <iframe title="Map preview" src={embed} width="100%" height="260" loading="lazy" />
           ) : (
-            <p className="t-small admin-empty">No map yet. Fill in the venue address above, or paste a map address here.</p>
+            <p className="t-small admin-empty">No map yet. Paste an address above to see it here.</p>
           )}
         </>
       )}
