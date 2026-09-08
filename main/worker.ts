@@ -13,7 +13,7 @@ export { BucketCachePurge } from "./.open-next/.build/durable-objects/bucket-cac
 type ExecutionContext = { waitUntil: (promise: Promise<unknown>) => void };
 type Env = { CRON_SECRET?: string; NEXT_PUBLIC_SITE_URL?: string };
 
-export default {
+const worker = {
   fetch: handler.fetch,
 
   async scheduled(_event: unknown, env: Env, ctx: ExecutionContext) {
@@ -25,3 +25,5 @@ export default {
     ctx.waitUntil(handler.fetch(request, env, ctx));
   },
 };
+
+export default worker;

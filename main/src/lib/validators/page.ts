@@ -187,3 +187,27 @@ export function slugRedirect(before: string, after: string, wasPublished: boolea
     note: `Address changed from ${before} to ${after}`,
   };
 }
+
+export function seoValues(data: {
+  seoTitle: string;
+  seoDescription: string;
+  seoOgImageId: string | null;
+  seoNoindex: boolean;
+  canonicalUrl: string;
+}) {
+  return {
+    seoTitle: data.seoTitle || null,
+    seoDescription: data.seoDescription || null,
+    seoOgImageId: data.seoOgImageId,
+    seoNoindex: data.seoNoindex,
+    canonicalUrl: data.canonicalUrl || null,
+  };
+}
+
+export function publishRefusal(problems: string[]) {
+  return {
+    ok: false as const,
+    error: "This cannot go live yet. Fix these first.",
+    fieldErrors: { publish: problems },
+  };
+}

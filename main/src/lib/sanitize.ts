@@ -2,10 +2,11 @@ import sanitizeHtml from "sanitize-html";
 
 // Matches what Tiptap can produce and what the .article styles cover. Anything else is dropped.
 const options: sanitizeHtml.IOptions = {
+  // Exactly the list in the plan. h1 is never allowed in a body, the page owns that.
   allowedTags: [
-    "p", "br", "strong", "em", "u", "s", "code", "pre", "blockquote",
-    "h2", "h3", "h4", "ul", "ol", "li", "a", "img", "hr",
-    "table", "thead", "tbody", "tr", "th", "td",
+    "p", "h2", "h3", "h4", "ul", "ol", "li", "strong", "em", "a", "blockquote",
+    "br", "hr", "table", "thead", "tbody", "tr", "th", "td", "img",
+    "figure", "figcaption",
   ],
   allowedAttributes: {
     a: ["href", "title", "target", "rel"],

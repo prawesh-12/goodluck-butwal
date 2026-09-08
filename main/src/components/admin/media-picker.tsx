@@ -38,16 +38,24 @@ export function MediaPicker({
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Waits for a pause in typing, and ignores a reply that lands after the dialog closed.
   useEffect(() => {
     if (!open) return;
-    setLoading(true);
+    let cancelled = false;
+
     const timer = setTimeout(async () => {
+      setLoading(true);
       const res = await fetch(`/api/admin/media/search?q=${encodeURIComponent(q)}`);
       const body = (await res.json()) as { ok: boolean; data?: PickedMedia[] };
+      if (cancelled) return;
       setItems(body.data ?? []);
       setLoading(false);
     }, 250);
-    return () => clearTimeout(timer);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [open, q]);
 
   const choose = (item: PickedMedia | null) => {

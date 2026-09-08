@@ -26,3 +26,21 @@ test("adds noopener to a link that opens a new tab", () => {
   const out = sanitize('<a href="https://example.com" target="_blank">go</a>');
   expect(out).toContain('rel="noopener noreferrer"');
 });
+
+test("the tag list is exactly the one the plan names", () => {
+  const allowed = "p h2 h3 h4 ul ol li strong em a blockquote br hr table thead tbody tr th td img figure figcaption".split(" ");
+  for (const tag of allowed) {
+    const html = `<${tag}>x</${tag}>`;
+    expect(sanitize(html), tag).toContain(`<${tag}`);
+  }
+});
+
+test("h1 is never allowed inside a body", () => {
+  expect(sanitize("<h1>Title</h1>")).not.toContain("<h1");
+});
+
+test("tags the plan does not list are dropped", () => {
+  for (const tag of ["u", "s", "code", "pre", "script", "iframe"]) {
+    expect(sanitize(`<${tag}>x</${tag}>`), tag).not.toContain(`<${tag}`);
+  }
+});
