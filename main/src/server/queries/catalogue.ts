@@ -1,5 +1,6 @@
 import { cache } from "react";
-import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
+import { unionAll } from "drizzle-orm/pg-core";
 import { db } from "@db/client";
 import {
   courseCategories,
@@ -219,30 +220,21 @@ function courseWhere(query: CourseQuery) {
 }
 
 export async function listCourses(query: CourseQuery) {
-  const where = courseWhere(query);
+  // The total comes back on every row as a window count, so the page costs one round trip rather
+  // than a second pass over the same filter.
+  const rows = await db
+    .select({ ...courseColumns, total: sql<number>`count(*) over ()`.mapWith(Number) })
+    .from(courses)
+    .innerJoin(institutions, eq(courses.institutionId, institutions.id))
+    .leftJoin(courseCategories, eq(courses.categoryId, courseCategories.id))
+    .leftJoin(destinations, eq(courses.destinationId, destinations.id))
+    .leftJoin(mediaAssets, eq(institutions.logoId, mediaAssets.id))
+    .where(courseWhere(query))
+    .orderBy(asc(courses.name))
+    .limit(PER_PAGE)
+    .offset(offsetOf(query.page));
 
-  const [rows, totals] = await Promise.all([
-    db
-      .select(courseColumns)
-      .from(courses)
-      .innerJoin(institutions, eq(courses.institutionId, institutions.id))
-      .leftJoin(courseCategories, eq(courses.categoryId, courseCategories.id))
-      .leftJoin(destinations, eq(courses.destinationId, destinations.id))
-      .leftJoin(mediaAssets, eq(institutions.logoId, mediaAssets.id))
-      .where(where)
-      .orderBy(asc(courses.name))
-      .limit(PER_PAGE)
-      .offset(offsetOf(query.page)),
-    db
-      .select({ value: count() })
-      .from(courses)
-      .innerJoin(institutions, eq(courses.institutionId, institutions.id))
-      .leftJoin(courseCategories, eq(courses.categoryId, courseCategories.id))
-      .leftJoin(destinations, eq(courses.destinationId, destinations.id))
-      .where(where),
-  ]);
-
-  return { rows: rows.map(toCourse), total: totals[0]?.value ?? 0 };
+  return { rows: rows.map(toCourse), total: rows[0]?.total ?? 0 };
 }
 
 export const getCourse = cache(async (slug: string): Promise<PublicCourse | undefined> => {
@@ -268,26 +260,43 @@ export const getCourse = cache(async (slug: string): Promise<PublicCourse | unde
 export type FilterOption = { slug: string; name: string };
 
 export const listCourseFilterOptions = cache(async () => {
-  const [destinationRows, categoryRows, institutionRows] = await Promise.all([
+  // Three short lists in one round trip. Destinations and categories keep their own order column,
+  // institutions have none so every row shares a rank and the name decides.
+  const rows = await unionAll(
     db
-      .select({ slug: destinations.slug, name: destinations.name })
+      .select({
+        kind: sql<string>`'destination'`.as("kind"),
+        slug: destinations.slug,
+        name: destinations.name,
+        ord: sql<number>`${destinations.sortOrder}`.as("ord"),
+      })
       .from(destinations)
-      .where(eq(destinations.status, "published"))
-      .orderBy(asc(destinations.sortOrder)),
+      .where(eq(destinations.status, "published")),
     db
-      .select({ slug: courseCategories.slug, name: courseCategories.name })
-      .from(courseCategories)
-      .orderBy(asc(courseCategories.sortOrder)),
+      .select({
+        kind: sql<string>`'category'`.as("kind"),
+        slug: courseCategories.slug,
+        name: courseCategories.name,
+        ord: sql<number>`${courseCategories.sortOrder}`.as("ord"),
+      })
+      .from(courseCategories),
     db
-      .select({ slug: institutions.slug, name: institutions.name })
+      .select({
+        kind: sql<string>`'institution'`.as("kind"),
+        slug: institutions.slug,
+        name: institutions.name,
+        ord: sql<number>`0`.as("ord"),
+      })
       .from(institutions)
-      .where(eq(institutions.status, "published"))
-      .orderBy(asc(institutions.name)),
-  ]);
+      .where(eq(institutions.status, "published")),
+  ).orderBy(sql`kind`, sql`ord`, sql`name`);
+
+  const pick = (kind: string): FilterOption[] =>
+    rows.filter((row) => row.kind === kind).map((row) => ({ slug: row.slug, name: row.name }));
 
   return {
-    destinations: destinationRows as FilterOption[],
-    categories: categoryRows as FilterOption[],
-    institutions: institutionRows as FilterOption[],
+    destinations: pick("destination"),
+    categories: pick("category"),
+    institutions: pick("institution"),
   };
 });
