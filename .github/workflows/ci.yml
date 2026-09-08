@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  pull_request:
+
+defaults:
+  run:
+    working-directory: main
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: main/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: main/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+
+      # Builds the Next app on its way to the worker, so there is no separate next build step.
+      - run: pnpm build:worker
+      - run: pnpm bundle:check
