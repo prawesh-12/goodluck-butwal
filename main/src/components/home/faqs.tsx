@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { gl } from "@/lib/assets";
 import { allFaqs } from "@/content/faqs";
-import { team } from "@/content/team";
+import type { PublicMember } from "@/server/queries/people";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 
@@ -42,8 +42,7 @@ export function Accordion({ items, defaultOpen = 0, variant = "surface" }: { ite
 }
 
 // "Still have questions" card: three counsellors from the team list plus the reader.
-export function FaqCta({ className = "" }: { className?: string }) {
-  const faces = [team[0], team[1], team[2]];
+export function FaqCta({ faces, className = "" }: { faces: PublicMember[]; className?: string }) {
   return (
     <div className={`flex w-full flex-col items-start gap-5 overflow-clip rounded-[10px] bg-surface p-5 md:rounded-[30px] md:p-10 ${className}`}>
       <div className="flex items-center gap-[10px]">
@@ -70,7 +69,7 @@ export function FaqCta({ className = "" }: { className?: string }) {
   );
 }
 
-export function Faqs() {
+export function Faqs({ faces }: { faces: PublicMember[] }) {
   return (
     <section className="flex w-full flex-col items-center pb-[30px] md:pb-[60px] lg:pb-[100px]">
       <div className="container-x">
@@ -80,7 +79,7 @@ export function Faqs() {
               <h2 className="t-h2">Frequently asked questions</h2>
               <p className="t-body text-muted">Common questions about programmes, scholarships and visas.</p>
             </div>
-            <FaqCta className="order-3 md:order-none" />
+            <FaqCta faces={faces} className="order-3 md:order-none" />
           </Appear>
           <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
             <Accordion items={allFaqs} />

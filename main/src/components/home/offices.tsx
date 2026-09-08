@@ -1,5 +1,4 @@
 import { gl } from "@/lib/assets";
-import { partnerLogos } from "@/content/partners";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/bits";
@@ -10,12 +9,12 @@ const pathways = ["Entering & leaving from country", "Visas", "Country citizensh
 
 // Sixteen partner logos fill the whole ring, 22.5° apart, so the orbit never shows a gap.
 const angles = Array.from({ length: 16 }, (_, i) => i * 22.5 - 90);
-const ring = partnerLogos.slice(0, 16);
+
 // A logo drawn on its own filled square needs no padding: let it fill the tile so the circle crops it round,
 // instead of floating as a square inside the white disc.
 const filled = (src: string) => /partner-04\./.test(src);
 
-function Orbit({ radius, icon, box }: { radius: number; icon: number; box: number }) {
+function Orbit({ radius, icon, box, ring }: { radius: number; icon: number; box: number; ring: string[] }) {
   return (
     <div aria-hidden className="absolute left-1/2 top-0 -translate-x-1/2" style={{ width: box, height: box }}>
       {/* Dashed track under the logos. */}
@@ -36,7 +35,8 @@ function Orbit({ radius, icon, box }: { radius: number; icon: number; box: numbe
   );
 }
 
-export function Offices() {
+export function Offices({ logos }: { logos: string[] }) {
+  const ring = logos.slice(0, 16);
   return (
     <section id="visas" className="pb-section flex w-full flex-col items-center">
       <div className="container-x">
@@ -78,8 +78,8 @@ export function Offices() {
             </div>
           </div>
           <div className="relative z-0 flex h-[350px] w-full max-w-[1000px] flex-col items-center justify-center overflow-clip py-[50px] md:h-[400px] md:py-[120px] lg:h-[505px]">
-            <div className="md:hidden"><Orbit radius={345} icon={60} box={750} /></div>
-            <div className="hidden md:block"><Orbit radius={430} icon={80} box={940} /></div>
+            <div className="md:hidden"><Orbit radius={345} icon={60} box={750} ring={ring} /></div>
+            <div className="hidden md:block"><Orbit radius={430} icon={80} box={940} ring={ring} /></div>
             <div className="relative flex max-w-[520px] flex-col items-center gap-[10px] md:gap-5 lg:gap-[30px]">
               <span className="relative flex size-20 items-center justify-center rounded-full bg-white shadow-[0_12px_30px_rgba(29,29,29,0.18)] md:size-[100px] lg:size-[130px]">
                 <span aria-hidden className="absolute -inset-4 rounded-full ring-1 ring-ink/10 md:-inset-6" />

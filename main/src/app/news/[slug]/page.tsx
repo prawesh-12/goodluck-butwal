@@ -6,6 +6,7 @@ import { Chip } from "@/components/ui/bits";
 import { InnerHero, NewsCard, SectionHead } from "@/components/inner";
 import { formatDate } from "@/lib/datetime";
 import { FaqCta } from "@/components/home/faqs";
+import { listTeam } from "@/server/queries/people";
 
 type Props = { params: Promise<{ slug: string }> };
 export const generateStaticParams = () => articles.map((a) => ({ slug: a.slug }));
@@ -16,6 +17,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ArticlePage({ params }: Props) {
+  const faces = (await listTeam()).slice(0, 3);
+
   const { slug } = await params;
   const a = articles.find((x) => x.slug === slug);
   if (!a) notFound();
@@ -35,7 +38,7 @@ export default async function ArticlePage({ params }: Props) {
               <img src={a.image} alt={a.title} className="size-full object-cover" loading="lazy" decoding="async" />
             </Appear>
             <div className="article article-scroll w-full max-w-[800px]" dangerouslySetInnerHTML={{ __html: a.html }} />
-            <div className="w-full max-w-[800px]"><FaqCta /></div>
+            <div className="w-full max-w-[800px]"><FaqCta faces={faces} /></div>
           </div>
         </div>
       </section>

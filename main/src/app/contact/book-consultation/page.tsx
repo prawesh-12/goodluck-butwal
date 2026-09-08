@@ -5,10 +5,13 @@ import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
 import { BookingForm } from "@/components/forms";
 import { Partners } from "@/components/home/partners";
+import { listPartnerLogos } from "@/server/queries/people";
 
 export const metadata: Metadata = { title: "Book an appointment", description: "Choose an office, a service and a time that suits you." };
 
-export default function BookConsultationPage() {
+export default async function BookConsultationPage() {
+  const logos = await listPartnerLogos();
+
   const au = officeById("au");
   return (
     <>
@@ -19,7 +22,7 @@ export default function BookConsultationPage() {
           <img aria-hidden src={img.pricingDeco} alt="" className="pointer-events-none absolute bottom-[-50px] right-[-30px] z-[1] w-[480px] max-w-none object-contain object-top md:w-[632px]" loading="lazy" decoding="async" />
         </Appear>
       } />
-      <Partners className="pb-[30px] pt-[60px] md:pt-20 lg:pt-[100px]" />
+      <Partners logos={logos} className="pb-[30px] pt-[60px] md:pt-20 lg:pt-[100px]" />
     </>
   );
 }

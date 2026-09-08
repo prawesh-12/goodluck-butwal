@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { team } from "@/content/team";
+import type { PublicMember } from "@/server/queries/people";
 import { offices, type OfficeId } from "@/lib/site";
 import { TeamCard } from "@/components/inner";
 import { useOffice } from "@/components/office";
@@ -11,7 +11,7 @@ type Tab = "all" | OfficeId;
 const tabs: { id: Tab; label: string }[] = [{ id: "all", label: "Whole team" }, ...offices.map((o) => ({ id: o.id, label: o.country }))];
 
 // Team by office, as the brief asks, with the whole team one tap away. Starts on the office chosen in the header.
-export function TeamGrid() {
+export function TeamGrid({ team }: { team: PublicMember[] }) {
   const { office } = useOffice();
   const [tab, setTab] = useState<Tab>("all");
   useEffect(() => setTab(office), [office]);

@@ -1,8 +1,7 @@
-import { partnerLogos } from "@/content/partners";
 import { Badge, Ticker } from "@/components/ui/bits";
 
 // The 43 partner logos from goodluck_main, unnamed there too.
-export function Partners({ tone = "default", className = "" }: { tone?: "default" | "dark" | "gray"; className?: string }) {
+export function Partners({ logos, tone = "default", className = "" }: { logos: string[]; tone?: "default" | "dark" | "gray"; className?: string }) {
   const line = tone === "gray" ? "bg-[linear-gradient(90deg,rgba(255,255,255,0)_0%,#bababa_50%,rgba(255,255,255,0)_100%)]" : "hairline-fade";
   return (
     <section className={`flex w-full flex-col items-center ${className}`}>
@@ -19,7 +18,7 @@ export function Partners({ tone = "default", className = "" }: { tone?: "default
             )}
           </div>
           <Ticker gap={50} speed={120} className="w-full [--gap-override:30px] md:[--gap-override:50px]">
-            {partnerLogos.map((src) => (
+            {logos.map((src) => (
               <img key={src} src={src} alt="Partner logo" className="h-9 w-auto max-w-[120px] shrink-0 object-contain" loading="lazy" decoding="async" />
             ))}
           </Ticker>

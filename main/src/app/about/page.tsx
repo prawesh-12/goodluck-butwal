@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { gl, img } from "@/lib/assets";
 import { offices } from "@/lib/site";
 import { about } from "@/content/about";
-import { team } from "@/content/team";
+import { listTeam, listPartnerLogos } from "@/server/queries/people";
 import { googleRating } from "@/content/stories";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
@@ -14,16 +14,20 @@ import { TabShoulders } from "@/components/home/steps";
 
 export const metadata: Metadata = { title: "About us", description: about.established };
 
-const stats = [
-  ["Established", "2022", "Education and migration guidance since 2022.", 0],
-  ["Offices worldwide", String(offices.length), "Melbourne, Butwal and Cebu.", 2],
-  ["Team members", String(team.length), "Counsellors, migration and admission staff.", 3],
-  ["Partner institutions", "100+", "Colleges, institutions, universities and TAFE facilities we represent.", 0],
-  ["Google rating", googleRating.score, `Based on ${googleRating.count} client reviews.`, 2],
-  ["Languages", "5+", "Certified counsellors who speak your language.", 3],
-] as const;
 
-export default function AboutPage() {
+
+export default async function AboutPage() {
+  const [team, logos] = await Promise.all([listTeam(), listPartnerLogos()]);
+
+  const stats = [
+    ["Established", "2022", "Education and migration guidance since 2022.", 0],
+    ["Offices worldwide", String(offices.length), "Melbourne, Butwal and Cebu.", 2],
+    ["Team members", String(team.length), "Counsellors, migration and admission staff.", 3],
+    ["Partner institutions", "100+", "Colleges, institutions, universities and TAFE facilities we represent.", 0],
+    ["Google rating", googleRating.score, `Based on ${googleRating.count} client reviews.`, 2],
+    ["Languages", "5+", "Certified counsellors who speak your language.", 3],
+  ] as const;
+
   return (
     <>
       <InnerHero badge="About Goodluck" title="About Goodluck Education & Migration" lead={about.established} bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" after={
@@ -99,7 +103,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <Partners tone="dark" className="pt-[60px] md:pt-20 lg:pt-[100px]" />
+      <Partners logos={logos} tone="dark" className="pt-[60px] md:pt-20 lg:pt-[100px]" />
 
       <section className="py-section relative flex w-full flex-col items-center">
         <SectionBg src={img.testimonialBg} top bottom />

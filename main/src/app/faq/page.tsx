@@ -3,11 +3,14 @@ import { faqs } from "@/content/faqs";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
 import { Accordion, FaqCta } from "@/components/home/faqs";
+import { listTeam } from "@/server/queries/people";
 
 export const metadata: Metadata = { title: "FAQ" };
 const groups: [string, typeof faqs.education][] = [["Education services", faqs.education], ["Migration services", faqs.migration]];
 
-export default function FaqPage() {
+export default async function FaqPage() {
+  const faces = (await listTeam()).slice(0, 3);
+
   return (
     <>
       <InnerHero title="Frequently asked questions" lead="Any questions? Book an appointment and our team can assess your case." />
@@ -20,7 +23,7 @@ export default function FaqPage() {
                 <Accordion items={items} variant="white" defaultOpen={i === 0 ? 0 : null} />
               </Appear>
             ))}
-            <FaqCta />
+            <FaqCta faces={faces} />
           </div>
         </div>
       </section>

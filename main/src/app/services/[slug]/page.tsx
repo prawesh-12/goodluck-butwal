@@ -8,6 +8,7 @@ import { Chip } from "@/components/ui/bits";
 import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 import { Artwork, ServiceCard } from "@/components/home/services";
 import { Accordion, FaqCta } from "@/components/home/faqs";
+import { listTeam } from "@/server/queries/people";
 
 type Props = { params: Promise<{ slug: string }> };
 export const generateStaticParams = () => services.map((s) => ({ slug: s.slug }));
@@ -17,6 +18,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ServicePage({ params }: Props) {
+  const faces = (await listTeam()).slice(0, 3);
+
   const { slug } = await params;
   const s = serviceBySlug(slug);
   if (!s) notFound();
@@ -84,7 +87,7 @@ export default async function ServicePage({ params }: Props) {
                 <h2 className="t-h2">Common questions</h2>
                 <p className="t-body text-muted">Answers from the Goodluck team.</p>
               </div>
-              <FaqCta className="order-3 md:order-none" />
+              <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>
             <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
               <Accordion items={related} />

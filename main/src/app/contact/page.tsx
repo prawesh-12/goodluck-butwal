@@ -10,12 +10,13 @@ import { EnquiryForm } from "@/components/forms";
 import { OfficeContactCards } from "@/components/contact-cards";
 import { listOffices } from "@/server/queries/offices";
 import { Accordion, FaqCta } from "@/components/home/faqs";
+import { listTeam } from "@/server/queries/people";
 
 export const metadata: Metadata = { title: "Contact", description: "Talk to our experts in Melbourne, Butwal or Cebu." };
 const tones = ["surface", "dark", "blue"] as const;
 
 export default async function ContactPage() {
-  const offices = await listOffices();
+  const [offices, faces] = await Promise.all([listOffices(), listTeam().then((t) => t.slice(0, 3))]);
 
   return (
     <>
@@ -89,7 +90,7 @@ export default async function ContactPage() {
                 <h2 className="t-h2">Frequently asked questions</h2>
                 <p className="t-body text-muted">Common questions about programmes, scholarships and visas.</p>
               </div>
-              <FaqCta className="order-3 md:order-none" />
+              <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>
             <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
               <Accordion items={allFaqs} />

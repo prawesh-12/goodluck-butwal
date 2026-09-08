@@ -5,10 +5,13 @@ import { Appear } from "@/components/ui/appear";
 import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 import { DestinationCard, destinationCards } from "@/components/home/destinations";
 import { Accordion, FaqCta } from "@/components/home/faqs";
+import { listTeam } from "@/server/queries/people";
 
 export const metadata: Metadata = { title: "Study abroad", description: "Study in Australia, the United Kingdom and New Zealand with Goodluck." };
 
-export default function StudyAbroadPage() {
+export default async function StudyAbroadPage() {
+  const faces = (await listTeam()).slice(0, 3);
+
   return (
     <>
       <InnerHero badge="Study abroad" title="Countries we help you study in" lead="Study in Australia, the United Kingdom and New Zealand with us." width={1260} after={
@@ -38,7 +41,7 @@ export default function StudyAbroadPage() {
                 <h2 className="t-h2">Education services FAQ</h2>
                 <p className="t-body text-muted">Common questions about programmes, universities and scholarships.</p>
               </div>
-              <FaqCta className="order-3 md:order-none" />
+              <FaqCta faces={faces} className="order-3 md:order-none" />
             </Appear>
             <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
               <Accordion items={faqs.education} />
