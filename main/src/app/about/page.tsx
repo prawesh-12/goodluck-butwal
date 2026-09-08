@@ -47,7 +47,7 @@ export default async function AboutPage() {
     <>
       <InnerHero badge={t("about.hero.badge", "About Goodluck")} title={t("about.hero.title", "About Goodluck Education & Migration")} lead={about.established} bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" after={
         <Appear delay={0.1} className="w-full">
-          <VideoDialog src={gl.film} poster={gl.filmPoster} title="Inside Goodluck Education and Migration" className="group aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]" />
+          <VideoDialog src={gl.film} poster={gl.filmPoster} title={t("about.video.title", "Inside Goodluck Education and Migration")} className="group aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]" />
         </Appear>
       } />
 

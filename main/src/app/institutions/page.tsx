@@ -21,9 +21,9 @@ export default async function InstitutionsPage() {
   return (
     <>
       <InnerHero
-        badge="Institutions"
+        badge={t("institutions.hero.badge", "Institutions")}
         badgeTone="chip"
-        title="Universities and colleges we work with"
+        title={t("institutions.hero.title", "Universities and colleges we work with")}
         lead={institutions.length > 0 ? `${institutions.length} institutions across our study destinations.` : undefined}
         clouds={false}
       />

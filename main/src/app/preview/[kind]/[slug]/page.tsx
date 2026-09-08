@@ -18,6 +18,7 @@ import { previewMetadata } from "@/lib/preview";
 import { InnerHero } from "@/components/inner";
 import { Chip } from "@/components/ui/bits";
 import type { Entity } from "@/lib/rbac";
+import { loadText } from "@/server/queries/text";
 
 export const metadata = previewMetadata;
 export const dynamic = "force-dynamic";
@@ -44,6 +45,7 @@ export default async function Preview({
   params: Promise<{ kind: string; slug: string }>;
 }) {
   const { kind, slug } = await params;
+  const t = await loadText();
   const target = KINDS[kind];
   if (!target) notFound();
 
@@ -61,7 +63,7 @@ export default async function Preview({
     <>
       <InnerHero
         title={String(row.title)}
-        lead="This is a preview. Only signed-in staff can see it, and search engines are told to ignore it."
+        lead={t("preview.lead", "This is a preview. Only signed-in staff can see it, and search engines are told to ignore it.")}
       >
         <Chip>{String(row.status)}</Chip>
       </InnerHero>

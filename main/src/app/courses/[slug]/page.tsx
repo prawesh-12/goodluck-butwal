@@ -81,7 +81,7 @@ export default async function CoursePage({ params }: Props) {
               {course.descriptionHtml && <div className="article article-scroll w-full max-w-[800px]" dangerouslySetInnerHTML={{ __html: course.descriptionHtml }} />}
               {course.entryRequirementsHtml && (
                 <div className="w-full max-w-[800px]">
-                  <h2 className="t-h3 pb-5">Entry requirements</h2>
+                  <h2 className="t-h3 pb-5">{t("courses.requirements.title", "Entry requirements")}</h2>
                   <div className="article article-scroll w-full" dangerouslySetInnerHTML={{ __html: course.entryRequirementsHtml }} />
                 </div>
               )}
@@ -94,7 +94,7 @@ export default async function CoursePage({ params }: Props) {
         <section className="pt-section flex w-full flex-col items-center">
           <div className="container-x">
             <div className="flex flex-col items-start gap-[30px] md:gap-10 lg:gap-[50px]">
-              <SectionHead align="left" badge="Institution" title={`About ${institution.name}`} />
+              <SectionHead align="left" badge={t("courses.institution.badge", "Institution")} title={`About ${institution.name}`} />
               <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
                 <InstitutionCard institution={institution} />
               </div>

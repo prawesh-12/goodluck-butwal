@@ -10,6 +10,7 @@ import { InnerHero, NewsCard, SectionHead } from "@/components/inner";
 import { formatDate } from "@/lib/datetime";
 import { FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
+import { loadText } from "@/server/queries/text";
 
 type Props = { params: Promise<{ slug: string }> };
 export const generateStaticParams = async () => (await listArticles()).map((a) => ({ slug: a.slug }));
@@ -27,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ArticlePage({ params }: Props) {
+  const t = await loadText();
   const faces = (await listTeam()).slice(0, 3);
 
   const { slug } = await params;
@@ -62,7 +64,7 @@ export default async function ArticlePage({ params }: Props) {
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="container-x">
           <div className="flex flex-col gap-5 md:gap-10 lg:gap-[50px]">
-            <SectionHead align="left" title="More articles" />
+            <SectionHead align="left" title={t("news.more.title", "More articles")} />
             <div className="grid gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
               {more.map((p, i) => <NewsCard key={p.slug} article={p} delay={0.05 * i} className={i === 2 ? "md:col-span-2 lg:col-span-1" : ""} />)}
             </div>

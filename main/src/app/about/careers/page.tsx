@@ -9,6 +9,7 @@ import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { SectionBg } from "@/components/ui/bits";
 import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
+import { loadText } from "@/server/queries/text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildEntityMetadata("page", "careers", { path: "/about/careers", title: "Careers" });
@@ -16,16 +17,17 @@ export async function generateMetadata(): Promise<Metadata> {
 const tones = ["surface", "dark", "blue", "surface"] as const;
 
 export default async function CareersPage() {
+  const t = await loadText();
   const about = await getAboutContent();
 
   return (
     <>
       <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "About us", path: "/about" }, { name: "Careers", path: "/about/careers" }])} />
-      <InnerHero badge="Careers" title="Climb your career ladder with Goodluck" lead="We hold your efforts in high regard." after={<Appear delay={0.1}><PillButton href={`mailto:${company.email}`}>Email {company.email}</PillButton></Appear>} />
+      <InnerHero badge={t("about.careers.badge", "Careers")} title={t("about.careers.title", "Climb your career ladder with Goodluck")} lead={t("about.careers.lead", "We hold your efforts in high regard.")} after={<Appear delay={0.1}><PillButton href={`mailto:${company.email}`}>Email {company.email}</PillButton></Appear>} />
       <section className="flex w-full flex-col items-center pb-[100px] md:pb-[160px] lg:pb-[200px]">
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead badge="Working here" title="Discover the excellence of Goodluck" />
+            <SectionHead badge={t("about.careers.life.badge", "Working here")} title={t("about.careers.life.title", "Discover the excellence of Goodluck")} />
             <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-4">
               {about.careersValues.map((v, i) => (
                 <InfoCard key={v.title} label={`0${i + 1}`} title={v.title} line={v.line} tone={tones[i]} delay={0.1 * i} className="min-h-[220px] justify-between md:min-h-[260px]" />
@@ -38,7 +40,7 @@ export default async function CareersPage() {
         <SectionBg src={img.testimonialBg} top bottom />
         <div className="container-x relative z-[1]">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead title="Time to tune in to what our crew has to spill" />
+            <SectionHead title={t("about.careers.voices.title", "Time to tune in to what our crew has to spill")} />
             <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">
               {about.staffVoices.map((s, i) => (
                 <Appear key={s.name} delay={0.1 * (i % 2)} className="flex flex-col items-start justify-between gap-10 overflow-hidden rounded-[10px] bg-white p-5 md:rounded-[30px] md:p-10">

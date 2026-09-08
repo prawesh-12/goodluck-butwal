@@ -32,10 +32,10 @@ export default async function CoursesPage({ searchParams }: Props) {
   return (
     <>
       <InnerHero
-        badge="Courses"
+        badge={t("courses.hero.badge", "Courses")}
         badgeTone="chip"
-        title="Find a course"
-        lead="Filter by destination, qualification level, category, institution and intake."
+        title={t("courses.hero.title", "Find a course")}
+        lead={t("courses.hero.lead", "Filter by destination, qualification level, category, institution and intake.")}
         clouds={false}
       />
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">

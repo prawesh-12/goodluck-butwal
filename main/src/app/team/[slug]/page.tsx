@@ -94,7 +94,7 @@ export default async function TeamMemberPage({ params }: Props) {
             <div className="grid gap-[30px] md:grid-cols-2 md:gap-10">
               {qualifications.length > 0 && (
                 <Appear className="flex flex-col gap-5">
-                  <h2 className="t-h3">Qualifications</h2>
+                  <h2 className="t-h3">{t("team.qualifications.title", "Qualifications")}</h2>
                   <div className="flex flex-col gap-[10px]">
                     {qualifications.map((item) => <CheckRow key={item}>{item}</CheckRow>)}
                   </div>
@@ -102,7 +102,7 @@ export default async function TeamMemberPage({ params }: Props) {
               )}
               {expertise.length > 0 && (
                 <Appear delay={0.1} className="flex flex-col gap-5">
-                  <h2 className="t-h3">Areas of expertise</h2>
+                  <h2 className="t-h3">{t("team.expertise.title", "Areas of expertise")}</h2>
                   <div className="flex flex-col gap-[10px]">
                     {expertise.map((item) => <CheckRow key={item}>{item}</CheckRow>)}
                   </div>

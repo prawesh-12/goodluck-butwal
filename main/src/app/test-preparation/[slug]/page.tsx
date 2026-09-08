@@ -64,7 +64,7 @@ export default async function TestPrepCoursePage({ params }: Props) {
         <section className="pt-section flex w-full flex-col items-center">
           <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">
             <div className="flex flex-col items-start gap-[30px] md:gap-10">
-              <SectionHead align="left" badge="Syllabus" title="What the course covers" />
+              <SectionHead align="left" badge={t("testprep.syllabus.badge", "Syllabus")} title={t("testprep.syllabus.title", "What the course covers")} />
               <div className="flex w-full flex-col gap-[10px]">
                 {course.syllabus.map((item) => (
                   <CheckRow key={item.title}>
@@ -80,7 +80,7 @@ export default async function TestPrepCoursePage({ params }: Props) {
       <section className="pt-section flex w-full flex-col items-center">
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead badge="Batches" title="Upcoming batches" />
+            <SectionHead badge={t("testprep.batches.badge", "Batches")} title={t("testprep.batches.title", "Upcoming batches")} />
             <BatchTable batches={batches} empty={t("empty.batches", "No batches are open for booking yet. Ask us about the next one.")} />
           </div>
         </div>
@@ -89,7 +89,7 @@ export default async function TestPrepCoursePage({ params }: Props) {
       <section className="pt-section flex w-full flex-col items-center pb-[30px] md:pb-[60px] lg:pb-[100px]">
         <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">
           <Appear className="flex flex-col items-center gap-5 overflow-hidden rounded-[10px] bg-surface p-5 text-center md:rounded-[30px] md:p-10">
-            <h2 className="t-h3">Still have questions?</h2>
+            <h2 className="t-h3">{t("cta.questions.title", "Still have questions?")}</h2>
             <PillButton href="/contact/book-consultation" tone="dark">
               Book an appointment
             </PillButton>

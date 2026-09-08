@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { InfoCard, InnerHero } from "@/components/inner";
 import { listOfficeProfiles } from "@/server/queries/offices";
+import { loadText } from "@/server/queries/text";
 
 export const revalidate = 300;
 
@@ -14,14 +15,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutOfficesPage() {
+  const t = await loadText();
   const offices = await listOfficeProfiles();
   const cities = offices.map((o) => o.city).filter(Boolean);
 
   return (
     <>
       <InnerHero
-        badge="Our offices"
-        title="Where to find us"
+        badge={t("about.offices.badge", "Our offices")}
+        title={t("about.offices.page_title", "Where to find us")}
         lead={cities.length ? `${cities.join(" and ")}.` : undefined}
       />
       <section className="pb-section flex w-full flex-col items-center">

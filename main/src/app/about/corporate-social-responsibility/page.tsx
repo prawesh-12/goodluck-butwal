@@ -5,6 +5,7 @@ import { breadcrumbs } from "@/components/seo/schema";
 import { getAboutContent } from "@/server/queries/pages";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
+import { loadText } from "@/server/queries/text";
 
 export async function generateMetadata(): Promise<Metadata> {
   const about = await getAboutContent();
@@ -16,12 +17,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CsrPage() {
+  const t = await loadText();
   const about = await getAboutContent();
 
   return (
     <>
       <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "About us", path: "/about" }, { name: "Corporate social responsibility", path: "/about/corporate-social-responsibility" }])} />
-      <InnerHero badge="Corporate social responsibility" title="Community and sport" lead={about.csrIntro} bg="field" />
+      <InnerHero badge={t("about.csr.badge", "Corporate social responsibility")} title={t("about.csr.title", "Community and sport")} lead={about.csrIntro} bg="field" />
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="container-x">
           <div className="grid gap-5 md:grid-cols-3 md:gap-[30px]">

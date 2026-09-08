@@ -23,9 +23,9 @@ export default async function EventsPage() {
   return (
     <>
       <InnerHero
-        badge="Events"
+        badge={t("events.hero.badge", "Events")}
         badgeTone="chip"
-        title="Seminars, fairs and information sessions"
+        title={t("events.hero.title", "Seminars, fairs and information sessions")}
         lead={`${upcoming} coming up. Times are shown in the time zone of the office running the event.`}
         clouds={false}
       />

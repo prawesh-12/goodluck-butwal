@@ -65,7 +65,7 @@ export default async function InstitutionPage({ params, searchParams }: Props) {
       >
         <div className="order-1 flex flex-wrap items-center justify-center gap-[10px]">
           {institution.destination && <Chip tone="white">{institution.destination}</Chip>}
-          {institution.isPartner && <Chip tone="white">Partner institution</Chip>}
+          {institution.isPartner && <Chip tone="white">{t("institutions.partner_badge", "Partner institution")}</Chip>}
         </div>
       </InnerHero>
 
@@ -94,7 +94,7 @@ export default async function InstitutionPage({ params, searchParams }: Props) {
       <section className="pt-section flex w-full flex-col items-center">
         <div className="container-x">
           <div className="flex flex-col items-start gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead align="left" badge="Courses" title={`Courses at ${institution.name}`} lead={courses.total > 0 ? `${courses.total} published courses.` : undefined} />
+            <SectionHead align="left" badge={t("institutions.courses.badge", "Courses")} title={`Courses at ${institution.name}`} lead={courses.total > 0 ? `${courses.total} published courses.` : undefined} />
             {courses.rows.length > 0 ? (
               <>
                 <div className="flex w-full flex-col gap-5">

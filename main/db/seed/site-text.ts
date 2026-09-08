@@ -39,8 +39,12 @@ function footerRows(): StringRow[] {
   return rows;
 }
 
+export function uiStringRows(): StringRow[] {
+  return [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows, ...chromeRows, ...pageRows];
+}
+
 export async function seedUiStrings() {
-  const rows = [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows, ...chromeRows];
+  const rows = uiStringRows();
 
   for (const row of rows) {
     await db
@@ -343,4 +347,60 @@ const chromeRows: StringRow[] = [
   { key: "courses.filter.apply", value: "Apply filters", group: "courses", label: "Filter button", help: "The button that runs the search on the courses page." },
   { key: "courses.filter.clear", value: "Clear all", group: "courses", label: "Clear filters chip", help: "The chip that removes every filter at once." },
   { key: "courses.filter.remove", value: "Remove filter {name}", group: "courses", label: "Remove one filter", help: "Read aloud for each filter chip. Write {name} where the filter should go." },
+];
+
+const pageRows: StringRow[] = [
+  { key: "courses.hero.badge", value: "Courses", group: "courses", label: "Courses page badge", help: "The small pill at the top of the courses page." },
+  { key: "courses.hero.title", value: "Find a course", group: "courses", label: "Courses page heading", help: "The main heading at the top of the courses page." },
+  { key: "courses.hero.lead", value: "Filter by destination, qualification level, category, institution and intake.", group: "courses", label: "Courses page intro", help: "The line under that heading." },
+  { key: "courses.institution.badge", value: "Institution", group: "courses", label: "Institution block badge", help: "The small pill above the institution shown on a course page." },
+  { key: "courses.requirements.title", value: "Entry requirements", group: "courses", label: "Entry requirements heading", help: "Sits above the entry requirements on a course page." },
+
+  { key: "institutions.hero.badge", value: "Institutions", group: "institutions", label: "Institutions page badge", help: "The small pill at the top of the institutions page." },
+  { key: "institutions.hero.title", value: "Universities and colleges we work with", group: "institutions", label: "Institutions page heading", help: "The main heading at the top of the institutions page." },
+  { key: "institutions.courses.badge", value: "Courses", group: "institutions", label: "Courses block badge", help: "The small pill above the course list on an institution page." },
+  { key: "institutions.partner_badge", value: "Partner institution", group: "institutions", label: "Partner label", help: "Shown on an institution we represent directly." },
+
+  { key: "news.hero.badge", value: "News and updates", group: "news", label: "News page badge", help: "The small pill at the top of the news page, and of a category or tag page." },
+  { key: "news.hero.title", value: "Study abroad insights and visa tips", group: "news", label: "News page heading", help: "The main heading at the top of the news page." },
+  { key: "news.more.title", value: "More articles", group: "news", label: "More articles heading", help: "Sits above the other articles at the foot of an article." },
+
+  { key: "events.hero.badge", value: "Events", group: "events", label: "Events page badge", help: "The small pill at the top of the events page." },
+  { key: "events.hero.title", value: "Seminars, fairs and information sessions", group: "events", label: "Events page heading", help: "The main heading at the top of the events page." },
+  { key: "events.online.title", value: "This event runs online", group: "events", label: "Online event heading", help: "Shown in place of a map when an event has no venue." },
+  { key: "events.register.title", value: "Register", group: "events", label: "Registration heading", help: "Sits above the registration form on an event page." },
+
+  { key: "offices.credentials.title", value: "Credentials", group: "offices", label: "Credentials heading", help: "Sits above the registrations and memberships on an office page." },
+  { key: "offices.services.badge", value: "What we do here", group: "offices", label: "Office services badge", help: "The small pill above the services list on an office page." },
+  { key: "offices.services.title", value: "Services from this office", group: "offices", label: "Office services heading", help: "The heading above the services list on an office page." },
+  { key: "offices.team.badge", value: "The team here", group: "offices", label: "Office team badge", help: "The small pill above the staff photos on an office page." },
+  { key: "offices.contact.badge", value: "Talk to us", group: "offices", label: "Office contact badge", help: "The small pill above the contact details on an office page." },
+
+  { key: "about.team.lead", value: "We draw on our global network to assemble a team of experts.", group: "about", label: "Team page intro", help: "The line under the heading at the top of the team page." },
+  { key: "about.offices.badge", value: "Our offices", group: "about", label: "Offices page badge", help: "The small pill at the top of the offices page." },
+  { key: "about.offices.page_title", value: "Where to find us", group: "about", label: "Offices page heading", help: "The main heading at the top of the offices page." },
+  { key: "about.csr.badge", value: "Corporate social responsibility", group: "about", label: "Responsibility page badge", help: "The small pill at the top of the corporate social responsibility page." },
+  { key: "about.csr.title", value: "Community and sport", group: "about", label: "Responsibility page heading", help: "The main heading at the top of that page." },
+  { key: "about.careers.badge", value: "Careers", group: "about", label: "Careers page badge", help: "The small pill at the top of the careers page." },
+  { key: "about.careers.title", value: "Climb your career ladder with Goodluck", group: "about", label: "Careers page heading", help: "The main heading at the top of the careers page." },
+  { key: "about.careers.lead", value: "We hold your efforts in high regard.", group: "about", label: "Careers page intro", help: "The line under that heading." },
+  { key: "about.careers.life.badge", value: "Working here", group: "about", label: "Working here badge", help: "The small pill above the photos further down the careers page." },
+  { key: "about.careers.life.title", value: "Discover the excellence of Goodluck", group: "about", label: "Working here heading", help: "The heading above those photos." },
+  { key: "about.careers.voices.title", value: "Time to tune in to what our crew has to spill", group: "about", label: "Staff voices heading", help: "The heading above the staff videos on the careers page." },
+  { key: "about.video.title", value: "Inside Goodluck Education and Migration", group: "about", label: "About video title", help: "Read aloud for the video on the About page." },
+
+  { key: "search.hero.badge", value: "Search", group: "search", label: "Search page badge", help: "The small pill at the top of the search page." },
+
+  { key: "testprep.hero.badge", value: "Test preparation", group: "testprep", label: "Test preparation badge", help: "The small pill at the top of the test preparation and batches pages." },
+  { key: "testprep.hero.title", value: "Test preparation", group: "testprep", label: "Test preparation heading", help: "The main heading at the top of the test preparation page." },
+  { key: "testprep.batches.badge", value: "Batches", group: "testprep", label: "Batches badge", help: "The small pill above a batch table." },
+  { key: "testprep.batches.title", value: "Upcoming batches", group: "testprep", label: "Batches heading", help: "The heading above a batch table." },
+  { key: "testprep.faqs.title", value: "Common questions", group: "testprep", label: "Questions heading", help: "The heading above the questions on the test preparation page." },
+  { key: "testprep.syllabus.badge", value: "Syllabus", group: "testprep", label: "Syllabus badge", help: "The small pill above what an IELTS or PTE course covers." },
+  { key: "testprep.syllabus.title", value: "What the course covers", group: "testprep", label: "Syllabus heading", help: "The heading above what an IELTS or PTE course covers." },
+
+  { key: "team.qualifications.title", value: "Qualifications", group: "team", label: "Qualifications heading", help: "Sits above a staff member's qualifications on their page." },
+  { key: "team.expertise.title", value: "Areas of expertise", group: "team", label: "Expertise heading", help: "Sits above what a staff member handles, on their page." },
+
+  { key: "preview.lead", value: "This is a preview. Only signed-in staff can see it, and search engines are told to ignore it.", group: "system", label: "Preview banner", help: "Shown to staff previewing a draft. Visitors never see it." },
 ];

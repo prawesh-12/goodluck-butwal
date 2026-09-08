@@ -26,7 +26,7 @@ export default async function SearchPage({ searchParams }: Props) {
   return (
     <>
       <InnerHero
-        badge="Search"
+        badge={t("search.hero.badge", "Search")}
         badgeTone="chip"
         title={term ? `Results for “${term.q}”` : "Search"}
         size="md"

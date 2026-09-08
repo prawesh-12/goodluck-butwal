@@ -12,6 +12,7 @@ import { Chip } from "@/components/ui/bits";
 import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 import { RegistrationForm } from "@/components/events/registration-form";
 import { formText } from "@/server/queries/form-text";
+import { loadText } from "@/server/queries/text";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -32,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function EventPage({ params }: Props) {
+  const t = await loadText();
   const { slug } = await params;
   const event = await getEvent(slug);
   if (!event) notFound();
@@ -96,7 +98,7 @@ export default async function EventPage({ params }: Props) {
               {event.isOnline ? (
                 <InfoCard
                   label="Where"
-                  title="This event runs online"
+                  title={t("events.online.title", "This event runs online")}
                   line="The joining link is on your confirmation email once you register."
                   tone="blue"
                 />
@@ -118,7 +120,7 @@ export default async function EventPage({ params }: Props) {
             ) : null}
 
             <div className="flex w-full max-w-[800px] flex-col gap-[30px]">
-              <SectionHead align="left" title="Register" lead={closed ? undefined : "Tell us you are coming and we will email you the details."} />
+              <SectionHead align="left" title={t("events.register.title", "Register")} lead={closed ? undefined : "Tell us you are coming and we will email you the details."} />
               <RegistrationForm eventId={event.id} closed={closed} seatsLeft={seatsLeft} text={forms} />
             </div>
           </div>
