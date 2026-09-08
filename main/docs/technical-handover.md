@@ -73,6 +73,21 @@ Names and where each one lives are in `main/.env.example`. In short:
 Anything an administrator might want to change is in the `settings` table, not here: notification
 addresses, social links and analytics ids.
 
+Two of them need an account creating rather than a value copying:
+
+**`NEXT_PUBLIC_MAPS_API_KEY`** is a Google Maps Embed API key. In the Google Cloud console: create
+a project, enable **Maps Embed API** under APIs and services, then Credentials, Create credentials,
+API key. Restrict it before saving it anywhere: under Application restrictions choose Websites and
+add `goodluck.services/*`, and under API restrictions tick Maps Embed API only. The Embed API has
+no usage charge, but a key with no restrictions can be lifted from the page and spent against your
+other APIs. With no key set, a map appears only where an admin has pasted a URL of their own.
+
+**`NEXT_PUBLIC_SENTRY_DSN`** is on the Sentry project under Settings, Client Keys. A DSN is
+write-only and meant to be public, which is why it carries the public prefix: the two error screens
+run in the browser and cannot read any other name. Do not run Sentry's setup wizard. It installs
+the SDK, which costs 0.62 MB compressed and breaks the size cap. `src/lib/sentry.ts` posts the same
+envelope over `fetch`.
+
 ## Running it locally
 
 ```bash
