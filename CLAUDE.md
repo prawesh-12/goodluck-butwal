@@ -85,6 +85,8 @@ Read `.claude/skills/` at the start of every session.
 - Skill instructions beat your own defaults.
 - Do not improvise a different approach because it seems better.
 - If two skills apply, follow both. If they conflict, stop and ask.
+- Skills that change UI, styling, animation or component structure do not apply here. The
+  frontend is approved and frozen. Read them for context if you like, never act on them.
 
 ---
 
@@ -122,7 +124,7 @@ for the same area so history stays greppable:
 
 `db` `auth` `rbac` `admin` `api` `nav` `footer` `home` `news` `services` `destinations`
 `team` `partners` `forms` `enquiries` `consultations` `institutions` `courses` `test-prep`
-`events` `media` `settings` `seo` `deps` `ci`
+`events` `media` `settings` `seo` `deps` `ci` `repo`
 
 **Subject:** imperative, lowercase, no full stop. Whole title line under 60 characters.
 Say what changed, not what you did. "add enquiry endpoint", not "added the enquiry endpoint".
