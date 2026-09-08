@@ -197,10 +197,11 @@
 .admin-table { width: 100%; margin-top: 18px; border-collapse: collapse; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; overflow: hidden; font-size: 15px; }
 .admin-table th { text-align: left; padding: 10px 14px; background: var(--color-surface); font-weight: 600; color: var(--color-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
 .admin-table td { padding: 10px 14px; border-top: 1px solid var(--color-hairline); color: var(--color-ink); }
-/* A link inherits its colour from Tailwind's reset, so a table of links read as plain text. */
-.admin-table a, .admin-pager a { color: var(--color-blue-deep); text-decoration: underline; text-underline-offset: 2px; }
-.admin-table a:hover, .admin-pager a:hover { color: var(--color-blue); }
-/* The link out to the live page is three short words and belongs on one line. */
+/* Only the link out to the live page looks like a link. The title opens the editor but reads as
+   the name of the row, which is what the column is scanned for. */
+.admin-table a[target="_blank"], .admin-pager a { color: var(--color-blue-deep); text-decoration: underline; text-underline-offset: 2px; }
+.admin-table a[target="_blank"]:hover, .admin-pager a:hover { color: var(--color-blue); }
+/* Three short words, so they belong on one line. */
 .admin-table a[target="_blank"] { white-space: nowrap; }
 .admin-count { color: var(--color-muted); margin-bottom: 4px; }
 .admin-subhead { margin-top: 26px; }
