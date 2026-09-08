@@ -83,3 +83,14 @@ export function coursePublishProblems(data: CoursePublishFields, images: Attache
 }
 
 export { coursePath };
+
+const categoryFields = {
+  name: z.string().trim().min(1, "Give the subject area a name."),
+  // Left empty, the web address is made from the name.
+  slug: z.union([z.literal(""), slugField]).default(""),
+  sortOrder: z.coerce.number().int().min(0).default(0),
+};
+
+export const createCourseCategorySchema = z.object(categoryFields);
+export const updateCourseCategorySchema = z.object({ id: z.uuid(), ...categoryFields });
+export const reorderSchema = z.object({ ids: z.array(z.uuid()).min(1) });

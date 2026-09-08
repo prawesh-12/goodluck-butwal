@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "bundle:check": "node scripts/bundle-check.mjs",
-    "db:seed": "tsx --env-file=.env.local db/seed/from-content.ts"
+    "db:seed": "tsx --env-file=.env.local db/seed/from-content.ts",
+    "db:seed:dev": "tsx --env-file=.env.local db/seed/from-content.ts --dev"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

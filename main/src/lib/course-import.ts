@@ -1,4 +1,4 @@
-import { INTAKE_MONTHS, qualificationLevels } from "@/components/admin/course-meta";
+import { INTAKE_MONTHS, qualificationLevels, type QualificationLevel } from "@/components/admin/course-meta";
 
 export const IMPORT_COLUMNS = [
   "name",
@@ -20,7 +20,7 @@ export type ParsedCourse = {
   row: number;
   name: string;
   institutionSlug: string;
-  qualificationLevel: string | null;
+  qualificationLevel: QualificationLevel | null;
   categorySlug: string | null;
   durationMonths: number | null;
   durationLabel: string;
@@ -39,7 +39,7 @@ export type ImportResult =
 export type KnownSlugs = { institutionSlugs: string[]; categorySlugs: string[] };
 
 const MONTH_BY_LOWER = new Map(INTAKE_MONTHS.map((month) => [month.toLowerCase(), month]));
-const LEVELS = new Set<string>(qualificationLevels);
+const LEVEL_BY_VALUE = new Map<string, QualificationLevel>(qualificationLevels.map((level) => [level, level]));
 
 // A hand-rolled reader beats a dependency here: quoted fields, doubled quotes and CRLF are the
 // whole grammar a spreadsheet export uses.
@@ -145,7 +145,8 @@ export function parseCourseCsv(text: string, known: KnownSlugs): ImportResult {
       });
     }
 
-    if (level && !LEVELS.has(level)) {
+    const parsedLevel = LEVEL_BY_VALUE.get(level) ?? null;
+    if (level && !parsedLevel) {
       problems.push({
         row,
         message: `Row ${row}: qualification_level is "${level}", which is not one of ${qualificationLevels.join(", ")}.`,
@@ -194,7 +195,7 @@ export function parseCourseCsv(text: string, known: KnownSlugs): ImportResult {
       row,
       name,
       institutionSlug,
-      qualificationLevel: level || null,
+      qualificationLevel: parsedLevel,
       categorySlug: categorySlug || null,
       durationMonths: months,
       durationLabel,
