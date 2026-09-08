@@ -168,3 +168,15 @@
 .admin-table { width: 100%; margin-top: 18px; border-collapse: collapse; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; overflow: hidden; font-size: 15px; }
 .admin-table th { text-align: left; padding: 10px 14px; background: var(--color-surface); font-weight: 600; color: var(--color-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
 .admin-table td { padding: 10px 14px; border-top: 1px solid var(--color-hairline); color: var(--color-ink); }
+.admin-count { color: var(--color-muted); margin-bottom: 4px; }
+.admin-subhead { margin-top: 26px; }
+.admin-facts { display: grid; gap: 12px 24px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin-top: 18px; }
+.admin-facts dt { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-text); }
+.admin-facts dd { margin: 2px 0 0; color: var(--color-ink); }
+.admin-message { margin-top: 10px; padding: 16px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; white-space: pre-wrap; }
+.admin-editor { display: flex; flex-direction: column; gap: 12px; max-width: 460px; }
+.admin-editor select, .admin-editor textarea { padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; background: #fff; }
+.admin-actions { display: flex; align-items: center; gap: 12px; }
+.admin-pager { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+.admin-clash { display: block; font-size: 12px; font-weight: 600; color: #b42318; }
+.admin-filters select, .admin-filters input { padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; background: #fff; }
