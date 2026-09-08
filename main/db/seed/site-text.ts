@@ -40,7 +40,7 @@ function footerRows(): StringRow[] {
 }
 
 export async function seedUiStrings() {
-  const rows = [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows];
+  const rows = [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows, ...chromeRows];
 
   for (const row of rows) {
     await db
@@ -231,7 +231,6 @@ const errorRows: StringRow[] = [
   { key: "errors.404.body", value: "The page you are looking for doesn\u2019t exist or has been moved.", group: "errors", label: "Page not found text", help: "The line under the heading when an address does not exist." },
   { key: "errors.404.cta", value: "Back to home", group: "errors", label: "Page not found button", help: "The button on the page shown when an address does not exist." },
 
-  { key: "empty.cta", value: "Book a free consultation", group: "errors", label: "Empty list button", help: "The button under every \u201cnothing here yet\u201d message, unless a page sets its own." },
   { key: "empty.courses.title", value: "No courses match those filters", group: "errors", label: "No matching courses heading", help: "Shown on the courses page when the filters return nothing." },
   { key: "empty.courses.lead", value: "Clear a filter to widen the search, or ask a counsellor what is open for your intake.", group: "errors", label: "No matching courses text", help: "The line under that heading on the courses page." },
   { key: "empty.institutions.title", value: "No institutions listed yet", group: "errors", label: "No institutions heading", help: "Shown on the institutions page when nothing is published." },
@@ -292,4 +291,56 @@ const formRows: StringRow[] = [
   { key: "forms.field.attendees", value: "How many are coming", group: "forms", label: "Attendee count field", help: "The label above the number of people on an event registration." },
   { key: "forms.field.event_notes", value: "Anything we should know", group: "forms", label: "Event notes field", help: "The label above the notes box on an event registration." },
   { key: "forms.field.seats_left", value: "{count} seats left.", group: "forms", label: "Seats left note", help: "Shown under the number of people on an event registration. Write {count} where the number should go." },
+];
+
+const chromeRows: StringRow[] = [
+  { key: "nav.book_cta", value: "Book a consultation", group: "nav", label: "Header button", help: "The dark button in the site header. It is hidden on the contact pages." },
+  { key: "nav.office_selector_label", value: "Choose your office", group: "nav", label: "Office switcher label", help: "Read aloud by screen readers for the flag button in the header. Not seen on screen." },
+  { key: "nav.menu_open", value: "Open menu", group: "nav", label: "Menu button, closed", help: "Read aloud for the small menu button on phones when the menu is shut." },
+  { key: "nav.menu_close", value: "Close menu", group: "nav", label: "Menu button, open", help: "Read aloud for the small menu button on phones when the menu is open." },
+
+  { key: "footer.tagline", value: "Ready to create your luck?", group: "footer", label: "Footer heading", help: "The line under the logo at the foot of every page." },
+  { key: "footer.offices.title", value: "Offices", group: "footer", label: "Footer offices heading", help: "The heading above the office addresses in the footer." },
+  { key: "footer.copyright", value: "\u00a9 {year} {name}. All rights reserved.", group: "footer", label: "Copyright line", help: "The last line of the footer. Write {year} for the current year and {name} for the company name." },
+
+  { key: "cta.consultation", value: "Book a free consultation", group: "cta", label: "Consultation button", help: "Used at the foot of the team, institution and empty-list pages." },
+  { key: "cta.appointment", value: "Book an appointment", group: "cta", label: "Appointment button", help: "Used at the foot of the test preparation batches page." },
+  { key: "cta.enquiry", value: "Enquire about this course", group: "cta", label: "Course enquiry button", help: "The button at the foot of a course page." },
+  { key: "cta.website", value: "Visit website", group: "cta", label: "Institution website button", help: "The button that opens an institution's own site." },
+  { key: "cta.previous", value: "Previous", group: "cta", label: "Previous page button", help: "Moves back a page in a list of courses or institutions." },
+  { key: "cta.next", value: "Next", group: "cta", label: "Next page button", help: "Moves on a page in a list of courses or institutions." },
+  { key: "cta.page_of", value: "Page {page} of {pages}", group: "cta", label: "Page counter", help: "Sits between the two page buttons. Write {page} and {pages} where the numbers should go." },
+  { key: "cta.person.title", value: "Talk to {name}", group: "cta", label: "Team member panel heading", help: "The heading at the foot of a team member's page. Write {name} where their first name should go." },
+  { key: "cta.person.lead", value: "Book a free consultation and we will put you with the right person for your case.", group: "cta", label: "Team member panel text", help: "The line under that heading." },
+  { key: "cta.course.title", value: "Ask about this course", group: "cta", label: "Course panel heading", help: "The heading at the foot of a course page." },
+  { key: "cta.course.lead", value: "Send an enquiry and a counsellor will come back with entry requirements, fees and the next intake.", group: "cta", label: "Course panel text", help: "The line under that heading." },
+  { key: "cta.institution.title", value: "Thinking about {name}?", group: "cta", label: "Institution panel heading", help: "The heading at the foot of an institution page. Write {name} where the institution's name should go." },
+  { key: "cta.institution.lead", value: "A counsellor can check entry requirements, intakes and fees with you.", group: "cta", label: "Institution panel text", help: "The line under that heading." },
+  { key: "cta.questions.title", value: "Still have questions?", group: "cta", label: "Questions panel heading", help: "The heading above the button at the foot of the batches page." },
+
+  { key: "home.hero.title_before", value: "Create your", group: "home", label: "Headline, before the mark", help: "The first half of the homepage headline. The logo mark sits between the two halves." },
+  { key: "home.hero.title_after", value: "luck", group: "home", label: "Headline, after the mark", help: "The second half of the homepage headline." },
+  { key: "home.hero.cta", value: "Book a consultation", group: "home", label: "Homepage first button", help: "The blue button under the homepage headline." },
+  { key: "home.hero.services_cta", value: "Our services", group: "home", label: "Homepage second button", help: "The plain button beside it." },
+  { key: "home.events.badge", value: "Events", group: "home", label: "Events block badge", help: "The small pill above the events on the homepage." },
+  { key: "home.events.title", value: "Coming up near you", group: "home", label: "Events block heading", help: "The heading above the events on the homepage." },
+  { key: "home.events.cta", value: "All events", group: "home", label: "Events block button", help: "The button beside that heading." },
+
+  { key: "about.founders.title", value: "Message from co-founders", group: "about", label: "Co-founders page heading", help: "The heading at the top of the co-founders page." },
+
+  { key: "courses.filter.keyword", value: "Keyword", group: "courses", label: "Keyword box", help: "The label above the keyword box on the courses page." },
+  { key: "courses.filter.keyword_hint", value: "Course, institution or country", group: "courses", label: "Keyword box hint", help: "The grey wording inside the empty keyword box." },
+  { key: "courses.filter.destination", value: "Destination", group: "courses", label: "Destination list", help: "The label above the country list on the courses page." },
+  { key: "courses.filter.destination_any", value: "All destinations", group: "courses", label: "Destination list, nothing chosen", help: "The first line of the country list, meaning no filter." },
+  { key: "courses.filter.level", value: "Qualification level", group: "courses", label: "Level list", help: "The label above the qualification list on the courses page." },
+  { key: "courses.filter.level_any", value: "All levels", group: "courses", label: "Level list, nothing chosen", help: "The first line of the qualification list, meaning no filter." },
+  { key: "courses.filter.category", value: "Category", group: "courses", label: "Category list", help: "The label above the category list on the courses page." },
+  { key: "courses.filter.category_any", value: "All categories", group: "courses", label: "Category list, nothing chosen", help: "The first line of the category list, meaning no filter." },
+  { key: "courses.filter.institution", value: "Institution", group: "courses", label: "Institution list", help: "The label above the institution list on the courses page." },
+  { key: "courses.filter.institution_any", value: "All institutions", group: "courses", label: "Institution list, nothing chosen", help: "The first line of the institution list, meaning no filter." },
+  { key: "courses.filter.intake", value: "Intake", group: "courses", label: "Intake list", help: "The label above the intake month list on the courses page." },
+  { key: "courses.filter.intake_any", value: "Any intake", group: "courses", label: "Intake list, nothing chosen", help: "The first line of the intake list, meaning no filter." },
+  { key: "courses.filter.apply", value: "Apply filters", group: "courses", label: "Filter button", help: "The button that runs the search on the courses page." },
+  { key: "courses.filter.clear", value: "Clear all", group: "courses", label: "Clear filters chip", help: "The chip that removes every filter at once." },
+  { key: "courses.filter.remove", value: "Remove filter {name}", group: "courses", label: "Remove one filter", help: "Read aloud for each filter chip. Write {name} where the filter should go." },
 ];

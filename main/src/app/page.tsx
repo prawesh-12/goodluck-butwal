@@ -48,7 +48,15 @@ export default async function Home() {
   return (
     <>
       <JsonLd data={[organization(socials.map((s) => s.href)), webSite()]} />
-      <Hero googleRating={googleRating} />
+      <Hero
+        googleRating={googleRating}
+        text={{
+          titleBefore: t("home.hero.title_before", "Create your"),
+          titleAfter: t("home.hero.title_after", "luck"),
+          bookCta: t("home.hero.cta", "Book a consultation"),
+          servicesCta: t("home.hero.services_cta", "Our services"),
+        }}
+      />
       <Partners logos={logos} />
       <Destinations cards={cards} />
       <Services services={services} />
@@ -56,7 +64,14 @@ export default async function Home() {
       <Stories successStories={successStories} googleRating={googleRating} />
       <Offices logos={logos} />
       <News articles={articles} />
-      <Events events={upcomingEvents} />
+      <Events
+        events={upcomingEvents}
+        text={{
+          badge: t("home.events.badge", "Events"),
+          title: t("home.events.title", "Coming up near you"),
+          cta: t("home.events.cta", "All events"),
+        }}
+      />
       <Faqs
         faces={faces}
         items={allFaqs}

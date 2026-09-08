@@ -9,6 +9,7 @@ import { PillButton } from "@/components/ui/button";
 import { Chip } from "@/components/ui/bits";
 import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 import { InstitutionCard } from "@/components/catalogue/institution-card";
+import { loadText } from "@/server/queries/text";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -27,7 +28,7 @@ export default async function CoursePage({ params }: Props) {
   const { slug } = await params;
   const course = await getCourse(slug);
   if (!course) notFound();
-  const institution = await getInstitution(course.institutionSlug);
+  const [institution, t] = await Promise.all([getInstitution(course.institutionSlug), loadText()]);
 
   const facts = [
     { label: "Qualification", title: course.level, line: course.category },
@@ -105,9 +106,9 @@ export default async function CoursePage({ params }: Props) {
       <section className="pt-section flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">
           <Appear className="flex flex-col items-center gap-5 overflow-hidden rounded-[10px] bg-surface p-5 text-center md:rounded-[30px] md:p-10">
-            <h2 className="t-h3">Ask about this course</h2>
-            <p className="t-body text-muted">Send an enquiry and a counsellor will come back with entry requirements, fees and the next intake.</p>
-            <PillButton href={`/contact?${enquiry.toString()}`} tone="dark">Enquire about this course</PillButton>
+            <h2 className="t-h3">{t("cta.course.title", "Ask about this course")}</h2>
+            <p className="t-body text-muted">{t("cta.course.lead", "Send an enquiry and a counsellor will come back with entry requirements, fees and the next intake.")}</p>
+            <PillButton href={`/contact?${enquiry.toString()}`} tone="dark">{t("cta.enquiry", "Enquire about this course")}</PillButton>
           </Appear>
         </div>
       </section>

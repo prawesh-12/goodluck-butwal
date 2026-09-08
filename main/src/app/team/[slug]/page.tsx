@@ -9,6 +9,7 @@ import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { CheckRow, SocialLinks } from "@/components/ui/bits";
 import { InnerHero } from "@/components/inner";
+import { loadText } from "@/server/queries/text";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -56,6 +57,7 @@ export default async function TeamMemberPage({ params }: Props) {
   const qualifications = member.qualifications ?? [];
   const expertise = member.expertise ?? [];
   const firstName = member.name.split(" ")[0];
+  const t = await loadText();
 
   return (
     <>
@@ -114,10 +116,10 @@ export default async function TeamMemberPage({ params }: Props) {
       <section className="pt-section flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">
           <Appear className="flex flex-col items-center gap-5 overflow-hidden rounded-[10px] bg-surface p-5 text-center md:rounded-[30px] md:p-10">
-            <h2 className="t-h3">Talk to {firstName}</h2>
-            <p className="t-body text-muted">Book a free consultation and we will put you with the right person for your case.</p>
+            <h2 className="t-h3">{t("cta.person.title", "Talk to {name}").replace("{name}", firstName)}</h2>
+            <p className="t-body text-muted">{t("cta.person.lead", "Book a free consultation and we will put you with the right person for your case.")}</p>
             <SocialLinks />
-            <PillButton href="/contact/book-consultation" tone="dark">Book a free consultation</PillButton>
+            <PillButton href="/contact/book-consultation" tone="dark">{t("cta.consultation", "Book a free consultation")}</PillButton>
           </Appear>
         </div>
       </section>

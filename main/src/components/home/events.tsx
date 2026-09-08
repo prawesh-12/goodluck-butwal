@@ -9,7 +9,9 @@ import type { UpcomingEvent } from "@/server/queries/events";
 
 // Same row as the news block. It shows the events of the office the visitor is seeing, and
 // nothing at all when that office has none coming up.
-export function Events({ events }: { events: UpcomingEvent[] }) {
+export type EventsText = { badge: string; title: string; cta: string };
+
+export function Events({ events, text }: { events: UpcomingEvent[]; text: EventsText }) {
   const { office } = useOffice();
   const mine = events.filter((event) => event.officeCode === office).slice(0, 3);
   if (mine.length === 0) return null;
@@ -20,12 +22,12 @@ export function Events({ events }: { events: UpcomingEvent[] }) {
         <div className="flex flex-col items-start gap-[30px] md:gap-10 lg:gap-[50px]">
           <div className="flex w-full flex-col gap-[10px] md:flex-row md:items-end md:gap-[30px] lg:gap-[50px]">
             <Appear className="flex flex-1 flex-col items-start gap-[10px]">
-              <Badge className="ring-1 ring-hairline">Events</Badge>
-              <h2 className="t-h2">Coming up near you</h2>
+              <Badge className="ring-1 ring-hairline">{text.badge}</Badge>
+              <h2 className="t-h2">{text.title}</h2>
             </Appear>
             <Appear delay={0.1} className="flex flex-col items-start md:items-end">
               <PillButton href="/events" tone="dark">
-                All events
+                {text.cta}
               </PillButton>
             </Appear>
           </div>

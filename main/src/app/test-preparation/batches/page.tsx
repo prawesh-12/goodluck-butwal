@@ -25,9 +25,9 @@ export default async function BatchesPage() {
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-[60px] lg:pb-[100px]">
         <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">
           <Appear className="flex flex-col items-center gap-5 overflow-hidden rounded-[10px] bg-surface p-5 text-center md:rounded-[30px] md:p-10">
-            <h2 className="t-h3">Still have questions?</h2>
+            <h2 className="t-h3">{t("cta.questions.title", "Still have questions?")}</h2>
             <PillButton href="/contact/book-consultation" tone="dark">
-              Book an appointment
+              {t("cta.appointment", "Book an appointment")}
             </PillButton>
           </Appear>
         </div>

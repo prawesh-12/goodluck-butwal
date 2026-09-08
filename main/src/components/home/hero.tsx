@@ -14,7 +14,9 @@ const destinationFlags = [
   { name: "United Kingdom", flag: "/images/flags/united-kingdom.svg" },
 ];
 
-export function Hero({ googleRating }: { googleRating: GoogleRating }) {
+export type HeroText = { titleBefore: string; titleAfter: string; bookCta: string; servicesCta: string };
+
+export function Hero({ googleRating, text }: { googleRating: GoogleRating; text: HeroText }) {
   const { scrollY } = useScroll();
   const grass = useTransform(scrollY, [380, 460], [1, 0], { ease: easeInOut });
   // The reference hero is max(175vh, 1262px) tall and the meadow's scroll rate grows with that height
@@ -121,7 +123,7 @@ export function Hero({ googleRating }: { googleRating: GoogleRating }) {
             <div className="flex flex-col items-center gap-5">
               <div className="flex flex-wrap items-center justify-center gap-x-[10px] gap-y-0 md:gap-[30px]">
                 <Appear y={20} delay={0.1}>
-                  <h1 className="t-h1">Create your</h1>
+                  <h1 className="t-h1">{text.titleBefore}</h1>
                 </Appear>
                 <div className="flex h-10 w-[37px] items-center justify-center md:h-[60px] md:w-[74px] lg:h-[84px] lg:w-[104px]">
                   <Appear y={20} delay={0.2} rotate={-16} className="flex size-[37px] shrink-0 items-center justify-center rounded-[8px] bg-white md:size-[74px] md:rounded-[16px] lg:size-[104px] lg:rounded-[24px] [filter:drop-shadow(rgba(0,0,0,0.1)_0px_8px_6px)_drop-shadow(rgba(0,0,0,0.3)_0px_3px_3px)]">
@@ -129,7 +131,7 @@ export function Hero({ googleRating }: { googleRating: GoogleRating }) {
                   </Appear>
                 </div>
                 <Appear y={20} delay={0.3}>
-                  <h1 className="t-h1">luck</h1>
+                  <h1 className="t-h1">{text.titleAfter}</h1>
                 </Appear>
               </div>
               <Appear y={20} delay={0.4} className="mt-[10px] max-w-[600px] md:mt-5">
@@ -146,8 +148,8 @@ export function Hero({ googleRating }: { googleRating: GoogleRating }) {
               </Appear>
             </div>
             <Appear y={20} delay={0.5} className="flex flex-wrap items-center justify-center gap-4 md:gap-5">
-              <PillButton href="/contact/book-consultation">Book a consultation</PillButton>
-              <FlatButton href="/services">Our services</FlatButton>
+              <PillButton href="/contact/book-consultation">{text.bookCta}</PillButton>
+              <FlatButton href="/services">{text.servicesCta}</FlatButton>
             </Appear>
             <Appear y={20} delay={0.6} className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[15px] font-medium leading-[18px] text-muted">
               <span className="flex items-center gap-2">

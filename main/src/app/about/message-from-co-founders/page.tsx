@@ -7,6 +7,7 @@ import { getAboutContent } from "@/server/queries/pages";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { InnerHero } from "@/components/inner";
+import { loadText } from "@/server/queries/text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildEntityMetadata("page", "message-from-co-founders", {
@@ -16,12 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CoFoundersPage() {
-  const about = await getAboutContent();
+  const [about, t] = await Promise.all([getAboutContent(), loadText()]);
 
   return (
     <>
       <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "About us", path: "/about" }, { name: "Message from co-founders", path: "/about/message-from-co-founders" }])} />
-      <InnerHero badge="Co-founders" title="Message from co-founders" lead={about.founders} />
+      <InnerHero badge={t("about.founders.role", "Co-founders")} title={t("about.founders.title", "Message from co-founders")} lead={about.founders} />
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="container-x">
           <div className="flex flex-col gap-[30px] md:flex-row md:items-start lg:gap-[70px]">
@@ -38,9 +39,9 @@ export default async function CoFoundersPage() {
               </div>
               <div className="flex flex-col items-start gap-1">
                 <h2 className="t-h5">{about.founders}</h2>
-                <p className="t-body text-muted">Co-founders</p>
+                <p className="t-body text-muted">{t("about.founders.role", "Co-founders")}</p>
               </div>
-              <PillButton href="/about/team" tone="dark">Meet the team</PillButton>
+              <PillButton href="/about/team" tone="dark">{t("about.mission.cta", "Meet the team")}</PillButton>
             </Appear>
           </div>
         </div>

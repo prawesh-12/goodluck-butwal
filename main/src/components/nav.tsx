@@ -23,7 +23,9 @@ function BlurTop() {
   );
 }
 
-export function Nav() {
+export type NavText = { bookCta: string; officeSelector: string; menuOpen: string; menuClose: string };
+
+export function Nav({ text }: { text: NavText }) {
   const [open, setOpen] = useState(false);
   const [officeOpen, setOfficeOpen] = useState(false);
   const { office, offices, choose } = useOffice();
@@ -59,18 +61,18 @@ export function Nav() {
             <div className="ml-auto flex shrink-0 items-center justify-end gap-[6px] md:gap-[10px]">
               {offices.length > 0 && (
                 <button type="button" onClick={() => { setOfficeOpen((v) => !v); setOpen(false); }} aria-expanded={officeOpen} aria-haspopup="menu" className="shrink-0 rounded-full transition-opacity duration-200 hover:opacity-70">
-                  <span className="sr-only">Choose your office</span>
+                  <span className="sr-only">{text.officeSelector}</span>
                   <OfficeBadge />
                 </button>
               )}
               {!onContact && (
                 <div className="hidden md:block">
                   <PillButton href="/contact/book-consultation" tone="dark" size="sm">
-                    Book a consultation
+                    {text.bookCta}
                   </PillButton>
                 </div>
               )}
-              <button type="button" onClick={() => { setOpen((v) => !v); setOfficeOpen(false); }} aria-expanded={open} aria-label={open ? "Close menu" : "Open menu"} className="relative flex size-8 items-center justify-center rounded-full bg-ink md:size-[34px] lg:hidden">
+              <button type="button" onClick={() => { setOpen((v) => !v); setOfficeOpen(false); }} aria-expanded={open} aria-label={open ? text.menuClose : text.menuOpen} className="relative flex size-8 items-center justify-center rounded-full bg-ink md:size-[34px] lg:hidden">
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-1"}`} />
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-1"}`} />
               </button>
@@ -87,7 +89,7 @@ export function Nav() {
                 {!onContact && (
                   <div className="mt-2 flex items-center justify-center border-t border-hairline px-2 pt-3 md:hidden">
                     <PillButton href="/contact/book-consultation" tone="dark" size="sm">
-                      Book a consultation
+                      {text.bookCta}
                     </PillButton>
                   </div>
                 )}

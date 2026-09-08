@@ -115,11 +115,11 @@ export default async function InstitutionPage({ params, searchParams }: Props) {
       <section className="pt-section flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">
           <Appear className="flex flex-col items-center gap-5 overflow-hidden rounded-[10px] bg-surface p-5 text-center md:rounded-[30px] md:p-10">
-            <h2 className="t-h3">Thinking about {institution.name}?</h2>
-            <p className="t-body text-muted">A counsellor can check entry requirements, intakes and fees with you.</p>
+            <h2 className="t-h3">{t("cta.institution.title", "Thinking about {name}?").replace("{name}", institution.name)}</h2>
+            <p className="t-body text-muted">{t("cta.institution.lead", "A counsellor can check entry requirements, intakes and fees with you.")}</p>
             <div className="flex flex-wrap items-center justify-center gap-5">
-              <PillButton href="/contact/book-consultation" tone="dark">Book a free consultation</PillButton>
-              {institution.website && <FlatButton href={institution.website} tone="dark">Visit website</FlatButton>}
+              <PillButton href="/contact/book-consultation" tone="dark">{t("cta.consultation", "Book a free consultation")}</PillButton>
+              {institution.website && <FlatButton href={institution.website} tone="dark">{t("cta.website", "Visit website")}</FlatButton>}
             </div>
           </Appear>
         </div>

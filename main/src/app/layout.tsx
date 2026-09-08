@@ -10,6 +10,7 @@ import { Analytics } from "@/components/analytics";
 import { StaffBar } from "@/components/admin/staff-bar";
 import { listOffices } from "@/server/queries/offices";
 import { getFooterColumns, getSocialLinks } from "@/server/queries/site";
+import { loadText } from "@/server/queries/text";
 
 export const metadata: Metadata = {
   metadataBase: new URL(company.url),
@@ -24,10 +25,11 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [offices, columns, socials] = await Promise.all([
+  const [offices, columns, socials, t] = await Promise.all([
     listOffices(),
     getFooterColumns(),
     getSocialLinks(),
+    loadText(),
   ]);
 
   return (
@@ -35,9 +37,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="overflow-x-clip">
         <OfficeProvider offices={offices}>
           <SmoothScroll />
-          <Nav />
+          <Nav
+            text={{
+              bookCta: t("nav.book_cta", "Book a consultation"),
+              officeSelector: t("nav.office_selector_label", "Choose your office"),
+              menuOpen: t("nav.menu_open", "Open menu"),
+              menuClose: t("nav.menu_close", "Close menu"),
+            }}
+          />
           <main className="flex flex-col items-start">{children}</main>
-          <Footer columns={columns} socials={socials} />
+          <Footer
+            columns={columns}
+            socials={socials}
+            text={{
+              tagline: t("footer.tagline", "Ready to create your luck?"),
+              officesHeading: t("footer.offices.title", "Offices"),
+              copyright: t("footer.copyright", "© {year} {name}. All rights reserved."),
+            }}
+          />
           <StaffBar />
         </OfficeProvider>
         <Analytics />

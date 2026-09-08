@@ -17,7 +17,7 @@ export async function Empty({
   return (
     <div className="flex w-full flex-col items-center gap-5 md:gap-[30px]">
       <SectionHead title={title} lead={lead} />
-      <PillButton href={href} tone="dark">{action ?? t("empty.cta", "Book a free consultation")}</PillButton>
+      <PillButton href={href} tone="dark">{action ?? t("cta.consultation", "Book a free consultation")}</PillButton>
     </div>
   );
 }
