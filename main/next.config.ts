@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   // These run only on the server and are imported from many routes. Left to Next, each route
   // chunk gets its own copy and the worker blows past its 2.50 MB cap.
-  serverExternalPackages: ["drizzle-orm", "@neondatabase/serverless", "sanitize-html", "nanoid"],
+  serverExternalPackages: ["drizzle-orm", "@neondatabase/serverless", "sanitize-html", "nanoid", "zod"],
   experimental: {
     // Turns on forbidden(), the only way a page can answer with a real 403 status.
     authInterrupts: true,
