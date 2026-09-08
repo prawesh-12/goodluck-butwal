@@ -3,6 +3,7 @@ import { buildMetadata } from "@/lib/seo";
 import { listEventCards } from "@/server/queries/events";
 import { InnerHero } from "@/components/inner";
 import { EventTabs } from "@/components/events/event-tabs";
+import { loadText } from "@/server/queries/text";
 
 export const revalidate = 300;
 
@@ -16,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function EventsPage() {
-  const cards = await listEventCards();
+  const [cards, t] = await Promise.all([listEventCards(), loadText()]);
   const upcoming = cards.filter((card) => !card.past).length;
 
   return (
@@ -30,7 +31,13 @@ export default async function EventsPage() {
       />
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="container-x">
-          <EventTabs events={cards} />
+          <EventTabs
+            events={cards}
+            empty={{
+              upcoming: t("empty.events.upcoming", "Nothing is coming up just now. Check back soon."),
+              past: t("empty.events.past", "No past events yet."),
+            }}
+          />
         </div>
       </section>
     </>

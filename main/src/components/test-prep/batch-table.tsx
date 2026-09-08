@@ -81,7 +81,7 @@ const MODES = [
   { value: "hybrid", label: "Hybrid" },
 ];
 
-export function BatchTable({ batches, filters = false }: { batches: BatchRow[]; filters?: boolean }) {
+export function BatchTable({ batches, empty, filters = false }: { batches: BatchRow[]; empty: string; filters?: boolean }) {
   const [test, setTest] = useState("all");
   const [mode, setMode] = useState("all");
 
@@ -99,7 +99,7 @@ export function BatchTable({ batches, filters = false }: { batches: BatchRow[]; 
       ) : null}
 
       {shown.length === 0 ? (
-        <p className="t-body text-muted">No batches are open for booking yet. Ask us about the next one.</p>
+        <p className="t-body text-muted">{empty}</p>
       ) : (
         <div className="article article-scroll w-full">
           <table>

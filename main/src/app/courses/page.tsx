@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { listCourseFilterOptions, listCourses } from "@/server/queries/catalogue";
+import { loadText } from "@/server/queries/text";
 import { filterHref, pageCount, parseCourseFilters, type SearchParams } from "@/components/catalogue/filters";
 import { InnerHero, SectionHead } from "@/components/inner";
 import { CourseFilters } from "@/components/catalogue/course-filters";
@@ -19,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Props = { searchParams: Promise<SearchParams> };
 
 export default async function CoursesPage({ searchParams }: Props) {
-  const options = await listCourseFilterOptions();
+  const [options, t] = await Promise.all([listCourseFilterOptions(), loadText()]);
   const query = parseCourseFilters(await searchParams, {
     destinations: options.destinations.map((d) => d.slug),
     categories: options.categories.map((c) => c.slug),
@@ -51,7 +52,10 @@ export default async function CoursesPage({ searchParams }: Props) {
                 <Pager page={query.page} pages={pages} hrefFor={(n) => filterHref(query, { page: n })} />
               </>
             ) : (
-              <Empty title="No courses match those filters" lead="Clear a filter to widen the search, or ask a counsellor what is open for your intake." />
+              <Empty
+                title={t("empty.courses.title", "No courses match those filters")}
+                lead={t("empty.courses.lead", "Clear a filter to widen the search, or ask a counsellor what is open for your intake.")}
+              />
             )}
           </div>
         </div>

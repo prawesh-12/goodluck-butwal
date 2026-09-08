@@ -9,12 +9,14 @@ export function ErrorBlock({
   code = "404",
   title = "Page not found",
   lead = "The page you are looking for doesn't exist or has been moved.",
+  cta = "Back to home",
   action,
 }: {
   badge?: string;
   code?: string;
   title?: string;
   lead?: string;
+  cta?: string;
   action?: ReactNode;
 } = {}) {
   return (
@@ -30,7 +32,7 @@ export function ErrorBlock({
                 <p className="t-body text-center text-muted">{lead}</p>
               </div>
             </Appear>
-            {action ?? <PillButton href="/" iconSide="left">Back to home</PillButton>}
+            {action ?? <PillButton href="/" iconSide="left">{cta}</PillButton>}
           </div>
           <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-[-40px] z-[1] w-[calc(100%+20px)] max-w-none object-contain object-top md:bottom-[-80px]" loading="lazy" decoding="async" />
         </Appear>

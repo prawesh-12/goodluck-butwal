@@ -40,7 +40,7 @@ function footerRows(): StringRow[] {
 }
 
 export async function seedUiStrings() {
-  const rows = [...footerRows(), ...homeRows, ...innerPageRows];
+  const rows = [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows];
 
   for (const row of rows) {
     await db
@@ -223,4 +223,27 @@ const homeRows: StringRow[] = [
   { key: "home.faqs.still.line", value: "Book an appointment and our team can assess your case.", group: "home", label: "Still have questions text", help: "The line under that title on the home page." },
   { key: "home.faqs.still.cta", value: "Book an appointment", group: "home", label: "Still have questions button", help: "Button on that card on the home page." },
   { key: "home.faqs.still.you", value: "You", group: "home", label: "Still have questions circle", help: "The word in the blue circle after the counsellor photos." },
+];
+
+const errorRows: StringRow[] = [
+  { key: "errors.404.badge", value: "Something went wrong", group: "errors", label: "Page not found badge", help: "The small pill at the top of the page shown when an address does not exist." },
+  { key: "errors.404.title", value: "Page not found", group: "errors", label: "Page not found heading", help: "The heading on the page shown when an address does not exist." },
+  { key: "errors.404.body", value: "The page you are looking for doesn\u2019t exist or has been moved.", group: "errors", label: "Page not found text", help: "The line under the heading when an address does not exist." },
+  { key: "errors.404.cta", value: "Back to home", group: "errors", label: "Page not found button", help: "The button on the page shown when an address does not exist." },
+
+  { key: "empty.cta", value: "Book a free consultation", group: "errors", label: "Empty list button", help: "The button under every \u201cnothing here yet\u201d message, unless a page sets its own." },
+  { key: "empty.courses.title", value: "No courses match those filters", group: "errors", label: "No matching courses heading", help: "Shown on the courses page when the filters return nothing." },
+  { key: "empty.courses.lead", value: "Clear a filter to widen the search, or ask a counsellor what is open for your intake.", group: "errors", label: "No matching courses text", help: "The line under that heading on the courses page." },
+  { key: "empty.institutions.title", value: "No institutions listed yet", group: "errors", label: "No institutions heading", help: "Shown on the institutions page when nothing is published." },
+  { key: "empty.institutions.lead", value: "Tell us where you want to study and a counsellor will send you the options.", group: "errors", label: "No institutions text", help: "The line under that heading on the institutions page." },
+  { key: "empty.institution_courses.title", value: "No courses listed yet", group: "errors", label: "Institution with no courses heading", help: "Shown on an institution page that has no published courses." },
+  { key: "empty.institution_courses.lead", value: "Ask a counsellor which programmes this institution is taking applications for.", group: "errors", label: "Institution with no courses text", help: "The line under that heading on an institution page." },
+  { key: "empty.search.prompt.title", value: "Type something to search", group: "errors", label: "Search page opening heading", help: "Shown on the search page before anything has been typed." },
+  { key: "empty.search.prompt.lead", value: "Try a course name, an institution, a country, or a keyword such as scholarship.", group: "errors", label: "Search page opening text", help: "The line under that heading on the search page." },
+  { key: "empty.search.prompt.cta", value: "Browse courses", group: "errors", label: "Search page opening button", help: "The button shown on the search page before anything has been typed." },
+  { key: "empty.search.title", value: "Nothing matches \u201c{q}\u201d", group: "errors", label: "No search results heading", help: "Shown when a search finds nothing. Write {q} where the words searched for should go." },
+  { key: "empty.search.lead", value: "Try a shorter word, a country name, or the name of a course or institution. A counsellor can also look for you.", group: "errors", label: "No search results text", help: "The line under that heading on the search page." },
+  { key: "empty.events.upcoming", value: "Nothing is coming up just now. Check back soon.", group: "errors", label: "No upcoming events", help: "Shown on the events page under the Upcoming tab when nothing is planned." },
+  { key: "empty.events.past", value: "No past events yet.", group: "errors", label: "No past events", help: "Shown on the events page under the Past tab." },
+  { key: "empty.batches", value: "No batches are open for booking yet. Ask us about the next one.", group: "errors", label: "No test preparation batches", help: "Shown where the IELTS and PTE batch table would be when none are open." },
 ];

@@ -4,6 +4,7 @@ import { listInstitutions } from "@/server/queries/catalogue";
 import { InnerHero } from "@/components/inner";
 import { InstitutionList } from "@/components/catalogue/institution-list";
 import { Empty } from "@/components/catalogue/empty";
+import { loadText } from "@/server/queries/text";
 
 export async function generateMetadata(): Promise<Metadata> {
   const institutions = await listInstitutions();
@@ -15,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function InstitutionsPage() {
-  const institutions = await listInstitutions();
+  const [institutions, t] = await Promise.all([listInstitutions(), loadText()]);
 
   return (
     <>
@@ -31,7 +32,10 @@ export default async function InstitutionsPage() {
           {institutions.length > 0 ? (
             <InstitutionList institutions={institutions} />
           ) : (
-            <Empty title="No institutions listed yet" lead="Tell us where you want to study and a counsellor will send you the options." />
+            <Empty
+              title={t("empty.institutions.title", "No institutions listed yet")}
+              lead={t("empty.institutions.lead", "Tell us where you want to study and a counsellor will send you the options.")}
+            />
           )}
         </div>
       </section>

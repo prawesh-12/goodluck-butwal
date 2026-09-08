@@ -10,6 +10,7 @@ import { PillButton } from "@/components/ui/button";
 import { CheckRow } from "@/components/ui/bits";
 import { InnerHero, SectionHead } from "@/components/inner";
 import { BatchTable } from "@/components/test-prep/batch-table";
+import { loadText } from "@/server/queries/text";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -31,7 +32,7 @@ export default async function TestPrepCoursePage({ params }: Props) {
   const course = await getTestPrepCourse((await params).slug);
   if (!course) notFound();
 
-  const batches = await upcomingBatchesForCourse(course.id);
+  const [batches, t] = await Promise.all([upcomingBatchesForCourse(course.id), loadText()]);
 
   return (
     <>
@@ -80,7 +81,7 @@ export default async function TestPrepCoursePage({ params }: Props) {
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
             <SectionHead badge="Batches" title="Upcoming batches" />
-            <BatchTable batches={batches} />
+            <BatchTable batches={batches} empty={t("empty.batches", "No batches are open for booking yet. Ask us about the next one.")} />
           </div>
         </div>
       </section>

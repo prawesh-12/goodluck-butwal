@@ -8,7 +8,7 @@ import type { EventCard } from "@/server/queries/events";
 
 const TABS = ["Upcoming", "Past"] as const;
 
-export function EventTabs({ events }: { events: EventCard[] }) {
+export function EventTabs({ events, empty }: { events: EventCard[]; empty: { upcoming: string; past: string } }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>("Upcoming");
   // Upcoming reads soonest first, past reads most recent first.
   const shown = tab === "Past" ? events.filter((e) => e.past).reverse() : events.filter((e) => !e.past);
@@ -26,7 +26,7 @@ export function EventTabs({ events }: { events: EventCard[] }) {
 
       {shown.length === 0 ? (
         <p className="t-body text-muted">
-          {tab === "Upcoming" ? "Nothing is coming up just now. Check back soon." : "No past events yet."}
+          {tab === "Upcoming" ? empty.upcoming : empty.past}
         </p>
       ) : (
         <motion.div layout className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">

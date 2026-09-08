@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { search } from "@/server/queries/search";
+import { loadText } from "@/server/queries/text";
 import { searchTerm } from "@/components/search/query";
 import { Chip } from "@/components/ui/bits";
 import { Field, InnerHero, NewsCard } from "@/components/inner";
@@ -19,7 +20,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function SearchPage({ searchParams }: Props) {
   const raw = (await searchParams).q;
   const term = searchTerm(raw);
-  const groups = await search(raw);
+  const [groups, t] = await Promise.all([search(raw), loadText()]);
   const total = groups.reduce((sum, group) => sum + group.count, 0);
 
   return (
@@ -47,15 +48,15 @@ export default async function SearchPage({ searchParams }: Props) {
         <div className="container-x">
           {!term ? (
             <Empty
-              title="Type something to search"
-              lead="Try a course name, an institution, a country, or a keyword such as scholarship."
+              title={t("empty.search.prompt.title", "Type something to search")}
+              lead={t("empty.search.prompt.lead", "Try a course name, an institution, a country, or a keyword such as scholarship.")}
               href="/courses"
-              action="Browse courses"
+              action={t("empty.search.prompt.cta", "Browse courses")}
             />
           ) : groups.length === 0 ? (
             <Empty
-              title={`Nothing matches “${term.q}”`}
-              lead="Try a shorter word, a country name, or the name of a course or institution. A counsellor can also look for you."
+              title={t("empty.search.title", "Nothing matches “{q}”").replace("{q}", term.q)}
+              lead={t("empty.search.lead", "Try a shorter word, a country name, or the name of a course or institution. A counsellor can also look for you.")}
             />
           ) : (
             <div className="flex w-full flex-col gap-[30px] md:gap-10 lg:gap-[50px]">

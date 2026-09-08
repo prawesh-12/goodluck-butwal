@@ -12,6 +12,7 @@ import { InnerHero, SectionHead } from "@/components/inner";
 import { CourseRow } from "@/components/catalogue/course-row";
 import { Pager } from "@/components/catalogue/pager";
 import { Empty } from "@/components/catalogue/empty";
+import { loadText } from "@/server/queries/text";
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<SearchParams> };
 
@@ -35,9 +36,10 @@ export default async function InstitutionPage({ params, searchParams }: Props) {
   const parsed = Number.parseInt((Array.isArray(raw) ? raw[0] : raw) ?? "", 10);
   const page = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 
-  const [gallery, courses] = await Promise.all([
+  const [gallery, courses, t] = await Promise.all([
     listInstitutionImages(slug),
     listCourses({ institution: slug, page }),
+    loadText(),
   ]);
   const pages = pageCount(courses.total);
   const place = [institution.city, institution.country].filter(Boolean).join(", ");
@@ -101,7 +103,10 @@ export default async function InstitutionPage({ params, searchParams }: Props) {
                 <Pager page={page} pages={pages} hrefFor={hrefFor} />
               </>
             ) : (
-              <Empty title="No courses listed yet" lead="Ask a counsellor which programmes this institution is taking applications for." />
+              <Empty
+                title={t("empty.institution_courses.title", "No courses listed yet")}
+                lead={t("empty.institution_courses.lead", "Ask a counsellor which programmes this institution is taking applications for.")}
+              />
             )}
           </div>
         </div>
