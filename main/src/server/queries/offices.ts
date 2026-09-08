@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { offices } from "@db/schema";
@@ -18,7 +19,7 @@ export type PublicOffice = {
   hours?: string;
 };
 
-export async function listOffices(): Promise<PublicOffice[]> {
+export const listOffices = cache(async (): Promise<PublicOffice[]> => {
   const rows = await db
     .select({
       code: offices.code,
@@ -47,4 +48,4 @@ export async function listOffices(): Promise<PublicOffice[]> {
     flag: `/images/flags/${row.country.toLowerCase().replace(/\s+/g, "-")}.svg`,
     hours: formatOpeningHours(row.openingHours) ?? undefined,
   }));
-}
+});

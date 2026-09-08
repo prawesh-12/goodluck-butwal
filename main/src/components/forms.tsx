@@ -3,8 +3,9 @@
 import { useState, type FormEvent } from "react";
 import { Field } from "@/components/inner";
 import { useOffice } from "@/components/office";
-import { enquirySubjects, offices } from "@/lib/site";
-import { services } from "@/content/services";
+import { enquirySubjects } from "@/lib/site";
+import type { PublicOffice } from "@/server/queries/offices";
+import type { PublicService } from "@/server/queries/services";
 import { destinations } from "@/content/destinations";
 
 // UI only: nothing is sent anywhere yet. The button stays translucent until the required fields are filled.
@@ -63,7 +64,7 @@ export function EnquiryForm() {
   );
 }
 
-export function BookingForm() {
+export function BookingForm({ offices, services }: { offices: PublicOffice[]; services: PublicService[] }) {
   const { office } = useOffice();
   const { ready, check } = useReady(["Name", "Email", "Phone", "Date", "Time", "Service"]);
   const [sent, setSent] = useState(false);

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { eq, like } from "drizzle-orm";
 import { db } from "@db/client";
 import { settings, uiStrings } from "@db/schema";
@@ -5,7 +6,7 @@ import { settings, uiStrings } from "@db/schema";
 export type FooterColumn = { title: string; links: { label: string; href: string }[] };
 export type SocialLink = { label: string; href: string; icon: string };
 
-export async function getFooterColumns(): Promise<FooterColumn[]> {
+export const getFooterColumns = cache(async (): Promise<FooterColumn[]> => {
   const rows = await db
     .select({ key: uiStrings.key, value: uiStrings.value })
     .from(uiStrings)
@@ -30,10 +31,10 @@ export async function getFooterColumns(): Promise<FooterColumn[]> {
     }
   }
   return [...columns.values()];
-}
+});
 
 // The footer hides a social link that has no real URL yet.
-export async function getSocialLinks(): Promise<SocialLink[]> {
+export const getSocialLinks = cache(async (): Promise<SocialLink[]> => {
   const [row] = await db
     .select({ value: settings.value })
     .from(settings)
@@ -41,4 +42,4 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
 
   const links = (row?.value as SocialLink[] | undefined) ?? [];
   return links.filter((link) => link.href && link.href !== "#");
-}
+});

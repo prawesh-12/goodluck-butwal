@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, offices, partners, teamMembers } from "@db/schema";
@@ -11,7 +12,7 @@ export type PublicMember = {
   photo: string;
 };
 
-export async function listTeam(): Promise<PublicMember[]> {
+export const listTeam = cache(async (): Promise<PublicMember[]> => {
   const rows = await db
     .select({
       slug: teamMembers.slug,
@@ -33,9 +34,9 @@ export async function listTeam(): Promise<PublicMember[]> {
     office: (row.office as OfficeId | null) ?? null,
     photo: row.photo ?? "",
   }));
-}
+});
 
-export async function listPartnerLogos(): Promise<string[]> {
+export const listPartnerLogos = cache(async (): Promise<string[]> => {
   const rows = await db
     .select({ path: mediaAssets.staticPath })
     .from(partners)
@@ -44,4 +45,4 @@ export async function listPartnerLogos(): Promise<string[]> {
     .orderBy(asc(partners.sortOrder));
 
   return rows.map((row) => row.path).filter((path): path is string => Boolean(path));
-}
+});

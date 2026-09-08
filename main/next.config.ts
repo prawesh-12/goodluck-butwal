@@ -6,8 +6,13 @@ const immutableCache = [
 
 const nextConfig: NextConfig = {
   images: { unoptimized: true },
-  // Turns on forbidden(), the only way a page can answer with a real 403 status.
-  experimental: { authInterrupts: true },
+  experimental: {
+    // Turns on forbidden(), the only way a page can answer with a real 403 status.
+    authInterrupts: true,
+    // The local Neon proxy takes far fewer connections than Neon itself, so a local build sets
+    // BUILD_CPUS=1 to prerender one page at a time. Unset everywhere else, including CI.
+    ...(process.env.BUILD_CPUS ? { cpus: Number(process.env.BUILD_CPUS) } : {}),
+  },
   async headers() {
     return [
       { source: "/images/:path*", headers: immutableCache },

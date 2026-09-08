@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { services } from "@/content/services";
+import { listServices } from "@/server/queries/services";
 import { faqs } from "@/content/faqs";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
@@ -10,7 +10,10 @@ import { listTeam } from "@/server/queries/people";
 export const metadata: Metadata = { title: "Our services", description: "Education counselling, visa guidance, scholarship guidance and IELTS coaching." };
 
 export default async function ServicesPage() {
-  const faces = (await listTeam()).slice(0, 3);
+  const [faces, services] = await Promise.all([
+    listTeam().then((t) => t.slice(0, 3)),
+    listServices(),
+  ]);
 
   return (
     <>
@@ -18,7 +21,7 @@ export default async function ServicesPage() {
         <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">
           {services.map((s, i) => (
             <Appear key={s.slug} delay={0.1 * i} className="min-w-0">
-              <ServiceCard slug={s.slug} label={s.label} title={s.title} line={s.line} image={s.image} imageAlt={s.imageAlt} />
+              <ServiceCard service={s} slug={s.slug} label={s.label} title={s.title} line={s.line} image={s.image} imageAlt={s.imageAlt} />
             </Appear>
           ))}
         </div>

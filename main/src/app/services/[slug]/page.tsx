@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { serviceBySlug, services } from "@/content/services";
+import { getService, listServices } from "@/server/queries/services";
 import { faqs } from "@/content/faqs";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
@@ -11,9 +11,9 @@ import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
 type Props = { params: Promise<{ slug: string }> };
-export const generateStaticParams = () => services.map((s) => ({ slug: s.slug }));
+export const generateStaticParams = async () => (await listServices()).map((s) => ({ slug: s.slug }));
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const s = serviceBySlug((await params).slug);
+  const s = await getService((await params).slug);
   return s ? { title: s.title, description: s.intro } : { title: "Service" };
 }
 
@@ -21,10 +21,10 @@ export default async function ServicePage({ params }: Props) {
   const faces = (await listTeam()).slice(0, 3);
 
   const { slug } = await params;
-  const s = serviceBySlug(slug);
+  const s = await getService(slug);
   if (!s) notFound();
   const related = s.slug === "visa-guidance" ? faqs.migration : faqs.education;
-  const others = services.filter((o) => o.slug !== s.slug);
+  const others = (await listServices()).filter((o) => o.slug !== s.slug);
 
   return (
     <>
@@ -103,7 +103,7 @@ export default async function ServicePage({ params }: Props) {
             <div className="grid w-full gap-5 md:grid-cols-3 md:gap-[30px]">
               {others.map((o, i) => (
                 <Appear key={o.slug} delay={0.1 * i} className="h-[300px]">
-                  <ServiceCard slug={o.slug} label={o.label} title={o.title} line={o.line} image={o.image} imageAlt={o.imageAlt} />
+                  <ServiceCard service={o} slug={o.slug} label={o.label} title={o.title} line={o.line} image={o.image} imageAlt={o.imageAlt} />
                 </Appear>
               ))}
             </div>

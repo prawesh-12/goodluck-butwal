@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { img } from "@/lib/assets";
-import { serviceBySlug, services } from "@/content/services";
+import type { PublicService } from "@/server/queries/services";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, Chip } from "@/components/ui/bits";
@@ -17,11 +17,11 @@ export function Artwork({ s, className, pad }: { s: Service; className: string; 
   );
 }
 
-type Service = (typeof services)[number];
+type Service = PublicService;
 
 // Surface tile: artwork on white, then label, title, one line and an arrow. Same family as the office and info cards.
-export function ServiceCard({ slug, label, title, line, className = "" }: { slug: string; label: string; title: string; line?: string; image: string; imageAlt: string; className?: string }) {
-  const s = serviceBySlug(slug)!;
+export function ServiceCard({ service, slug, label, title, line, className = "" }: { service: Service; slug: string; label: string; title: string; line?: string; image: string; imageAlt: string; className?: string }) {
+  const s = service;
   return (
     <Link href={`/services/${slug}`} className={`group flex h-full flex-col gap-[6px] rounded-[10px] bg-surface p-[6px] md:rounded-[20px] ${className}`}>
       <Artwork s={s} pad="p-4" className="aspect-[4/3] w-full overflow-clip rounded-[6px] bg-white md:rounded-[14px]" />
@@ -74,7 +74,7 @@ function Tile({ s, icon, t, className = "" }: { s: Service; icon: string; t: Ton
   );
 }
 
-export function Services() {
+export function Services({ services }: { services: Service[] }) {
   const [counselling, visa, scholarship, ielts] = services;
   return (
     <section id="services" className="py-section flex w-full flex-col items-center">
