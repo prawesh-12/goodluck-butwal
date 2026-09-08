@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { cache } from "react";
@@ -34,11 +36,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 export default async function LegalPage({ params }: { params: Promise<{ slug: string }> }) {
-  const page = await getLegalPage((await params).slug);
+  const { slug } = await params;
+  const page = await getLegalPage(slug);
   if (!page) notFound();
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: page.title, path: `/legal/${slug}` }])} />
       <InnerHero title={page.title} lead={page.intro ?? undefined} />
       <section className="pb-section flex w-full flex-col items-center">
         <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">

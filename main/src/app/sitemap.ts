@@ -6,11 +6,13 @@ import {
   destinations,
   events,
   institutions,
+  offices,
   pages,
   postCategories,
   posts,
   services,
   tags,
+  teamMembers,
   testPrepCourses,
 } from "@db/schema";
 import { company } from "@/lib/site";
@@ -23,6 +25,7 @@ const fixed = [
   "",
   "/about",
   "/about/team",
+  "/about/offices",
   "/about/message-from-co-founders",
   "/about/corporate-social-responsibility",
   "/about/careers",
@@ -49,6 +52,8 @@ const sources = [
   { table: testPrepCourses, prefix: "/test-preparation", frequency: "monthly" as Frequency, extra: undefined },
   { table: events, prefix: "/events", frequency: "weekly" as Frequency, extra: undefined },
   { table: pages, prefix: "/legal", frequency: "yearly" as Frequency, extra: eq(pages.parent, "legal") },
+  { table: offices, prefix: "/offices", frequency: "monthly" as Frequency, extra: undefined },
+  { table: teamMembers, prefix: "/team", frequency: "monthly" as Frequency, extra: undefined },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

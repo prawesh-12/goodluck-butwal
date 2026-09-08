@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { getInstitution, listCourses, listInstitutionImages } from "@/server/queries/catalogue";
 import { pageCount, type SearchParams } from "@/components/catalogue/filters";
@@ -43,6 +45,7 @@ export default async function InstitutionPage({ params, searchParams }: Props) {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "Institutions", path: "/institutions" }, { name: institution.name, path: `/institutions/${institution.slug}` }])} />
       <InnerHero
         bg="field"
         title={institution.name}

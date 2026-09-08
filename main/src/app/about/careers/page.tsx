@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { img } from "@/lib/assets";
 import { company } from "@/lib/site";
 import { getAboutContent } from "@/server/queries/pages";
@@ -18,6 +20,7 @@ export default async function CareersPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "About us", path: "/about" }, { name: "Careers", path: "/about/careers" }])} />
       <InnerHero badge="Careers" title="Climb your career ladder with Goodluck" lead="We hold your efforts in high regard." after={<Appear delay={0.1}><PillButton href={`mailto:${company.email}`}>Email {company.email}</PillButton></Appear>} />
       <section className="flex w-full flex-col items-center pb-[100px] md:pb-[160px] lg:pb-[200px]">
         <div className="container-x">

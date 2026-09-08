@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs, course as courseSchema } from "@/components/seo/schema";
+import { company } from "@/lib/site";
 import { notFound } from "next/navigation";
 import { getTestPrepCourse, listTestPrepCourses, upcomingBatchesForCourse } from "@/server/queries/test-prep";
 import { Appear } from "@/components/ui/appear";
@@ -32,6 +35,12 @@ export default async function TestPrepCoursePage({ params }: Props) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          courseSchema({ path: `/test-preparation/${course.slug}`, name: course.name, description: course.summary, provider: company.name }),
+          breadcrumbs([{ name: "Home", path: "/" }, { name: "Test preparation", path: "/test-preparation" }, { name: course.name, path: `/test-preparation/${course.slug}` }]),
+        ]}
+      />
       <InnerHero
         badge={course.testType.toUpperCase()}
         badgeTone="chip-white"

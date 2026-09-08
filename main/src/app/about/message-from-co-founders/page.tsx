@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { gl } from "@/lib/assets";
 import { getAboutContent } from "@/server/queries/pages";
 import { Appear } from "@/components/ui/appear";
@@ -18,6 +20,7 @@ export default async function CoFoundersPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "About us", path: "/about" }, { name: "Message from co-founders", path: "/about/message-from-co-founders" }])} />
       <InnerHero badge="Co-founders" title="Message from co-founders" lead={about.founders} />
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="container-x">

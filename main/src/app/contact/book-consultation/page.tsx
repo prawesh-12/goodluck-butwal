@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { img } from "@/lib/assets";
 import { officeById } from "@/lib/site";
 import { Appear } from "@/components/ui/appear";
@@ -28,6 +30,7 @@ export default async function BookConsultationPage() {
   const au = officeById("au");
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "Contact", path: "/contact" }, { name: "Book an appointment", path: "/contact/book-consultation" }])} />
       <InnerHero bg="field" pb="pb-0" gap="gap-[30px] md:gap-10 lg:gap-[70px]" badge="Book a consultation" title="Book an appointment" lead="Choose an office, a service and a time that suits you." after={
         <Appear y={10} delay={0.1} duration={0.6} className="relative flex w-full flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 pb-[120px] md:rounded-[30px] md:p-[30px] md:pb-20 lg:p-10 lg:pb-[120px]">
           <div className="relative z-[2] w-full"><BookingForm offices={offices} services={services} /></div>

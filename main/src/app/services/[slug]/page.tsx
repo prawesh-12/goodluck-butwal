@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { getService, listServices } from "@/server/queries/services";
 import { listServiceFaqs } from "@/server/queries/destinations";
@@ -35,6 +37,7 @@ export default async function ServicePage({ params }: Props) {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "Our services", path: "/services" }, { name: s.title, path: `/services/${s.slug}` }])} />
       <InnerHero badge={s.label} badgeTone="chip-white" title={s.title} lead={s.intro} bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" after={
         <Appear delay={0.1} className="group w-full">
           <Artwork s={s} pad="p-6 md:p-10" className="mx-auto aspect-video w-full max-w-[760px] overflow-clip rounded-[10px] bg-white ring-1 ring-hairline md:rounded-[24px]" />

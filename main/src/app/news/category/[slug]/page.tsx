@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { listArticlesByCategory, listCategories } from "@/server/queries/editorial";
 import { InnerHero } from "@/components/inner";
@@ -28,6 +30,7 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "News", path: "/news" }, { name: category.name, path: `/news/category/${category.slug}` }])} />
       <InnerHero badge="News and updates" badgeTone="chip" title={category.name} lead={`${articles.length} ${articles.length === 1 ? "article" : "articles"} in this category.`} clouds={false} />
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="container-x">

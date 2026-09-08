@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs, event as eventSchema } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { getEvent, listEvents, seatsTaken } from "@/server/queries/events";
 import { eventTypeLabels } from "@/lib/content-meta";
@@ -49,6 +51,12 @@ export default async function EventPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          eventSchema(event),
+          breadcrumbs([{ name: "Home", path: "/" }, { name: "Events", path: "/events" }, { name: event.title, path: `/events/${event.slug}` }]),
+        ]}
+      />
       <InnerHero
         bg="field"
         clouds={false}

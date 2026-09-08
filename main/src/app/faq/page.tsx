@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { faqPage } from "@/components/seo/schema";
 import { listServiceFaqs } from "@/server/queries/destinations";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
@@ -7,7 +9,7 @@ import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildMetadata({ path: "/faq", title: "Frequently asked questions" });
+  return buildMetadata({ path: "/faq", title: "FAQ" });
 }
 
 export default async function FaqPage() {
@@ -23,6 +25,7 @@ export default async function FaqPage() {
 
   return (
     <>
+      <JsonLd data={faqPage([...education, ...migration])} />
       <InnerHero title="Frequently asked questions" lead="Any questions? Book an appointment and our team can assess your case." />
       <section className="flex w-full flex-col items-center pb-[50px] md:pb-20 lg:pb-[100px]">
         <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">

@@ -1,3 +1,8 @@
+import type { Metadata } from "next";
+import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { organization, webSite } from "@/components/seo/schema";
+import { getSocialLinks } from "@/server/queries/site";
 import { Hero } from "@/components/home/hero";
 import { Partners } from "@/components/home/partners";
 import { Services } from "@/components/home/services";
@@ -16,6 +21,10 @@ import { Faqs } from "@/components/home/faqs";
 import { Events } from "@/components/home/events";
 import { listUpcomingEvents } from "@/server/queries/events";
 
+export async function generateMetadata(): Promise<Metadata> {
+  return buildMetadata({ path: "/" });
+}
+
 export default async function Home() {
   const [logos, faces, services, allFaqs, cards, articles, reviews, successStories, googleRating, about] =
     await Promise.all([
@@ -32,9 +41,11 @@ export default async function Home() {
   ]);
 
   const upcomingEvents = await listUpcomingEvents();
+  const socials = await getSocialLinks();
 
   return (
     <>
+      <JsonLd data={[organization(socials.map((s) => s.href)), webSite()]} />
       <Hero googleRating={googleRating} />
       <Partners logos={logos} />
       <Destinations cards={cards} />

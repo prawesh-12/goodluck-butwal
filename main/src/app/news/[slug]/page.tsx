@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { article, breadcrumbs } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { getArticle, listArticles } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
@@ -34,6 +36,12 @@ export default async function ArticlePage({ params }: Props) {
   const more = articles.filter((x) => x.slug !== slug && x.category === a.category).concat(articles.filter((x) => x.slug !== slug && x.category !== a.category)).slice(0, 3);
   return (
     <>
+      <JsonLd
+        data={[
+          article(a),
+          breadcrumbs([{ name: "Home", path: "/" }, { name: "News", path: "/news" }, { name: a.title, path: `/news/${a.slug}` }]),
+        ]}
+      />
       <InnerHero bg="field" clouds={false} pb="pb-[50px]" size="md" title={a.title} lead={a.excerpt} className="[&_h1]:order-2 [&_p]:order-3">
         <div className="order-1 flex items-center gap-[10px]">
           <Chip>{a.category}</Chip>

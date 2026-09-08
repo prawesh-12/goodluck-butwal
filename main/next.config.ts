@@ -4,6 +4,33 @@ const immutableCache = [
   { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
 ];
 
+// React refresh compiles with eval in development. Production never needs it.
+const scriptSrc = [
+  "'self'",
+  "'unsafe-inline'",
+  ...(process.env.NODE_ENV === "production" ? [] : ["'unsafe-eval'"]),
+  "https://www.googletagmanager.com",
+  "https://www.google-analytics.com",
+  "https://challenges.cloudflare.com",
+];
+
+const csp = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'self'",
+  "form-action 'self'",
+  `script-src ${scriptSrc.join(" ")}`,
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: blob: https://res.cloudinary.com https://www.googletagmanager.com https://www.google-analytics.com",
+  "media-src 'self' https://res.cloudinary.com",
+  "font-src 'self' data:",
+  "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://*.analytics.google.com https://*.sentry.io",
+  "frame-src 'self' https://challenges.cloudflare.com https://www.google.com https://maps.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+  "worker-src 'self' blob:",
+  "upgrade-insecure-requests",
+].join("; ");
+
 const nextConfig: NextConfig = {
   images: { unoptimized: true },
   // These run only on the server and are imported from many routes. Left to Next, each route
@@ -26,6 +53,9 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Content-Security-Policy", value: csp },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
       },
     ];

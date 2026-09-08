@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { getDestination, listDestinations, listAllFaqs } from "@/server/queries/destinations";
 import { listArticles } from "@/server/queries/editorial";
@@ -43,6 +45,7 @@ export default async function DestinationPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "Study abroad", path: "/study-abroad" }, { name: d.name, path: `/study-abroad/${d.slug}` }])} />
       <InnerHero bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" title={`Study in ${d.name}`} lead={d.overview} badge={undefined} className="[&_h1]:order-2 [&_p]:order-3" after={
         <Appear delay={0.1} className="w-full">
           <div className="aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]">

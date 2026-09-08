@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { getTag, listArticlesByTag } from "@/server/queries/editorial";
 import { InnerHero } from "@/components/inner";
@@ -22,6 +24,7 @@ export default async function TagPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "News", path: "/news" }, { name: tag.name, path: `/news/tag/${slug}` }])} />
       <InnerHero badge="News and updates" badgeTone="chip" title={tag.name} lead={`${articles.length} ${articles.length === 1 ? "article" : "articles"} tagged ${tag.name}.`} clouds={false} />
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-20 lg:pb-[100px]">
         <div className="container-x">

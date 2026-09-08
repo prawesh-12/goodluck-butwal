@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs, course as courseSchema } from "@/components/seo/schema";
 import { notFound } from "next/navigation";
 import { getCourse, getInstitution } from "@/server/queries/catalogue";
 import { Appear } from "@/components/ui/appear";
@@ -40,6 +42,12 @@ export default async function CoursePage({ params }: Props) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          courseSchema({ path: `/courses/${course.slug}`, name: course.name, description: `${course.name} at ${course.institution}.`, provider: course.institution }),
+          breadcrumbs([{ name: "Home", path: "/" }, { name: "Courses", path: "/courses" }, { name: course.name, path: `/courses/${course.slug}` }]),
+        ]}
+      />
       <InnerHero
         bg="field"
         size="md"

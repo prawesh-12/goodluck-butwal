@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { localBusiness } from "@/components/seo/schema";
 import { gl, img } from "@/lib/assets";
 import { company } from "@/lib/site";
 import { Appear } from "@/components/ui/appear";
@@ -32,6 +34,7 @@ export default async function ContactPage() {
 
   return (
     <>
+      <JsonLd data={offices.map((o) => localBusiness({ name: o.label, address: o.address, city: o.city, country: o.country, phone: o.phone, hours: o.hours }))} />
       <section className="relative flex w-full flex-col items-center overflow-clip pb-[100px] pt-32 md:pb-[160px] md:pt-[158px] lg:pb-[200px] lg:pt-[194px]">
         <div aria-hidden className="absolute inset-0 z-0 overflow-clip">
           <div className="absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgba(255,255,255,0.5)_0%,#fff_50%)]" />

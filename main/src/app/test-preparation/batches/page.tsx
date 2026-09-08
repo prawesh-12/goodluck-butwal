@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/seo/json-ld";
+import { breadcrumbs } from "@/components/seo/schema";
 import { listUpcomingBatches } from "@/server/queries/test-prep";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
@@ -16,6 +18,7 @@ export default async function BatchesPage() {
 
   return (
     <>
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "Test preparation", path: "/test-preparation" }, { name: "Upcoming batches", path: "/test-preparation/batches" }])} />
       <InnerHero badge="Test preparation" title="Upcoming batches" width={1260} after={<BatchTable batches={batches} filters />} />
 
       <section className="flex w-full flex-col items-center pb-[30px] md:pb-[60px] lg:pb-[100px]">
