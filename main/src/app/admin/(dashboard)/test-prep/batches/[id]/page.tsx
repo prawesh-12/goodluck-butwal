@@ -23,10 +23,10 @@ export default async function EditBatchPage({ params }: { params: Promise<{ id: 
     <>
       <div className="admin-actions">
         <h1 className="t-h4">{row.batchName}</h1>
-        <Link className="btn-black-sm" href={`/admin/test-prep/registrations?batch=${row.id}`}>
+        <Link className="admin-btn" href={`/admin/test-prep/registrations?batch=${row.id}`}>
           Registrations
         </Link>
-        <a className="btn-black-sm" href="/test-preparation/batches" target="_blank" rel="noreferrer">
+        <a className="admin-btn" href="/test-preparation/batches" target="_blank" rel="noreferrer">
           View on site
         </a>
       </div>

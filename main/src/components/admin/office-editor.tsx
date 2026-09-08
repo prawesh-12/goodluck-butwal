@@ -284,7 +284,7 @@ export function OfficeEditor({
       />
 
       <div className="admin-actions">
-        <button type="submit" className="btn-black-sm" disabled={busy}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
           {busy ? "Saving" : "Save"}
         </button>
         {message ? <span className="t-small">{message}</span> : null}

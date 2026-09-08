@@ -79,7 +79,7 @@ export function TeamList({ rows, canReorder }: { rows: TeamRow[]; canReorder: bo
           {moved ? (
             <button
               type="button"
-              className="btn-black-sm"
+              className="admin-btn"
               disabled={busy}
               onClick={async () => {
                 setBusy(true);

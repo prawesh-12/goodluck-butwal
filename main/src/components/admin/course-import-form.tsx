@@ -63,11 +63,11 @@ export function CourseImportForm({ columns, separator }: { columns: string; sepa
       </label>
 
       <div className="admin-actions">
-        <button type="button" className="btn-black-sm" disabled={busy || !csv.trim()} onClick={check}>
+        <button type="button" className="admin-btn" disabled={busy || !csv.trim()} onClick={check}>
           {busy ? "Reading" : "Check the file"}
         </button>
         {rows && rows.length > 0 ? (
-          <button type="button" className="btn-black-sm" disabled={busy} onClick={commit}>
+          <button type="button" className="admin-btn" disabled={busy} onClick={commit}>
             Import {rows.length} {rows.length === 1 ? "course" : "courses"}
           </button>
         ) : null}

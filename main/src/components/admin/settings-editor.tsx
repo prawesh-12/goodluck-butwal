@@ -171,7 +171,7 @@ export function SettingsEditor({ values, readOnly }: { values: SettingsValues; r
         {readOnly ? (
           <span className="t-small">Only a super admin can change these.</span>
         ) : (
-          <button type="submit" className="btn-black-sm" disabled={busy}>
+          <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
             {busy ? "Saving" : "Save"}
           </button>
         )}

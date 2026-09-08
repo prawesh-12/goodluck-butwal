@@ -59,7 +59,7 @@ export default async function EventsPage({
       <div className="admin-actions">
         <p className="t-small admin-count">{total} matching</p>
         {can(actor, "events", "create") ? (
-          <Link className="btn-black-sm" href="/admin/events/new">
+          <Link className="admin-btn" href="/admin/events/new">
             Add an event
           </Link>
         ) : null}

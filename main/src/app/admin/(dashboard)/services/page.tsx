@@ -38,7 +38,7 @@ export default async function ServicesListPage({
       <div className="admin-actions">
         <h1 className="t-h4">Services</h1>
         {can(actor, "services", "create") ? (
-          <Link className="btn-black-sm" href="/admin/services/new">
+          <Link className="admin-btn" href="/admin/services/new">
             New service
           </Link>
         ) : null}

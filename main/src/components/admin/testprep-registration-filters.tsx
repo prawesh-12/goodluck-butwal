@@ -83,7 +83,7 @@ export function RegistrationFilters({
         <input type="date" defaultValue={params.get("to") ?? ""} onChange={(e) => set("to", e.target.value)} />
       </label>
 
-      <a className="btn-black-sm" href={`${exportPath}?${params}`}>
+      <a className="admin-btn" href={`${exportPath}?${params}`}>
         Export CSV
       </a>
     </form>

@@ -51,7 +51,7 @@ export default async function AuditLogPage({
           <span className="t-small">To</span>
           <input type="date" name="to" defaultValue={to} />
         </label>
-        <button type="submit" className="btn-black-sm">
+        <button type="submit" className="admin-btn admin-btn-primary">
           Filter
         </button>
       </form>

@@ -22,7 +22,7 @@ export default async function ServiceFaqsPage({ params }: { params: Promise<{ id
     <>
       <div className="admin-actions">
         <h1 className="t-h4">{row.name} questions</h1>
-        <Link className="btn-black-sm" href={`/admin/services/${row.id}`}>
+        <Link className="admin-btn" href={`/admin/services/${row.id}`}>
           Back to the service
         </Link>
       </div>

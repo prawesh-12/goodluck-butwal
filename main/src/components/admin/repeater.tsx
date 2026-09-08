@@ -148,12 +148,12 @@ export function Repeater<T>({
         <div key={index} className="admin-tile">
           {children(item, update(index), index)}
           <div className="admin-actions">
-            <button type="button" className="btn-black-sm" onClick={() => move(index, index - 1)} disabled={index === 0}>
+            <button type="button" className="admin-btn" onClick={() => move(index, index - 1)} disabled={index === 0}>
               Up
             </button>
             <button
               type="button"
-              className="btn-black-sm"
+              className="admin-btn"
               onClick={() => move(index, index + 1)}
               disabled={index === items.length - 1}
             >
@@ -161,7 +161,7 @@ export function Repeater<T>({
             </button>
             <button
               type="button"
-              className="btn-black-sm"
+              className="admin-btn admin-btn-danger"
               onClick={() => onChange(items.filter((_, i) => i !== index))}
             >
               Remove
@@ -171,7 +171,7 @@ export function Repeater<T>({
       ))}
 
       <div className="admin-actions">
-        <button type="button" className="btn-black-sm" onClick={() => onChange([...items, blank()])}>
+        <button type="button" className="admin-btn" onClick={() => onChange([...items, blank()])}>
           {addLabel}
         </button>
       </div>
@@ -205,16 +205,16 @@ export function SaveBar({
       ) : null}
 
       <div className="admin-actions">
-        <button type="submit" className="btn-black-sm" disabled={busy}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
           {busy ? "Saving" : "Save"}
         </button>
         {viewHref ? (
-          <a className="btn-black-sm" href={viewHref} target="_blank" rel="noreferrer">
+          <a className="admin-btn" href={viewHref} target="_blank" rel="noreferrer">
             View on site
           </a>
         ) : null}
         {onDelete ? (
-          <button type="button" className="btn-black-sm" onClick={onDelete} disabled={busy}>
+          <button type="button" className="admin-btn admin-btn-danger" onClick={onDelete} disabled={busy}>
             Delete
           </button>
         ) : null}

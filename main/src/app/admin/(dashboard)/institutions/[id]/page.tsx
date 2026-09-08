@@ -34,7 +34,7 @@ export default async function EditInstitutionPage({ params }: { params: Promise<
     <>
       <div className="admin-actions">
         <h1 className="t-h4">{row.name}</h1>
-        <a className="btn-black-sm" href={path} target="_blank" rel="noreferrer">
+        <a className="admin-btn" href={path} target="_blank" rel="noreferrer">
           View on site
         </a>
       </div>

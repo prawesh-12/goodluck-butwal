@@ -55,7 +55,7 @@ export default function LoginPage() {
           </p>
         ) : null}
 
-        <button type="submit" className="btn-blue" disabled={busy}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
           {busy ? "Signing in" : "Sign in"}
         </button>
       </form>

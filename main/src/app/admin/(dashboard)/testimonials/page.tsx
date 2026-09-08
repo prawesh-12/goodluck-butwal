@@ -62,7 +62,7 @@ export default async function TestimonialsPage({
       <div className="admin-actions">
         <p className="t-small admin-count">{total} matching</p>
         {can(actor, "testimonials", "create") ? (
-          <Link className="btn-black-sm" href="/admin/testimonials/new">
+          <Link className="admin-btn" href="/admin/testimonials/new">
             Add a story
           </Link>
         ) : null}

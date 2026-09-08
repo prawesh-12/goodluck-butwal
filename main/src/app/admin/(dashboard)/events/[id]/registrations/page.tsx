@@ -68,7 +68,7 @@ export default async function EventRegistrationsPage({
           {capacity === null ? ", no limit set" : ` of ${capacity}`}
         </p>
         {can(actor, "registrations", "export") ? (
-          <a className="btn-black-sm" href={`/api/admin/export/event-registrations?event=${event.id}`}>
+          <a className="admin-btn" href={`/api/admin/export/event-registrations?event=${event.id}`}>
             Download CSV
           </a>
         ) : null}

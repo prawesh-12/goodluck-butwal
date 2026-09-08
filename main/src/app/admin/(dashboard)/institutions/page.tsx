@@ -42,7 +42,7 @@ export default async function InstitutionsPage({
       <div className="admin-actions">
         <h1 className="t-h4">Institutions</h1>
         {can(actor, "institutions", "create") ? (
-          <Link className="btn-black-sm" href="/admin/institutions/new">
+          <Link className="admin-btn" href="/admin/institutions/new">
             Add an institution
           </Link>
         ) : null}

@@ -176,7 +176,28 @@
 .admin-message { margin-top: 10px; padding: 16px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; white-space: pre-wrap; }
 .admin-editor { display: flex; flex-direction: column; gap: 12px; max-width: 460px; }
 .admin-editor select, .admin-editor textarea { padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; background: #fff; }
-.admin-actions { display: flex; align-items: center; gap: 12px; }
+.admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* The public pill, minus the arrow chip. btn-black-sm carries only a background and a shadow, so
+   admin buttons using it alone had no padding, no radius and black text on a black gradient.
+   Quiet is the default because most of these are toolbar and navigation buttons; the one action
+   that submits a form is the solid one. */
+.admin-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 7px 18px; border: 1px solid var(--color-hairline); border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; line-height: 18.2px; white-space: nowrap; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; background: #fff; color: var(--color-ink); }
+.admin-btn:hover { background: var(--color-surface); }
+.admin-btn:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; }
+.admin-btn:disabled { cursor: not-allowed; opacity: .45; }
+.admin-btn:disabled:hover { background: #fff; }
+
+.admin-btn-primary { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+.admin-btn-primary:hover { background: #000; border-color: #000; }
+.admin-btn-primary:disabled:hover { background: var(--color-ink); }
+
+/* Delete looked exactly like Save. The only thing between an admin and a lost row was the
+   confirm dialog. */
+.admin-btn-danger { color: #b42318; border-color: #f0c2bd; }
+.admin-btn-danger:hover { background: #b42318; color: #fff; border-color: #b42318; }
+.admin-btn-danger:disabled:hover { background: #fff; color: #b42318; }
+
 .admin-pager { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
 .admin-clash { display: block; font-size: 12px; font-weight: 600; color: #b42318; }
 .admin-filters select, .admin-filters input { padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; background: #fff; }

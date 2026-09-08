@@ -17,7 +17,7 @@ export default async function ImportCoursesPage() {
     <>
       <div className="admin-actions">
         <h1 className="t-h4">Import courses</h1>
-        <Link className="btn-black-sm" href="/admin/courses">
+        <Link className="admin-btn" href="/admin/courses">
           Back to courses
         </Link>
       </div>

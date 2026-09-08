@@ -39,7 +39,7 @@ export default async function TeamPage({
       />
 
       <div className="admin-actions">
-        <Link href="/admin/team/new" className="btn-black-sm">
+        <Link href="/admin/team/new" className="admin-btn">
           Add a team member
         </Link>
         <span className="t-small admin-count">{total} matching</span>

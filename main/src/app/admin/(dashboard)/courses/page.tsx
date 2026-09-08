@@ -44,10 +44,10 @@ export default async function CoursesPage({
         <h1 className="t-h4">Courses</h1>
         {can(actor, "courses", "create") ? (
           <>
-            <Link className="btn-black-sm" href="/admin/courses/new">
+            <Link className="admin-btn" href="/admin/courses/new">
               Add a course
             </Link>
-            <Link className="btn-black-sm" href="/admin/courses/import">
+            <Link className="admin-btn" href="/admin/courses/import">
               Import a spreadsheet
             </Link>
           </>

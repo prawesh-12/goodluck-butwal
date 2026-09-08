@@ -98,7 +98,7 @@ export function InstitutionGallery({
             <div className="admin-actions">
               <button
                 type="button"
-                className="btn-black-sm"
+                className="admin-btn admin-btn-danger"
                 onClick={() => setItems((current) => current.filter((_, i) => i !== index))}
               >
                 Remove
@@ -113,7 +113,7 @@ export function InstitutionGallery({
           <div className="admin-actions">
             <button
               type="button"
-              className="btn-black-sm"
+              className="admin-btn"
               onClick={() => setItems((current) => [...current, { mediaId: "", caption: "", media: null }])}
             >
               Add a picture

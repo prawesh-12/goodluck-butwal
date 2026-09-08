@@ -28,7 +28,7 @@ export default async function PartnersPage({
       <ContentFilters placeholder="Partner name" />
 
       <div className="admin-actions">
-        <Link href="/admin/partners/new" className="btn-black-sm">
+        <Link href="/admin/partners/new" className="admin-btn">
           Add a partner
         </Link>
         <span className="t-small admin-count">{total} matching</span>

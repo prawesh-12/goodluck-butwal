@@ -15,7 +15,7 @@ export function InstitutionPartnerLink() {
     <div className="admin-actions">
       <button
         type="button"
-        className="btn-black-sm"
+        className="admin-btn"
         disabled={busy}
         onClick={async () => {
           setBusy(true);

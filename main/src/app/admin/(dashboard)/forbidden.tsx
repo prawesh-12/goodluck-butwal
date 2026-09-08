@@ -8,7 +8,7 @@ export default function Forbidden() {
         Your role does not cover this screen. If you need it, ask a super admin.
       </p>
       <p className="admin-empty">
-        <Link href="/admin" className="btn-black-sm">
+        <Link href="/admin" className="admin-btn">
           Back to the dashboard
         </Link>
       </p>

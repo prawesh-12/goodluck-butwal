@@ -44,11 +44,11 @@ export default async function BatchesListPage({
     <>
       <div className="admin-actions">
         <h1 className="t-h4">Batches</h1>
-        <Link className="btn-black-sm" href="/admin/test-prep">
+        <Link className="admin-btn" href="/admin/test-prep">
           Courses
         </Link>
         {can(actor, "batches", "create") ? (
-          <Link className="btn-black-sm" href="/admin/test-prep/batches/new">
+          <Link className="admin-btn" href="/admin/test-prep/batches/new">
             New batch
           </Link>
         ) : null}

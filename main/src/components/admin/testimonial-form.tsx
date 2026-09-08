@@ -369,18 +369,18 @@ export function TestimonialForm({
       </label>
 
       <div className="admin-actions">
-        <button type="submit" className="btn-black-sm" disabled={busy}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
           {busy ? "Saving" : "Save"}
         </button>
 
-        <Link className="btn-black-sm" href="/success-stories" target="_blank">
+        <Link className="admin-btn" href="/success-stories" target="_blank">
           View on site
         </Link>
 
         {values.id && canDelete ? (
           <button
             type="button"
-            className="btn-black-sm"
+            className="admin-btn"
             disabled={busy}
             onClick={async () => {
               if (!window.confirm("Take this story off the site? It stays here as archived.")) return;

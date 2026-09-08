@@ -57,7 +57,7 @@ function StringRow({ row }: { row: SiteTextRow }) {
       {row.help ? <span className="t-small">{row.help}</span> : null}
 
       <div className="admin-actions">
-        <button type="submit" className="btn-black-sm" disabled={busy || value === row.value}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy || value === row.value}>
           {busy ? "Saving" : "Save"}
         </button>
         <span className="t-small">{value.length} characters</span>

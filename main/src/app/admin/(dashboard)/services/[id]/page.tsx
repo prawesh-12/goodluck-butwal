@@ -27,10 +27,10 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
     <>
       <div className="admin-actions">
         <h1 className="t-h4">{row.name}</h1>
-        <Link className="btn-black-sm" href={`/admin/services/${row.id}/faqs`}>
+        <Link className="admin-btn" href={`/admin/services/${row.id}/faqs`}>
           Questions
         </Link>
-        <a className="btn-black-sm" href={path} target="_blank" rel="noreferrer">
+        <a className="admin-btn" href={path} target="_blank" rel="noreferrer">
           View on site
         </a>
       </div>

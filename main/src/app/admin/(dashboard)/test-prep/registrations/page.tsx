@@ -29,7 +29,7 @@ export default async function RegistrationsPage({
     <>
       <div className="admin-actions">
         <h1 className="t-h4">Test prep registrations</h1>
-        <Link className="btn-black-sm" href="/admin/test-prep/batches">
+        <Link className="admin-btn" href="/admin/test-prep/batches">
           Batches
         </Link>
       </div>

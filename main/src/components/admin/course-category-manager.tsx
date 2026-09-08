@@ -80,7 +80,7 @@ export function CourseCategoryManager({
             </span>
           </label>
           <div className="admin-actions">
-            <button type="submit" className="btn-black-sm" disabled={busy || !name.trim()}>
+            <button type="submit" className="admin-btn admin-btn-primary" disabled={busy || !name.trim()}>
               {busy ? "Adding" : "Add"}
             </button>
           </div>
@@ -141,7 +141,7 @@ export function CourseCategoryManager({
                   {canDelete ? (
                     <button
                       type="button"
-                      className="btn-black-sm"
+                      className="admin-btn admin-btn-danger"
                       disabled={busy}
                       onClick={async () => {
                         if (!window.confirm(`Delete the ${row.name} subject area?`)) return;
@@ -167,7 +167,7 @@ export function CourseCategoryManager({
           {moved ? (
             <button
               type="button"
-              className="btn-black-sm"
+              className="admin-btn"
               disabled={busy}
               onClick={() =>
                 run(() => reorderCourseCategories({ ids: order.map((row) => row.id) }), "Order saved.")

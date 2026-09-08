@@ -33,7 +33,7 @@ export default async function EditCoursePage({ params }: { params: Promise<{ id:
     <>
       <div className="admin-actions">
         <h1 className="t-h4">{row.name}</h1>
-        <a className="btn-black-sm" href={path} target="_blank" rel="noreferrer">
+        <a className="admin-btn" href={path} target="_blank" rel="noreferrer">
           View on site
         </a>
       </div>

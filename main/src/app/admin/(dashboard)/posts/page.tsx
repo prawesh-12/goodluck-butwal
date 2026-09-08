@@ -63,7 +63,7 @@ export default async function PostsPage({
       <div className="admin-actions">
         <p className="t-small admin-count">{total} matching</p>
         {can(actor, "posts", "create") ? (
-          <Link className="btn-black-sm" href="/admin/posts/new">
+          <Link className="admin-btn" href="/admin/posts/new">
             Write a post
           </Link>
         ) : null}

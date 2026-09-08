@@ -83,11 +83,11 @@ export function MediaPicker({
         )}
 
         <div className="admin-actions">
-          <button type="button" className="btn-black-sm" onClick={() => setOpen(true)}>
+          <button type="button" className="admin-btn" onClick={() => setOpen(true)}>
             {picked ? "Change" : "Choose"}
           </button>
           {picked ? (
-            <button type="button" className="btn-black-sm" onClick={() => choose(null)}>
+            <button type="button" className="admin-btn" onClick={() => choose(null)}>
               Clear
             </button>
           ) : null}
@@ -106,7 +106,7 @@ export function MediaPicker({
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search by filename or alt text"
               />
-              <button type="button" className="btn-black-sm" onClick={() => setOpen(false)}>
+              <button type="button" className="admin-btn" onClick={() => setOpen(false)}>
                 Close
               </button>
             </div>

@@ -72,44 +72,44 @@ export default function RichText({
       <span className="t-small">{label}</span>
 
       <div className="admin-actions">
-        <button type="button" className="btn-black-sm" onClick={() => editor.chain().focus().toggleBold().run()}>
+        <button type="button" className="admin-btn" onClick={() => editor.chain().focus().toggleBold().run()}>
           Bold
         </button>
-        <button type="button" className="btn-black-sm" onClick={() => editor.chain().focus().toggleItalic().run()}>
+        <button type="button" className="admin-btn" onClick={() => editor.chain().focus().toggleItalic().run()}>
           Italic
         </button>
         <button
           type="button"
-          className="btn-black-sm"
+          className="admin-btn"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         >
           Heading
         </button>
         <button
           type="button"
-          className="btn-black-sm"
+          className="admin-btn"
           onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         >
           Subheading
         </button>
-        <button type="button" className="btn-black-sm" onClick={() => editor.chain().focus().toggleBulletList().run()}>
+        <button type="button" className="admin-btn" onClick={() => editor.chain().focus().toggleBulletList().run()}>
           Bullets
         </button>
-        <button type="button" className="btn-black-sm" onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+        <button type="button" className="admin-btn" onClick={() => editor.chain().focus().toggleOrderedList().run()}>
           Numbers
         </button>
-        <button type="button" className="btn-black-sm" onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+        <button type="button" className="admin-btn" onClick={() => editor.chain().focus().toggleBlockquote().run()}>
           Quote
         </button>
-        <button type="button" className="btn-black-sm" onClick={link}>
+        <button type="button" className="admin-btn" onClick={link}>
           Link
         </button>
-        <button type="button" className="btn-black-sm" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
+        <button type="button" className="admin-btn" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
           Divider
         </button>
         <button
           type="button"
-          className="btn-black-sm"
+          className="admin-btn"
           onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
         >
           Table

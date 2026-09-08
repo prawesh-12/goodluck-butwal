@@ -13,7 +13,7 @@ export function ConfirmButton({ id }: { id: string }) {
     <>
       <button
         type="button"
-        className="btn-black-sm"
+        className="admin-btn"
         disabled={busy}
         onClick={async () => {
           setBusy(true);

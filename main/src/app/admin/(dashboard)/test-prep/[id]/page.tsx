@@ -24,10 +24,10 @@ export default async function EditTestPrepCoursePage({ params }: { params: Promi
     <>
       <div className="admin-actions">
         <h1 className="t-h4">{row.name}</h1>
-        <Link className="btn-black-sm" href={`/admin/test-prep/batches?course=${row.id}`}>
+        <Link className="admin-btn" href={`/admin/test-prep/batches?course=${row.id}`}>
           Batches
         </Link>
-        <a className="btn-black-sm" href={path} target="_blank" rel="noreferrer">
+        <a className="admin-btn" href={path} target="_blank" rel="noreferrer">
           View on site
         </a>
       </div>

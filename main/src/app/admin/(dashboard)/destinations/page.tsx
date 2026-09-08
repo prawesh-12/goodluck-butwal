@@ -32,7 +32,7 @@ export default async function DestinationsListPage({
       <div className="admin-actions">
         <h1 className="t-h4">Destinations</h1>
         {can(actor, "destinations", "create") ? (
-          <Link className="btn-black-sm" href="/admin/destinations/new">
+          <Link className="admin-btn" href="/admin/destinations/new">
             New destination
           </Link>
         ) : null}

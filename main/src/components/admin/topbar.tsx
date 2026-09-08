@@ -22,7 +22,7 @@ export function TopBar({ name, role }: { name: string; role: string }) {
 
       <button
         type="button"
-        className="btn-black-sm"
+        className="admin-btn"
         onClick={async () => {
           await signOut();
           router.replace("/admin/login");

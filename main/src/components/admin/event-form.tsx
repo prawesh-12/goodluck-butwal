@@ -369,12 +369,12 @@ export function EventForm({
       </label>
 
       <div className="admin-actions">
-        <button type="submit" className="btn-black-sm" disabled={busy}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
           {busy ? "Saving" : "Save"}
         </button>
 
         {values.id ? (
-          <Link className="btn-black-sm" href={`/events/${values.slug}`} target="_blank">
+          <Link className="admin-btn" href={`/events/${values.slug}`} target="_blank">
             View on site
           </Link>
         ) : null}
@@ -382,7 +382,7 @@ export function EventForm({
         {values.id && canDelete ? (
           <button
             type="button"
-            className="btn-black-sm"
+            className="admin-btn"
             disabled={busy}
             onClick={async () => {
               if (!window.confirm("Take this event off the site? It stays here as archived.")) return;

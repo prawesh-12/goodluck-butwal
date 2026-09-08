@@ -22,7 +22,7 @@ export default async function DestinationFaqsPage({ params }: { params: Promise<
     <>
       <div className="admin-actions">
         <h1 className="t-h4">{row.name} questions</h1>
-        <Link className="btn-black-sm" href={`/admin/destinations/${row.id}`}>
+        <Link className="admin-btn" href={`/admin/destinations/${row.id}`}>
           Back to the destination
         </Link>
       </div>

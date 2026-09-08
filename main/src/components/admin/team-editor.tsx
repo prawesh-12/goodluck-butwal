@@ -202,14 +202,14 @@ export function TeamEditor({
       />
 
       <div className="admin-actions">
-        <button type="submit" className="btn-black-sm" disabled={busy}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
           {busy ? "Saving" : "Save"}
         </button>
 
         {!isNew && canDelete ? (
           <button
             type="button"
-            className="btn-black-sm"
+            className="admin-btn admin-btn-danger"
             disabled={busy}
             onClick={async () => {
               if (!confirm(`Remove ${values.fullName} from the team list?`)) return;

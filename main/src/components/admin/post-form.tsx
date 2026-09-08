@@ -265,12 +265,12 @@ export function PostForm({
       </label>
 
       <div className="admin-actions">
-        <button type="submit" className="btn-black-sm" disabled={busy}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
           {busy ? "Saving" : "Save"}
         </button>
 
         {values.id ? (
-          <Link className="btn-black-sm" href={`/news/${values.slug}`} target="_blank">
+          <Link className="admin-btn" href={`/news/${values.slug}`} target="_blank">
             View on site
           </Link>
         ) : null}
@@ -278,7 +278,7 @@ export function PostForm({
         {values.id && canDelete ? (
           <button
             type="button"
-            className="btn-black-sm"
+            className="admin-btn"
             disabled={busy}
             onClick={async () => {
               if (!window.confirm("Take this article off the site? It stays here as archived.")) return;

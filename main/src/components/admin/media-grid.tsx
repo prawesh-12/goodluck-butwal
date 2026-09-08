@@ -87,7 +87,7 @@ export function MediaGrid({
         </label>
         <button
           type="button"
-          className="btn-black-sm"
+          className="admin-btn"
           onClick={() => set("missing_alt", onlyMissing ? "" : "1")}
         >
           {onlyMissing ? "Show all" : `Needs alt text (${missingAlt})`}
@@ -116,7 +116,7 @@ export function MediaGrid({
                 {row.type === "image" && !row.altText ? (
                   <p className="t-small admin-error">Needs alt text</p>
                 ) : null}
-                <button type="button" className="btn-black-sm" onClick={() => setOpen(open === row.id ? null : row.id)}>
+                <button type="button" className="admin-btn" onClick={() => setOpen(open === row.id ? null : row.id)}>
                   {open === row.id ? "Close" : "Edit"}
                 </button>
               </figcaption>
@@ -145,11 +145,11 @@ export function MediaGrid({
                     <input name="caption" defaultValue={row.caption ?? ""} />
                   </label>
                   <div className="admin-actions">
-                    <button type="submit" className="btn-black-sm">Save</button>
+                    <button type="submit" className="admin-btn admin-btn-primary">Save</button>
                     {canDelete ? (
                       <button
                         type="button"
-                        className="btn-black-sm"
+                        className="admin-btn admin-btn-danger"
                         onClick={async () => {
                           const result = await deleteMedia({ id: row.id });
                           setMessage(result.ok ? "Deleted." : result.error);

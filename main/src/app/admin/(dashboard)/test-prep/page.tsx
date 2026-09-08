@@ -36,14 +36,14 @@ export default async function TestPrepListPage({
     <>
       <div className="admin-actions">
         <h1 className="t-h4">Test preparation</h1>
-        <Link className="btn-black-sm" href="/admin/test-prep/batches">
+        <Link className="admin-btn" href="/admin/test-prep/batches">
           Batches
         </Link>
-        <Link className="btn-black-sm" href="/admin/test-prep/registrations">
+        <Link className="admin-btn" href="/admin/test-prep/registrations">
           Registrations
         </Link>
         {can(actor, "testPrep", "create") ? (
-          <Link className="btn-black-sm" href="/admin/test-prep/new">
+          <Link className="admin-btn" href="/admin/test-prep/new">
             New course
           </Link>
         ) : null}

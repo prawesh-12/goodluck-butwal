@@ -66,7 +66,7 @@ function NewCategory() {
         </span>
       </label>
       <div className="admin-actions">
-        <button type="submit" className="btn-black-sm" disabled={busy || !name}>
+        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy || !name}>
           {busy ? "Adding" : "Add"}
         </button>
         {message ? <span className="t-small">{message}</span> : null}
@@ -138,7 +138,7 @@ function CategoryEditor({
 
       <div className="admin-actions">
         {canEdit ? (
-          <button type="submit" className="btn-black-sm" disabled={busy}>
+          <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
             {busy ? "Saving" : "Save"}
           </button>
         ) : null}
@@ -146,7 +146,7 @@ function CategoryEditor({
         {canDelete ? (
           <button
             type="button"
-            className="btn-black-sm"
+            className="admin-btn admin-btn-danger"
             disabled={busy}
             onClick={async () => {
               if (!window.confirm(`Delete the ${row.name} category?`)) return;

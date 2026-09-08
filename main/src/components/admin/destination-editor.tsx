@@ -178,7 +178,7 @@ export function DestinationEditor({
           <button
             key={key}
             type="button"
-            className="btn-black-sm"
+            className="admin-btn"
             aria-current={tab === key ? "true" : undefined}
             onClick={() => setTab(key)}
           >
