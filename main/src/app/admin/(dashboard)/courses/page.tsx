@@ -102,14 +102,13 @@ export default async function CoursesPage({
               <th>Length</th>
               <th>Status</th>
               <th>On the site</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/courses/${row.id}`}>{row.name}</Link>
-                </td>
+                <td>{row.name}</td>
                 <td>{row.institution ?? "Not set"}</td>
                 <td>{row.qualificationLevel ? QUALIFICATION_LABEL[row.qualificationLevel] : "Not set"}</td>
                 <td>{row.category ?? "Not set"}</td>
@@ -119,6 +118,11 @@ export default async function CoursesPage({
                   <a href={coursePath(row.slug)} target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/courses/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

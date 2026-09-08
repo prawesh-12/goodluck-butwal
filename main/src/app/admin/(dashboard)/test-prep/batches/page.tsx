@@ -81,6 +81,7 @@ export default async function BatchesListPage({
               <th>Seats</th>
               <th>Shows as</th>
               <th>On the site</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
@@ -89,12 +90,15 @@ export default async function BatchesListPage({
                 {i === 0 || rows[i - 1].courseId !== row.courseId ? (
                   <tr>
                     <th colSpan={9}>{row.courseName}</th>
+                  <td>
+                    <Link className="admin-btn" href={`/admin/test-prep/batches/${row.id}`}>
+                      Edit
+                    </Link>
+                  </td>
                   </tr>
                 ) : null}
                 <tr>
-                  <td>
-                    <Link href={`/admin/test-prep/batches/${row.id}`}>{row.batchName}</Link>
-                  </td>
+                  <td>{row.batchName}</td>
                   <td>{formatDate(row.startDate)}</td>
                   <td>{scheduleDays(row.scheduleDays)}</td>
                   <td>{classTime(row.startTime, row.endTime, row.timezone ?? "Asia/Kathmandu")}</td>

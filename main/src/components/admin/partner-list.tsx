@@ -43,6 +43,7 @@ export function PartnerList({ rows, canReorder }: { rows: PartnerRow[]; canReord
             <th>Featured</th>
             <th>Status</th>
             <th>On the site</th>
+            <th>Edit</th>
           </tr>
         </thead>
         <tbody>
@@ -55,9 +56,7 @@ export function PartnerList({ rows, canReorder }: { rows: PartnerRow[]; canReord
               onDrop={() => dropOn(row.id)}
               onDragEnd={() => setDragging(null)}
             >
-              <td>
-                <Link href={`/admin/partners/${row.id}`}>{row.name}</Link>
-              </td>
+              <td>{row.name}</td>
               <td>{row.websiteUrl ?? "Not set"}</td>
               <td>{row.isFeatured ? "Yes" : "No"}</td>
               <td>{row.status}</td>
@@ -65,6 +64,11 @@ export function PartnerList({ rows, canReorder }: { rows: PartnerRow[]; canReord
                 <a href="/" target="_blank" rel="noreferrer">
                   View on site
                 </a>
+              </td>
+              <td>
+                <Link className="admin-btn" href={`/admin/partners/${row.id}`}>
+                  Edit
+                </Link>
               </td>
             </tr>
           ))}

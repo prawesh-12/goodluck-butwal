@@ -40,19 +40,23 @@ export default async function EnquiriesPage({
               <th>Office</th>
               <th>Status</th>
               <th>Received</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/enquiries/${row.id}`}>{row.reference}</Link>
-                </td>
+                <td>{row.reference}</td>
                 <td>{row.fullName}</td>
                 <td>{row.email}</td>
                 <td>{row.office ?? "Not set"}</td>
                 <td>{row.status.replace(/_/g, " ")}</td>
                 <td>{formatInOfficeTz(row.createdAt, "Australia/Melbourne")}</td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/enquiries/${row.id}`}>
+                    Edit
+                  </Link>
+                </td>
               </tr>
             ))}
           </tbody>

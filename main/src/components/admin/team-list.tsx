@@ -43,6 +43,7 @@ export function TeamList({ rows, canReorder }: { rows: TeamRow[]; canReorder: bo
             <th>Office</th>
             <th>Status</th>
             <th>On the site</th>
+            <th>Edit</th>
           </tr>
         </thead>
         <tbody>
@@ -55,9 +56,7 @@ export function TeamList({ rows, canReorder }: { rows: TeamRow[]; canReorder: bo
               onDrop={() => dropOn(row.id)}
               onDragEnd={() => setDragging(null)}
             >
-              <td>
-                <Link href={`/admin/team/${row.id}`}>{row.fullName}</Link>
-              </td>
+              <td>{row.fullName}</td>
               <td>{row.position ?? "Not set"}</td>
               <td>{row.office ?? "No office"}</td>
               <td>{row.status}</td>
@@ -65,6 +64,11 @@ export function TeamList({ rows, canReorder }: { rows: TeamRow[]; canReorder: bo
                 <a href="/about/team" target="_blank" rel="noreferrer">
                   View on site
                 </a>
+              </td>
+              <td>
+                <Link className="admin-btn" href={`/admin/team/${row.id}`}>
+                  Edit
+                </Link>
               </td>
             </tr>
           ))}

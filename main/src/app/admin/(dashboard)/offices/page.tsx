@@ -42,14 +42,13 @@ export default async function OfficesPage({
               <th>Phone</th>
               <th>Status</th>
               <th>On the site</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/offices/${row.id}`}>{row.name}</Link>
-                </td>
+                <td>{row.name}</td>
                 <td>{row.city ?? "Not set"}</td>
                 <td>{row.phoneDisplay ?? "Not set"}</td>
                 <td>
@@ -60,6 +59,11 @@ export default async function OfficesPage({
                   <a href="/contact" target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/offices/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

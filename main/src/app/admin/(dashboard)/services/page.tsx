@@ -69,14 +69,13 @@ export default async function ServicesListPage({
               <th>Status</th>
               <th>Questions</th>
               <th>On the site</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/services/${row.id}`}>{row.name}</Link>
-                </td>
+                <td>{row.name}</td>
                 <td>{servicePath(row.slug)}</td>
                 <td>{row.category.replace(/_/g, " ")}</td>
                 <td>{row.officeScope}</td>
@@ -89,6 +88,11 @@ export default async function ServicesListPage({
                   <a href={servicePath(row.slug)} target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/services/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

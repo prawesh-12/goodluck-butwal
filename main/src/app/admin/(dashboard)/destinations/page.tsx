@@ -59,14 +59,13 @@ export default async function DestinationsListPage({
               <th>Status</th>
               <th>Questions</th>
               <th>On the site</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/destinations/${row.id}`}>{row.name}</Link>
-                </td>
+                <td>{row.name}</td>
                 <td>{destinationPath(row.slug)}</td>
                 <td>{row.hasPage ? "Yes" : "No"}</td>
                 <td>{row.isFeatured ? "Yes" : "No"}</td>
@@ -78,6 +77,11 @@ export default async function DestinationsListPage({
                   <a href={destinationPath(row.slug)} target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/destinations/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

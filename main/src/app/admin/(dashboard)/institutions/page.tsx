@@ -79,14 +79,13 @@ export default async function InstitutionsPage({
               <th>Featured</th>
               <th>Status</th>
               <th>On the site</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/institutions/${row.id}`}>{row.name}</Link>
-                </td>
+                <td>{row.name}</td>
                 <td>{row.destination ?? "Not set"}</td>
                 <td>{row.country ?? "Not set"}</td>
                 <td>{counts.get(row.id) ?? 0}</td>
@@ -97,6 +96,11 @@ export default async function InstitutionsPage({
                   <a href={institutionPath(row.slug)} target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/institutions/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

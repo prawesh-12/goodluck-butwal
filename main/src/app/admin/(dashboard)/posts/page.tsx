@@ -84,14 +84,13 @@ export default async function PostsPage({
               <th>Published</th>
               <th>Minutes</th>
               <th>Live page</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/posts/${row.id}`}>{row.title}</Link>
-                </td>
+                <td>{row.title}</td>
                 <td>{row.category ?? "Not set"}</td>
                 <td>{row.office ?? "Both"}</td>
                 <td>{row.status}</td>
@@ -101,6 +100,11 @@ export default async function PostsPage({
                   <a href={`/news/${row.slug}`} target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/posts/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

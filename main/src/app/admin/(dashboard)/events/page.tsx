@@ -80,14 +80,13 @@ export default async function EventsPage({
               <th>Registered</th>
               <th>Status</th>
               <th>Live page</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/events/${row.id}`}>{row.title}</Link>
-                </td>
+                <td>{row.title}</td>
                 <td>{eventTypeLabels[row.eventType]}</td>
                 <td>{row.office ?? "Not set"}</td>
                 <td>{formatInOfficeTz(row.startsAt, row.timezone ?? "UTC")}</td>
@@ -102,6 +101,11 @@ export default async function EventsPage({
                   <a href={`/events/${row.slug}`} target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/events/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

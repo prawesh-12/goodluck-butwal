@@ -72,14 +72,13 @@ export default async function TestPrepListPage({
               <th>Fee</th>
               <th>Status</th>
               <th>On the site</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/test-prep/${row.id}`}>{row.name}</Link>
-                </td>
+                <td>{row.name}</td>
                 <td>{TEST_LABEL[row.testType]}</td>
                 <td>{row.office ?? "Not set"}</td>
                 <td>{row.fee ? `${row.feeCurrency} ${row.fee}` : "Not set"}</td>
@@ -88,6 +87,11 @@ export default async function TestPrepListPage({
                   <a href={`/test-preparation/${row.slug}`} target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/test-prep/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

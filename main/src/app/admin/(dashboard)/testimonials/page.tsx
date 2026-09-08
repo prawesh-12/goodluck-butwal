@@ -82,15 +82,14 @@ export default async function TestimonialsPage({
               <th>Status</th>
               <th>Consent</th>
               <th>Live page</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
                 <td>
-                  <Link href={`/admin/testimonials/${row.id}`}>
-                    {row.displayName || "No name yet"}
-                  </Link>
+                  {row.displayName || "No name yet"}
                   {row.isAnonymised ? <span className="admin-clash">anonymised</span> : null}
                 </td>
                 <td>{row.type}</td>
@@ -101,6 +100,11 @@ export default async function TestimonialsPage({
                   <a href="/success-stories" target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/testimonials/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}

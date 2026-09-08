@@ -69,14 +69,13 @@ export default async function PagesListPage({
               <th>In menu</th>
               <th>Status</th>
               <th>On the site</th>
+              <th>Edit</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row) => (
               <tr key={row.id}>
-                <td>
-                  <Link href={`/admin/pages/${row.id}`}>{row.title}</Link>
-                </td>
+                <td>{row.title}</td>
                 <td>{pagePath(row.parent, row.slug)}</td>
                 <td>{row.parent}</td>
                 <td>{row.showInNav ? "Yes" : "No"}</td>
@@ -85,6 +84,11 @@ export default async function PagesListPage({
                   <a href={pagePath(row.parent, row.slug)} target="_blank" rel="noreferrer">
                     View on site
                   </a>
+                </td>
+                <td>
+                  <Link className="admin-btn" href={`/admin/pages/${row.id}`}>
+                    Edit
+                  </Link>
                 </td>
               </tr>
             ))}
