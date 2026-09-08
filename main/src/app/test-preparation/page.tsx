@@ -60,7 +60,7 @@ export default async function TestPreparationPage() {
           <Appear className="flex w-full flex-col items-center gap-5 overflow-hidden rounded-[10px] bg-surface p-5 text-center md:rounded-[30px] md:p-10">
             <SectionHead badge={t("testprep.batches.badge", "Batches")} title={t("testprep.batches.title", "Upcoming batches")} />
             <PillButton href="/test-preparation/batches" tone="dark">
-              See the batch dates
+              {t("testprep.batches.cta", "See the batch dates")}
             </PillButton>
           </Appear>
         </div>

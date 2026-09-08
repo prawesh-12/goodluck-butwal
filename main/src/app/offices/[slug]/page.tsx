@@ -57,7 +57,7 @@ export default async function OfficePage({ params }: Props) {
                     </a>
                   )}
                   <a href={mapsLink} target="_blank" rel="noopener" className="t-base font-semibold text-ink underline underline-offset-4">
-                    Open in Maps
+                    {t("contact.offices.maps_link", "Open in Maps")}
                   </a>
                 </div>
               </Appear>
@@ -148,9 +148,9 @@ export default async function OfficePage({ params }: Props) {
       <section className="pb-section flex w-full flex-col items-center">
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px]">
-            <SectionHead badge={t("offices.contact.badge", "Talk to us")} title={`Book a consultation in ${office.city}`} />
+            <SectionHead badge={t("offices.contact.badge", "Talk to us")} title={t("offices.contact.title", "Book a consultation in {city}").replace("{city}", office.city)} />
             <PillButton href="/contact/book-consultation" tone="dark">
-              Book a consultation
+              {t("nav.book_cta", "Book a consultation")}
             </PillButton>
           </div>
         </div>

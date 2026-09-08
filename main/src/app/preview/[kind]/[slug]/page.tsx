@@ -73,7 +73,7 @@ export default async function Preview({
             <div className="article" dangerouslySetInnerHTML={{ __html: String(row.body) }} />
           ) : (
             <p className="t-body text-muted">
-              This record has no body text yet. Everything else about it is on its admin screen.
+              {t("preview.no_body", "This record has no body text yet. Everything else about it is on its admin screen.")}
             </p>
           )}
         </div>

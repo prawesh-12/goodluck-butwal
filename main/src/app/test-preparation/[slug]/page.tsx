@@ -91,7 +91,7 @@ export default async function TestPrepCoursePage({ params }: Props) {
           <Appear className="flex flex-col items-center gap-5 overflow-hidden rounded-[10px] bg-surface p-5 text-center md:rounded-[30px] md:p-10">
             <h2 className="t-h3">{t("cta.questions.title", "Still have questions?")}</h2>
             <PillButton href="/contact/book-consultation" tone="dark">
-              Book an appointment
+              {t("cta.appointment", "Book an appointment")}
             </PillButton>
           </Appear>
         </div>

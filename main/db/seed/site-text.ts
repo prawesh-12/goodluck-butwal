@@ -40,7 +40,7 @@ function footerRows(): StringRow[] {
 }
 
 export function uiStringRows(): StringRow[] {
-  return [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows, ...chromeRows, ...pageRows, ...lastRows];
+  return [...footerRows(), ...homeRows, ...innerPageRows, ...errorRows, ...formRows, ...chromeRows, ...pageRows, ...lastRows, ...strayRows];
 }
 
 export async function seedUiStrings() {
@@ -418,4 +418,10 @@ const lastRows: StringRow[] = [
   { key: "search.field.label", value: "Search", group: "search", label: "Search box", help: "The label above the search box." },
   { key: "search.field.hint", value: "Course, institution, country or keyword", group: "search", label: "Search box hint", help: "The grey wording inside the empty search box." },
   { key: "search.field.submit", value: "Search", group: "search", label: "Search button", help: "The button beside the search box." },
+];
+
+const strayRows: StringRow[] = [
+  { key: "offices.contact.title", value: "Book a consultation in {city}", group: "offices", label: "Office booking heading", help: "The heading at the foot of an office page. Write {city} where the city name should go." },
+  { key: "testprep.batches.cta", value: "See the batch dates", group: "testprep", label: "Batch dates button", help: "The button under the batches panel on the test preparation page." },
+  { key: "preview.no_body", value: "This record has no body text yet. Everything else about it is on its admin screen.", group: "system", label: "Preview with no body", help: "Shown to staff previewing a record that has no article text. Visitors never see it." },
 ];

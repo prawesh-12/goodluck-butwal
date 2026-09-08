@@ -33,3 +33,33 @@ test("every seeded key is read by a page", () => {
 test("every row carries a label and a help line for the admin", () => {
   expect(uiStringRows().filter((row) => !row.label.trim() || !row.help.trim())).toEqual([]);
 });
+
+// The audit that moved every sentence into ui_strings was a grep, and a grep missed the lines
+// where the text sits on its own between the tags. This is that grep, kept.
+const publicFiles = sourceFiles("src").filter(
+  (path) => !path.includes("/admin/") && /^src\/(app|components)\//.test(path),
+);
+
+// Wording that stays in the code, each for a reason written down in QUESTIONS.md.
+const ALLOWED = [
+  // The 500 screens run after a render has already failed, often because the database did.
+  "src/app/error.tsx",
+  "src/app/global-error.tsx",
+];
+
+// The honeypot label is inside an aria-hidden block. Only a bot ever reads it.
+const HONEYPOT = "Company website";
+
+test("no sentence is left sitting in a public component", () => {
+  const stray = publicFiles
+    .filter((path) => !ALLOWED.includes(path))
+    .flatMap((path) =>
+      readFileSync(path, "utf8")
+        .split("\n")
+        .map((line, i) => ({ path, line: line.trim(), at: i + 1 }))
+        .filter(({ line }) => /^[A-Z][a-z][A-Za-z ,.?!&'-]{4,}$/.test(line) && line !== HONEYPOT)
+        .map(({ path, line, at }) => `${path}:${at} ${line}`),
+    );
+
+  expect(stray).toEqual([]);
+});
