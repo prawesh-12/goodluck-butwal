@@ -1,6 +1,6 @@
 import { db } from "../client";
 import { mediaAssets, services, uiStrings } from "../schema";
-import { services as source } from "../../src/content/services";
+import { services as source } from "./source/services";
 import { eq } from "drizzle-orm";
 
 // The bento tones the homepage already paints these cards in, in slug order.

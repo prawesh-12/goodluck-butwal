@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { gl } from "@/lib/assets";
-import { about } from "@/content/about";
+import { getAboutContent } from "@/server/queries/pages";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { InnerHero } from "@/components/inner";
 
 export const metadata: Metadata = { title: "Message from co-founders" };
 
-export default function CoFoundersPage() {
+export default async function CoFoundersPage() {
+  const about = await getAboutContent();
+
   return (
     <>
       <InnerHero badge="Co-founders" title="Message from co-founders" lead={about.founders} />

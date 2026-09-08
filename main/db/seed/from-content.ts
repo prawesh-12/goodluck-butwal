@@ -6,6 +6,7 @@ import { seedSettings, seedUiStrings } from "./site-text";
 import { seedPartners, seedTeam } from "./people";
 import { seedServices } from "./services";
 import { seedDestinations, seedFaqs } from "./destinations";
+import { seedPages } from "./pages";
 import { seedPostCategories, seedPosts, seedRating, seedTestimonials } from "./editorial";
 
 // Run from the app root, so public/ is one level down from here.
@@ -24,9 +25,10 @@ step("post_categories", seedPostCategories);
 step("posts", seedPosts);
 step("testimonials", seedTestimonials);
 step("rating", seedRating);
+step("pages", seedPages);
 
 async function main() {
-  console.log("Seeding from src/content into the database");
+  console.log("Seeding from db/seed/source into the database");
   const results = await runAll();
   const total = results.reduce((n, r) => n + r.rows, 0);
   console.log(`\nDone. ${total} rows across ${results.length} steps.`);

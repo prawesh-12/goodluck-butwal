@@ -2,8 +2,8 @@ import { eq } from "drizzle-orm";
 import { db } from "../client";
 import { mediaAssets, postCategories, posts, settings, testimonials } from "../schema";
 import { slugify } from "../../src/lib/slug";
-import articles from "../../src/content/articles.json";
-import { googleRating, reviews, successStories } from "../../src/content/stories";
+import articles from "./source/articles.json";
+import { googleRating, reviews, successStories } from "./source/stories";
 
 async function mediaIdByPath() {
   const rows = await db.select({ id: mediaAssets.id, path: mediaAssets.staticPath }).from(mediaAssets);

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getDestination, listDestinations, listAllFaqs } from "@/server/queries/destinations";
-import articles from "@/content/articles.json";
+import { listArticles } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, CheckRow, Chip } from "@/components/ui/bits";
@@ -28,6 +28,7 @@ export default async function DestinationPage({ params }: Props) {
   const { destination } = await params;
   const d = await getDestination(destination);
   if (!d) notFound();
+  const articles = await listArticles();
   const news = articles.filter((a) => keyword[d.slug].test(a.title)).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
 
   return (

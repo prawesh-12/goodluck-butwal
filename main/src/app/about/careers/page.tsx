@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { img } from "@/lib/assets";
 import { company } from "@/lib/site";
-import { about } from "@/content/about";
+import { getAboutContent } from "@/server/queries/pages";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { SectionBg } from "@/components/ui/bits";
@@ -10,7 +10,9 @@ import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
 export const metadata: Metadata = { title: "Careers" };
 const tones = ["surface", "dark", "blue", "surface"] as const;
 
-export default function CareersPage() {
+export default async function CareersPage() {
+  const about = await getAboutContent();
+
   return (
     <>
       <InnerHero badge="Careers" title="Climb your career ladder with Goodluck" lead="We hold your efforts in high regard." after={<Appear delay={0.1}><PillButton href={`mailto:${company.email}`}>Email {company.email}</PillButton></Appear>} />

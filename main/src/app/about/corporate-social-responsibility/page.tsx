@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
-import { about } from "@/content/about";
+import { getAboutContent } from "@/server/queries/pages";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero } from "@/components/inner";
 
-export const metadata: Metadata = { title: "Corporate social responsibility", description: about.csrIntro };
+export async function generateMetadata(): Promise<Metadata> {
+  const about = await getAboutContent();
+  return { title: "Corporate social responsibility", description: about.csrIntro };
+}
 
-export default function CsrPage() {
+export default async function CsrPage() {
+  const about = await getAboutContent();
+
   return (
     <>
       <InnerHero badge="Corporate social responsibility" title="Community and sport" lead={about.csrIntro} bg="field" />

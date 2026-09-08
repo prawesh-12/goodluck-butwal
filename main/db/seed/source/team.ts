@@ -1,4 +1,4 @@
-import type { OfficeId } from "@/lib/site";
+import type { OfficeId } from "../../../src/lib/site";
 
 // 22 people, taken from goodluck_main/our-team. Name, role, office section and photo only: nothing else is published. Photos live in public/images/team.
 export type Member = { slug: string; name: string; role: string; office: OfficeId | null; photo: string };

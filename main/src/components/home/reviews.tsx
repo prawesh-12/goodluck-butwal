@@ -1,6 +1,5 @@
 import { img } from "@/lib/assets";
 import type { GoogleRating, PublicReview } from "@/server/queries/editorial";
-import { about } from "@/content/about";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg } from "@/components/ui/bits";
@@ -50,7 +49,7 @@ function ReviewTile({ r }: { r: PublicReview }) {
 // Two rows like the Magic UI marquee demo: top drifts right, bottom drifts left. Linear, since it never stops.
 
 
-export function Reviews({ reviews, googleRating }: { reviews: PublicReview[]; googleRating: GoogleRating }) {
+export function Reviews({ reviews, googleRating, values }: { reviews: PublicReview[]; googleRating: GoogleRating; values: string }) {
   const meta = metaFor(googleRating);
   const rows = [reviews.slice(0, 3), reviews.slice(3)];
   return (
@@ -62,7 +61,7 @@ export function Reviews({ reviews, googleRating }: { reviews: PublicReview[]; go
             <Appear className="flex flex-col items-center gap-[10px]">
               <Badge className="ring-1 ring-hairline">Why choose us</Badge>
               <h2 className="t-h2 text-center">Reason for choosing us</h2>
-              <p className="t-body text-center text-muted">{about.values}</p>
+              <p className="t-body text-center text-muted">{values}</p>
             </Appear>
             <Appear delay={0.1} className="flex flex-wrap items-center justify-center gap-[10px] md:gap-5">
               <PillButton href="/about">About Goodluck</PillButton>

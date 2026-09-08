@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { gl, img } from "@/lib/assets";
 import { offices } from "@/lib/site";
-import { about } from "@/content/about";
+import { getAboutContent } from "@/server/queries/pages";
 import { listTeam, listPartnerLogos } from "@/server/queries/people";
-import { googleRating } from "@/content/stories";
+import { getGoogleRating } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg } from "@/components/ui/bits";
@@ -12,12 +12,20 @@ import { InnerHero, SectionHead, StatCard, TeamCard } from "@/components/inner";
 import { Partners } from "@/components/home/partners";
 import { TabShoulders } from "@/components/home/steps";
 
-export const metadata: Metadata = { title: "About us", description: about.established };
+export async function generateMetadata(): Promise<Metadata> {
+  const about = await getAboutContent();
+  return { title: "About us", description: about.established };
+}
 
 
 
 export default async function AboutPage() {
-  const [team, logos] = await Promise.all([listTeam(), listPartnerLogos()]);
+  const [team, logos, about, googleRating] = await Promise.all([
+    listTeam(),
+    listPartnerLogos(),
+    getAboutContent(),
+    getGoogleRating(),
+  ]);
 
   const stats = [
     ["Established", "2022", "Education and migration guidance since 2022.", 0],

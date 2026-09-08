@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../client";
 import { destinationFaqs, destinations, mediaAssets, serviceFaqs, services, uiStrings } from "../schema";
-import { destinations as source } from "../../src/content/destinations";
-import { faqs } from "../../src/content/faqs";
+import { destinations as source } from "./source/destinations";
+import { faqs } from "./source/faqs";
 
 const COUNTRY_CODE: Record<string, string> = { australia: "AU", "united-kingdom": "GB", "new-zealand": "NZ" };
 

@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../client";
 import { mediaAssets, offices, partners, teamMembers } from "../schema";
-import { team } from "../../src/content/team";
-import { partnerLogos } from "../../src/content/partners";
+import { team } from "./source/team";
+import { partnerLogos } from "./source/partners";
 
 async function mediaIdByPath() {
   const rows = await db
