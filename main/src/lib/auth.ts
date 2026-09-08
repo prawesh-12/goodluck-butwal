@@ -23,6 +23,8 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 12,
+    // An admin creating an account must not be signed out of their own.
+    autoSignIn: false,
     sendResetPassword: async ({ user, url }) => {
       await sendEmail({
         to: user.email,
