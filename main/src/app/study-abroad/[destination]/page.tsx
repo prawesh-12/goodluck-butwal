@@ -8,6 +8,8 @@ import { Badge, CheckRow, Chip } from "@/components/ui/bits";
 import { InfoCard, InnerHero, NewsCard, SectionHead } from "@/components/inner";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
+import { listInstitutions } from "@/server/queries/catalogue";
+import { InstitutionCard } from "@/components/catalogue/institution-card";
 
 type Props = { params: Promise<{ destination: string }> };
 export const generateStaticParams = async () =>
@@ -30,6 +32,7 @@ export default async function DestinationPage({ params }: Props) {
   if (!d) notFound();
   const articles = await listArticles();
   const news = articles.filter((a) => keyword[d.slug].test(a.title)).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+  const relevantInstitutions = (await listInstitutions()).filter((i) => i.destinationSlug === d.slug).slice(0, 6);
 
   return (
     <>
@@ -145,6 +148,20 @@ export default async function DestinationPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {relevantInstitutions.length > 0 && (
+        <section className="pt-section flex w-full flex-col items-center">
+          <div className="container-x">
+            <div className="flex flex-col items-start gap-[30px] md:gap-10 lg:gap-[50px]">
+              <SectionHead align="left" badge="Institutions" title={`Relevant institutions in ${d.name}`} />
+              <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
+                {relevantInstitutions.map((i, n) => <InstitutionCard key={i.slug} institution={i} delay={0.05 * n} />)}
+              </div>
+              <Appear><PillButton href="/institutions" tone="dark">See all institutions</PillButton></Appear>
+            </div>
+          </div>
+        </section>
+      )}
 
       {news.length > 0 && (
         <section className="pt-section flex w-full flex-col items-center">

@@ -73,6 +73,7 @@ export const social = [
 export const nav = [
   { label: "About", href: "/about" },
   { label: "Study abroad", href: "/study-abroad" },
+  { label: "Institutions", href: "/institutions" },
   { label: "Services", href: "/services" },
   { label: "News", href: "/news" },
   { label: "Contact", href: "/contact" },
