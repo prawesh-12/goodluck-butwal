@@ -32,9 +32,10 @@ export function adminUrlForPath(pathname: string): string {
   return rest.length === 1 ? `/admin/${list}?q=${encodeURIComponent(rest[0])}` : `/admin/${list}`;
 }
 
-export function previewPath(slug: string): string {
-  return `/preview/post/${encodeURIComponent(slug)}`;
+export function previewPath(kind: string, slug: string) {
+  return kind === "post" ? `/preview/post/${slug}` : `/preview/${kind}/${encodeURIComponent(slug)}`;
 }
+
 
 export const previewMetadata: Metadata = {
   title: "Preview",
