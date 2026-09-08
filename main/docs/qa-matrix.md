@@ -57,6 +57,18 @@ The design has breakpoints at 640, 810, 1200 and 1440. Check each side of each.
 
 ## Accessibility
 
+**Statically checked, and passing:**
+
+| Check | Result |
+|---|---|
+| Every `<img>` on a public page has an `alt` attribute | 0 missing |
+| No page carries more than one `<h1>` | 0 pages |
+| Decorative images are `alt=""` with `aria-hidden`, not undescribed | yes |
+| Every form input has a label element wrapping it | yes |
+| The office selector and mobile menu carry `aria-` state | yes |
+
+That is the part a machine can answer. The rest needs a browser.
+
 Not yet run. The plan asks for axe on twelve pages, every serious and critical finding fixed, and
 one keyboard-only journey: home, destination, enquiry, submit.
 
