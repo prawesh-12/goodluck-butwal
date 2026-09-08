@@ -5,10 +5,16 @@ import { social } from "@/lib/site";
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
 // Brand marks from extras/social_icons, so they keep their own colours rather than taking the text colour.
-export function SocialLinks({ className }: { className?: string }) {
+export function SocialLinks({
+  className,
+  links = social,
+}: {
+  className?: string;
+  links?: { label: string; href: string; icon: string }[];
+}) {
   return (
     <div className={cx("flex items-center gap-3", className)}>
-      {social.map((s) => (
+      {links.map((s) => (
         <a key={s.label} href={s.href} target="_blank" rel="noreferrer noopener" aria-label={s.label} className="flex size-9 items-center justify-center rounded-full ring-1 ring-hairline transition-transform duration-200 hover:-translate-y-[2px]">
           <img src={s.icon} alt="" className="size-5" loading="lazy" decoding="async" />
         </a>
