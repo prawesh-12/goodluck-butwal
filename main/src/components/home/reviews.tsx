@@ -1,18 +1,18 @@
 import { img } from "@/lib/assets";
-import { googleRating, reviews } from "@/content/stories";
+import type { GoogleRating, PublicReview } from "@/server/queries/editorial";
 import { about } from "@/content/about";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg } from "@/components/ui/bits";
 import { Marquee } from "@/components/ui/marquee";
 
-const meta = [
+const metaFor = (googleRating: GoogleRating) => [
   { icon: img.star, w: 19, text: `${googleRating.score} Google rating` },
   { icon: img.heart, w: 20, text: `${googleRating.count} reviews` },
 ];
 
 // Google reviews from the goodluck_main widget. Reviewers have no photos there, so an initial stands in.
-export function ReviewCard({ r, className = "" }: { r: (typeof reviews)[number]; className?: string }) {
+export function ReviewCard({ r, className = "" }: { r: PublicReview; className?: string }) {
   return (
     <div className={`flex flex-col items-start justify-between overflow-hidden rounded-[10px] bg-white p-5 md:rounded-[30px] md:p-10 ${className}`}>
       <div className="flex flex-col items-start gap-4 pb-10">
@@ -31,7 +31,7 @@ export function ReviewCard({ r, className = "" }: { r: (typeof reviews)[number];
 }
 
 // Magic UI's testimonial card: photo, name and source up top, stars where the bird icon sits, quote below.
-function ReviewTile({ r }: { r: (typeof reviews)[number] }) {
+function ReviewTile({ r }: { r: PublicReview }) {
   return (
     <figure className="flex w-[300px] flex-col gap-4 rounded-2xl border border-hairline bg-white p-5 md:w-[400px]">
       <div className="flex flex-wrap items-center gap-3">
@@ -48,9 +48,11 @@ function ReviewTile({ r }: { r: (typeof reviews)[number] }) {
 }
 
 // Two rows like the Magic UI marquee demo: top drifts right, bottom drifts left. Linear, since it never stops.
-const rows = [reviews.slice(0, 3), reviews.slice(3)];
 
-export function Reviews() {
+
+export function Reviews({ reviews, googleRating }: { reviews: PublicReview[]; googleRating: GoogleRating }) {
+  const meta = metaFor(googleRating);
+  const rows = [reviews.slice(0, 3), reviews.slice(3)];
   return (
     <section id="why-goodluck" className="pb-section relative flex w-full flex-col items-center overflow-clip">
       <SectionBg src={img.testimonialBg} top bottom soft />

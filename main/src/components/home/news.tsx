@@ -1,10 +1,10 @@
-import articles from "@/content/articles.json";
+import type { PublicArticle } from "@/server/queries/editorial";
 import { NewsCard } from "@/components/inner";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/bits";
 
-export function News() {
+export function News({ articles }: { articles: PublicArticle[] }) {
   const latest = [...articles].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
   return (
     <section id="news" className="pb-section flex w-full flex-col items-center">

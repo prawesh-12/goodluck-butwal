@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import articles from "@/content/articles.json";
+import { getArticle, listArticles } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
 import { InnerHero, NewsCard, SectionHead } from "@/components/inner";
@@ -9,10 +9,10 @@ import { FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 
 type Props = { params: Promise<{ slug: string }> };
-export const generateStaticParams = () => articles.map((a) => ({ slug: a.slug }));
+export const generateStaticParams = async () => (await listArticles()).map((a) => ({ slug: a.slug }));
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const a = articles.find((x) => x.slug === slug);
+  const a = await getArticle(slug);
   return a ? { title: a.title, description: a.excerpt, openGraph: { images: [a.image], type: "article", publishedTime: a.date } } : { title: "News" };
 }
 
@@ -20,8 +20,9 @@ export default async function ArticlePage({ params }: Props) {
   const faces = (await listTeam()).slice(0, 3);
 
   const { slug } = await params;
-  const a = articles.find((x) => x.slug === slug);
+  const a = await getArticle(slug);
   if (!a) notFound();
+  const articles = await listArticles();
   const more = articles.filter((x) => x.slug !== slug && x.category === a.category).concat(articles.filter((x) => x.slug !== slug && x.category !== a.category)).slice(0, 3);
   return (
     <>

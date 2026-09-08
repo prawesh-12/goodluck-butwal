@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { easeInOut, motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { gl, img } from "@/lib/assets";
-import { googleRating } from "@/content/stories";
+import type { GoogleRating } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton, PillButton } from "@/components/ui/button";
 import { VideoDialog } from "@/components/ui/video-dialog";
@@ -14,7 +14,7 @@ const destinationFlags = [
   { name: "United Kingdom", flag: "/images/flags/united-kingdom.svg" },
 ];
 
-export function Hero() {
+export function Hero({ googleRating }: { googleRating: GoogleRating }) {
   const { scrollY } = useScroll();
   const grass = useTransform(scrollY, [380, 460], [1, 0], { ease: easeInOut });
   // The reference hero is max(175vh, 1262px) tall and the meadow's scroll rate grows with that height

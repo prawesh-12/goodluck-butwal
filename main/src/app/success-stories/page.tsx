@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { img } from "@/lib/assets";
-import { googleRating, reviews, successStories } from "@/content/stories";
+import { getGoogleRating, listReviews, listSuccessStories } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { SectionBg } from "@/components/ui/bits";
@@ -9,7 +9,13 @@ import { ReviewCard } from "@/components/home/reviews";
 
 export const metadata: Metadata = { title: "Success stories", description: "Visa grants and reviews shared by our clients." };
 
-export default function SuccessStoriesPage() {
+export default async function SuccessStoriesPage() {
+  const [successStories, reviews, googleRating] = await Promise.all([
+    listSuccessStories(),
+    listReviews(),
+    getGoogleRating(),
+  ]);
+
   return (
     <>
       <InnerHero badge="Success stories" title="Highly recommended" lead="Visa grants and reviews shared by our clients." width={1260} after={

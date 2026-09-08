@@ -6,6 +6,7 @@ import { Offices } from "@/components/home/offices";
 import { listPartnerLogos, listTeam } from "@/server/queries/people";
 import { listServices } from "@/server/queries/services";
 import { listAllFaqs, listDestinations } from "@/server/queries/destinations";
+import { getGoogleRating, listArticles, listReviews, listSuccessStories } from "@/server/queries/editorial";
 import { destinationCards } from "@/components/home/destinations";
 import { Reviews } from "@/components/home/reviews";
 import { Stories } from "@/components/home/stories";
@@ -13,24 +14,29 @@ import { News } from "@/components/home/news";
 import { Faqs } from "@/components/home/faqs";
 
 export default async function Home() {
-  const [logos, faces, services, allFaqs, cards] = await Promise.all([
+  const [logos, faces, services, allFaqs, cards, articles, reviews, successStories, googleRating] =
+    await Promise.all([
     listPartnerLogos(),
     listTeam().then((t) => t.slice(0, 3)),
     listServices(),
     listAllFaqs(),
     listDestinations().then((rows) => destinationCards(rows)),
+    listArticles(),
+    listReviews(),
+    listSuccessStories(),
+    getGoogleRating(),
   ]);
 
   return (
     <>
-      <Hero />
+      <Hero googleRating={googleRating} />
       <Partners logos={logos} />
       <Destinations cards={cards} />
       <Services services={services} />
-      <Reviews />
-      <Stories />
+      <Reviews reviews={reviews} googleRating={googleRating} />
+      <Stories successStories={successStories} googleRating={googleRating} />
       <Offices logos={logos} />
-      <News />
+      <News articles={articles} />
       <Faqs faces={faces} items={allFaqs} />
     </>
   );

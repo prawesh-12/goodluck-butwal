@@ -6,6 +6,7 @@ import { seedSettings, seedUiStrings } from "./site-text";
 import { seedPartners, seedTeam } from "./people";
 import { seedServices } from "./services";
 import { seedDestinations, seedFaqs } from "./destinations";
+import { seedPostCategories, seedPosts, seedRating, seedTestimonials } from "./editorial";
 
 // Run from the app root, so public/ is one level down from here.
 const ROOT = process.cwd();
@@ -19,6 +20,10 @@ step("partners", seedPartners);
 step("services", seedServices);
 step("destinations", seedDestinations);
 step("faqs", seedFaqs);
+step("post_categories", seedPostCategories);
+step("posts", seedPosts);
+step("testimonials", seedTestimonials);
+step("rating", seedRating);
 
 async function main() {
   console.log("Seeding from src/content into the database");

@@ -1,11 +1,19 @@
 import type { Metadata } from "next";
-import articles from "@/content/articles.json";
+import { listArticles } from "@/server/queries/editorial";
 import { InnerHero } from "@/components/inner";
 import { NewsList } from "@/components/news-list";
 
-export const metadata: Metadata = { title: "News and updates", description: `${articles.length} articles from the Goodluck team.` };
+export async function generateMetadata(): Promise<Metadata> {
+  const articles = await listArticles();
+  return {
+    title: "News and updates",
+    description: `${articles.length} articles from the Goodluck team.`,
+  };
+}
 
-export default function NewsPage() {
+export default async function NewsPage() {
+  const articles = await listArticles();
+
   return (
     <>
       <InnerHero badge="News and updates" badgeTone="chip" title="Study abroad insights and visa tips" lead={`${articles.length} articles from the Goodluck team.`} clouds={false} />

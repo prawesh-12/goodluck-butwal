@@ -2,10 +2,14 @@ import type { MetadataRoute } from "next";
 import { company } from "@/lib/site";
 import { listServices } from "@/server/queries/services";
 import { listDestinations } from "@/server/queries/destinations";
-import articles from "@/content/articles.json";
+import { listArticles } from "@/server/queries/editorial";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [services, destinations] = await Promise.all([listServices(), listDestinations()]);
+  const [services, destinations, articles] = await Promise.all([
+    listServices(),
+    listDestinations(),
+    listArticles(),
+  ]);
   const fixed = ["", "/about", "/about/team", "/about/message-from-co-founders", "/about/corporate-social-responsibility", "/about/careers", "/study-abroad", "/services", "/success-stories", "/news", "/faq", "/contact", "/contact/book-consultation"];
   return [
     ...fixed.map((p) => ({ url: `${company.url}${p}`, changeFrequency: "monthly" as const })),

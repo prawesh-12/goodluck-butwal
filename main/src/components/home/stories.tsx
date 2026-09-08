@@ -1,13 +1,13 @@
 import { img } from "@/lib/assets";
-import { googleRating, successStories } from "@/content/stories";
+import type { GoogleRating } from "@/server/queries/editorial";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg, Ticker } from "@/components/ui/bits";
 
 // The twelve success-story graphics carry their own text, so each sits on a plain white plate and nothing else is added.
-const rows = [successStories.slice(0, 6), successStories.slice(6)];
 
-function StoryCard({ s, tilt }: { s: (typeof successStories)[number]; tilt: number }) {
+
+function StoryCard({ s, tilt }: { s: { image: string; alt: string }; tilt: number }) {
   return (
     <div
       style={{ rotate: `${tilt}deg` }}
@@ -20,7 +20,8 @@ function StoryCard({ s, tilt }: { s: (typeof successStories)[number]; tilt: numb
   );
 }
 
-export function Stories() {
+export function Stories({ successStories, googleRating }: { successStories: { image: string; alt: string }[]; googleRating: GoogleRating }) {
+  const rows = [successStories.slice(0, 6), successStories.slice(6)];
   return (
     <section id="success-stories" className="flex w-full flex-col items-center">
       <div className="pb-section relative w-full overflow-clip bg-white pt-[60px] md:pt-[100px]">
