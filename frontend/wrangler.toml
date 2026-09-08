@@ -1,0 +1,25 @@
+name = "goodluck"
+main = ".open-next/worker.js"
+compatibility_date = "2026-09-08"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[[r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "gem-cache"
+
+[triggers]
+crons = ["*/15 * * * *"]
+
+# Public values only. Secrets go in with `wrangler secret put`, never in this file.
+[vars]
+BETTER_AUTH_URL = "https://goodluck.services"
+NEXT_PUBLIC_SITE_URL = "https://goodluck.services"
+CLOUDINARY_CLOUD_NAME = ""
+RESEND_FROM_EMAIL = ""
+TURNSTILE_SITE_KEY = ""
+NEXT_PUBLIC_GTM_ID = ""
+NEXT_PUBLIC_MAPS_API_KEY = ""
