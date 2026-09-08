@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { gl, img } from "@/lib/assets";
-import { company, offices } from "@/lib/site";
+import { company } from "@/lib/site";
 import { allFaqs } from "@/content/faqs";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton } from "@/components/ui/button";
@@ -8,12 +8,15 @@ import { Badge, SocialLinks } from "@/components/ui/bits";
 import { SectionHead } from "@/components/inner";
 import { EnquiryForm } from "@/components/forms";
 import { OfficeContactCards } from "@/components/contact-cards";
+import { listOffices } from "@/server/queries/offices";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 
 export const metadata: Metadata = { title: "Contact", description: "Talk to our experts in Melbourne, Butwal or Cebu." };
 const tones = ["surface", "dark", "blue"] as const;
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const offices = await listOffices();
+
   return (
     <>
       <section className="relative flex w-full flex-col items-center overflow-clip pb-[100px] pt-32 md:pb-[160px] md:pt-[158px] lg:pb-[200px] lg:pt-[194px]">
@@ -35,7 +38,7 @@ export default function ContactPage() {
                 <FlatButton href={`mailto:${company.email}`}>{company.email}</FlatButton>
                 <SocialLinks />
               </div>
-              <OfficeContactCards />
+              <OfficeContactCards offices={offices} />
             </Appear>
             <Appear y={10} delay={0.1} duration={0.6} className="relative flex flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 pb-20 md:rounded-[30px] md:pb-[70px] lg:p-10 lg:pb-[120px]">
               <div className="relative z-[2] w-full"><EnquiryForm /></div>

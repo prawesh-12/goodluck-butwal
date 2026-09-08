@@ -1,10 +1,10 @@
 "use client";
 
-import { offices } from "@/lib/site";
+import type { PublicOffice } from "@/server/queries/offices";
 import { useOffice } from "@/components/office";
 
 // Office contact cards, the chosen office first.
-export function OfficeContactCards() {
+export function OfficeContactCards({ offices }: { offices: PublicOffice[] }) {
   const { office } = useOffice();
   const ordered = [...offices].sort((a, b) => Number(b.id === office) - Number(a.id === office));
   return (

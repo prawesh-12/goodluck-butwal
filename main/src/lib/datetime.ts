@@ -22,3 +22,32 @@ export function formatInOfficeTz(
     timeZoneName: "short",
   }).format(date);
 }
+
+const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const clock = (time: string) => {
+  const [h, m] = time.split(":").map(Number);
+  const suffix = h < 12 ? "am" : "pm";
+  const hour = h % 12 === 0 ? 12 : h % 12;
+  return m ? `${hour}:${String(m).padStart(2, "0")} ${suffix}` : `${hour} ${suffix}`;
+};
+
+export type OpeningHours = { day: number; open: string; close: string; closed: boolean }[];
+
+// Renders the one line the contact cards show, e.g. "Mon - Fri: 10 am to 5 pm".
+// Returns null when the office keeps no published hours.
+export function formatOpeningHours(hours: OpeningHours | null | undefined) {
+  const open = hours?.filter((h) => !h.closed) ?? [];
+  if (open.length === 0) return null;
+
+  const days = open.map((h) => h.day).sort((a, b) => a - b);
+  const contiguous = days.every((day, i) => i === 0 || day === days[i - 1] + 1);
+  const label =
+    days.length === 1
+      ? DAY_NAMES[days[0]]
+      : contiguous
+        ? `${DAY_NAMES[days[0]]} - ${DAY_NAMES[days[days.length - 1]]}`
+        : days.map((d) => DAY_NAMES[d]).join(", ");
+
+  return `${label}: ${clock(open[0].open)} to ${clock(open[0].close)}`;
+}

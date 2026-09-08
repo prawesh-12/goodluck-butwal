@@ -6,6 +6,7 @@ import { Nav } from "@/components/nav";
 import { Footer } from "@/components/footer";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { OfficeProvider } from "@/components/office";
+import { listOffices } from "@/server/queries/offices";
 
 export const metadata: Metadata = {
   metadataBase: new URL(company.url),
@@ -15,11 +16,17 @@ export const metadata: Metadata = {
   openGraph: { siteName: company.name, type: "website" },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+// Published content is live within five minutes without a deploy. Admin routes opt out with
+// force-dynamic.
+export const revalidate = 300;
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const offices = await listOffices();
+
   return (
     <html lang="en" className={`${interDisplay.variable} ${bricolage.variable}`}>
       <body className="overflow-x-clip">
-        <OfficeProvider>
+        <OfficeProvider offices={offices}>
           <SmoothScroll />
           <Nav />
           <main className="flex flex-col items-start">{children}</main>
