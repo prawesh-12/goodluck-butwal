@@ -1,7 +1,8 @@
 import { cache } from "react";
+import { slugify } from "@/lib/slug";
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
-import { mediaAssets, postCategories, posts, settings, testimonials } from "@db/schema";
+import { mediaAssets, postCategories, postTags, posts, settings, tags, testimonials } from "@db/schema";
 
 export type PublicArticle = {
   slug: string;
@@ -97,3 +98,37 @@ export const getGoogleRating = cache(async () => {
 });
 
 export type GoogleRating = Awaited<ReturnType<typeof getGoogleRating>>;
+
+export const listArticlesByCategory = cache(async (slug: string) => {
+  const all = await listArticles();
+  return all.filter((article) => slugify(article.category) === slug);
+});
+
+export const listCategories = cache(async () => {
+  const rows = await db
+    .select({ slug: postCategories.slug, name: postCategories.name })
+    .from(postCategories)
+    .orderBy(asc(postCategories.sortOrder));
+  return rows;
+});
+
+export const listArticlesByTag = cache(async (slug: string): Promise<PublicArticle[]> => {
+  const ids = await db
+    .select({ postId: postTags.postId })
+    .from(postTags)
+    .innerJoin(tags, eq(postTags.tagId, tags.id))
+    .where(eq(tags.slug, slug));
+
+  if (ids.length === 0) return [];
+  const wanted = new Set(ids.map((row) => row.postId));
+
+  const rows = await db.select({ id: posts.id, slug: posts.slug }).from(posts);
+  const slugs = new Set(rows.filter((row) => wanted.has(row.id)).map((row) => row.slug));
+
+  return (await listArticles()).filter((article) => slugs.has(article.slug));
+});
+
+export const getTag = cache(async (slug: string) => {
+  const [row] = await db.select({ name: tags.name }).from(tags).where(eq(tags.slug, slug));
+  return row;
+});
