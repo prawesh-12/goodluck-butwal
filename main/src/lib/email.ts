@@ -5,8 +5,30 @@ type Message = {
   replyTo?: string;
 };
 
+// Every message carries a plain-text alternative. Deriving it from the html keeps the two in
+// step, which hand-written pairs never manage.
+function toPlainText(html: string) {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/(p|div|h[1-6]|li|tr)>/gi, "\n")
+    .replace(/<hr[^>]*>/gi, "\n---\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/\n{3,}/g, "\n\n")
+    .split("\n")
+    .map((line) => line.trim())
+    .join("\n")
+    .trim();
+}
+
 // Resend over plain fetch. Their SDK is large and the Worker bundle is capped.
 export async function sendEmail({ to, subject, html, replyTo }: Message) {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is not set, so no mail can be sent.");
+  }
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -18,6 +40,7 @@ export async function sendEmail({ to, subject, html, replyTo }: Message) {
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
+      text: toPlainText(html),
       reply_to: replyTo,
     }),
   });
@@ -26,3 +49,17 @@ export async function sendEmail({ to, subject, html, replyTo }: Message) {
     throw new Error(`Resend rejected the message (${res.status}): ${await res.text()}`);
   }
 }
+
+// The row is already saved by the time we get here, so a mail failure must not fail the request.
+// It is reported and swallowed.
+export async function sendEmailQuietly(message: Message) {
+  try {
+    await sendEmail(message);
+    return true;
+  } catch (error) {
+    console.error("email failed", { subject: message.subject, error });
+    return false;
+  }
+}
+
+export { toPlainText };

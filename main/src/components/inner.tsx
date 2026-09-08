@@ -139,15 +139,16 @@ export function SectionHead({ badge, title, lead, align = "center", badgeTone = 
 }
 
 // Form field as measured: label 15/16px muted, 50px white box, 10px radius, hairline border.
-export function Field({ label, name, type = "text", placeholder, textarea, className, required }: { label: string; name: string; type?: string; placeholder?: string; textarea?: boolean; className?: string; required?: boolean }) {
+export function Field({ label, name, type = "text", placeholder, textarea, className, required, min, max, help }: { label: string; name: string; type?: string; placeholder?: string; textarea?: boolean; className?: string; required?: boolean; min?: string; max?: string; help?: string }) {
   return (
     <label className={cx("flex flex-col items-start gap-[10px]", className)}>
       <span className="t-base text-muted">{label}</span>
       {textarea ? (
         <textarea name={name} placeholder={placeholder} required={required} className="h-[150px] w-full resize-none rounded-[10px] bg-white p-5 text-[16px] font-medium text-ink outline-none ring-1 ring-inset ring-hairline placeholder:text-muted/60 focus:ring-ink/40" />
       ) : (
-        <input name={name} type={type} placeholder={placeholder} required={required} className="h-[50px] w-full rounded-[10px] bg-white px-5 text-[16px] font-medium text-ink outline-none ring-1 ring-inset ring-hairline placeholder:text-muted/60 focus:ring-ink/40" />
+        <input name={name} type={type} placeholder={placeholder} required={required} min={min} max={max} className="h-[50px] w-full rounded-[10px] bg-white px-5 text-[16px] font-medium text-ink outline-none ring-1 ring-inset ring-hairline placeholder:text-muted/60 focus:ring-ink/40" />
       )}
+      {help ? <span className="t-small text-muted">{help}</span> : null}
     </label>
   );
 }
