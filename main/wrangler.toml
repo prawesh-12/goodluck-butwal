@@ -18,7 +18,7 @@ crons = ["*/15 * * * *"]
 [vars]
 BETTER_AUTH_URL = "https://goodluck.services"
 NEXT_PUBLIC_SITE_URL = "https://goodluck.services"
-CLOUDINARY_CLOUD_NAME = ""
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = ""
 RESEND_FROM_EMAIL = ""
 NEXT_PUBLIC_TURNSTILE_SITE_KEY = ""
 NEXT_PUBLIC_GTM_ID = ""

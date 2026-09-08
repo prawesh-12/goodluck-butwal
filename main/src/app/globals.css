@@ -180,3 +180,8 @@
 .admin-pager { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
 .admin-clash { display: block; font-size: 12px; font-weight: 600; color: #b42318; }
 .admin-filters select, .admin-filters input { padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; background: #fff; }
+.admin-media-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-top: 18px; }
+.admin-media-tile { margin: 0; padding: 10px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; }
+.admin-media-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--color-surface); border-radius: 6px; }
+.admin-media-name { margin: 8px 0 6px; word-break: break-all; color: var(--color-muted); }
+.admin-media-form { margin-top: 10px; max-width: none; }

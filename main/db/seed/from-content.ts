@@ -6,6 +6,7 @@ import { seedSettings, seedUiStrings } from "./site-text";
 import { seedPartners, seedTeam } from "./people";
 import { seedServices } from "./services";
 import { seedDestinations, seedFaqs } from "./destinations";
+import { seedAltText } from "./alt-text";
 import { seedPages } from "./pages";
 import { seedPostCategories, seedPosts, seedRating, seedTestimonials } from "./editorial";
 
@@ -26,6 +27,7 @@ step("posts", seedPosts);
 step("testimonials", seedTestimonials);
 step("rating", seedRating);
 step("pages", seedPages);
+step("alt_text", seedAltText);
 
 async function main() {
   console.log("Seeding from db/seed/source into the database");
