@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { img } from "@/lib/assets";
+import { formatDate } from "@/lib/datetime";
 import { Appear } from "@/components/ui/appear";
 import { Badge, Chip } from "@/components/ui/bits";
 
@@ -69,8 +70,6 @@ export function InnerHero({
 }
 
 export type Article = { slug: string; title: string; date: string; category: string; image: string; excerpt: string; width?: number; height?: number };
-
-export const formatDate = (iso: string) => new Date(iso).toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
 
 // Article banners already carry the headline, so the card shows the banner, the category and the date.
 export function NewsCard({ article, delay = 0, className }: { article: Article; delay?: number; className?: string }) {

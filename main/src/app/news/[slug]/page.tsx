@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import articles from "@/content/articles.json";
 import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
-import { InnerHero, NewsCard, SectionHead, formatDate } from "@/components/inner";
+import { InnerHero, NewsCard, SectionHead } from "@/components/inner";
+import { formatDate } from "@/lib/datetime";
 import { FaqCta } from "@/components/home/faqs";
 
 type Props = { params: Promise<{ slug: string }> };
