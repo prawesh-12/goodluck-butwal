@@ -4,7 +4,6 @@ import { social } from "@/config/site";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
-// Brand marks from extras/social_icons, so they keep their own colours rather than taking the text colour.
 export function SocialLinks({
   className,
   links = social,
@@ -37,7 +36,6 @@ export function Badge({ children, tone = "surface", className }: { children: Rea
   );
 }
 
-// Small pill used in feature chips and the use-case list.
 export function Chip({ children, tone = "surface", wrap }: { children: ReactNode; tone?: "surface" | "white"; wrap?: boolean }) {
   return (
     <span className={cx("inline-flex items-center rounded-full px-[14px] pb-[6px] pt-1 text-[14px] font-medium leading-[18.2px] text-muted", wrap ? "min-h-7 whitespace-normal text-left" : "h-7 whitespace-nowrap", tone === "surface" ? "bg-surface" : "bg-white")}>
@@ -46,7 +44,6 @@ export function Chip({ children, tone = "surface", wrap }: { children: ReactNode
   );
 }
 
-// Chevron list row (security list, pricing features).
 export function CheckRow({ children, icon = img.chevron, color = "text-muted", iconW = 6 }: { children: ReactNode; icon?: string; color?: string; iconW?: number }) {
   return (
     <div className="flex items-start gap-[6px]">
@@ -58,7 +55,7 @@ export function CheckRow({ children, icon = img.chevron, color = "text-muted", i
   );
 }
 
-// Infinite marquee. Children are rendered twice; the track slides one copy per cycle.
+// Children are rendered twice; the track slides one copy per cycle.
 export function Ticker({ children, gap, speed, className, reverse, align = "center" }: { children: ReactNode; gap: number; speed: number; className?: string; reverse?: boolean; align?: "center" | "end" }) {
   return (
     <div className={cx("ticker overflow-clip", className)}>
@@ -70,8 +67,7 @@ export function Ticker({ children, gap, speed, className, reverse, align = "cent
   );
 }
 
-// Full-bleed background photo with the white fades Framer uses on top and/or bottom.
-// soft: the fade only reaches white at the very edge, for a section that meets another photo instead of a white one.
+// soft: the fade reaches white only at the very edge, for a section meeting another photo.
 export function SectionBg({ src, top, bottom, soft, position = "50% 0%", children, className }: { src: string; top?: boolean; bottom?: boolean; soft?: boolean; position?: string; children?: ReactNode; className?: string }) {
   // Tailwind only generates classes it can read in full, so the four gradients are spelled out.
   const fade = "absolute -left-[10px] -right-[10px] z-[2] h-[100px] md:h-[160px] lg:h-[200px]";

@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { lookupRedirect } from "@/lib/seo/redirects";
 
-// Presence of the cookie only, so the edge stays cheap and middleware pulls in no auth library.
-// The admin layout reads the real session and turns away anyone expired or deactivated.
+// Cookie presence only, so the edge pulls in no auth library. The admin layout reads the real
+// session and turns away anyone expired or deactivated.
 const COOKIE = "better-auth.session_token";
 
 export async function middleware(request: NextRequest) {
@@ -26,7 +26,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Everything except Next's own assets, the files in public/, and the API. A redirect is for
-  // pages people follow, and the API must never answer a request with a 301.
+  // Pages only. A redirect is for URLs people follow, and the API must never answer with a 301.
   matcher: ["/((?!api|_next/static|_next/image|images|brand|videos|favicon.ico|robots.txt|sitemap.xml).*)"],
 };

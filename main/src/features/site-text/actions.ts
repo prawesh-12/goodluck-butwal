@@ -29,8 +29,7 @@ export async function updateUiString(input: unknown): Promise<Result> {
     .where(eq(uiStrings.key, key));
   if (!existing) return { ok: false, error: "That text no longer exists." };
 
-  // Nothing keeps a second copy of the seeded wording, so a cleared box leaves the current text
-  // in place instead of putting a blank space on the site.
+  // Nothing keeps a second copy of the seeded wording, so a cleared box keeps the current text.
   if (value.trim() === "") {
     return { ok: true, note: "Left as it was. An empty box would show a blank space on the site." };
   }

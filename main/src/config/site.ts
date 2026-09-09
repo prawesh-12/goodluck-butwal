@@ -1,4 +1,4 @@
-// Every fact here was checked against goodluck_main. Do not type an address, phone or email anywhere else.
+// The one source for addresses, phones and emails. Do not type one anywhere else.
 export const company = {
   name: "Goodluck Education & Migration",
   short: "Goodluck",
@@ -63,7 +63,6 @@ export const offices: Office[] = [
 
 export const officeById = (id: OfficeId) => offices.find((o) => o.id === id)!;
 
-// Fill in the real profile URLs; the icons render from these.
 export const social = [
   { label: "Facebook", href: "#", icon: "/images/social/facebook.webp" },
   { label: "Instagram", href: "#", icon: "/images/social/instagram.webp" },

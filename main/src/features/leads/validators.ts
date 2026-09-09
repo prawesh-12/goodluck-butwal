@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-// Digits, plus and the usual separators. Kept loose because the offices take calls from
-// everywhere and a rejected phone number loses a lead.
+// Kept loose: the offices take calls from everywhere and a rejected number loses a lead.
 const phone = z
   .string()
   .trim()

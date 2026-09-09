@@ -43,8 +43,8 @@ const CRUDP: Action[] = [...CRUD, "publish"];
 const CRU: Action[] = ["create", "read", "update"];
 const NONE: Action[] = [];
 
-// The permission matrix, as data. Nothing else in the app decides who may do what.
-// "own" scoping is not expressed here, scopedWhere and requireOwnership handle it.
+// Nothing else in the app decides who may do what. "own" scoping lives in scopedWhere and
+// requireOwnership, not here.
 const MATRIX: Record<Entity, Record<UserRole, Action[]>> = {
   offices: { super_admin: CRUDP, au_admin: ["read", "update"], np_admin: ["read", "update"], content_editor: NONE },
   team: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
@@ -106,8 +106,8 @@ export function requirePermission(user: Actor, entity: Entity, action: Action): 
   }
 }
 
-// Super admins have no office and see everything. Everyone else is pinned to theirs, plus rows
-// that belong to no office because those are shared. Never compare office_id anywhere else.
+// Super admins see everything, everyone else is pinned to their office plus office-less rows.
+// Never compare office_id anywhere else.
 export function scopedWhere(
   table: PgTable & { officeId: AnyPgColumn },
   user: Actor,

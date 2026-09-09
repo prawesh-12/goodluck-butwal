@@ -1,8 +1,7 @@
 export const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
 
-// Every timestamp is stored UTC. Times only mean anything next to the office they belong to,
-// so the zone abbreviation is always shown.
+// Timestamps are stored UTC and only mean anything next to an office, so the zone is named.
 export function formatInOfficeTz(
   value: Date | string,
   timeZone: string,
@@ -23,9 +22,8 @@ export function formatInOfficeTz(
   }).format(date);
 }
 
-// A time typed into a form is HH:MM, the same column read back from Postgres is HH:MM:SS, and
-// the two used to be pasted into the same template. Appending seconds to a value that already
-// had them produced an invalid date, which threw at format time rather than here.
+// A form sends HH:MM, the same column read back from Postgres is HH:MM:SS. Appending seconds
+// to a value that already had them produced an invalid date.
 export function officeSlot(date?: string | null, time?: string | null): Date | null {
   if (!date || !time) return null;
   const [hour, minute] = time.split(":");
@@ -45,8 +43,6 @@ const clock = (time: string) => {
 
 export type OpeningHours = { day: number; open: string; close: string; closed: boolean }[];
 
-// Renders the one line the contact cards show, e.g. "Mon - Fri: 10 am to 5 pm".
-// Returns null when the office keeps no published hours.
 export function formatOpeningHours(hours: OpeningHours | null | undefined) {
   const open = hours?.filter((h) => !h.closed) ?? [];
   if (open.length === 0) return null;

@@ -3,7 +3,7 @@ import type { Entity } from "@/lib/auth/rbac";
 export type NavItem = { href: string; label: string; entity: Entity };
 export type NavGroup = { heading: string; items: NavItem[] };
 
-// The sidebar is data. A row appears only if the matrix says the user may read that entity.
+// A row appears only if the permission matrix says the user may read that entity.
 export const NAV: NavGroup[] = [
   {
     heading: "Enquiries",

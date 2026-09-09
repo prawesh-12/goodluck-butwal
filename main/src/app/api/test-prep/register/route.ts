@@ -62,8 +62,7 @@ export async function POST(request: Request) {
   const refusal = registrationRefusal(batch);
   if (refusal) return NextResponse.json({ ok: false, error: refusal }, { status: 409 });
 
-  // Two people can hit the last seat at once, so the seat is claimed by the update itself and
-  // the row is only written if that update took one.
+  // The seat is claimed by the update itself, so two people cannot take the last one.
   const [claimed] = await db
     .update(testPrepBatches)
     .set({ seatsTaken: sql`${testPrepBatches.seatsTaken} + 1`, updatedAt: new Date() })
@@ -82,8 +81,6 @@ export async function POST(request: Request) {
     ipHash,
   });
 
-  // The seat is taken and the row is written. Mail is sent after that and never fails the
-  // request, the same as every other form on the site.
   const details = {
     fullName: data.fullName,
     email: data.email,

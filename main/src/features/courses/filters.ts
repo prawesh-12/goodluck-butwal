@@ -1,5 +1,4 @@
-// Filter state lives in the URL so a course search can be shared and the back button works.
-// Pure: no database, no React, so it can be unit tested on its own.
+// Filter state lives in the URL so a search can be shared and the back button works.
 
 export const PER_PAGE = 20;
 
@@ -65,8 +64,7 @@ const known = <T extends string>(value: string | string[] | undefined, allowed: 
   return v && (allowed as readonly string[]).includes(v) ? (v as T) : undefined;
 };
 
-// Anything that is not a slug we already hold is dropped, so a hand-edited URL renders a page
-// rather than an error.
+// Unknown slugs are dropped, so a hand-edited URL renders a page rather than an error.
 export function parseCourseFilters(params: SearchParams, options: KnownFilters): CourseQuery {
   const page = Number.parseInt(first(params.page) ?? "", 10);
   const keyword = first(params.q);

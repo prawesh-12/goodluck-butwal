@@ -12,7 +12,6 @@ import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { Turnstile } from "@/components/shared/turnstile";
 import { trackFormSubmit } from "@/lib/integrations/analytics";
 
-// The button stays translucent until the required fields are filled.
 function SubmitButton({ label, ready, className = "" }: { label: string; ready: boolean; className?: string }) {
   return (
     <button type="submit" disabled={!ready} className={`inline-flex h-[57px] items-center justify-center rounded-full px-11 text-[16px] font-semibold leading-[20.8px] text-white transition-colors duration-300 md:h-[59px] md:text-[18px] md:leading-[23.4px] ${ready ? "bg-ink hover:bg-black" : "bg-black/30 backdrop-blur-[5px]"} ${className}`}>
@@ -21,8 +20,7 @@ function SubmitButton({ label, ready, className = "" }: { label: string; ready: 
   );
 }
 
-// The list is drawn in the page rather than by the operating system, so it matches the field it
-// drops out of on every platform.
+// Drawn in the page, not by the operating system, so it matches the field on every platform.
 const TRIGGER = "flex h-[50px] w-full items-center justify-between gap-3 rounded-[10px] bg-white px-5 text-left text-[16px] font-medium text-ink outline-none ring-1 ring-inset ring-hairline focus-visible:ring-2 focus-visible:ring-ink/40";
 const LIST = "fixed z-[60] max-h-[280px] overflow-y-auto rounded-[10px] bg-white p-[6px] text-[16px] font-medium text-ink shadow-[0_18px_40px_-12px_rgba(29,29,29,0.28)] ring-1 ring-hairline";
 const OPTION = "cursor-pointer select-none rounded-[8px] px-4 py-[10px] leading-[22px] outline-none aria-selected:bg-surface aria-selected:text-ink data-[active]:bg-surface data-[active]:text-ink aria-disabled:pointer-events-none aria-disabled:opacity-50";
@@ -54,8 +52,7 @@ function useReady(required: string[]) {
   return { ready, check };
 }
 
-// Bots fill every field they find. This one is invisible and never focusable, so a value in it
-// only ever came from a script.
+// Invisible and never focusable, so a value in it only ever came from a script.
 function Honeypot() {
   return (
     <div aria-hidden className="hidden">
@@ -99,8 +96,7 @@ async function post(url: string, body: Record<string, unknown>) {
   return (await res.json()) as { ok: boolean; reference?: string; error?: string };
 }
 
-// What a form turns into once it has been sent: the confirmation sentence, then the answers read
-// back so the visitor can see what actually reached us. No reference code, the email carries it.
+// No reference code: the confirmation email carries it.
 function Sent({ message, rows, note }: { message: string; rows: [string, string][]; note?: string }) {
   const shown = rows.filter(([, value]) => value);
   return (

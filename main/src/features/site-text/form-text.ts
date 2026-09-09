@@ -1,7 +1,6 @@
 import { loadText } from "@/features/site-text/queries";
 
-// Every form label, placeholder, button and message in one object. The forms are client
-// components, so their wording has to arrive as a prop rather than be read where it is used.
+// The forms are client components, so their wording arrives as a prop.
 export type FormText = {
   note: string;
   error: string;
@@ -44,8 +43,6 @@ export type FormText = {
 export async function formText(): Promise<FormText> {
   const t = await loadText();
   return {
-    // Blank by default. The approved forms carry no note or intro, so nothing renders until an
-    // admin writes one.
     note: t("forms.required_note", ""),
     error: t("forms.error", "That did not go through. Try again."),
     sending: t("forms.sending", "Sending"),

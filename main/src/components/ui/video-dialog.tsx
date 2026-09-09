@@ -5,14 +5,12 @@ import { createPortal } from "react-dom";
 import { Play, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 
-// Magic UI's HeroVideoDialog ("from-center"), playing a local mp4 instead of an iframe.
-// The modal is portalled to <body> because the thumbnail lives inside a card link, and the play button stops that link from navigating.
+// Portalled to <body>: the thumbnail sits inside a card link, and the play button must not navigate it.
 export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bare, className = "" }: { src: string; loopSrc?: string; poster?: string; title: string; inline?: boolean; prefetch?: boolean; bare?: boolean; className?: string }) {
   const [open, setOpen] = useState(false);
-  // `inline` is a live "should be rolling" flag. The element is kept once mounted so scrolling back
-  // and forth does not restart the download; it just plays or rewinds and pauses.
-  // `prefetch` mounts and buffers it; `inline` starts and stops playback. Splitting the two keeps the decode
-  // off the frame where the card arrives, which is what would otherwise show up as a stutter mid-scroll.
+  // prefetch mounts and buffers, inline starts and stops playback. Splitting them keeps the
+  // decode off the frame the card arrives on. Once mounted the element stays, so scrolling
+  // back does not restart the download.
   const [mounted, setMounted] = useState(false);
   const loop = useRef<HTMLVideoElement>(null);
   if ((inline || prefetch) && !mounted) setMounted(true);

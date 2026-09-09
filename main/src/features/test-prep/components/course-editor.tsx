@@ -28,8 +28,8 @@ export type CourseValue = SeoValue & {
   sortOrder: number;
 };
 
-// One line rather than an import: a client component that pulls in a validator drags zod into
-// the browser bundle, which is at its cap.
+// Inlined rather than imported: a client component pulling in a validator drags zod into the
+// browser bundle.
 const coursePath = (slug: string) => `/test-preparation/${slug}`;
 
 export function TestPrepCourseEditor({

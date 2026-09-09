@@ -23,8 +23,7 @@ import { loadText } from "@/features/site-text/queries";
 export const metadata = previewMetadata;
 export const dynamic = "force-dynamic";
 
-// Every content type a draft can exist in. Posts keep their own route because they render the
-// full article template; these show the stored copy so an editor can read it before publishing.
+// Posts keep their own route because they render the full article template.
 const KINDS: Record<
   string,
   { entity: Entity; table: PgTable; slug: PgColumn; title: PgColumn; body: PgColumn | null; status: PgColumn }

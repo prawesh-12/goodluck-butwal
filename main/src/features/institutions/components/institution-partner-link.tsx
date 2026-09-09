@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { linkPartnersToInstitutions } from "@/features/institutions/actions";
 import { Button } from "@/components/ui/admin/button";
 
-// Partner logos and institutions are two tables today. This joins the rows whose names already
-// match, so the home page ticker and the institution pages read from one source.
+// Joins partner rows to institutions whose names already match, so both read one source.
 export function InstitutionPartnerLink() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);

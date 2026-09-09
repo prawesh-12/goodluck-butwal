@@ -1,7 +1,7 @@
 "use client";
 
-// Two plain calls against the Better Auth endpoints rather than its React client. That client
-// pulls zod, jose, kysely and nanostores into the browser bundle for what amounts to two POSTs.
+// Plain fetch, not the Better Auth React client, which would pull its whole runtime into the
+// browser for two POSTs.
 
 type Result = { ok: boolean; error?: string };
 

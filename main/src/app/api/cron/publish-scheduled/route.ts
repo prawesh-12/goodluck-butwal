@@ -112,8 +112,7 @@ export async function GET(request: Request) {
   return NextResponse.json({ ok: true, published });
 }
 
-// Hashing first makes both sides the same length, so a wrong secret gives nothing away through
-// how long the compare takes.
+// Hash first so both sides are equal length and the compare cannot leak the secret by timing.
 async function sameSecret(given: string, expected: string) {
   const [a, b] = await Promise.all([digest(given), digest(expected)]);
   let diff = 0;

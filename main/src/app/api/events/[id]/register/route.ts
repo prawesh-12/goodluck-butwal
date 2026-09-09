@@ -73,8 +73,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     );
   }
 
-  // Two seats could still be sold twice under a burst. Overbooking by one is a phone call;
-  // a duplicate email is not, which is why that one is settled by the unique index below.
+  // Overbooking by one is a phone call, a duplicate registration is not. The unique index
+  // settles duplicates; the re-count after insert settles the last seat.
   const refusal = registrationRefusal({
     registrationEnabled: event.registrationEnabled,
     registrationDeadline: event.registrationDeadline,
@@ -97,17 +97,15 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       sourcePage: data.sourcePage,
       ipHash,
     })
-    // The unique index is on (event_id, lower(email)), an expression, so no target is named:
-    // any conflict on this table is that one.
+    // The unique index is an expression, (event_id, lower(email)), so no target can be named.
     .onConflictDoNothing()
     .returning({ id: eventRegistrations.id });
 
   const outcome = insertOutcome(inserted);
   if (!outcome.ok) return NextResponse.json(outcome, { status: 409 });
 
-  // The capacity check above is a read, so a burst could slip past it. Re-count inside the same
-  // request and give the seat back if this registration is the one that tipped it over. The
-  // unique index already settles duplicates, this settles the last seat.
+  // The capacity check above is a read and races. Re-count here and give the seat back if
+  // this registration is the one that tipped it over.
   if (event.capacity !== null) {
     const [after] = await db
       .select({ taken: sql<number>`coalesce(sum(${eventRegistrations.attendees}), 0)::int` })

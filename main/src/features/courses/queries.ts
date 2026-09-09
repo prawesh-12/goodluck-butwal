@@ -129,8 +129,7 @@ function courseWhere(query: CourseQuery) {
 }
 
 export async function listCourses(query: CourseQuery) {
-  // The total comes back on every row as a window count, so the page costs one round trip rather
-  // than a second pass over the same filter.
+  // The total rides along as a window count, so the page costs one round trip.
   const rows = await db
     .select({ ...courseColumns, total: sql<number>`count(*) over ()`.mapWith(Number) })
     .from(courses)
@@ -169,8 +168,7 @@ export const getCourse = cache(async (slug: string): Promise<PublicCourse | unde
 export type FilterOption = { slug: string; name: string };
 
 export const listCourseFilterOptions = cache(async () => {
-  // Three short lists in one round trip. Destinations and categories keep their own order column,
-  // institutions have none so every row shares a rank and the name decides.
+  // Three lists in one round trip. Institutions have no order column, so the name decides.
   const rows = await unionAll(
     db
       .select({

@@ -1,8 +1,8 @@
 import localFont from "next/font/local";
 import { Bricolage_Grotesque } from "next/font/google";
 
-// Inter Display is what Framer ships for body copy; it is not on Google Fonts, so the latin files are
-// bundled. Only 500 and 600 are ever asked for, and every extra face here is preloaded.
+// Not on Google Fonts, so the latin files are bundled. Only 500 and 600 are used, and every
+// face declared here is preloaded.
 export const interDisplay = localFont({
   src: [
     { path: "../assets/fonts/InterDisplay-Medium.woff2", weight: "500" },

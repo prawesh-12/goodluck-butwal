@@ -137,7 +137,6 @@ export function Toggle({
   );
 }
 
-// One list of rows, in the order the site shows them. Add, remove, and move a row up or down.
 export function Repeater<T>({
   label,
   help,

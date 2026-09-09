@@ -13,9 +13,8 @@ export const getFooterColumns = cache(async (): Promise<FooterColumn[]> => {
   const byKey = await allUiStrings();
   const columns = new Map<string, FooterColumn>();
 
-  // A column is a list of links, so its first link is what proves it is one. Taking every
-  // footer.* key instead built empty columns headed "tagline" and "copyright", and a second
-  // "Offices" beside the one the footer lays out itself from the offices table.
+  // A column is proved by its first link. Taking every footer.* key instead built empty columns
+  // headed "tagline" and "copyright", and a second "Offices".
   for (const key of byKey.keys()) {
     const slug = /^footer\.([^.]+)\.0\.label$/.exec(key)?.[1];
     if (!slug) continue;
@@ -39,8 +38,7 @@ export const getSocialLinks = cache(async (): Promise<SocialLink[]> => {
   return links.filter((link) => link.href && link.href !== "#");
 });
 
-// Undefined rather than an empty string: the hero keeps its own default image, so nothing set
-// here means the page looks the way it ships.
+// Undefined, not "": nothing set here means the hero keeps the image it ships with.
 export const getHeroImage = cache(async (): Promise<string | undefined> => {
   const id = String((await allSettings()).get("hero_image_id") ?? "");
   if (!id) return undefined;

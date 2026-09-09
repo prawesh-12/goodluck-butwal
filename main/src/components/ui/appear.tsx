@@ -3,7 +3,6 @@
 import { motion, useReducedMotion } from "motion/react";
 import type { CSSProperties, ReactNode } from "react";
 
-// Framer's "appear on scroll" preset: spring, no bounce, y offset, staggered delay.
 export function Appear({
   children,
   y = 20,

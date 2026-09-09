@@ -15,8 +15,7 @@ export function TeamGrid({ team }: { team: PublicMember[] }) {
   const { office } = useOffice();
   const [tab, setTab] = useState<Tab>(office);
   const [lastOffice, setLastOffice] = useState(office);
-  // Follows the header selector. Adjusted during render rather than in an effect so the right tab
-  // is on screen for the first paint instead of one frame later.
+  // Adjusted during render, not in an effect, so the right tab is on screen for the first paint.
   if (office !== lastOffice) {
     setLastOffice(office);
     setTab(office);

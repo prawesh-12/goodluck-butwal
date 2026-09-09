@@ -5,14 +5,10 @@ import { db } from "@db/client";
 import { sessions, users } from "@db/schema";
 import type { Actor, UserRole } from "@/lib/auth/rbac";
 
-// Deliberately does NOT import lib/auth. Every admin page and server action reads the session,
-// and pulling the whole Better Auth server into each of those route chunks copied it into all of
-// them. Only /api/auth/[...all] builds the full server.
-//
-// Better Auth writes `better-auth.session_token=<token>.<signature>`, and `<token>` is the
-// value in sessions.token. The signature guards against a tampered cookie, but the token is a
-// random secret looked up in the database, so a forged one matches no row. The lookup below is
-// the check that actually decides.
+// Does not import lib/auth: that copies the whole Better Auth server into every admin route
+// chunk. Only /api/auth/[...all] builds it.
+// The cookie signature is not checked here. The token is a random secret looked up in the
+// database, so a forged one matches no row and the lookup is what decides.
 const COOKIE = "better-auth.session_token";
 const SECURE_COOKIE = `__Secure-${COOKIE}`;
 

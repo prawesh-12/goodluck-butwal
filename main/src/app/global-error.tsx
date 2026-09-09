@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 
-// The last resort: the root layout itself failed, so this renders its own html and body and
-// cannot use any component from the app.
+// The root layout itself failed, so this renders its own html and body and can use no component.
 export default function GlobalError() {
   return (
     <html lang="en">

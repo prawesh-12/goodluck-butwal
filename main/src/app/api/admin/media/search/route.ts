@@ -7,7 +7,6 @@ import { can } from "@/lib/auth/rbac";
 
 export const dynamic = "force-dynamic";
 
-// Feeds the media picker. Read-only, and it returns only what the picker renders.
 export async function GET(request: Request) {
   const actor = await requireActor();
   if (!can(actor, "media", "read")) {

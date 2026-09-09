@@ -19,8 +19,7 @@ export default async function EditServicePage({ params }: { params: Promise<{ id
   if (!row) notFound();
 
   const strings = await uiStringsFor(`service.${row.slug}.`);
-  // The poster is stored as a path because the page renders it directly, so it is matched back
-  // to the media row it came from.
+  // The poster is stored as a path, so it is matched back to the media row it came from.
   const posterImageId = await mediaIdByPath(strings.get(`service.${row.slug}.poster`) ?? "");
   const media = await pickedMedia([row.artworkId, row.reelId, row.seoOgImageId, posterImageId]);
   const path = servicePath(row.slug);

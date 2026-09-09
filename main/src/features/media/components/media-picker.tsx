@@ -17,8 +17,8 @@ export function mediaSrc(item: Pick<PickedMedia, "kind" | "staticPath" | "cloudi
   return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,q_auto,w_${width}/${item.cloudinaryPublicId}`;
 }
 
-// The only way to choose an image anywhere in the admin. There are no file inputs on any form,
-// so every image is a media_assets row with alt text attached to it.
+// The only way to choose an image in the admin. No form has a file input, so every image is a
+// media_assets row with alt text attached.
 export function MediaPicker({
   label,
   name,

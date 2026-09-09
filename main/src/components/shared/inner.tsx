@@ -7,8 +7,6 @@ import { Badge, Chip } from "@/components/ui/bits";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
-// Inner-page hero: sky or field photo with a white overlay, two faded clouds on desktop, centred copy.
-// Top padding is 128 / 158 / 194 by breakpoint; bottom padding and the gap to `after` vary per page.
 export function InnerHero({
   badge,
   badgeTone = "white",
@@ -71,7 +69,6 @@ export function InnerHero({
 
 export type Article = { slug: string; title: string; date: string; category: string; image: string; excerpt: string; width?: number; height?: number };
 
-// Article banners already carry the headline, so the card shows the banner, the category and the date.
 export function NewsCard({ article, delay = 0, className, href }: { article: Article; delay?: number; className?: string; href?: string }) {
   return (
     <Appear delay={delay} className={cx("p-1", className)}>
@@ -88,7 +85,6 @@ export function NewsCard({ article, delay = 0, className, href }: { article: Art
   );
 }
 
-// Team member: round portrait, name and role, as on the reference team grid.
 export function TeamCard({ name, role, photo, office, delay = 0, href }: { name: string; role: string; photo: string; office?: string; delay?: number; href?: string }) {
   const body = (
     <>
@@ -113,7 +109,6 @@ export function TeamCard({ name, role, photo, office, delay = 0, href }: { name:
   );
 }
 
-// Label-and-title card used for services, steps and highlights.
 export function InfoCard({ label, title, line, tone = "surface", icon, className, delay = 0 }: { label?: string; title: string; line?: string; tone?: "surface" | "white" | "dark" | "blue"; icon?: ReactNode; className?: string; delay?: number }) {
   const t = {
     surface: { card: "bg-surface", title: "", text: "text-muted", chip: "bg-white text-muted" },
@@ -135,7 +130,6 @@ export function InfoCard({ label, title, line, tone = "surface", icon, className
   );
 }
 
-// Section heading block: badge, title, optional lead. Centred by default.
 export function SectionHead({ badge, title, lead, align = "center", badgeTone = "surface", className }: { badge?: string; title: ReactNode; lead?: string; align?: "center" | "left"; badgeTone?: "surface" | "white"; className?: string }) {
   const centre = align === "center";
   return (
@@ -147,7 +141,6 @@ export function SectionHead({ badge, title, lead, align = "center", badgeTone = 
   );
 }
 
-// Form field as measured: label 15/16px muted, 50px white box, 10px radius, hairline border.
 export function Field({ label, name, type = "text", placeholder, textarea, className, required, min, max, help }: { label: string; name: string; type?: string; placeholder?: string; textarea?: boolean; className?: string; required?: boolean; min?: string; max?: string; help?: string }) {
   return (
     <label className={cx("flex flex-col items-start gap-[10px]", className)}>
@@ -162,7 +155,6 @@ export function Field({ label, name, type = "text", placeholder, textarea, class
   );
 }
 
-// Stat card: phone p20 r10 auto height, tablet 250px p30 r30, desktop 280px square on the homepage.
 export function StatCard({ label, value, text, icon, tone = "white", className }: { label: string; value: string; text: string; icon: string; tone?: "white" | "light" | "dark" | "blue"; className?: string }) {
   const t = {
     white: { card: "bg-white", label: "text-ink", value: "", text: "text-muted", icon: "icon-dark" },

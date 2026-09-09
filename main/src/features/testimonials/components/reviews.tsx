@@ -12,7 +12,7 @@ const metaFor = (googleRating: GoogleRating, t: Text) => [
   { icon: img.heart, w: 20, text: t("home.reviews.count", "{count} reviews").replace("{count}", String(googleRating.count)) },
 ];
 
-// Google reviews from the goodluck_main widget. Reviewers have no photos there, so an initial stands in.
+// Reviewers have no photo on Google, so an initial stands in.
 export function ReviewCard({ r, className = "" }: { r: PublicReview; className?: string }) {
   return (
     <div className={`flex flex-col items-start justify-between overflow-hidden rounded-[10px] bg-white p-5 md:rounded-[30px] md:p-10 ${className}`}>

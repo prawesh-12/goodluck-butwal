@@ -7,8 +7,7 @@ export function seatsRemaining(totalSeats: number, seatsTaken: number) {
   return totalSeats - seatsTaken;
 }
 
-// plan section 5. The status column overrides the count. "open" is what every row starts as,
-// so it is the one value that lets the count speak.
+// The status column overrides the count. "open" is the one value that lets the count speak.
 const OVERRIDE: Partial<Record<BatchStatus, SeatLabel>> = {
   filling_fast: "Filling fast",
   full: "Full",
@@ -30,8 +29,7 @@ export const BATCH_FULL = "That batch is full. Pick another batch and we will ho
 export const BATCH_CLOSED = "That batch has closed for registrations. Pick another batch.";
 export const BATCH_FINISHED = "That batch has already finished. Pick an upcoming one.";
 
-// The count is checked before the status, so a batch marked "filling fast" with no seats left
-// still cannot be booked into.
+// Count before status, so a batch marked "filling fast" with no seats left cannot be booked.
 export function registrationRefusal(batch: Seats): string | null {
   if (seatsRemaining(batch.totalSeats, batch.seatsTaken) <= 0) return BATCH_FULL;
   if (batch.status === "full") return BATCH_FULL;

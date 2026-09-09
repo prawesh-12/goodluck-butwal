@@ -41,8 +41,7 @@ export type KnownSlugs = { institutionSlugs: string[]; categorySlugs: string[] }
 const MONTH_BY_LOWER = new Map(INTAKE_MONTHS.map((month) => [month.toLowerCase(), month]));
 const LEVEL_BY_VALUE = new Map<string, QualificationLevel>(qualificationLevels.map((level) => [level, level]));
 
-// A hand-rolled reader beats a dependency here: quoted fields, doubled quotes and CRLF are the
-// whole grammar a spreadsheet export uses.
+// Quoted fields, doubled quotes and CRLF are the whole grammar a spreadsheet export uses.
 function readCsv(text: string): string[][] {
   const src = text.replace(/^﻿/, "");
   const rows: string[][] = [];

@@ -3,8 +3,7 @@ import { company } from "@/config/site";
 
 export type Schema = Record<string, unknown>;
 
-// A raw "<" would close the script tag the JSON is printed inside, so the three characters that
-// can start an HTML token are written as escapes instead.
+// A raw "<" would close the script tag the JSON is printed inside.
 export function toJsonLd(data: Schema | Schema[]) {
   return JSON.stringify(data)
     .replace(/</g, "\\u003c")

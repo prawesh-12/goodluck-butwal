@@ -69,8 +69,7 @@ export const listEvents = cache(async (): Promise<PublicEvent[]> => {
     image: mediaUrl(row, 960),
     officeCode: row.officeCode ?? "",
     officeName: row.officeName ?? "",
-    // Every published event has an office, so this fallback only ever covers a draft made live
-    // by hand in the database.
+    // Only reachable for a draft made live by hand in the database.
     timezone: row.timezone ?? "UTC",
   }));
 });
@@ -93,8 +92,6 @@ export type EventCard = {
   past: boolean;
 };
 
-// The list page. Times are formatted here, in the office that owns the event, and whether an
-// event has been and gone is decided here too rather than while a page renders.
 export const listEventCards = cache(async (): Promise<EventCard[]> => {
   const now = Date.now();
   return (await listEvents()).map((event) => ({
@@ -124,8 +121,7 @@ export type UpcomingEvent = {
   officeCode: string;
 };
 
-// The home page block. Formatting happens here because the office time zone is a server fact,
-// and the block itself only decides which office the visitor is seeing.
+// Formatted here because the office time zone is a server fact.
 export const listUpcomingEvents = cache(async (): Promise<UpcomingEvent[]> => {
   const now = Date.now();
   return (await listEvents())

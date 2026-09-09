@@ -1,7 +1,7 @@
 const GTM_SHAPE = /^GTM-[A-Z0-9]+$/;
 
-// Anything that is not a real container id renders nothing, so a blank setting, a leftover
-// placeholder or a pasted GA4 id cannot put a broken tag on every page.
+// A blank setting, a leftover placeholder or a pasted GA4 id must not put a broken tag on
+// every page.
 export function gtmId(fromSettings?: unknown): string | null {
   const id = String(fromSettings ?? "").trim() || (process.env.NEXT_PUBLIC_GTM_ID ?? "").trim();
   return GTM_SHAPE.test(id) ? id : null;

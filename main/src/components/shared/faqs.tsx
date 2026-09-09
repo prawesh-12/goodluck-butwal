@@ -49,7 +49,6 @@ export function Accordion({ items, defaultOpen = 0, variant = "surface" }: { ite
   );
 }
 
-// "Still have questions" card: three counsellors from the team list plus the reader.
 export function FaqCta({ faces, className = "", text = ctaText }: { faces: PublicMember[]; className?: string; text?: FaqCtaText }) {
   return (
     <div className={`flex w-full flex-col items-start gap-5 overflow-clip rounded-[10px] bg-surface p-5 md:rounded-[30px] md:p-10 ${className}`}>

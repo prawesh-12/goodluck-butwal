@@ -1,7 +1,5 @@
-// Constants and pure helpers the admin forms need in the browser. Kept apart from the Zod
-// schemas on purpose: a client component that imports a validator drags the whole zod runtime
-// into the browser bundle.
-// The schemas themselves stay shared between the client form and the server action.
+// Kept out of the Zod schemas: a client component importing a validator drags zod into the
+// browser bundle.
 
 export const EXCERPT_MAX = 200;
 
@@ -15,7 +13,6 @@ export const DAY_NAMES = [
   "Saturday",
 ];
 
-// The four card colours the homepage bento already paints.
 export const tones = ["blue", "dark", "surface", "white"] as const;
 export type Tone = (typeof tones)[number];
 
@@ -36,8 +33,7 @@ export const servicePath = (slug: string) => `/services/${slug}`;
 export type RequiredField = "quote" | "imageId" | "videoUrl" | "videoProvider";
 export type Requirement = { field: RequiredField; label: string; message: string };
 
-// The type selector decides what the record must carry. One list, read by the form, the schema
-// and the publish check.
+// One list, read by the form, the schema and the publish check.
 export function requiredFieldsFor(type: TestimonialType): Requirement[] {
   if (type === "text") {
     return [{ field: "quote", label: "Quote", message: "A written testimonial needs the quote." }];

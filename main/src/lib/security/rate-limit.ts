@@ -4,8 +4,7 @@ import { db } from "@db/client";
 
 const MAX_PER_HOUR = 3;
 
-// Counted from the rows themselves, so there is no store to keep in sync and a restart cannot
-// forget who has been submitting.
+// Counted from the rows themselves, so there is no store to keep in sync across a restart.
 export async function overRateLimit(
   table: PgTable & { ipHash: AnyPgColumn; createdAt: AnyPgColumn },
   ipHash: string,

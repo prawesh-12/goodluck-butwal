@@ -129,8 +129,7 @@ export type RegistrationGate = {
   attendees: number;
 };
 
-// The one place that decides whether a registration is accepted. Each refusal has its own words
-// so a visitor is told which of the two it was.
+// Each refusal has its own words so a visitor is told which one it was.
 export function registrationRefusal(gate: RegistrationGate, now: Date = new Date()): string | null {
   if (!gate.registrationEnabled) return REGISTRATION_OFF;
 
@@ -143,8 +142,7 @@ export function registrationRefusal(gate: RegistrationGate, now: Date = new Date
   return null;
 }
 
-// The unique index on (event_id, lower(email)) settles a race that a read-then-write cannot.
-// An insert that conflicts returns no row.
+// The unique index settles a race a read-then-write cannot. A conflicting insert returns no row.
 export function insertOutcome(inserted: unknown[]): { ok: true } | { ok: false; error: string } {
   return inserted.length > 0 ? { ok: true } : { ok: false, error: ALREADY_REGISTERED };
 }
@@ -182,8 +180,8 @@ function zoneOffsetMs(instant: Date, timeZone: string) {
   return wall - instant.getTime();
 }
 
-// "2026-03-01T18:00" typed by an admin in Melbourne is 18:00 in Melbourne, not in UTC. Two
-// passes because the offset itself depends on the instant, which is what we are solving for.
+// An admin types local time, not UTC. Two passes because the offset depends on the instant,
+// which is what we are solving for.
 export function zonedToUtc(local: string, timeZone: string): Date {
   const naive = Date.parse(`${local}:00Z`);
   const guess = new Date(naive - zoneOffsetMs(new Date(naive), timeZone));

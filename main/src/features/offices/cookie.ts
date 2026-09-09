@@ -14,8 +14,8 @@ export const officeCookie = (office: OfficeId) =>
 const officeFromTimezone = (timezone: string): OfficeId =>
   /Asia\/Kat(h)?mandu/.test(timezone) ? "np" : "au";
 
-// A cookie only counts when it names an office the site actually publishes, otherwise anyone
-// could park an unknown value in it and decide what the header shows.
+// Only a published office counts, otherwise anyone could park a value here and decide what
+// the header shows.
 export function resolveOffice(
   cookie: string | null | undefined,
   timezone: string,

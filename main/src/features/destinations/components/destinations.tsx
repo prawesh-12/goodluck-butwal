@@ -21,7 +21,7 @@ const fromRow = (rows: PublicDestination[], slug: string): Card => {
   return { slug, name: d.name, line: d.overview, fact: facts[slug], bg: d.card, pos: focus[slug], flag: d.flag, href: `/study-abroad/${slug}` };
 };
 
-// New Zealand has no destination page on goodluck_main yet, so its card only invites an enquiry.
+// New Zealand has no page of its own yet, so its card only invites an enquiry.
 export const destinationCards = (rows: PublicDestination[]): Card[] => [
   fromRow(rows, "australia"),
   { slug: "new-zealand", name: "New Zealand", line: "Ask our counsellors about studying in New Zealand.", bg: gl.newZealand, pos: focus["new-zealand"], flag: "/images/flags/new-zealand.svg", href: "/contact/book-consultation" },

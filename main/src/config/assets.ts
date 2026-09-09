@@ -1,4 +1,3 @@
-// Design assets carried over from the FintechX template (icons, clouds, decorations). Files live in public/images.
 export const img = {
   arrow: "/images/ui/arrow.svg",
   heroSky: "/images/hero/sky-v2.webp",
@@ -21,7 +20,6 @@ export const img = {
   arrowLeft: "/images/ui/arrow-left.svg",
 };
 
-// Goodluck's own artwork: brand files, hero, backgrounds, illustrations and photos.
 export const gl = {
   logo: "/brand/logo.png",
   mark: "/brand/mark.png",

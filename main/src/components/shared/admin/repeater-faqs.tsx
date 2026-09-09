@@ -8,7 +8,6 @@ export type FaqRow = { id?: string; question: string; answerHtml: string };
 
 type SaveResult = { ok: true } | { ok: false; error: string; fieldErrors?: Record<string, string[]> };
 
-// The same screen for both destination and service questions. Order here is order on the site.
 export function FaqEditor({
   ownerId,
   ownerName,

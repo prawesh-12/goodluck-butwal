@@ -4,7 +4,6 @@ import { db } from "@db/client";
 import { destinations, mediaAssets, uiStrings } from "@db/schema";
 import { mediaUrl } from "@/lib/utils/media-url";
 
-// The shape the approved destination pages already render.
 export type PublicDestination = {
   slug: string;
   name: string;

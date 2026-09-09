@@ -1,5 +1,4 @@
-// Cloudinary over plain fetch. Their SDK is large and the signature is one SHA-1 that
-// crypto.subtle already does.
+// Plain fetch, not the SDK: the signature is one SHA-1 that crypto.subtle already does.
 
 export type ImageWidth = 320 | 640 | 960 | 1280 | 1920;
 export type AllowedImageType = "image/jpeg" | "image/png" | "image/webp" | "image/avif";
@@ -23,7 +22,7 @@ function config() {
   return { cloudName, apiKey, apiSecret };
 }
 
-// Cloudinary's rule: sort the signed params by name, join as k=v&k=v, append the secret, SHA-1 it.
+// Cloudinary's rule: sort signed params by name, join k=v&k=v, append the secret, SHA-1.
 // file, api_key and resource_type are never signed.
 export async function signParams(params: Record<string, string | number>, apiSecret: string) {
   const toSign = Object.keys(params)
@@ -104,8 +103,7 @@ function ascii(bytes: Uint8Array, start: number, end: number) {
   return String.fromCharCode(...bytes.subarray(start, end));
 }
 
-// The client-supplied mime type and the filename are both attacker-controlled. The first bytes
-// of the file are not.
+// The mime type and filename are attacker-controlled. The first bytes are not.
 export function sniffImageType(bytes: Uint8Array): AllowedImageType | null {
   if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return "image/jpeg";
   if (bytes[0] === 0x89 && ascii(bytes, 1, 4) === "PNG") return "image/png";

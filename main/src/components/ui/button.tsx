@@ -29,7 +29,6 @@ function ArrowChip({ side, lg, flip, variants }: { side: "left" | "right"; lg: b
   );
 }
 
-// Pill with the arrow chip that swaps sides on hover. lg = hero button (49/51/55px by breakpoint), sm = nav button (34/38px).
 export function PillButton({
   href,
   children,
@@ -48,7 +47,7 @@ export function PillButton({
   const lg = size === "lg";
   const flip = iconSide === "left";
   const big = 44 / 31;
-  // Hidden chip sits 50px past its slot so nothing peeks out of the pill, as on the reference.
+  // The hidden chip sits 50px past its slot so nothing peeks out of the pill.
   const shift = 50;
   const chipVariants = flip
     ? {
@@ -91,7 +90,6 @@ export function PillButton({
   );
 }
 
-// Solid pill without the chip. white: white → black on hover. dark: #1D1D1D → hairline on hover.
 export function FlatButton({
   href,
   children,

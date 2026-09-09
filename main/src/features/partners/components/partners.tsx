@@ -1,6 +1,5 @@
 import { Badge, Ticker } from "@/components/ui/bits";
 
-// The 43 partner logos from goodluck_main, unnamed there too.
 import { loadText } from "@/features/site-text/queries";
 
 export async function Partners({ logos, tone = "default", className = "" }: { logos: string[]; tone?: "default" | "dark" | "gray"; className?: string }) {

@@ -1,5 +1,4 @@
 // Search state lives in the URL so a result page can be shared and the back button works.
-// Pure: no database, no React, so it can be unit tested on its own.
 
 import type { Article } from "@/components/shared/inner";
 
@@ -28,8 +27,7 @@ export const MAX_QUERY = 100;
 export type SearchHit = { kind: SearchKind; href: string; article: Article };
 export type SearchGroup = { kind: SearchKind; label: string; count: number; hits: SearchHit[] };
 
-// ILIKE reads % and _ as wildcards, so a search for "100%" or "year_one" has to escape them,
-// and the backslash that escapes them has to be escaped first.
+// ILIKE reads % and _ as wildcards, and the escaping backslash has to be escaped first.
 const escapeLike = (value: string) => value.replace(/[\\%_]/g, "\\$&");
 
 export function searchTerm(raw: string | string[] | null | undefined) {

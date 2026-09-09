@@ -6,8 +6,7 @@ type Message = {
   replyTo?: string;
 };
 
-// Every message carries a plain-text alternative. Deriving it from the html keeps the two in
-// step, which hand-written pairs never manage.
+// Derived from the html so the two cannot drift apart.
 function toPlainText(html: string) {
   return html
     .replace(/<style[\s\S]*?<\/style>/gi, "")
@@ -51,16 +50,13 @@ export async function sendEmail({ to, subject, html, replyTo }: Message) {
   }
 }
 
-// The row is already saved by the time we get here, so a mail failure must not fail the request.
-// It is logged and swallowed.
 export async function sendEmailQuietly(message: Message) {
   try {
     await sendEmail(message);
     return true;
   } catch (error) {
-    // The row is already saved, so a failed send must not fail the request. The subject and the
-    // reason are logged, never the body: that carries the enquirer's own words. Without the
-    // reason an unverified sending domain looks identical to a network outage.
+    // The row is already saved, so a failed send must not fail the request. Subject and reason
+    // only, never the body: that carries the enquirer's own words.
     console.error("email failed", { subject: message.subject, reason: (error as Error).message });
     return false;
   }

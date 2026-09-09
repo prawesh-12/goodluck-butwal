@@ -60,8 +60,7 @@ export type OfficeInput = z.infer<typeof updateOfficeSchema>;
 
 export type AltText = { hero?: string | null; shareImage?: string | null };
 
-// Everything the contact cards, the header and the footer read. Named one by one so the answer
-// is a list to fix, not "invalid".
+// Named one by one so the answer is a list to fix, not "invalid".
 export function officePublishProblems(data: OfficeInput, alt: AltText): string[] {
   const missing: string[] = [];
   if (!data.city) missing.push("City");

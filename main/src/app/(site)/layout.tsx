@@ -25,8 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Published content is live within five minutes without a deploy. Admin routes opt out with
-// force-dynamic.
 export const revalidate = 300;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

@@ -272,8 +272,7 @@ export async function saveInstitutionGallery(input: unknown): Promise<Result> {
   return { ok: true, data: { id: owner.id } };
 }
 
-// The ticker and the institution pages should show one set of logos. Nothing is invented here:
-// a partner is only linked when its name already matches an institution exactly.
+// A partner is only linked when its name already matches an institution exactly.
 export async function linkPartnersToInstitutions(): Promise<Result<{ linked: number }>> {
   const actor = await requireActor();
   requirePermission(actor, "institutions", "update");

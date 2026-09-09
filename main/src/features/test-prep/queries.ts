@@ -79,8 +79,7 @@ export const listTestPrepCourses = cache(async (): Promise<PublicCourse[]> => {
     feeCurrency: row.feeCurrency,
     image: mediaUrl(row, 960),
     imageAlt: row.imageAlt ?? "",
-    // Batch times are office-local, so a course with no office falls back to the Nepal zone
-    // it is taught in.
+    // Batch times are office-local, so a course with no office falls back to the Nepal zone.
     timezone: row.timezone ?? "Asia/Kathmandu",
   }));
 });

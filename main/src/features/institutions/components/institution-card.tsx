@@ -5,9 +5,7 @@ import type { PublicInstitution } from "@/features/institutions/queries";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
-// The news card, with the institution logo where the article banner goes.
-// Same markup as NewsCard, which hard-codes a /news link and renders no title. An institution
-// logo carries no name, so the card needs both.
+// Not NewsCard: that hard-codes a /news link and renders no title, and a logo carries no name.
 export function InstitutionCard({
   institution,
   delay = 0,

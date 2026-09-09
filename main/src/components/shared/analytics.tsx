@@ -2,8 +2,7 @@ import Script from "next/script";
 import { gtmId } from "@/lib/integrations/analytics";
 import { allSettings } from "@db/settings";
 
-// The GA4 id is configured inside the container, not here, so changing measurement never needs
-// a deploy. The container id itself comes from settings for the same reason.
+// The GA4 id lives in the container and the container id in settings, so neither needs a deploy.
 export async function Analytics() {
   const configured = (await allSettings()).get("gtm_id");
 

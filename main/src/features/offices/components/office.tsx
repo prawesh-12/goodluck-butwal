@@ -5,8 +5,7 @@ import type { OfficeId } from "@/config/site";
 import type { PublicOffice } from "@/features/offices/queries";
 import { officeCookie, readOfficeCookie, resolveOffice } from "@/features/offices/cookie";
 
-// One brand, three offices: a saved choice wins, otherwise the visitor's timezone decides which
-// one the site leads with.
+// A saved choice wins, otherwise the visitor's timezone decides.
 const Ctx = createContext<{ office: OfficeId; offices: PublicOffice[]; choose: (office: OfficeId) => void }>({
   office: "au",
   offices: [],
@@ -31,8 +30,8 @@ function choose(office: OfficeId) {
 
 export function OfficeProvider({ children, offices }: { children: ReactNode; offices: PublicOffice[] }) {
   const codes = offices.map((o) => o.id);
-  // The server snapshot is "au" so the first client render matches the HTML; React swaps in the
-  // real answer straight after hydration, which is why the cookie is never read on the server.
+  // The server snapshot is "au" so the first client render matches the HTML. This is why the
+  // cookie is never read on the server, which would make every public page dynamic.
   const office = useSyncExternalStore(
     subscribe,
     () =>

@@ -31,8 +31,8 @@ type Result<T> = { ok: true; data: T } | { ok: false; error: string; fieldErrors
 const GOING_LIVE = new Set(["published", "scheduled"]);
 const blank = (value: string) => (value === "" ? null : value);
 
-// Test prep is Nepal's, matrix section 7. Every course is filed to the Nepal office so the
-// ownership check has something to compare against.
+// Every test prep course is filed to the Nepal office, so the ownership check has something
+// to compare against.
 async function nepalOfficeId() {
   const [row] = await db.select({ id: offices.id }).from(offices).where(eq(offices.code, "np"));
   return row?.id ?? null;

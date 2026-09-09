@@ -8,7 +8,6 @@ import { gl } from "@/config/assets";
 import { nav } from "@/config/site";
 import { PillButton } from "@/components/ui/button";
 
-// Eight stacked backdrop-blur layers with masks: the progressive blur under the floating nav.
 function BlurTop() {
   const layers = [0.078125, 0.15625, 0.3125, 0.625, 1.25, 2.5, 5, 10];
   return (

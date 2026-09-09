@@ -11,7 +11,6 @@ export type SeoValue = {
   canonicalUrl: string;
 };
 
-// Used by every entity that has its own address on the site.
 export function SeoFields({
   value,
   onChange,

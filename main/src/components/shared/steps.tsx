@@ -1,4 +1,3 @@
-// The tab strip sits on a panel like a browser tab: white line hides the panel border, shoulders curve up, a gradient fades the sides.
 export function TabShoulders({ width }: { width: number }) {
   return (
     <>

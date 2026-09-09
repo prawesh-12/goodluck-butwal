@@ -9,8 +9,7 @@ const STATUSES = ["draft", "scheduled", "published", "archived"];
 
 export type OfficeOption = { id: string; name: string };
 
-// Shared by the offices, team and partners lists. Search waits for a pause in typing, so a long
-// name is one query rather than twelve.
+// Search waits for a pause in typing, so a long name is one query rather than twelve.
 export function ContentFilters({
   placeholder,
   offices,

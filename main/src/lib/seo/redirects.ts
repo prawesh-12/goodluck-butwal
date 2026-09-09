@@ -4,9 +4,8 @@ import { redirects } from "@db/schema";
 
 type Rule = { to: string; status: number };
 
-// Held for five minutes in the isolate. Middleware runs on every request, so reading the table
-// each time would put a query in front of the whole site. A rename is live within five minutes,
-// which is the same window the plan gives published content.
+// Cached in the isolate: middleware runs on every request, so reading the table each time
+// would put a query in front of the whole site.
 const TTL = 5 * 60 * 1000;
 
 let cache: Map<string, Rule> | null = null;

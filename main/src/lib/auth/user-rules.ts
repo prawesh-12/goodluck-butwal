@@ -15,8 +15,7 @@ type Change = {
   confirmation?: string;
 };
 
-// Returns the reason a change is refused, or null when it is allowed. Kept apart from the
-// database so every branch can be tested directly.
+// Kept apart from the database so every branch can be tested directly.
 export function refusalReason(change: Change): string | null {
   const {
     actorId,

@@ -12,9 +12,8 @@ import { loadText } from "@/features/site-text/queries";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero, SectionHead } from "@/components/shared/inner";
 
-// The registered particulars a regulator asks for are not in this repo, so the body is left to
-// the admin. Everything the page states on its own comes from the office table and the company
-// record, which are the two places those facts already live.
+// Registered particulars are not in this repo, so the body is admin-editable. Everything else
+// comes from the office table and the company record.
 const getProfileBody = cache(async () => {
   const [row] = await db
     .select({ intro: pages.intro, bodyHtml: pages.bodyHtml })

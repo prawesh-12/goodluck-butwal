@@ -13,8 +13,7 @@ import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }> };
 
-// people.ts carries the grid, which needs neither the bio nor the lists, so the profile reads
-// its own row rather than widening the query every other page runs.
+// Its own row rather than widening listTeam(), which every other page runs.
 const getMember = cache(async (slug: string) => {
   const [row] = await db
     .select({

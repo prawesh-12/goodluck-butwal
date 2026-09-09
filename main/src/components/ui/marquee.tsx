@@ -2,7 +2,6 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
-// Magic UI Marquee (magicui.design/docs/components/marquee), cn() swapped for the local cx.
 export function Marquee({
   className,
   reverse = false,

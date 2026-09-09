@@ -11,7 +11,6 @@ export type SeoValues = {
   canonicalUrl: string;
 };
 
-// Shared by the offices and team editors, the two entities that carry SEO columns.
 export function SeoSection({
   values,
   path,
@@ -90,7 +89,6 @@ export function SeoSection({
   );
 }
 
-// The one text field every admin editor uses.
 export function Field({
   name,
   label,

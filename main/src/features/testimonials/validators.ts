@@ -21,8 +21,6 @@ const goLiveAt = z
   .refine((v) => v === "" || !Number.isNaN(Date.parse(v)), "Choose a date and a time.")
   .default("");
 
-// The type selector decides what the record must carry. One list, read by the form, the schema
-// and the publish check.
 
 const fields = {
   type: z.enum(testimonialTypes),

@@ -5,8 +5,6 @@ import { offices, services } from "@db/schema";
 import { formatOpeningHours, type OpeningHours } from "@/lib/utils/datetime";
 import type { OfficeId } from "@/config/site";
 
-// The shape the public components render. Client components take this as a prop, they cannot
-// query themselves.
 export type PublicOffice = {
   id: OfficeId;
   country: string;
@@ -70,8 +68,7 @@ export type OfficeProfile = PublicOffice & {
   credentialsHtml: string | null;
 };
 
-// Melbourne and Butwal are the two offices with a page of their own. Cebu is a contact address,
-// so /offices/cebu has to 404 rather than render a half-empty page.
+// Cebu is a contact address only, so /offices/cebu must 404 rather than half-render.
 const OFFICES_WITH_A_PAGE = ["au", "np"];
 
 export const listOfficeProfiles = cache(async (): Promise<OfficeProfile[]> => {
@@ -124,8 +121,7 @@ export const listOfficeProfiles = cache(async (): Promise<OfficeProfile[]> => {
 export const getOfficeProfile = async (slug: string) =>
   (await listOfficeProfiles()).find((office) => office.slug === slug);
 
-// The office pages list what the office does. They need a name and a link, not the artwork,
-// steps and facts that listServices() carries for the service pages themselves.
+// Name and link only, not the artwork and steps listServices() carries.
 export const listServiceLinks = cache(async () =>
   db
     .select({ slug: services.slug, name: services.name, summary: services.summary })

@@ -38,9 +38,8 @@ export const listArticles = cache(async (): Promise<PublicArticle[]> => {
     .leftJoin(mediaAssets, eq(posts.bannerImageId, mediaAssets.id))
     .where(eq(posts.status, "published"))
     .orderBy(asc(posts.sortOrder))
-    // The news page filters by category in the browser, so it genuinely wants every article,
-    // and two other pages search the titles. This is the guard that stops an unbounded table
-    // from taking a page down. Well above the 31 articles that exist.
+    // The news page filters in the browser, so it wants every article. The cap stops an unbounded
+    // table taking the page down.
     .limit(500);
 
   return rows.map((row) => ({
@@ -55,8 +54,7 @@ export const listArticles = cache(async (): Promise<PublicArticle[]> => {
   }));
 });
 
-// The body is only ever rendered on the article page, so it is read one row at a time rather
-// than on every page that shows a card.
+// One row at a time: the body is only rendered here, not on the pages that show cards.
 export const getArticle = cache(async (slug: string): Promise<FullArticle | undefined> => {
   const [row] = await db
     .select({

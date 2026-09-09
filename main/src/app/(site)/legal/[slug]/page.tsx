@@ -11,8 +11,7 @@ import { InnerHero } from "@/components/shared/inner";
 
 const SLUGS = ["privacy-policy", "terms"];
 
-// Unpublished copy 404s rather than showing a blank page or invented wording. The client has
-// not supplied either document yet, so both rows stay unpublished until they do.
+// Unpublished copy 404s rather than showing invented wording.
 const getLegalPage = cache(async (slug: string) => {
   if (!SLUGS.includes(slug)) return undefined;
   const [row] = await db

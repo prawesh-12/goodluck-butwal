@@ -4,16 +4,14 @@ import { PillButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/bits";
 import { loadText } from "@/features/site-text/queries";
 
-// The visa pathways listed on the goodluck_main homepage, and the study destinations shown with the plane.
 const flags = ["/images/flags/australia.svg", "/images/flags/new-zealand.svg", "/images/flags/united-kingdom.svg"];
 const pathways = ["Entering & leaving from country", "Visas", "Country citizenship", "Settling in country", "Help & support"];
 
 // Sixteen partner logos fill the whole ring, 22.5° apart, so the orbit never shows a gap.
 const angles = Array.from({ length: 16 }, (_, i) => i * 22.5 - 90);
 
-// A logo drawn on its own filled square needs no padding: let it fill the tile so the circle crops it round,
-// instead of floating as a square inside the white disc. Matched with or without a file extension,
-// because the same logo is served from public/ by path and from Cloudinary by id.
+// A logo on its own filled plate fills the tile so the circle crops it round. Matched with or
+// without an extension: the same logo is served from public/ by path and Cloudinary by id.
 const filled = (src: string) => /partner-04(?:\.|$)/.test(src);
 
 function Orbit({ radius, icon, box, ring }: { radius: number; icon: number; box: number; ring: string[] }) {

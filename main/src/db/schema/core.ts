@@ -1,6 +1,5 @@
-// users, offices and media_assets all point at each other, and the shared columns point at
-// users and media_assets. TypeScript cannot infer a table type across a file cycle, so this
-// set lives in one module. Everything else references these one way only.
+// users, offices and media_assets reference each other, and TypeScript cannot infer a table
+// type across a file cycle, so these three must stay in one module.
 import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import {
   boolean,
@@ -141,8 +140,7 @@ export const mediaAssets = pgTable(
   },
   (t) => [
     index("media_assets_kind_folder_created_idx").on(t.kind, t.folder, t.createdAt.desc()),
-    // The natural key for a file already in public/. Postgres allows many nulls, so Cloudinary
-    // rows are unaffected.
+    // Postgres allows many nulls here, so Cloudinary rows are unaffected.
     uniqueIndex("media_assets_static_path_idx").on(t.staticPath),
   ],
 );

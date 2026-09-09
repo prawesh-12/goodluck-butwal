@@ -1,5 +1,4 @@
-// Constants the institution and course forms need in the browser. Kept out of the Zod schemas
-// on purpose: a client component that imports a validator drags the whole zod runtime into the
+// Kept out of the Zod schemas: a client component importing a validator drags zod into the
 // browser bundle.
 
 export const qualificationLevels = [

@@ -1,8 +1,7 @@
 import { and, type SQL } from "drizzle-orm";
 import { contentStatuses } from "@/lib/validators/fields";
 
-// Every admin list is paged the same way and filtered the same way, so the plumbing lives here
-// rather than being repeated once per area.
+// Shared so the paging and filtering is not repeated once per admin area.
 export const PAGE_SIZE = 25;
 
 export type AdminFilters = { q?: string; status?: string; office?: string; page?: number };

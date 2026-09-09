@@ -1,6 +1,6 @@
 type Office = { name: string; addressLine1: string | null; phoneDisplay: string | null };
 
-// Everything below is built by string concatenation and half of it is typed by the public, so a
+// These are built by string concatenation and half the values are typed by the public, so a
 // name of "<img onerror=...>" would otherwise reach a staff inbox as markup.
 const esc = (value?: string | null) =>
   String(value ?? "")

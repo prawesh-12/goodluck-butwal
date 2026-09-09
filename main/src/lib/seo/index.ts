@@ -59,8 +59,7 @@ export function buildMetadataFrom(input: SeoInput, defaults: SeoDefaults): Metad
   const shared = { title, description, url: canonical, images };
 
   return {
-    // A stored title that already carries the site name would otherwise get the layout template
-    // applied to it a second time.
+    // Otherwise the layout template appends the site name a second time.
     title: title.endsWith(TITLE_SUFFIX) ? { absolute: title } : title,
     description: description || undefined,
     alternates: { canonical },
@@ -109,8 +108,7 @@ const seoTables = {
 
 export type SeoKind = keyof typeof seoTables;
 
-// The public query modules return the shape each page renders, not the editable SEO columns,
-// so the override row is fetched here by slug.
+// The public queries return what a page renders, not the editable SEO columns.
 const getSeoRow = cache(async (kind: SeoKind, slug: string): Promise<SeoRow | null> => {
   const table = seoTables[kind];
   const [row] = await db

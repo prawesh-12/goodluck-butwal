@@ -4,15 +4,14 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import type Lenis from "lenis";
 
-// The reference runs Lenis. Its wheel curve fits a time-based lerp of about 0.08 (one 600px tick settles in ~1.4s).
+// lerp 0.08: one 600px wheel tick settles in about 1.4s.
 export function SmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // Nothing here runs until after mount, so the library is fetched then rather than in the
-    // first load. Someone who scrolls in that gap gets native scrolling for a moment.
+    // Fetched after mount so it stays out of the initial bundle.
     let cancelled = false;
     let raf = 0;
     let lenis: Lenis | null = null;

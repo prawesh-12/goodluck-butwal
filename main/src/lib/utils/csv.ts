@@ -1,5 +1,4 @@
-// Excel only reads a UTF-8 CSV correctly when it starts with a byte order mark. Without it,
-// every accented name in the export comes out mangled.
+// Excel mangles every accented name in a UTF-8 CSV without a byte order mark.
 const BOM = "﻿";
 
 function cell(value: unknown) {

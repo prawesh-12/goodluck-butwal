@@ -7,8 +7,6 @@ import { PillButton } from "@/components/ui/button";
 import { Badge, Chip } from "@/components/ui/bits";
 import type { UpcomingEvent } from "@/features/events/queries";
 
-// Same row as the news block. It shows the events of the office the visitor is seeing, and
-// nothing at all when that office has none coming up.
 export type EventsText = { badge: string; title: string; cta: string };
 
 export function Events({ events, text }: { events: UpcomingEvent[]; text: EventsText }) {

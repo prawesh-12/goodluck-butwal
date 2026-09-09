@@ -23,7 +23,7 @@ type Row = {
   folder: string;
 };
 
-// Static rows keep the path they always had. Cloudinary rows get the transform the plan sets.
+// Static rows keep their path, Cloudinary rows get a width transform.
 function src(row: Row, width = 320) {
   if (row.kind === "static") return row.staticPath ?? "";
   const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;

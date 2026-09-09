@@ -18,8 +18,8 @@ function zoneName(timeZone: string) {
   return parts.find((part) => part.type === "timeZoneName")?.value ?? "";
 }
 
-// start_time and end_time are already office-local, so nothing is converted. The zone is named
-// so a reader in another country knows which clock the class runs on.
+// Already office-local, so nothing is converted. The zone is named so a reader abroad knows
+// which clock the class runs on.
 export function classTime(start: string | null, end: string | null, timeZone: string) {
   if (!start) return "Not set";
   const range = end ? `${clock(start)} to ${clock(end)}` : clock(start);

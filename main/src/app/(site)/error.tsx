@@ -2,8 +2,7 @@
 
 import { ErrorBlock } from "@/components/shared/error-block";
 
-// Shows the approved error panel rather than Next's default page. The message is never shown
-// to the visitor: it can carry a query, a path or a stack.
+// The error message is never shown: it can carry a query, a path or a stack.
 export default function Error({ reset }: { reset: () => void }) {
   return (
     <ErrorBlock

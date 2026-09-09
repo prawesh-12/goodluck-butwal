@@ -18,9 +18,8 @@ import { groupHits, searchTerm, type SearchGroup, type SearchKind } from "@/feat
 
 const PER_GROUP = 12;
 
-// Every branch of the union hands back the same ten columns, so the six searches cost one round
-// trip. row_number carries each branch's own ordering through, which UNION ALL does not promise.
-// The slug breaks ties, otherwise two rows sharing a date make the cut-off at twelve arbitrary.
+// One round trip for six searches. row_number carries each branch's own ordering through,
+// which UNION ALL does not promise; the slug breaks ties so the cut-off is not arbitrary.
 const media = {
   kind: mediaAssets.kind,
   staticPath: mediaAssets.staticPath,
