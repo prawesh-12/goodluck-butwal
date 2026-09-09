@@ -74,8 +74,6 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
 
-      # Better Auth builds its adapter when its module loads and Next loads every route module
-      # during a build. Nothing queries, so a placeholder connection string is enough.
+      # Pages prerender from the database, so this needs the seeded one. The fan-out is what
+      # max_connections in docker-compose.yml is raised for.
       - run: pnpm build
-        env:
-          DATABASE_URL: postgresql://build:build@localhost:5432/build
