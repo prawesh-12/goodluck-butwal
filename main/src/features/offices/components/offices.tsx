@@ -12,8 +12,9 @@ const pathways = ["Entering & leaving from country", "Visas", "Country citizensh
 const angles = Array.from({ length: 16 }, (_, i) => i * 22.5 - 90);
 
 // A logo drawn on its own filled square needs no padding: let it fill the tile so the circle crops it round,
-// instead of floating as a square inside the white disc.
-const filled = (src: string) => /partner-04\./.test(src);
+// instead of floating as a square inside the white disc. Matched with or without a file extension,
+// because the same logo is served from public/ by path and from Cloudinary by id.
+const filled = (src: string) => /partner-04(?:\.|$)/.test(src);
 
 function Orbit({ radius, icon, box, ring }: { radius: number; icon: number; box: number; ring: string[] }) {
   return (
