@@ -1,16 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
-import { reportError } from "@/lib/integrations/sentry";
 
 // The last resort: the root layout itself failed, so this renders its own html and body and
 // cannot use any component from the app.
-export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
-  useEffect(() => {
-    void reportError(error, { route: window.location.pathname });
-  }, [error]);
-
+export default function GlobalError() {
   return (
     <html lang="en">
       <body style={{ fontFamily: "system-ui, sans-serif", padding: "60px 20px", textAlign: "center" }}>

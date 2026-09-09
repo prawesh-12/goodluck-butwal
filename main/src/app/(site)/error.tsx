@@ -1,16 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
 import { ErrorBlock } from "@/components/shared/error-block";
-import { reportError } from "@/lib/integrations/sentry";
 
-// Shows the approved error panel rather than Next's default page, and reports the failure.
-// The message is never shown to the visitor: it can carry a query, a path or a stack.
-export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-  useEffect(() => {
-    void reportError(error, { route: window.location.pathname });
-  }, [error]);
-
+// Shows the approved error panel rather than Next's default page. The message is never shown
+// to the visitor: it can carry a query, a path or a stack.
+export default function Error({ reset }: { reset: () => void }) {
   return (
     <ErrorBlock
       badge="Something went wrong"

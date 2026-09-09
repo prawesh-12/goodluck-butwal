@@ -132,4 +132,3 @@ export const services: Service[] = [
   },
 ];
 
-export const serviceBySlug = (slug: string) => services.find((s) => s.slug === slug);

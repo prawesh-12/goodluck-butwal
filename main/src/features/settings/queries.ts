@@ -57,20 +57,6 @@ export const getHeroImage = cache(async (): Promise<string | undefined> => {
   return (asset ? mediaUrl(asset, 1920) : "") || undefined;
 });
 
-// Every video in the library is a file in public/: uploads go to Cloudinary as images only, so
-// there is no transformation to build here.
-export const getHeroVideo = cache(async (): Promise<string | undefined> => {
-  const id = String((await allSettings()).get("hero_video_id") ?? "");
-  if (!id) return undefined;
-
-  const [asset] = await db
-    .select({ staticPath: mediaAssets.staticPath })
-    .from(mediaAssets)
-    .where(eq(mediaAssets.id, id));
-
-  return asset?.staticPath || undefined;
-});
-
 export const getGoogleRating = cache(async () => {
   const byKey = await allSettings();
   return {

@@ -111,4 +111,3 @@ export const destinations: Destination[] = [
   },
 ];
 
-export const destinationBySlug = (slug: string) => destinations.find((d) => d.slug === slug);
