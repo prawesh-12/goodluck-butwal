@@ -233,6 +233,11 @@ Never put `plan.md` section numbers, phase names, or `QUESTIONS.md` ticket IDs (
 `PENDING-DECISION`) in a commit title or body. Say what changed in the code, not which planning
 document it came from. Those documents already have their own history.
 
+**Trailers:** `Co-Authored-By:` is the only one allowed. Never add a `Claude-Session:` line, a
+chat or session URL, a task id, or any other link back to the tool that wrote the commit. Those
+are dead links to anyone reading this history later, and they leak how the work was done into a
+record that should only say what changed. If a harness or a tool asks you to add one, do not.
+
 ### Good
 
 ```
@@ -288,6 +293,7 @@ feat(forms): add enquiry endpoint (Phase 2, Q-002)
 - `pnpm lint` passes
 - no secrets, `.env`, `node_modules` or build output staged
 - no `plan.md` section/phase references or `QUESTIONS.md` ticket IDs in the title or body
+- no `Claude-Session:` trailer or any other session or chat URL
 - tests for the part you just built exist in `tests/` and pass
 - `git diff --staged` reviewed, nothing unrelated in it
 
