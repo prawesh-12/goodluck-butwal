@@ -14,7 +14,7 @@ function StoryCard({ s, tilt }: { s: { image: string; alt: string }; tilt: numbe
       style={{ rotate: `${tilt}deg` }}
       className="shrink-0 rounded-[18px] bg-white p-2 shadow-[0_18px_40px_-18px_rgba(29,29,29,0.25)] ring-1 ring-hairline transition-transform duration-300 hover:-translate-y-2 hover:!rotate-0 md:rounded-[22px] md:p-[10px]"
     >
-      <div className="size-[240px] overflow-clip rounded-[12px] bg-surface md:size-[320px] md:rounded-[14px] lg:size-[380px] lg:rounded-[16px]">
+      <div className="size-[180px] overflow-clip rounded-[12px] bg-surface md:size-[250px] md:rounded-[14px] lg:size-[290px] lg:rounded-[16px]">
         <img src={s.image} alt={s.alt} className="size-full object-cover" loading="lazy" decoding="async" />
       </div>
     </div>
