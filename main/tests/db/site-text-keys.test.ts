@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { uiStringRows } from "@db/seed/site-text";
+import { uiStringRows } from "../../db/seed/site-text";
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {

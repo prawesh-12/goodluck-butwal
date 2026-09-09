@@ -1,6 +1,6 @@
-import { db } from "../client";
-import { courseCategories, courses, institutions } from "../schema";
-import { qualificationLevel } from "../schema/enums";
+import { db } from "@db/client";
+import { courseCategories, courses, institutions } from "@db/schema";
+import { qualificationLevel } from "@db/schema/enums";
 
 // The eight subject areas named in the plan. Real data, seeded everywhere.
 const CATEGORIES = [

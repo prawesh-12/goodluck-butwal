@@ -4,7 +4,7 @@ import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { getAdminTeamMember } from "@/features/team/admin-queries";
 import { officeOptions } from "@/features/offices/admin-queries";
-import { pickedMediaMap } from "@/features/media/admin-queries";
+import { pickedMedia } from "@/features/media/picked-media-map";
 import { TeamEditor } from "@/features/team/components/team-editor";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,7 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ id:
   allowOwn(actor, row);
 
   const [media, offices] = await Promise.all([
-    pickedMediaMap([row.photoId, row.seoOgImageId]),
+    pickedMedia([row.photoId, row.seoOgImageId]),
     officeOptions(),
   ]);
 

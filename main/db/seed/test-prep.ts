@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "../client";
-import { offices, testPrepBatches, testPrepCourses } from "../schema";
+import { db } from "@db/client";
+import { offices, testPrepBatches, testPrepCourses } from "@db/schema";
 
 // IELTS and PTE are the two tests named in content/services.ts. Nothing else here is copy:
 // summary, description, syllabus and fee stay empty until the client supplies them.

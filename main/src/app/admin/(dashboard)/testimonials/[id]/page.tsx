@@ -3,7 +3,7 @@ import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { TestimonialForm } from "@/features/testimonials/components/testimonial-form";
-import { pickedMediaMap } from "@/features/media/admin-queries";
+import { pickedMedia } from "@/features/media/picked-media-map";
 import { editorialOptions } from "@/features/posts/admin-queries";
 import { getAdminTestimonial } from "@/features/testimonials/admin-queries";
 
@@ -24,7 +24,7 @@ export default async function EditTestimonialPage({
 
   const [options, media] = await Promise.all([
     editorialOptions(),
-    pickedMediaMap([story.authorPhotoId, story.imageId]),
+    pickedMedia([story.authorPhotoId, story.imageId]),
   ]);
 
   return (

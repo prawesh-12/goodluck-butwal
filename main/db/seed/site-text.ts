@@ -1,5 +1,5 @@
-import { db } from "../client";
-import { settings, uiStrings } from "../schema";
+import { db } from "@db/client";
+import { settings, uiStrings } from "@db/schema";
 import { footerLinks, social } from "@/config/site";
 
 type StringRow = { key: string; value: string; group: string; label: string; help: string };

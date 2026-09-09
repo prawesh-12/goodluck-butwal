@@ -1,5 +1,5 @@
-import { db } from "../client";
-import { mediaAssets, services, uiStrings } from "../schema";
+import { db } from "@db/client";
+import { mediaAssets, services, uiStrings } from "@db/schema";
 import { services as source } from "./source/services";
 import { eq } from "drizzle-orm";
 

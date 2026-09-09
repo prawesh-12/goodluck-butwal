@@ -1,6 +1,6 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
-import { db } from "../client";
-import { mediaAssets } from "../schema";
+import { db } from "@db/client";
+import { mediaAssets } from "@db/schema";
 import { team } from "./source/team";
 import { reviews, successStories } from "./source/stories";
 import articles from "./source/articles.json";

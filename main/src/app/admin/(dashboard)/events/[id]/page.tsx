@@ -4,7 +4,7 @@ import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { utcToZonedInput, type EventInput } from "@/features/events/validators";
 import { EventForm } from "@/features/events/components/event-form";
-import { pickedMediaMap } from "@/features/media/admin-queries";
+import { pickedMedia } from "@/features/media/picked-media-map";
 import { getAdminEvent, officeZones } from "@/features/events/admin-queries";
 import { seatsTaken } from "@/features/events/queries";
 
@@ -21,7 +21,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
 
   const [offices, media, taken] = await Promise.all([
     officeZones(),
-    pickedMediaMap([event.coverImageId, event.seoOgImageId]),
+    pickedMedia([event.coverImageId, event.seoOgImageId]),
     seatsTaken(event.id),
   ]);
 

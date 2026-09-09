@@ -3,7 +3,7 @@ import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { PostForm } from "@/features/posts/components/post-form";
-import { pickedMediaMap } from "@/features/media/admin-queries";
+import { pickedMedia } from "@/features/media/picked-media-map";
 import { editorialOptions } from "@/features/posts/admin-queries";
 import { getAdminPost } from "@/features/posts/admin-queries";
 
@@ -20,7 +20,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
 
   const [options, media] = await Promise.all([
     editorialOptions(),
-    pickedMediaMap([post.bannerImageId, post.seoOgImageId]),
+    pickedMedia([post.bannerImageId, post.seoOgImageId]),
   ]);
 
   return (

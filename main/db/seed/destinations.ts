@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "../client";
-import { destinationFaqs, destinations, mediaAssets, serviceFaqs, services, uiStrings } from "../schema";
+import { db } from "@db/client";
+import { destinationFaqs, destinations, mediaAssets, serviceFaqs, services, uiStrings } from "@db/schema";
 import { destinations as source } from "./source/destinations";
 import { faqs } from "./source/faqs";
 

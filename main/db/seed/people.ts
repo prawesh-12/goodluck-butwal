@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "../client";
-import { mediaAssets, offices, partners, teamMembers } from "../schema";
+import { db } from "@db/client";
+import { mediaAssets, offices, partners, teamMembers } from "@db/schema";
 import { team } from "./source/team";
 import { partnerLogos } from "./source/partners";
 

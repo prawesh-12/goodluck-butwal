@@ -44,31 +44,3 @@ export async function mediaIdByPath(path: string) {
     .where(publicId ? eq(mediaAssets.cloudinaryPublicId, publicId) : eq(mediaAssets.staticPath, path));
   return row?.id ?? null;
 }
-
-export async function pickedMediaMap(ids: (string | null | undefined)[]) {
-  const wanted = ids.filter((id): id is string => Boolean(id));
-  if (wanted.length === 0) return new Map<string, PickedRow>();
-
-  const rows = await db
-    .select({
-      id: mediaAssets.id,
-      kind: mediaAssets.kind,
-      staticPath: mediaAssets.staticPath,
-      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
-      filename: mediaAssets.filename,
-      altText: mediaAssets.altText,
-    })
-    .from(mediaAssets)
-    .where(inArray(mediaAssets.id, wanted));
-
-  return new Map(rows.map((row) => [row.id, row]));
-}
-
-type PickedRow = {
-  id: string;
-  kind: "static" | "cloudinary";
-  staticPath: string | null;
-  cloudinaryPublicId: string | null;
-  filename: string | null;
-  altText: string | null;
-};

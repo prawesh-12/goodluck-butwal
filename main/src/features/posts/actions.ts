@@ -19,7 +19,7 @@ import {
   type PostInput,
 } from "@/features/posts/validators";
 import { altTextByIds } from "@/features/offices/admin-queries";
-import { pickedMediaMap } from "@/features/media/admin-queries";
+import { pickedMedia } from "@/features/media/picked-media-map";
 import { postSlugs } from "@/features/posts/admin-queries";
 
 type Result =
@@ -240,7 +240,7 @@ export async function findBodyImage(input: unknown): Promise<ImageResult> {
   const parsed = z.object({ id: z.uuid() }).safeParse(input);
   if (!parsed.success) return { ok: false, error: "That image could not be found." };
 
-  const found = (await pickedMediaMap([parsed.data.id])).get(parsed.data.id);
+  const found = (await pickedMedia([parsed.data.id])).get(parsed.data.id);
   if (!found) return { ok: false, error: "That image is no longer in the media library." };
   return { ok: true, data: found };
 }

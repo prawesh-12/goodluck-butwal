@@ -3,7 +3,7 @@ import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { getAdminOffice } from "@/features/offices/admin-queries";
-import { pickedMediaMap } from "@/features/media/admin-queries";
+import { pickedMedia } from "@/features/media/picked-media-map";
 import { OfficeEditor } from "@/features/offices/components/office-editor";
 
 export const dynamic = "force-dynamic";
@@ -17,7 +17,7 @@ export default async function OfficePage({ params }: { params: Promise<{ id: str
   // An office row is its own office, so ownership is the row id.
   allowOwn(actor, { officeId: row.id });
 
-  const media = await pickedMediaMap([row.heroImageId, row.seoOgImageId]);
+  const media = await pickedMedia([row.heroImageId, row.seoOgImageId]);
 
   return (
     <>

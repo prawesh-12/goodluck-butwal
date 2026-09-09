@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import { join, extname } from "node:path";
-import { db } from "../client";
-import { mediaAssets } from "../schema";
+import { db } from "@db/client";
+import { mediaAssets } from "@db/schema";
 
 const MIME: Record<string, string> = {
   ".webp": "image/webp",

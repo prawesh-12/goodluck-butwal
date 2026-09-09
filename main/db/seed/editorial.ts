@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { db } from "../client";
-import { mediaAssets, postCategories, posts, settings, testimonials } from "../schema";
+import { db } from "@db/client";
+import { mediaAssets, postCategories, posts, settings, testimonials } from "@db/schema";
 import { slugify } from "@/lib/utils/slug";
 import articles from "./source/articles.json";
 import { googleRating, reviews, successStories } from "./source/stories";

@@ -1,5 +1,5 @@
-import { db } from "../client";
-import { mediaAssets, pages } from "../schema";
+import { db } from "@db/client";
+import { mediaAssets, pages } from "@db/schema";
 import { about } from "./source/about";
 
 async function mediaIdByPath() {

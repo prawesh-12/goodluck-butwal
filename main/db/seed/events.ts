@@ -1,6 +1,6 @@
 import { asc } from "drizzle-orm";
-import { db } from "../client";
-import { events, mediaAssets, offices } from "../schema";
+import { db } from "@db/client";
+import { events, mediaAssets, offices } from "@db/schema";
 
 // There is no real event list yet. These exist so the events screens have something to open in
 // development. Every one says so in its own title, they are created only under --dev, and they

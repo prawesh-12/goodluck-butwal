@@ -1,5 +1,5 @@
-import { db } from "../client";
-import { offices } from "../schema";
+import { db } from "@db/client";
+import { offices } from "@db/schema";
 import { company, offices as source } from "@/config/site";
 
 // Every office takes these hours until the client gives its real ones.
