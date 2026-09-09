@@ -1,6 +1,6 @@
 // Constants and pure helpers the admin forms need in the browser. Kept apart from the Zod
 // schemas on purpose: a client component that imports a validator drags the whole zod runtime
-// into the browser bundle, and two copies of it put the worker over its size cap.
+// into the browser bundle.
 // The schemas themselves stay shared between the client form and the server action.
 
 export const EXCERPT_MAX = 200;

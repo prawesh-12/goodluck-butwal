@@ -1,8 +1,8 @@
 import { scrub, scrubText } from "./sentry-scrub";
 
 // Sentry over plain fetch, for the same reason Cloudinary and Resend are: the SDK costs about
-// 0.6 MB compressed and the worker is capped at 2.50. This sends the same envelope their
-// ingest endpoint expects, and nothing is sent without a DSN, so local runs stay silent.
+// 0.6 MB compressed. This sends the same envelope their ingest endpoint expects, and nothing is
+// sent without a DSN, so local runs stay silent.
 type Dsn = { origin: string; projectId: string; key: string };
 
 function parseDsn(raw: string | undefined): Dsn | null {

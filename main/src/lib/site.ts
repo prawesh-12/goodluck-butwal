@@ -61,7 +61,6 @@ export const offices: Office[] = [
   },
 ];
 
-export const primaryOffices = offices.filter((o) => o.primary);
 export const officeById = (id: OfficeId) => offices.find((o) => o.id === id)!;
 
 // Fill in the real profile URLs; the icons render from these.

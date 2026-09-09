@@ -3,20 +3,20 @@ import { z } from "zod";
 import { contentStatuses, mediaId, seoFields, slugField } from "./page";
 
 // The four bento colours the homepage already paints these cards in. Nothing else renders.
-export const serviceCategories = ["education", "study_abroad", "test_prep", "migration"] as const;
-export const officeScopes = ["both", "au", "np"] as const;
+const serviceCategories = ["education", "study_abroad", "test_prep", "migration"] as const;
+const officeScopes = ["both", "au", "np"] as const;
 
-export const stepItem = z.object({
+const stepItem = z.object({
   title: z.string().trim().min(1, "Give the step a heading."),
   body: z.string().trim().min(1, "Say what happens in the step."),
 });
 
-export const factItem = z.object({
+const factItem = z.object({
   label: z.string().trim().min(1, "Say what the number is."),
   value: z.string().trim().min(1, "Add the number."),
 });
 
-export const documentItem = z.object({ label: z.string().trim().min(1, "Name the document.") });
+const documentItem = z.object({ label: z.string().trim().min(1, "Name the document.") });
 
 const serviceFields = {
   slug: slugField,
@@ -47,7 +47,7 @@ export const updateServiceSchema = z.object({ id: z.uuid(), ...serviceFields });
 
 export type ServiceInput = z.infer<typeof createServiceSchema>;
 
-export const faqItemSchema = z.object({
+const faqItemSchema = z.object({
   id: z.uuid().optional(),
   question: z.string().trim().min(1, "Ask the question."),
   answerHtml: z.string().trim().min(1, "Answer it."),

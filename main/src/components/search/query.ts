@@ -14,7 +14,7 @@ export const KINDS = [
 
 export type SearchKind = (typeof KINDS)[number];
 
-export const kindLabels: Record<SearchKind, string> = {
+const kindLabels: Record<SearchKind, string> = {
   courses: "Courses",
   institutions: "Institutions",
   posts: "News",

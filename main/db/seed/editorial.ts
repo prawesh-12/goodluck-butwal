@@ -56,7 +56,7 @@ export async function seedPosts() {
 export async function seedTestimonials() {
   const media = await mediaIdByPath();
 
-  // Q-010 is unanswered, so nothing is published until the client confirms consent.
+  // Nothing is published until the client confirms each person consented to being quoted.
   const written = reviews.map((review, index) => ({
     type: "text" as const,
     authorName: review.name,

@@ -25,7 +25,7 @@ export async function seedCourseCategories() {
   return CATEGORIES.length;
 }
 
-// Q-004 has no answer yet, so the fallback in the plan applies: ten institutions and forty
+// No real catalogue has been supplied yet, so the fallback applies: ten institutions and forty
 // courses, every one of them named [PLACEHOLDER], created only under --dev and left as drafts so
 // nothing reaches the site. No institution name, description or course copy is invented here.
 const DEV = process.argv.includes("--dev");

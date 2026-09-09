@@ -13,7 +13,7 @@ const clock = (time: string) => {
 };
 
 // The zone the office keeps, named the way Intl names it, e.g. AEST or GMT+5:45.
-export function zoneName(timeZone: string) {
+function zoneName(timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-AU", { timeZone, timeZoneName: "short" }).formatToParts(new Date());
   return parts.find((part) => part.type === "timeZoneName")?.value ?? "";
 }

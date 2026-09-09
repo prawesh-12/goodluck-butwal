@@ -23,7 +23,7 @@ async function mediaIdByPath() {
   return new Map(rows.map((row) => [row.path, row.id]));
 }
 
-// Q-018: these are rendered but have no column, so they live as interface text.
+// Rendered but with no column of their own, so they live as interface text.
 async function putString(key: string, value: string, label: string, help: string) {
   await db
     .insert(uiStrings)

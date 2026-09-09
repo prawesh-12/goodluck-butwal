@@ -2,7 +2,7 @@ import { and, count, eq, gte } from "drizzle-orm";
 import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
 import { db } from "@db/client";
 
-export const MAX_PER_HOUR = 3;
+const MAX_PER_HOUR = 3;
 
 // Counted from the rows themselves, so there is no store to keep in sync and a restart cannot
 // forget who has been submitting.

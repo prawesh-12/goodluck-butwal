@@ -72,7 +72,7 @@ export function buildMetadataFrom(input: SeoInput, defaults: SeoDefaults): Metad
   };
 }
 
-export const getSeoDefaults = cache(async (): Promise<SeoDefaults> => {
+const getSeoDefaults = cache(async (): Promise<SeoDefaults> => {
   const byKey = await allSettings();
   const ogImageId = String(byKey.get("default_og_image_id") ?? "");
 
@@ -111,7 +111,7 @@ export type SeoKind = keyof typeof seoTables;
 
 // The public query modules return the shape each page renders, not the editable SEO columns,
 // so the override row is fetched here by slug.
-export const getSeoRow = cache(async (kind: SeoKind, slug: string): Promise<SeoRow | null> => {
+const getSeoRow = cache(async (kind: SeoKind, slug: string): Promise<SeoRow | null> => {
   const table = seoTables[kind];
   const [row] = await db
     .select({

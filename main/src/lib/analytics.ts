@@ -7,8 +7,7 @@ export function gtmId(fromSettings?: unknown): string | null {
   return GTM_SHAPE.test(id) ? id : null;
 }
 
-export const formNames = ["enquiry", "booking", "event_registration", "test_prep_registration"] as const;
-export type FormName = (typeof formNames)[number];
+export type FormName = "enquiry" | "booking" | "event_registration" | "test_prep_registration";
 
 type DataLayerWindow = Window & { dataLayer?: Record<string, unknown>[] };
 

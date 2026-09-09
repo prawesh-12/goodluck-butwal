@@ -22,8 +22,6 @@ const auAdmin: Actor = { id: "u2", role: "au_admin", officeId: AU, isActive: tru
 const npAdmin: Actor = { id: "u3", role: "np_admin", officeId: NP, isActive: true };
 const editor: Actor = { id: "u4", role: "content_editor", officeId: null, isActive: true };
 
-// The seven from the permissions section. These gate Phase 3.
-
 test("a Nepal admin's enquiry filter excludes Australian rows", () => {
   const { sql, params } = render(scopedWhere(enquiries, npAdmin));
   expect(sql).toContain('"office_id"');

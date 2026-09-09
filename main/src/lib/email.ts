@@ -25,7 +25,7 @@ function toPlainText(html: string) {
     .trim();
 }
 
-// Resend over plain fetch. Their SDK is large and the Worker bundle is capped.
+// Resend over plain fetch. Their SDK is large and this is one signed request.
 export async function sendEmail({ to, subject, html, replyTo }: Message) {
   if (!process.env.RESEND_API_KEY) {
     throw new Error("RESEND_API_KEY is not set, so no mail can be sent.");

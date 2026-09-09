@@ -2,7 +2,7 @@ import { pagePath } from "../content-meta";
 import { z } from "zod";
 
 export const contentStatuses = ["draft", "scheduled", "published", "archived"] as const;
-export const pageParents = ["about", "legal"] as const;
+const pageParents = ["about", "legal"] as const;
 
 export const slugField = z
   .string()
@@ -31,7 +31,7 @@ const titleBody = z.object({
   body: z.string().trim().min(1, "Add the words."),
 });
 
-export const aboutBlocks = z.object({
+const aboutBlocks = z.object({
   established: z.string().trim().default(""),
   mission: z.string().trim().default(""),
   vision: z.string().trim().default(""),
@@ -42,13 +42,13 @@ export const aboutBlocks = z.object({
     .default({ text: "", author: "" }),
 });
 
-export const coFoundersBlocks = z.object({
+const coFoundersBlocks = z.object({
   message_html: z.string().default(""),
   summary: z.string().trim().default(""),
   photo_id: mediaId,
 });
 
-export const csrBlocks = z.object({
+const csrBlocks = z.object({
   partners: z
     .array(
       z.object({
@@ -61,7 +61,7 @@ export const csrBlocks = z.object({
     .default([]),
 });
 
-export const careersBlocks = z.object({
+const careersBlocks = z.object({
   values: z.array(titleBody).default([]),
   voices: z
     .array(
@@ -77,7 +77,7 @@ export const careersBlocks = z.object({
     .preprocess((v) => (v === "" || v === undefined ? null : v), z.email("That is not an email address.").nullable()),
 });
 
-export const legalBlocks = z.object({});
+const legalBlocks = z.object({});
 
 const BLOCKS_BY_SLUG: Record<string, z.ZodType> = {
   about: aboutBlocks,

@@ -2,7 +2,7 @@ import { db } from "../client";
 import { offices } from "../schema";
 import { company, offices as source } from "../../src/lib/site";
 
-// Q-008 is unanswered, so every office takes the fallback hours until the client says otherwise.
+// Every office takes these hours until the client gives its real ones.
 const WEEKDAYS_10_TO_5 = [0, 1, 2, 3, 4, 5, 6].map((day) => ({
   day,
   open: "10:00",

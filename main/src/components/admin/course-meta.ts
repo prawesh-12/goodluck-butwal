@@ -1,6 +1,6 @@
 // Constants the institution and course forms need in the browser. Kept out of the Zod schemas
 // on purpose: a client component that imports a validator drags the whole zod runtime into the
-// browser bundle, and the worker is already close to its size cap.
+// browser bundle.
 
 export const qualificationLevels = [
   "foundation",

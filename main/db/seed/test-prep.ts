@@ -9,8 +9,8 @@ const COURSES = [
   { slug: "pte", name: "PTE", testType: "pte" as const },
 ];
 
-// PENDING-DECISION: Q-004. No real batch data exists, so these four are marked in their own
-// name and are only created under --dev, the same gate the placeholder catalogue uses.
+// No real batch data exists yet, so these four are marked in their own name and created only
+// under --dev, the same gate the placeholder catalogue uses.
 const DEV = process.argv.includes("--dev");
 
 const PLACEHOLDER_BATCHES = [

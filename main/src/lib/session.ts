@@ -6,8 +6,8 @@ import { sessions, users } from "@db/schema";
 import type { Actor, UserRole } from "./rbac";
 
 // Deliberately does NOT import lib/auth. Every admin page and server action reads the session,
-// and pulling the whole Better Auth server into each of those route chunks put the worker
-// bundle over its 2.50 MB cap. Only /api/auth/[...all] builds the full server now.
+// and pulling the whole Better Auth server into each of those route chunks copied it into all of
+// them. Only /api/auth/[...all] builds the full server.
 //
 // Better Auth writes `better-auth.session_token=<token>.<signature>`, and `<token>` is the
 // value in sessions.token. The signature guards against a tampered cookie, but the token is a
@@ -16,7 +16,7 @@ import type { Actor, UserRole } from "./rbac";
 const COOKIE = "better-auth.session_token";
 const SECURE_COOKIE = `__Secure-${COOKIE}`;
 
-export async function currentActor(): Promise<Actor | null> {
+async function currentActor(): Promise<Actor | null> {
   const jar = await cookies();
   const raw = jar.get(SECURE_COOKIE)?.value ?? jar.get(COOKIE)?.value;
   if (!raw) return null;

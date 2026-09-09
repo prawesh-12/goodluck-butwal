@@ -1,8 +1,7 @@
 "use client";
 
 // Two plain calls against the Better Auth endpoints rather than its React client. That client
-// pulls zod, jose, kysely and nanostores into the browser bundle for what amounts to two POSTs,
-// and the worker has a hard size cap.
+// pulls zod, jose, kysely and nanostores into the browser bundle for what amounts to two POSTs.
 
 type Result = { ok: boolean; error?: string };
 

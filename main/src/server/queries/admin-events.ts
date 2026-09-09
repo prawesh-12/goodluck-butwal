@@ -65,7 +65,7 @@ export async function listAdminEvents(actor: Actor, f: EventFilters) {
 }
 
 // Capacity counts seats, not rows: one registration can bring guests.
-export async function seatsTakenByEvent() {
+async function seatsTakenByEvent() {
   const rows = await db
     .select({ eventId: eventRegistrations.eventId, seats: sum(eventRegistrations.attendees) })
     .from(eventRegistrations)

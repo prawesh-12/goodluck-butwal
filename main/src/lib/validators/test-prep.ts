@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { contentStatuses, mediaId, seoFields, slugField } from "./page";
 
-export const testTypes = ["ielts", "pte"] as const;
-export const batchModes = ["in_person", "online", "hybrid"] as const;
-export const batchStatuses = ["open", "filling_fast", "full", "closed", "completed"] as const;
-export const regStatuses = ["registered", "attended", "cancelled"] as const;
+const testTypes = ["ielts", "pte"] as const;
+const batchModes = ["in_person", "online", "hybrid"] as const;
+const batchStatuses = ["open", "filling_fast", "full", "closed", "completed"] as const;
+const regStatuses = ["registered", "attended", "cancelled"] as const;
 
 const money = z
   .string()
@@ -12,7 +12,7 @@ const money = z
   .refine((v) => v === "" || /^\d+(\.\d{1,2})?$/.test(v), "Use a number, like 12000 or 12000.50")
   .default("");
 
-export const syllabusItem = z.object({
+const syllabusItem = z.object({
   title: z.string().trim().min(1, "Give the section a heading."),
   body: z.string().trim().min(1, "Say what is covered."),
 });

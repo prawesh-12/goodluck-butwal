@@ -4,7 +4,7 @@ const httpsUrl = z
   .url("Check the web address.")
   .refine((value) => value.startsWith("https://"), "A web address must start with https://");
 
-export const socialLinkSchema = z.object({
+const socialLinkSchema = z.object({
   label: z.string().trim().min(1, "Give the link a name."),
   href: httpsUrl,
   icon: z.string(),

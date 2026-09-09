@@ -40,7 +40,7 @@ const publicFiles = sourceFiles("src").filter(
   (path) => !path.includes("/admin/") && /^src\/(app|components)\//.test(path),
 );
 
-// Wording that stays in the code, each for a reason written down in QUESTIONS.md.
+// Wording that stays in the code, each for a reason.
 const ALLOWED = [
   // The 500 screens run after a render has already failed, often because the database did.
   "src/app/(site)/error.tsx",

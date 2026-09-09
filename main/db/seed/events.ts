@@ -2,9 +2,9 @@ import { asc } from "drizzle-orm";
 import { db } from "../client";
 import { events, mediaAssets, offices } from "../schema";
 
-// Q-004 is unanswered: there is no real event list yet. These exist so the events screens have
-// something to open in development. Every one says so in its own title, they are created only
-// under --dev, and they stay drafts so nothing reaches the site. Same rule as the catalogue seed.
+// There is no real event list yet. These exist so the events screens have something to open in
+// development. Every one says so in its own title, they are created only under --dev, and they
+// stay drafts so nothing reaches the site. Same rule as the catalogue seed.
 const PLACEHOLDER = "[PLACEHOLDER]";
 const DEV = process.argv.includes("--dev");
 
@@ -71,7 +71,7 @@ export async function seedEvents() {
       title: draft.title,
       eventType: draft.eventType,
       officeId: officeId.get(draft.officeCode) ?? null,
-      summary: `${PLACEHOLDER} Replace this event before it goes live. See QUESTIONS.md Q-004.`,
+      summary: `${PLACEHOLDER} Replace this event before it goes live.`,
       descriptionHtml: `<p>${PLACEHOLDER} There is no approved copy for this event yet.</p>`,
       coverImageId: cover?.id ?? null,
       startsAt,

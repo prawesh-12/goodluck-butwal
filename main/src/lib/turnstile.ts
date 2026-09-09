@@ -2,7 +2,7 @@ const VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 // No secret configured means no bot check. That is only ever true in local development, and it
 // has to be loud rather than quietly letting everything through in production.
-export function turnstileConfigured() {
+function turnstileConfigured() {
   return Boolean(process.env.TURNSTILE_SECRET_KEY);
 }
 

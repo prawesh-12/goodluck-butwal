@@ -28,7 +28,7 @@ export const updateInstitutionSchema = z.object({ id: z.uuid(), ...fields });
 
 export type InstitutionInput = z.infer<typeof createInstitutionSchema>;
 
-export const galleryItemSchema = z.object({
+const galleryItemSchema = z.object({
   id: z.uuid().optional(),
   mediaId: z.uuid("Choose a picture from the media library."),
   caption: z.string().trim().default(""),

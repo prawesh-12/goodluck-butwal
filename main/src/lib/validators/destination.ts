@@ -2,22 +2,22 @@ import { destinationPath } from "../content-meta";
 import { z } from "zod";
 import { contentStatuses, mediaId, seoFields, slugField } from "./page";
 
-export const highlightItem = z.object({
+const highlightItem = z.object({
   label: z.string().trim().min(1, "Give the highlight a label."),
   value: z.string().trim().min(1, "Add the value."),
   note: z.string().trim().default(""),
 });
 
-export const whyItem = z.object({ text: z.string().trim().min(1, "An empty reason shows as a blank line.") });
+const whyItem = z.object({ text: z.string().trim().min(1, "An empty reason shows as a blank line.") });
 
-export const checklistItem = z.object({ text: z.string().trim().min(1, "An empty step shows as a blank line.") });
+const checklistItem = z.object({ text: z.string().trim().min(1, "An empty step shows as a blank line.") });
 
 export const intakeItem = z.object({
   month: z.string().trim().min(1, "Name the intake month."),
   note: z.string().trim().default(""),
 });
 
-export const migrationItem = z.object({
+const migrationItem = z.object({
   title: z.string().trim().min(1, "Give the block a heading."),
   body: z.string().trim().min(1, "Add the words."),
   icon: z.string().trim().default(""),
@@ -30,7 +30,7 @@ export const costItem = z.object({
   note: z.string().trim().default(""),
 });
 
-export const helpItem = z.object({
+const helpItem = z.object({
   title: z.string().trim().min(1, "Give the block a heading."),
   body: z.string().trim().min(1, "Add the words."),
 });

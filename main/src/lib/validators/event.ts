@@ -113,7 +113,7 @@ export function eventPublishProblems(data: EventInput, alt: EventAltText): strin
   return missing;
 }
 
-export const REGISTRATION_OFF = "This event is not taking registrations.";
+const REGISTRATION_OFF = "This event is not taking registrations.";
 export const REGISTRATION_CLOSED = "Registration for this event has closed.";
 export const EVENT_FULL = "This event is full.";
 export const ALREADY_REGISTERED = "You are already registered.";

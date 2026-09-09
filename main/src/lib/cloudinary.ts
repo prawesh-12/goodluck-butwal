@@ -1,11 +1,8 @@
-// Cloudinary over plain fetch. Their SDK is large and the Worker bundle is capped, and the
-// signature is one SHA-1 that crypto.subtle already does.
+// Cloudinary over plain fetch. Their SDK is large and the signature is one SHA-1 that
+// crypto.subtle already does.
 
-export const IMAGE_WIDTHS = [320, 640, 960, 1280, 1920] as const;
-export type ImageWidth = (typeof IMAGE_WIDTHS)[number];
-
-export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"] as const;
-export type AllowedImageType = (typeof ALLOWED_IMAGE_TYPES)[number];
+export type ImageWidth = 320 | 640 | 960 | 1280 | 1920;
+export type AllowedImageType = "image/jpeg" | "image/png" | "image/webp" | "image/avif";
 
 export type UploadedImage = {
   publicId: string;
