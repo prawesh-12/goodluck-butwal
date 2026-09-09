@@ -10,8 +10,10 @@
     "lint": "NODE_OPTIONS=--max-old-space-size=8192 eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "db:migrate:prod": "node --env-file=.env.production node_modules/drizzle-kit/bin.cjs migrate",
     "db:seed": "tsx --env-file=.env.local db/seed/from-content.ts",
-    "db:seed:dev": "tsx --env-file=.env.local db/seed/from-content.ts --dev"
+    "db:seed:dev": "tsx --env-file=.env.local db/seed/from-content.ts --dev",
+    "db:seed:prod": "tsx --env-file=.env.production db/seed/from-content.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
