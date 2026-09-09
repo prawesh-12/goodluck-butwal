@@ -3,7 +3,7 @@ import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { formatInOfficeTz } from "@/lib/datetime";
 import { LeadFilters } from "@/components/admin/lead-filters";
-import { listEnquiries, PAGE_SIZE, type LeadFilters as Filters } from "@/server/queries/leads";
+import { listEnquiries, listServiceOptions, PAGE_SIZE, type LeadFilters as Filters } from "@/server/queries/leads";
 
 export const dynamic = "force-dynamic";
 
@@ -19,13 +19,16 @@ export default async function EnquiriesPage({
 
   const params = await searchParams;
   const filters: Filters = { ...params, page: Number(params.page ?? 1) };
-  const { rows, total, page } = await listEnquiries(actor, filters);
+  const [{ rows, total, page }, services] = await Promise.all([
+    listEnquiries(actor, filters),
+    listServiceOptions(),
+  ]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <>
       <h1 className="t-h4">Enquiries</h1>
-      <LeadFilters statuses={STATUSES} exportPath="/api/admin/export/enquiries" />
+      <LeadFilters statuses={STATUSES} services={services} exportPath="/api/admin/export/enquiries" />
       <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
@@ -38,6 +41,7 @@ export default async function EnquiriesPage({
               <th>Name</th>
               <th>Email</th>
               <th>Office</th>
+              <th>Service</th>
               <th>Status</th>
               <th>Received</th>
               <th>Edit</th>
@@ -50,6 +54,7 @@ export default async function EnquiriesPage({
                 <td>{row.fullName}</td>
                 <td>{row.email}</td>
                 <td>{row.office ?? "Not set"}</td>
+                <td>{row.service ?? "Not set"}</td>
                 <td>{row.status.replace(/_/g, " ")}</td>
                 <td>{formatInOfficeTz(row.createdAt, "Australia/Melbourne")}</td>
                 <td>

@@ -5,7 +5,15 @@ import { useEffect, useState } from "react";
 import { Select } from "./repeater";
 
 // Search waits for a pause in typing, so a long name is one query rather than twelve.
-export function LeadFilters({ statuses, exportPath }: { statuses: string[]; exportPath: string }) {
+export function LeadFilters({
+  statuses,
+  services = [],
+  exportPath,
+}: {
+  statuses: string[];
+  services?: { slug: string; name: string }[];
+  exportPath: string;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -53,6 +61,18 @@ export function LeadFilters({ statuses, exportPath }: { statuses: string[]; expo
           ...statuses.map((s) => ({ value: s, label: s.replace(/_/g, " ") })),
         ]}
       />
+
+      {services.length > 0 ? (
+        <Select
+          label="Service"
+          defaultValue={params.get("service") ?? ""}
+          onChange={(value) => set("service", value)}
+          options={[
+            { value: "", label: "Any" },
+            ...services.map((s) => ({ value: s.slug, label: s.name })),
+          ]}
+        />
+      ) : null}
 
       <label className="admin-field">
         <span className="t-small">From</span>

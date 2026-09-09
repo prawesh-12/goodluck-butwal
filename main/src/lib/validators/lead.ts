@@ -24,7 +24,7 @@ export const enquirySchema = z.object({
   ...shared,
   currentLocation: z.string().trim().optional(),
   destinationSlug: z.string().optional(),
-  subject: z.string().optional(),
+  serviceSlug: z.string().optional(),
   officeCode: z.string().optional(),
   message: z.string().trim().min(1, "Tell us what you need."),
   utmSource: z.string().optional(),

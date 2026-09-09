@@ -38,6 +38,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ enti
     event: url.searchParams.get("event") ?? undefined,
     q: url.searchParams.get("q") ?? undefined,
     status: url.searchParams.get("status") ?? undefined,
+    service: url.searchParams.get("service") ?? undefined,
     from: url.searchParams.get("from") ?? undefined,
     to: url.searchParams.get("to") ?? undefined,
   };

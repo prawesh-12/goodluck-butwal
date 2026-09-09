@@ -58,8 +58,8 @@ export async function POST(request: Request) {
   const destination = data.destinationSlug
     ? (await db.select({ id: destinations.id, name: destinations.name }).from(destinations).where(eq(destinations.slug, data.destinationSlug)))[0]
     : undefined;
-  const service = data.subject
-    ? (await db.select({ id: services.id, name: services.name }).from(services).where(eq(services.slug, data.subject)))[0]
+  const service = data.serviceSlug
+    ? (await db.select({ id: services.id, name: services.name }).from(services).where(eq(services.slug, data.serviceSlug)))[0]
     : undefined;
 
   await db.insert(enquiries).values({
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     phone: data.phone,
     location: data.currentLocation,
     destination: destination?.name,
-    subject: service?.name ?? data.subject,
+    subject: service?.name,
     message: data.message,
     sourcePage: data.sourcePage,
     utm: { source: data.utmSource, medium: data.utmMedium, campaign: data.utmCampaign },

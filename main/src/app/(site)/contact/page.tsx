@@ -12,6 +12,7 @@ import { EnquiryForm } from "@/components/forms";
 import { OfficeContactCards } from "@/components/contact-cards";
 import { listOffices } from "@/server/queries/offices";
 import { listAllFaqs, listDestinations } from "@/server/queries/destinations";
+import { listServices } from "@/server/queries/services";
 import { Accordion, FaqCta } from "@/components/home/faqs";
 import { listTeam } from "@/server/queries/people";
 import { loadText } from "@/server/queries/text";
@@ -27,15 +28,17 @@ export async function generateMetadata(): Promise<Metadata> {
 const tones = ["surface", "dark", "blue"] as const;
 
 export default async function ContactPage() {
-  const [offices, faces, destinations, allFaqs, t, forms] = await Promise.all([
+  const [offices, faces, destinations, services, allFaqs, t, forms] = await Promise.all([
     listOffices(),
     listTeam().then((team) => team.slice(0, 3)),
     listDestinations(),
+    listServices(),
     listAllFaqs(),
     loadText(),
     formText(),
   ]);
   const openInMaps = t("contact.offices.maps_link", "Open in Maps");
+  const chatOnWhatsapp = t("contact.offices.whatsapp_link", "Chat on WhatsApp");
 
   return (
     <>
@@ -59,10 +62,10 @@ export default async function ContactPage() {
                 <FlatButton href={`mailto:${company.email}`}>{company.email}</FlatButton>
                 <SocialLinks />
               </div>
-              <OfficeContactCards offices={offices} />
+              <OfficeContactCards offices={offices} whatsappLabel={chatOnWhatsapp} />
             </Appear>
             <Appear y={10} delay={0.1} duration={0.6} className="relative flex flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 pb-20 md:rounded-[30px] md:pb-[70px] lg:p-10 lg:pb-[120px]">
-              <div className="relative z-[2] w-full"><EnquiryForm destinations={destinations} text={forms} /></div>
+              <div className="relative z-[2] w-full"><EnquiryForm destinations={destinations} services={services} text={forms} /></div>
               <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-[-20px] z-[1] w-[calc(100%+20px)] max-w-none object-contain object-top" loading="lazy" decoding="async" />
             </Appear>
           </div>
@@ -77,6 +80,7 @@ export default async function ContactPage() {
               {offices.map((o, i) => {
                 const t = tones[i];
                 const white = t !== "surface";
+                const mapQuery = encodeURIComponent(`${o.address}, ${o.city}, ${o.country}`);
                 return (
                   <Appear key={o.id} delay={0.1 * i} className={`flex flex-col items-start gap-[30px] overflow-hidden rounded-[10px] p-5 md:rounded-[30px] lg:p-[30px] ${t === "surface" ? "bg-surface" : t === "dark" ? "icon-dark" : "bg-[linear-gradient(135deg,#406ae4_0%,#5290f4_100%)]"}`}>
                     <div className="flex flex-col items-start gap-5">
@@ -92,7 +96,19 @@ export default async function ContactPage() {
                     </div>
                     <div className="flex flex-wrap gap-x-5 gap-y-2">
                       <a href={o.tel} className={`t-base font-semibold underline underline-offset-4 ${white ? "text-white" : "text-ink"}`}>{o.phone}</a>
-                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${o.address}, ${o.country}`)}`} target="_blank" rel="noopener" className={`t-base font-semibold underline underline-offset-4 ${white ? "text-white" : "text-ink"}`}>{openInMaps}</a>
+                      {o.whatsapp && (
+                        <a href={o.whatsapp} target="_blank" rel="noopener" className={`t-base font-semibold underline underline-offset-4 ${white ? "text-white" : "text-ink"}`}>{chatOnWhatsapp}</a>
+                      )}
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`} target="_blank" rel="noopener" className={`t-base font-semibold underline underline-offset-4 ${white ? "text-white" : "text-ink"}`}>{openInMaps}</a>
+                    </div>
+                    <div className="w-full overflow-clip rounded-[10px] md:rounded-[20px]">
+                      <iframe
+                        title={`Map to the ${o.label} in ${o.city}`}
+                        src={`https://www.google.com/maps?q=${mapQuery}&output=embed`}
+                        className="h-[220px] w-full border-0"
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      />
                     </div>
                   </Appear>
                 );

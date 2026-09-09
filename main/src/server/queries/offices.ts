@@ -15,9 +15,16 @@ export type PublicOffice = {
   address: string;
   phone: string;
   tel: string;
+  whatsapp?: string;
   timezone: string;
   flag: string;
   hours?: string;
+};
+
+// wa.me takes digits only, so the + and any spacing in the stored number have to go.
+export const whatsappLink = (number: string | null) => {
+  const digits = (number ?? "").replace(/\D/g, "");
+  return digits ? `https://wa.me/${digits}` : undefined;
 };
 
 export const listOffices = cache(async (): Promise<PublicOffice[]> => {
@@ -30,6 +37,7 @@ export const listOffices = cache(async (): Promise<PublicOffice[]> => {
       address: offices.addressLine1,
       phoneDisplay: offices.phoneDisplay,
       phone: offices.phone,
+      whatsapp: offices.whatsapp,
       timezone: offices.timezone,
       openingHours: offices.openingHours,
     })
@@ -45,6 +53,7 @@ export const listOffices = cache(async (): Promise<PublicOffice[]> => {
     address: row.address ?? "",
     phone: row.phoneDisplay ?? "",
     tel: `tel:${row.phone ?? ""}`,
+    whatsapp: whatsappLink(row.whatsapp),
     timezone: row.timezone,
     flag: `/images/flags/${row.country.toLowerCase().replace(/\s+/g, "-")}.svg`,
     hours: formatOpeningHours(row.openingHours) ?? undefined,
@@ -77,6 +86,7 @@ export const listOfficeProfiles = cache(async (): Promise<OfficeProfile[]> => {
       addressLine2: offices.addressLine2,
       phoneDisplay: offices.phoneDisplay,
       phone: offices.phone,
+      whatsapp: offices.whatsapp,
       email: offices.email,
       timezone: offices.timezone,
       mapsUrl: offices.mapsUrl,
@@ -98,6 +108,7 @@ export const listOfficeProfiles = cache(async (): Promise<OfficeProfile[]> => {
     address: [row.addressLine1, row.addressLine2].filter(Boolean).join(", "),
     phone: row.phoneDisplay ?? "",
     tel: `tel:${row.phone ?? ""}`,
+    whatsapp: whatsappLink(row.whatsapp),
     email: row.email ?? "",
     timezone: row.timezone,
     flag: `/images/flags/${row.country.toLowerCase().replace(/\s+/g, "-")}.svg`,

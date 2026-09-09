@@ -35,9 +35,11 @@ export default async function OfficePage({ params }: Props) {
   const [allOffices, team, services] = await Promise.all([listOffices(), listTeam(), listServiceLinks()]);
   const staff = team.filter((m) => m.office === office.id);
   const hours = [...(office.openingHours ?? [])].sort((a, b) => weekOrder(a.day) - weekOrder(b.day));
-  const mapsLink =
-    office.mapsUrl ??
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${office.address}, ${office.city}, ${office.country}`)}`;
+  const mapQuery = encodeURIComponent(`${office.address}, ${office.city}, ${office.country}`);
+  const mapsLink = office.mapsUrl ?? `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
+  const mapEmbed = office.mapsEmbedUrl?.startsWith("https://")
+    ? office.mapsEmbedUrl
+    : `https://www.google.com/maps?q=${mapQuery}&output=embed`;
 
   return (
     <>
@@ -48,7 +50,7 @@ export default async function OfficePage({ params }: Props) {
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
             <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">
               <Appear className="flex flex-col gap-5">
-                <OfficeContactCards offices={allOffices} />
+                <OfficeContactCards offices={allOffices} whatsappLabel={t("contact.offices.whatsapp_link", "Chat on WhatsApp")} />
                 <div className="flex flex-wrap gap-x-5 gap-y-2">
                   {office.email && (
                     <a href={`mailto:${office.email}`} className="t-base font-semibold text-ink underline underline-offset-4">
@@ -60,17 +62,15 @@ export default async function OfficePage({ params }: Props) {
                   </a>
                 </div>
               </Appear>
-              {office.mapsEmbedUrl?.startsWith("https://") && (
-                <Appear delay={0.1} className="min-h-[320px] overflow-clip rounded-[10px] md:rounded-[20px]">
-                  <iframe
-                    title={`Map to the ${office.label} in ${office.city}`}
-                    src={office.mapsEmbedUrl}
-                    className="size-full min-h-[320px] w-full border-0"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                </Appear>
-              )}
+              <Appear delay={0.1} className="min-h-[320px] overflow-clip rounded-[10px] md:rounded-[20px]">
+                <iframe
+                  title={`Map to the ${office.label} in ${office.city}`}
+                  src={mapEmbed}
+                  className="size-full min-h-[320px] w-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </Appear>
             </div>
 
             {hours.length > 0 && (

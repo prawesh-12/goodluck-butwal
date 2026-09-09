@@ -4,7 +4,7 @@ import type { PublicOffice } from "@/server/queries/offices";
 import { useOffice } from "@/components/office";
 
 // Office contact cards, the chosen office first.
-export function OfficeContactCards({ offices }: { offices: PublicOffice[] }) {
+export function OfficeContactCards({ offices, whatsappLabel }: { offices: PublicOffice[]; whatsappLabel: string }) {
   const { office } = useOffice();
   const ordered = [...offices].sort((a, b) => Number(b.id === office) - Number(a.id === office));
   return (
@@ -14,7 +14,12 @@ export function OfficeContactCards({ offices }: { offices: PublicOffice[] }) {
           <p className={`t-small ${i === 0 ? "text-gray-text" : "text-muted"}`}>{o.label}</p>
           <p className="text-[18px] font-semibold leading-[23.4px]">{o.city}, {o.country}</p>
           <p className={`t-base ${i === 0 ? "text-gray-text" : "text-muted"}`}>{o.address}</p>
-          <a href={o.tel} className={`t-base font-semibold underline underline-offset-4 ${i === 0 ? "text-white" : "text-ink"}`}>{o.phone}</a>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
+            <a href={o.tel} className={`t-base font-semibold underline underline-offset-4 ${i === 0 ? "text-white" : "text-ink"}`}>{o.phone}</a>
+            {o.whatsapp && (
+              <a href={o.whatsapp} target="_blank" rel="noopener" className={`t-base font-semibold underline underline-offset-4 ${i === 0 ? "text-white" : "text-ink"}`}>{whatsappLabel}</a>
+            )}
+          </div>
         </div>
       ))}
     </div>

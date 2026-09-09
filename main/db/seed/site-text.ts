@@ -121,6 +121,7 @@ const innerPageRows: StringRow[] = [
   { key: "contact.offices.badge", value: "Our worldwide offices", group: "contact", label: "Offices section badge", help: "The small pill above the office cards on the Contact page." },
   { key: "contact.offices.title", value: "Explore our office worldwide", group: "contact", label: "Offices section heading", help: "Heading above the office cards on the Contact page." },
   { key: "contact.offices.maps_link", value: "Open in Maps", group: "contact", label: "Maps link text", help: "The link on every office card that opens Google Maps." },
+  { key: "contact.offices.whatsapp_link", value: "Chat on WhatsApp", group: "contact", label: "WhatsApp link text", help: "The link beside the phone number on an office card. Only shows for an office with a WhatsApp number." },
   { key: "contact.faq.title", value: "Frequently asked questions", group: "contact", label: "Contact FAQ heading", help: "Heading above the questions at the foot of the Contact page." },
   { key: "contact.faq.lead", value: "Common questions about programmes, scholarships and visas.", group: "contact", label: "Contact FAQ intro", help: "The line under the FAQ heading on the Contact page." },
   { key: "contact.booking.badge", value: "Book a consultation", group: "contact", label: "Booking page badge", help: "The small pill above the heading on the booking page." },

@@ -30,6 +30,17 @@ test("a phone field of letters is refused", () => {
   expect(enquirySchema.safeParse({ ...enquiry, phone: "call me" }).success).toBe(false);
 });
 
+test("an enquiry keeps the service slug it was sent", () => {
+  const result = enquirySchema.safeParse({ ...enquiry, serviceSlug: "ielts-coaching" });
+  expect(result.success).toBe(true);
+  expect(result.data?.serviceSlug).toBe("ielts-coaching");
+});
+
+test("an enquiry with no service is accepted", () => {
+  expect(enquirySchema.safeParse(enquiry).data?.serviceSlug).toBeUndefined();
+  expect(enquirySchema.safeParse({ ...enquiry, serviceSlug: "" }).success).toBe(true);
+});
+
 test("a consultation needs an office, a service, a date and a time", () => {
   const full = {
     fullName: "Sam",

@@ -3,7 +3,6 @@
 import { useCallback, useState, type FormEvent } from "react";
 import { Field } from "@/components/inner";
 import { useOffice } from "@/components/office";
-import { enquirySubjects } from "@/lib/site";
 import type { PublicOffice } from "@/server/queries/offices";
 import type { PublicDestination } from "@/server/queries/destinations";
 import type { PublicService } from "@/server/queries/services";
@@ -97,7 +96,7 @@ function dateRange() {
   return { min: iso(from), max: iso(to) };
 }
 
-export function EnquiryForm({ destinations, text }: { destinations: PublicDestination[]; text: FormText }) {
+export function EnquiryForm({ destinations, services, text }: { destinations: PublicDestination[]; services: PublicService[]; text: FormText }) {
   const { office } = useOffice();
   const { ready, check } = useReady(["Name", "Email", "Message"]);
   const [sent, setSent] = useState<string | null>(null);
@@ -117,7 +116,7 @@ export function EnquiryForm({ destinations, text }: { destinations: PublicDestin
       phone: form.get("Phone") || undefined,
       currentLocation: form.get("Location") || undefined,
       destinationSlug: form.get("Destination") || undefined,
-      subject: form.get("Subject") || undefined,
+      serviceSlug: form.get("Service") || undefined,
       message: form.get("Message"),
       officeCode: office,
       company_website: form.get("company_website") || undefined,
@@ -151,9 +150,9 @@ export function EnquiryForm({ destinations, text }: { destinations: PublicDestin
         <option value="">{text.field.destinationHint}</option>
         {destinations.map((d) => <option key={d.slug} value={d.slug}>{d.name}</option>)}
       </Select>
-      <Select label={text.field.service} name="Subject">
+      <Select label={text.field.service} name="Service">
         <option value="">{text.field.serviceHint}</option>
-        {enquirySubjects.map((s) => <option key={s} value={s}>{s}</option>)}
+        {services.map((s) => <option key={s.slug} value={s.slug}>{s.title}</option>)}
       </Select>
       <Field label={text.field.message} name="Message" textarea placeholder={text.field.messageHint} className="lg:col-span-2" required />
       <Honeypot />

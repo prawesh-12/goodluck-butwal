@@ -102,6 +102,3 @@ export const footerLinks = {
     { label: "Book a consultation", href: "/contact/book-consultation" },
   ],
 };
-
-// Enquiry subjects offered on the goodluck_main contact form.
-export const enquirySubjects = ["Education Services", "Visa Services", "Tourist Visa", "Dependent Visa", "English Test Preparation"];

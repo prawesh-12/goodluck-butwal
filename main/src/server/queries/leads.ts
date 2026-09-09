@@ -30,6 +30,7 @@ function enquiryWhere(actor: Actor, f: LeadFilters) {
     );
   }
   if (f.status) parts.push(eq(enquiries.status, f.status as "new"));
+  if (f.service) parts.push(eq(services.slug, f.service));
   if (f.from) parts.push(gte(enquiries.createdAt, new Date(f.from)));
   if (f.to) parts.push(lte(enquiries.createdAt, new Date(`${f.to}T23:59:59Z`)));
 
@@ -73,7 +74,12 @@ export async function listEnquiries(actor: Actor, f: LeadFilters) {
       .orderBy(desc(enquiries.createdAt))
       .limit(PAGE_SIZE)
       .offset((page - 1) * PAGE_SIZE),
-    db.select({ n: count() }).from(enquiries).where(where),
+    // Joined here too because the service filter matches on the slug, which lives on services.
+    db
+      .select({ n: count() })
+      .from(enquiries)
+      .leftJoin(services, eq(enquiries.serviceId, services.id))
+      .where(where),
   ]);
 
   return { rows, total: total.n, page };
@@ -100,6 +106,13 @@ export async function getEnquiry(actor: Actor, id: string) {
     .leftJoin(services, eq(enquiries.serviceId, services.id))
     .where(eq(enquiries.id, id));
   return row;
+}
+
+export async function listServiceOptions() {
+  return db
+    .select({ slug: services.slug, name: services.name })
+    .from(services)
+    .orderBy(asc(services.sortOrder));
 }
 
 function consultationWhere(actor: Actor, f: LeadFilters) {
