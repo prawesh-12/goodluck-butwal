@@ -2,6 +2,7 @@ import { cache } from "react";
 import { asc, eq, like } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, services, uiStrings } from "@db/schema";
+import { mediaUrl } from "./catalogue";
 
 // The shape the approved service pages already render.
 export type PublicService = {
@@ -35,7 +36,9 @@ export const listServices = cache(async (): Promise<PublicService[]> => {
         facts: services.facts,
         documents: services.documents,
         tone: services.tone,
-        image: artwork.staticPath,
+        kind: artwork.kind,
+        staticPath: artwork.staticPath,
+        cloudinaryPublicId: artwork.cloudinaryPublicId,
         imageAlt: artwork.altText,
         reelId: services.reelId,
       })
@@ -61,7 +64,7 @@ export const listServices = cache(async (): Promise<PublicService[]> => {
     label: text.get(`service.${row.slug}.label`) ?? "",
     line: row.line ?? "",
     intro: row.intro ?? "",
-    image: row.image ?? "",
+    image: mediaUrl(row, 960),
     imageAlt: row.imageAlt ?? "",
     video: row.reelId ? (reelPath.get(row.reelId) ?? undefined) : undefined,
     poster: text.get(`service.${row.slug}.poster`),

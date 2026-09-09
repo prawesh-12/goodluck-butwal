@@ -1,17 +1,13 @@
-import Link from "next/link";
+import { EmptyState, ListHeader, NewButton } from "@/components/admin/list-ui";
 
 export default function Forbidden() {
   return (
-    <>
-      <h1 className="t-h4">Not your area</h1>
-      <p className="t-body admin-empty">
+    <div className="space-y-4">
+      <ListHeader title="Not your area" />
+      <EmptyState>
         Your role does not cover this screen. If you need it, ask a super admin.
-      </p>
-      <p className="admin-empty">
-        <Link href="/admin" className="admin-btn">
-          Back to the dashboard
-        </Link>
-      </p>
-    </>
+      </EmptyState>
+      <NewButton href="/admin">Back to the dashboard</NewButton>
+    </div>
   );
 }

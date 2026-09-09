@@ -4,6 +4,12 @@ import { auditLog, users } from "@db/schema";
 import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { formatInOfficeTz } from "@/lib/datetime";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { EmptyState, ListHeader, RowAvatar } from "@/components/admin/list-ui";
+import { Button } from "@/components/admin/ui/button";
+import { Card, CardContent } from "@/components/admin/ui/card";
+import { Input } from "@/components/admin/ui/input";
+import { Label } from "@/components/admin/ui/label";
 
 export const dynamic = "force-dynamic";
 
@@ -39,47 +45,56 @@ export default async function AuditLogPage({
     .limit(PAGE_SIZE);
 
   return (
-    <>
-      <h1 className="t-h4">Audit log</h1>
+    <div className="space-y-4">
+      <ListHeader title="Audit log" />
 
-      <form className="admin-filters">
-        <label className="admin-field">
-          <span className="t-small">From</span>
-          <input type="date" name="from" defaultValue={from} />
-        </label>
-        <label className="admin-field">
-          <span className="t-small">To</span>
-          <input type="date" name="to" defaultValue={to} />
-        </label>
-        <button type="submit" className="admin-btn admin-btn-primary">
-          Filter
-        </button>
-      </form>
+      <Card>
+        <CardContent className="pt-6">
+          <form className="grid items-end gap-4 sm:grid-cols-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="audit-from">From</Label>
+              <Input id="audit-from" type="date" name="from" defaultValue={from} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="audit-to">To</Label>
+              <Input id="audit-to" type="date" name="to" defaultValue={to} />
+            </div>
+            <div>
+              <Button type="submit">Filter</Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">Nothing recorded in that range.</p>
+        <EmptyState>Nothing recorded in that range.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>When</th>
-              <th>Who</th>
-              <th>Action</th>
-              <th>What</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>When</TableHead>
+              <TableHead>Who</TableHead>
+              <TableHead>Action</TableHead>
+              <TableHead>What</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{formatInOfficeTz(row.createdAt, "Australia/Melbourne")}</td>
-                <td>{row.who ?? "System"}</td>
-                <td>{row.action}</td>
-                <td>{row.summary ?? row.entityType ?? ""}</td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell>{formatInOfficeTz(row.createdAt, "Australia/Melbourne")}</TableCell>
+                <TableCell>
+                  <span className="flex items-center gap-2.5">
+                    <RowAvatar name={row.who ?? "System"} />
+                    {row.who ?? "System"}
+                  </span>
+                </TableCell>
+                <TableCell>{row.action}</TableCell>
+                <TableCell>{row.summary ?? row.entityType ?? ""}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
-    </>
+    </div>
   );
 }

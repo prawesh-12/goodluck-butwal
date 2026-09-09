@@ -1,4 +1,5 @@
 import { requireActor } from "@/lib/session";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
 
 export const dynamic = "force-dynamic";
 
@@ -55,43 +56,43 @@ export default async function HelpPage() {
       <h1 className="t-h4">Help</h1>
 
       <h2 className="t-h6">Where to change what</h2>
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>I want to change...</th>
-            <th>Go to</th>
-            <th>Who can do it</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>I want to change...</TableHead>
+            <TableHead>Go to</TableHead>
+            <TableHead>Who can do it</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {WHERE.map(([want, where, role]) => (
-            <tr key={want}>
-              <td>{want}</td>
-              <td>{where}</td>
-              <td>{role}</td>
-            </tr>
+            <TableRow key={want}>
+              <TableCell>{want}</TableCell>
+              <TableCell>{where}</TableCell>
+              <TableCell>{role}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       <h2 className="t-h6">Who gets access</h2>
       <p className="t-body">Give the smallest role that does the job.</p>
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Person</th>
-            <th>Role</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Person</TableHead>
+            <TableHead>Role</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {WHO.map(([person, role]) => (
-            <tr key={person}>
-              <td>{person}</td>
-              <td>{role}</td>
-            </tr>
+            <TableRow key={person}>
+              <TableCell>{person}</TableCell>
+              <TableCell>{role}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       <h2 className="t-h6">Rules the site enforces for you</h2>
       <ul className="t-body">

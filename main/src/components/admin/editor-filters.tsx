@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { FilterCard, SearchField } from "./list-ui";
 import { Select } from "./repeater";
 
 export type FilterSelect = {
@@ -46,21 +47,20 @@ export function EditorialFilters({
   };
 
   return (
-    <form className="admin-filters" onSubmit={(event) => event.preventDefault()}>
-      <label className="admin-field">
-        <span className="t-small">Search</span>
-        <input value={q} onChange={(event) => setQ(event.target.value)} placeholder={placeholder} />
-      </label>
+    <form onSubmit={(event) => event.preventDefault()}>
+      <FilterCard>
+        <SearchField id="editorial-search" value={q} onChange={setQ} placeholder={placeholder} />
 
-      {selects.map((select) => (
-        <Select
-          key={select.name}
-          label={select.label}
-          defaultValue={params.get(select.name) ?? ""}
-          onChange={(value) => set(select.name, value)}
-          options={[{ value: "", label: "Any" }, ...select.options]}
-        />
-      ))}
+        {selects.map((select) => (
+          <Select
+            key={select.name}
+            label={select.label}
+            defaultValue={params.get(select.name) ?? ""}
+            onChange={(value) => set(select.name, value)}
+            options={[{ value: "", label: "Any" }, ...select.options]}
+          />
+        ))}
+      </FilterCard>
     </form>
   );
 }

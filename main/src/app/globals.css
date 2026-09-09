@@ -13,6 +13,37 @@
   --color-blue-deep: #406ae4;
   --color-green: #10b981;
   --color-gray-text: #bababa;
+  /* shadcn tokens, admin only. Names were picked so none collides with the
+     public tokens above: no public markup uses background, foreground, card,
+     popover, primary, secondary, accent, destructive, border, input, ring or
+     sidebar, and --color-muted is deliberately left as the public muted. */
+  --color-background: #ffffff;
+  --color-foreground: #1d1d1d;
+  --color-card: #ffffff;
+  --color-card-foreground: #1d1d1d;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1d1d1d;
+  --color-primary: #1d1d1d;
+  --color-primary-foreground: #fafafa;
+  --color-secondary: #edf1f4;
+  --color-secondary-foreground: #1d1d1d;
+  --color-muted-foreground: #4d585f;
+  --color-accent: #edf1f4;
+  --color-accent-foreground: #1d1d1d;
+  --color-destructive: #b42318;
+  --color-destructive-foreground: #fafafa;
+  --color-success: #15803d;
+  --color-success-foreground: #fafafa;
+  --color-border: #dde5ed;
+  --color-input: #dde5ed;
+  --color-ring: #3b82f6;
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #1d1d1d;
+  --color-sidebar-accent: #edf1f4;
+  --color-sidebar-accent-foreground: #1d1d1d;
+  --radius-lg: 0.625rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.375rem;
   --font-display: var(--font-bricolage), "Bricolage Grotesque", sans-serif;
   --font-body: var(--font-inter-display), "Inter Display", "Inter", sans-serif;
   @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
@@ -138,6 +169,29 @@
 @media (min-width: 1200px) { .article h2 { font-size: 32px; } }
 
 /* Admin panel. Every rule is scoped under .admin so the public pages cannot be reached. */
+/* shadcn baseline for the admin tree only: plain divs read as foreground on
+   background, and every control inherits the app font. */
+.admin { background: var(--color-background); color: var(--color-foreground); font-family: var(--font-body); }
+.admin * { border-color: var(--color-border); }
+/* The sidebar list is the only scrollable column in the admin shell. Thin,
+   quiet, overlay-free: the layout must not shift when it appears, and a
+   scroll in the nav must never move the page behind it. */
+.admin-sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.admin-sidebar-nav::-webkit-scrollbar { width: 10px; }
+.admin-sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.admin-sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.admin-sidebar-nav::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); border: 3px solid transparent; background-clip: content-box; }
 /* Chrome draws its old stepper scrollbar in the sidebar otherwise. Both properties inherit, so
    the one rule covers the page, the sidebar and the media picker. */
 .admin-root { scrollbar-width: thin; scrollbar-color: var(--color-gray-text) transparent; }

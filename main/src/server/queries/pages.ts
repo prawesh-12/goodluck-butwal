@@ -2,6 +2,7 @@ import { cache } from "react";
 import { inArray } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, pages } from "@db/schema";
+import { mediaUrl } from "./catalogue";
 
 // Same field names the About routes already render, so a page only swaps its import.
 export type AboutContent = {
@@ -43,11 +44,18 @@ export const getAboutContent = cache(async (): Promise<AboutContent> => {
       .select({ slug: pages.slug, intro: pages.intro, blocks: pages.blocks })
       .from(pages)
       .where(inArray(pages.slug, SLUGS)),
-    db.select({ id: mediaAssets.id, path: mediaAssets.staticPath }).from(mediaAssets),
+    db
+      .select({
+        id: mediaAssets.id,
+        kind: mediaAssets.kind,
+        staticPath: mediaAssets.staticPath,
+        cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
+      })
+      .from(mediaAssets),
   ]);
 
   const bySlug = new Map(rows.map((row) => [row.slug, row]));
-  const path = new Map(media.map((m) => [m.id, m.path]));
+  const path = new Map(media.map((m) => [m.id, mediaUrl(m, 640)]));
 
   const about = bySlug.get("about")?.blocks as AboutBlocks;
   const founders = bySlug.get("message-from-co-founders")?.blocks as FoundersBlocks;

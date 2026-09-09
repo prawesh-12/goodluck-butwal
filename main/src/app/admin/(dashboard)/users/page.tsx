@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { asc } from "drizzle-orm";
 import { db } from "@db/client";
 import { offices, users } from "@db/schema";
@@ -6,6 +5,16 @@ import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
 import { eq } from "drizzle-orm";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  RowAvatar,
+  StatusBadge,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -34,50 +43,61 @@ export default async function UsersPage() {
     .orderBy(asc(users.name));
 
   return (
-    <>
-      <h1 className="t-h4">Users</h1>
-
-      <div className="admin-actions">
-        <p className="t-small admin-count">{rows.length} accounts</p>
-        {can(actor, "users", "create") ? (
-          <Link className="admin-btn" href="/admin/users/new">
-            Add a user
-          </Link>
-        ) : null}
-      </div>
+    <div className="space-y-4">
+      <ListHeader
+        title="Users"
+        count={rows.length}
+        countNoun="accounts"
+        actions={
+          can(actor, "users", "create") ? (
+            <NewButton href="/admin/users/new">Add a user</NewButton>
+          ) : null
+        }
+      />
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">No accounts yet.</p>
+        <EmptyState>No accounts yet.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Office</th>
-              <th>Status</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Role</TableHead>
+              <TableHead>Office</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                <td>{row.email}</td>
-                <td>{ROLE_LABEL[row.role] ?? row.role}</td>
-                <td>{row.office ?? "All"}</td>
-                <td>{row.isActive ? "Active" : "Deactivated"}</td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/users/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="flex items-center gap-2.5">
+                    <RowAvatar name={row.name} />
+                    <span className="font-medium">{row.name}</span>
+                  </span>
+                </TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>
+                  <FlatBadge>{ROLE_LABEL[row.role] ?? row.role}</FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge>{row.office ?? "All"}</FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={row.isActive ? "Active" : "Deactivated"} />
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <EditLink href={`/admin/users/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
-    </>
+    </div>
   );
 }

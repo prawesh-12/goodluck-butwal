@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
@@ -11,6 +10,17 @@ import {
   listAdminInstitutions,
   PAGE_SIZE,
 } from "@/server/queries/admin-catalogue";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  Pager,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -38,15 +48,16 @@ export default async function InstitutionsPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">Institutions</h1>
-        {can(actor, "institutions", "create") ? (
-          <Link className="admin-btn" href="/admin/institutions/new">
-            Add an institution
-          </Link>
-        ) : null}
-      </div>
+    <div className="space-y-4">
+      <ListHeader
+        title="Institutions"
+        count={total}
+        actions={
+          can(actor, "institutions", "create") ? (
+            <NewButton href="/admin/institutions/new">Add an institution</NewButton>
+          ) : null
+        }
+      />
 
       <ContentFilters
         placeholder="Name, address or country"
@@ -60,67 +71,56 @@ export default async function InstitutionsPage({
           },
         ]}
       />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          No institutions match. Clear the filters, or{" "}
-          <Link href="/admin/institutions/new">add an institution</Link>.
-        </p>
+        <EmptyState>No institutions match. Clear the filters, or add an institution.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Destination</th>
-              <th>Country</th>
-              <th>Courses</th>
-              <th>Partner</th>
-              <th>Featured</th>
-              <th>Status</th>
-              <th>On the site</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Destination</TableHead>
+              <TableHead>Country</TableHead>
+              <TableHead>Courses</TableHead>
+              <TableHead>Partner</TableHead>
+              <TableHead>Featured</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                <td>{row.destination ?? "Not set"}</td>
-                <td>{row.country ?? "Not set"}</td>
-                <td>{counts.get(row.id) ?? 0}</td>
-                <td>{row.isPartner ? "Yes" : "No"}</td>
-                <td>{row.isFeatured ? "Yes" : "No"}</td>
-                <td>{row.status}</td>
-                <td>
-                  <a href={institutionPath(row.slug)} target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/institutions/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="font-medium">{row.name}</span>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge>{row.destination ?? "Not set"}</FlatBadge>
+                </TableCell>
+                <TableCell>{row.country ?? "Not set"}</TableCell>
+                <TableCell>{counts.get(row.id) ?? 0}</TableCell>
+                <TableCell>{row.isPartner ? "Yes" : "No"}</TableCell>
+                <TableCell>{row.isFeatured ? "Yes" : "No"}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <ViewSiteLink href={institutionPath(row.slug)} />
+                    <EditLink href={`/admin/institutions/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link> : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link> : null}
-        </nav>
-      ) : null}
+      <Pager page={page} pages={pages} params={params} />
 
       {can(actor, "institutions", "update") && can(actor, "partners", "update") ? (
         <InstitutionPartnerLink />
       ) : null}
-    </>
+    </div>
   );
 }

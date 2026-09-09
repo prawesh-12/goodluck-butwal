@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { FilterCard, SearchField } from "./list-ui";
 import { Select } from "./repeater";
 
 export type FilterSelect = {
@@ -41,21 +42,20 @@ export function ContentFilters({ placeholder, selects }: { placeholder: string; 
   };
 
   return (
-    <form className="admin-filters" onSubmit={(e) => e.preventDefault()}>
-      <label className="admin-field">
-        <span className="t-small">Search</span>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={placeholder} />
-      </label>
+    <form onSubmit={(e) => e.preventDefault()}>
+      <FilterCard>
+        <SearchField id="page-search" value={q} onChange={setQ} placeholder={placeholder} />
 
-      {selects.map((select) => (
-        <Select
-          key={select.name}
-          label={select.label}
-          defaultValue={params.get(select.name) ?? ""}
-          onChange={(value) => set(select.name, value)}
-          options={[{ value: "", label: select.anyLabel }, ...select.options]}
-        />
-      ))}
+        {selects.map((select) => (
+          <Select
+            key={select.name}
+            label={select.label}
+            defaultValue={params.get(select.name) ?? ""}
+            onChange={(value) => set(select.name, value)}
+            options={[{ value: "", label: select.anyLabel }, ...select.options]}
+          />
+        ))}
+      </FilterCard>
     </form>
   );
 }

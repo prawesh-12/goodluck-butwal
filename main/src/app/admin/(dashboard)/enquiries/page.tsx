@@ -4,6 +4,9 @@ import { allow } from "@/lib/guard";
 import { formatInOfficeTz } from "@/lib/datetime";
 import { LeadFilters } from "@/components/admin/lead-filters";
 import { listEnquiries, listServiceOptions, PAGE_SIZE, type LeadFilters as Filters } from "@/server/queries/leads";
+import { Button } from "@/components/admin/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { StatusBadge } from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -26,55 +29,67 @@ export default async function EnquiriesPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <h1 className="t-h4">Enquiries</h1>
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <h1 className="text-2xl font-semibold tracking-tight">Enquiries</h1>
+        <p className="text-sm text-muted-foreground">{total} matching</p>
+      </div>
       <LeadFilters statuses={STATUSES} services={services} exportPath="/api/admin/export/enquiries" />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">Nothing matches those filters. Widen the dates or clear the search.</p>
+        <p className="text-sm text-muted-foreground">Nothing matches those filters. Widen the dates or clear the search.</p>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Reference</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Office</th>
-              <th>Service</th>
-              <th>Status</th>
-              <th>Received</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Reference</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Office</TableHead>
+              <TableHead>Service</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Received</TableHead>
+              <TableHead>Edit</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.reference}</td>
-                <td>{row.fullName}</td>
-                <td>{row.email}</td>
-                <td>{row.office ?? "Not set"}</td>
-                <td>{row.service ?? "Not set"}</td>
-                <td>{row.status.replace(/_/g, " ")}</td>
-                <td>{formatInOfficeTz(row.createdAt, "Australia/Melbourne")}</td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/enquiries/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell className="font-mono text-xs">{row.reference}</TableCell>
+                <TableCell className="font-medium">{row.fullName}</TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.office ?? "Not set"}</TableCell>
+                <TableCell>{row.service ?? "Not set"}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>{formatInOfficeTz(row.createdAt, "Australia/Melbourne")}</TableCell>
+                <TableCell>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href={`/admin/enquiries/${row.id}`}>Edit</Link>
+                  </Button>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
       {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link> : null}
-          <span className="t-small">Page {page} of {pages}</span>
-          {page < pages ? <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link> : null}
+        <nav className="flex items-center gap-3">
+          {page > 1 ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link>
+            </Button>
+          ) : null}
+          <span className="text-sm text-muted-foreground">Page {page} of {pages}</span>
+          {page < pages ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link>
+            </Button>
+          ) : null}
         </nav>
       ) : null}
-    </>
+    </div>
   );
 }

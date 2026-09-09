@@ -1,8 +1,16 @@
-import Link from "next/link";
 import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { ContentFilters } from "@/components/admin/content-filters";
 import { listAdminOffices, PAGE_SIZE, type AdminFilters } from "@/server/queries/admin-people";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  ListHeader,
+  Pager,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -20,70 +28,52 @@ export default async function OfficesPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <h1 className="t-h4">Offices</h1>
+    <div className="space-y-4">
+      <ListHeader title="Offices" count={total} />
       <p className="t-small admin-help">
         The offices are fixed. You can change their details, but not add or remove one.
       </p>
 
       <ContentFilters placeholder="Office, city or country" />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          Nothing matches those filters. Clear the search to see your office.
-        </p>
+        <EmptyState>Nothing matches those filters. Clear the search to see your office.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Office</th>
-              <th>City</th>
-              <th>Phone</th>
-              <th>Status</th>
-              <th>On the site</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Office</TableHead>
+              <TableHead>City</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                <td>{row.city ?? "Not set"}</td>
-                <td>{row.phoneDisplay ?? "Not set"}</td>
-                <td>
-                  {row.status}
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="font-medium">{row.name}</span>
+                </TableCell>
+                <TableCell>{row.city ?? "Not set"}</TableCell>
+                <TableCell>{row.phoneDisplay ?? "Not set"}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
                   {row.isActive ? "" : ", temporarily closed"}
-                </td>
-                <td>
-                  <a href="/contact" target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/offices/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <ViewSiteLink href="/contact" />
+                    <EditLink href={`/admin/offices/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? (
-            <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link>
-          ) : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? (
-            <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link>
-          ) : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

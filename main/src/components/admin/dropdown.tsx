@@ -182,11 +182,14 @@ export function Dropdown({
         aria-labelledby={labelledBy}
         aria-label={ariaLabel}
         disabled={disabled}
-        className="admin-dropdown"
+        className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
         onClick={() => (open ? setOpen(false) : show())}
         onKeyDown={onKeyDown}
       >
-        <span className="admin-dropdown-value">{label}</span>
+        <span className="truncate">{label}</span>
+        <svg width="12" height="8" viewBox="0 0 12 8" aria-hidden="true" className="ml-2 shrink-0 opacity-50">
+          <path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
 
       {open ? (
@@ -196,8 +199,8 @@ export function Dropdown({
           role="listbox"
           aria-labelledby={labelledBy}
           aria-label={ariaLabel}
-          className="admin-dropdown-list"
-          style={{ top: box.top, left: box.left, width: box.width }}
+          className="fixed z-50 max-h-64 min-w-32 overflow-y-auto rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md"
+          style={{ top: box.top, left: box.left, width: Math.max(box.width, 128) }}
         >
           {options.map((option, index) => (
             <li
@@ -207,7 +210,7 @@ export function Dropdown({
               aria-selected={index === selected}
               aria-disabled={option.disabled || undefined}
               data-active={index === active || undefined}
-              className="admin-dropdown-option"
+              className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[active]:bg-accent data-[active]:text-accent-foreground aria-disabled:pointer-events-none aria-disabled:opacity-50"
               onPointerEnter={() => !option.disabled && setActive(index)}
               onClick={() => commit(index)}
             >

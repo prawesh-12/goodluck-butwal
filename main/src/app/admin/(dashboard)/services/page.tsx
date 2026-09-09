@@ -5,6 +5,17 @@ import { can } from "@/lib/rbac";
 import { ContentFilters } from "@/components/admin/page-filters";
 import { listAdminServices, PAGE_SIZE } from "@/server/queries/admin-content";
 import { servicePath } from "@/lib/validators/service";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  Pager,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -34,15 +45,16 @@ export default async function ServicesListPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">Services</h1>
-        {can(actor, "services", "create") ? (
-          <Link className="admin-btn" href="/admin/services/new">
-            New service
-          </Link>
-        ) : null}
-      </div>
+    <div className="space-y-4">
+      <ListHeader
+        title="Services"
+        count={total}
+        actions={
+          can(actor, "services", "create") ? (
+            <NewButton href="/admin/services/new">New service</NewButton>
+          ) : null
+        }
+      />
 
       <ContentFilters
         placeholder="Service or address"
@@ -51,64 +63,56 @@ export default async function ServicesListPage({
           { name: "scope", label: "Office", anyLabel: "Any", options: SCOPES },
         ]}
       />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          No services match. Clear the filters, or <Link href="/admin/services/new">add a service</Link>.
-        </p>
+        <EmptyState>No services match. Clear the filters, or add a service.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Service</th>
-              <th>Address</th>
-              <th>Category</th>
-              <th>Office</th>
-              <th>Card colour</th>
-              <th>Status</th>
-              <th>Questions</th>
-              <th>On the site</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Service</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Office</TableHead>
+              <TableHead>Card colour</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Questions</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                <td>{servicePath(row.slug)}</td>
-                <td>{row.category.replace(/_/g, " ")}</td>
-                <td>{row.officeScope}</td>
-                <td>{row.tone ?? "Not set"}</td>
-                <td>{row.status}</td>
-                <td>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="font-medium">{row.name}</span>
+                </TableCell>
+                <TableCell>{servicePath(row.slug)}</TableCell>
+                <TableCell>
+                  <FlatBadge variant="outline">{row.category.replace(/_/g, " ")}</FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge>{row.officeScope}</FlatBadge>
+                </TableCell>
+                <TableCell>{row.tone ?? "Not set"}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>
                   <Link href={`/admin/services/${row.id}/faqs`}>Questions</Link>
-                </td>
-                <td>
-                  <a href={servicePath(row.slug)} target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/services/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <ViewSiteLink href={servicePath(row.slug)} />
+                    <EditLink href={`/admin/services/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link> : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link> : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

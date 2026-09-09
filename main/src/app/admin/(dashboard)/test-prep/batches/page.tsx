@@ -8,6 +8,19 @@ import { seatLabel } from "@/lib/seats";
 import { ContentFilters } from "@/components/admin/page-filters";
 import { classTime, MODE_LABEL, scheduleDays } from "@/components/test-prep/schedule";
 import { courseOptions, listAdminBatches, PAGE_SIZE } from "@/server/queries/admin-test-prep";
+import { Button } from "@/components/admin/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  Pager,
+  RowAvatar,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -41,18 +54,21 @@ export default async function BatchesListPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">Batches</h1>
-        <Link className="admin-btn" href="/admin/test-prep">
-          Courses
-        </Link>
-        {can(actor, "batches", "create") ? (
-          <Link className="admin-btn" href="/admin/test-prep/batches/new">
-            New batch
-          </Link>
-        ) : null}
-      </div>
+    <div className="space-y-4">
+      <ListHeader
+        title="Batches"
+        count={total}
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              <Link href="/admin/test-prep">Courses</Link>
+            </Button>
+            {can(actor, "batches", "create") ? (
+              <NewButton href="/admin/test-prep/batches/new">New batch</NewButton>
+            ) : null}
+          </>
+        }
+      />
 
       <ContentFilters
         placeholder="Batch name"
@@ -62,73 +78,80 @@ export default async function BatchesListPage({
           { name: "mode", label: "Mode", anyLabel: "Any", options: MODES },
         ]}
       />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
+        <EmptyState>
           No batches match. Clear the filters, or <Link href="/admin/test-prep/batches/new">add a batch</Link>.
-        </p>
+        </EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Batch</th>
-              <th>Starts</th>
-              <th>Days</th>
-              <th>Time</th>
-              <th>Mode</th>
-              <th>Trainer</th>
-              <th>Seats</th>
-              <th>Shows as</th>
-              <th>On the site</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Batch</TableHead>
+              <TableHead>Starts</TableHead>
+              <TableHead>Days</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead>Mode</TableHead>
+              <TableHead>Trainer</TableHead>
+              <TableHead>Seats</TableHead>
+              <TableHead>Shows as</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row, i) => (
               <Fragment key={row.id}>
                 {i === 0 || rows[i - 1].courseId !== row.courseId ? (
-                  <tr>
-                    <th colSpan={9}>{row.courseName}</th>
-                  <td>
-                    <Link className="admin-btn" href={`/admin/test-prep/batches/${row.id}`}>
-                      Edit
-                    </Link>
-                  </td>
-                  </tr>
+                  <TableRow>
+                    <TableCell colSpan={8} className="font-medium">
+                      {row.courseName}
+                    </TableCell>
+                    <TableCell>
+                      <span className="flex items-center justify-end gap-1">
+                        <EditLink href={`/admin/test-prep/batches/${row.id}`} />
+                      </span>
+                    </TableCell>
+                  </TableRow>
                 ) : null}
-                <tr>
-                  <td>{row.batchName}</td>
-                  <td>{formatDate(row.startDate)}</td>
-                  <td>{scheduleDays(row.scheduleDays)}</td>
-                  <td>{classTime(row.startTime, row.endTime, row.timezone ?? "Asia/Kathmandu")}</td>
-                  <td>{MODE_LABEL[row.mode]}</td>
-                  <td>{row.trainer ?? "Not decided"}</td>
-                  <td>
+                <TableRow>
+                  <TableCell>
+                    <span className="font-medium">{row.batchName}</span>
+                  </TableCell>
+                  <TableCell>{formatDate(row.startDate)}</TableCell>
+                  <TableCell>{scheduleDays(row.scheduleDays)}</TableCell>
+                  <TableCell>{classTime(row.startTime, row.endTime, row.timezone ?? "Asia/Kathmandu")}</TableCell>
+                  <TableCell>
+                    <FlatBadge variant="outline">{MODE_LABEL[row.mode]}</FlatBadge>
+                  </TableCell>
+                  <TableCell>
+                    {row.trainer ? (
+                      <span className="flex items-center gap-2.5">
+                        <RowAvatar name={row.trainer} />
+                        {row.trainer}
+                      </span>
+                    ) : (
+                      "Not decided"
+                    )}
+                  </TableCell>
+                  <TableCell>
                     {row.seatsTaken} of {row.totalSeats}
-                  </td>
-                  <td>{seatLabel(row)}</td>
-                  <td>
-                    <a href={`/test-preparation/${row.courseSlug}`} target="_blank" rel="noreferrer">
-                      View on site
-                    </a>
-                  </td>
-                </tr>
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={seatLabel(row)} />
+                  </TableCell>
+                  <TableCell>
+                    <span className="flex items-center justify-end gap-1">
+                      <ViewSiteLink href={`/test-preparation/${row.courseSlug}`} />
+                    </span>
+                  </TableCell>
+                </TableRow>
               </Fragment>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link> : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link> : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

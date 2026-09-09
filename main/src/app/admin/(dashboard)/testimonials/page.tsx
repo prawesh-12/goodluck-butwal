@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
@@ -11,6 +10,19 @@ import {
   PAGE_SIZE,
   type EditorialFilters as Filters,
 } from "@/server/queries/admin-editorial";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  ConsentBadge,
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  Pager,
+  RowAvatar,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -31,8 +43,16 @@ export default async function TestimonialsPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <h1 className="t-h4">Testimonials</h1>
+    <div className="space-y-4">
+      <ListHeader
+        title="Testimonials"
+        count={total}
+        actions={
+          can(actor, "testimonials", "create") ? (
+            <NewButton href="/admin/testimonials/new">Add a story</NewButton>
+          ) : null
+        }
+      />
 
       <EditorialFilters
         placeholder="Name or words in the quote"
@@ -59,72 +79,55 @@ export default async function TestimonialsPage({
         ]}
       />
 
-      <div className="admin-actions">
-        <p className="t-small admin-count">{total} matching</p>
-        {can(actor, "testimonials", "create") ? (
-          <Link className="admin-btn" href="/admin/testimonials/new">
-            Add a story
-          </Link>
-        ) : null}
-      </div>
-
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          Nothing matches those filters. Clear the search, or add a story.
-        </p>
+        <EmptyState>Nothing matches those filters. Clear the search, or add a story.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Shown as</th>
-              <th>Kind</th>
-              <th>Office</th>
-              <th>Status</th>
-              <th>Consent</th>
-              <th>Live page</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Shown as</TableHead>
+              <TableHead>Kind</TableHead>
+              <TableHead>Office</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Consent</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>
-                  {row.displayName || "No name yet"}
-                  {row.isAnonymised ? <span className="admin-clash">anonymised</span> : null}
-                </td>
-                <td>{row.type}</td>
-                <td>{row.office ?? "Both"}</td>
-                <td>{row.status}</td>
-                <td>{row.consentGiven ? "Recorded" : "Not recorded"}</td>
-                <td>
-                  <a href="/success-stories" target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/testimonials/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="flex items-center gap-2.5">
+                    <RowAvatar name={row.displayName || "?"} />
+                    <span className="font-medium">{row.displayName || "No name yet"}</span>
+                    {row.isAnonymised ? <FlatBadge>anonymised</FlatBadge> : null}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge variant="outline">{row.type}</FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge>{row.office ?? "Both"}</FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>
+                  <ConsentBadge given={row.consentGiven} />
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <ViewSiteLink href="/success-stories" />
+                    <EditLink href={`/admin/testimonials/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? (
-            <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link>
-          ) : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? (
-            <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link>
-          ) : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

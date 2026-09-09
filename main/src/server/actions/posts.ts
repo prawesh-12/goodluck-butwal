@@ -75,6 +75,7 @@ async function setTags(postId: string, tagIds: string[]) {
 function refresh(slugs: string[]) {
   revalidatePath("/admin/posts");
   revalidatePath("/news");
+  revalidatePath("/");
   for (const slug of slugs) revalidatePath(`/news/${slug}`);
 }
 

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { confirmConsultation } from "@/server/actions/leads";
+import { Button } from "./ui/button";
 
 export function ConfirmButton({ id }: { id: string }) {
   const router = useRouter();
@@ -11,9 +12,10 @@ export function ConfirmButton({ id }: { id: string }) {
 
   return (
     <>
-      <button
+      <Button
         type="button"
-        className="admin-btn"
+        variant="outline"
+        size="sm"
         disabled={busy}
         onClick={async () => {
           setBusy(true);
@@ -24,8 +26,8 @@ export function ConfirmButton({ id }: { id: string }) {
         }}
       >
         {busy ? "Confirming" : "Confirm"}
-      </button>
-      {error ? <span className="t-small admin-error">{error}</span> : null}
+      </Button>
+      {error ? <span className="text-xs font-medium text-destructive">{error}</span> : null}
     </>
   );
 }

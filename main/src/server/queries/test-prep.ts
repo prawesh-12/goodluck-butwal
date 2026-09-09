@@ -3,6 +3,7 @@ import { and, asc, eq, gte } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, offices, teamMembers, testPrepBatches, testPrepCourses } from "@db/schema";
 import type { BatchStatus } from "@/lib/seats";
+import { mediaUrl } from "./catalogue";
 
 export type PublicCourse = {
   id: string;
@@ -54,7 +55,9 @@ export const listTestPrepCourses = cache(async (): Promise<PublicCourse[]> => {
       syllabus: testPrepCourses.syllabus,
       fee: testPrepCourses.defaultFee,
       feeCurrency: testPrepCourses.feeCurrency,
-      image: mediaAssets.staticPath,
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
       imageAlt: mediaAssets.altText,
       timezone: offices.timezone,
     })
@@ -74,7 +77,7 @@ export const listTestPrepCourses = cache(async (): Promise<PublicCourse[]> => {
     syllabus: row.syllabus ?? [],
     fee: row.fee,
     feeCurrency: row.feeCurrency,
-    image: row.image ?? "",
+    image: mediaUrl(row, 960),
     imageAlt: row.imageAlt ?? "",
     // Batch times are office-local, so a course with no office falls back to the Nepal zone
     // it is taught in.

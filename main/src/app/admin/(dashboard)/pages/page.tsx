@@ -1,10 +1,20 @@
-import Link from "next/link";
 import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
 import { ContentFilters } from "@/components/admin/page-filters";
 import { listAdminPages, PAGE_SIZE } from "@/server/queries/admin-content";
 import { pagePath } from "@/lib/validators/page";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  Pager,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -28,15 +38,14 @@ export default async function PagesListPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">Pages</h1>
-        {can(actor, "pages", "create") ? (
-          <Link className="admin-btn" href="/admin/pages/new">
-            New page
-          </Link>
-        ) : null}
-      </div>
+    <div className="space-y-4">
+      <ListHeader
+        title="Pages"
+        count={total}
+        actions={
+          can(actor, "pages", "create") ? <NewButton href="/admin/pages/new">New page</NewButton> : null
+        }
+      />
 
       <ContentFilters
         placeholder="Title or address"
@@ -53,58 +62,48 @@ export default async function PagesListPage({
           },
         ]}
       />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          No pages match. Clear the filters, or <Link href="/admin/pages/new">add a page</Link>.
-        </p>
+        <EmptyState>No pages match. Clear the filters, or add a page.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Address</th>
-              <th>Section</th>
-              <th>In menu</th>
-              <th>Status</th>
-              <th>On the site</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Address</TableHead>
+              <TableHead>Section</TableHead>
+              <TableHead>In menu</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.title}</td>
-                <td>{pagePath(row.parent, row.slug)}</td>
-                <td>{row.parent}</td>
-                <td>{row.showInNav ? "Yes" : "No"}</td>
-                <td>{row.status}</td>
-                <td>
-                  <a href={pagePath(row.parent, row.slug)} target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/pages/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="font-medium">{row.title}</span>
+                </TableCell>
+                <TableCell>{pagePath(row.parent, row.slug)}</TableCell>
+                <TableCell>
+                  <FlatBadge>{row.parent}</FlatBadge>
+                </TableCell>
+                <TableCell>{row.showInNav ? "Yes" : "No"}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <ViewSiteLink href={pagePath(row.parent, row.slug)} />
+                    <EditLink href={`/admin/pages/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link> : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link> : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
@@ -11,6 +10,17 @@ import {
   listCourseCategories,
   PAGE_SIZE,
 } from "@/server/queries/admin-catalogue";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  Pager,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -39,20 +49,19 @@ export default async function CoursesPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">Courses</h1>
-        {can(actor, "courses", "create") ? (
-          <>
-            <Link className="admin-btn" href="/admin/courses/new">
-              Add a course
-            </Link>
-            <Link className="admin-btn" href="/admin/courses/import">
-              Import a spreadsheet
-            </Link>
-          </>
-        ) : null}
-      </div>
+    <div className="space-y-4">
+      <ListHeader
+        title="Courses"
+        count={total}
+        actions={
+          can(actor, "courses", "create") ? (
+            <>
+              <NewButton href="/admin/courses/new">Add a course</NewButton>
+              <NewButton href="/admin/courses/import">Import a spreadsheet</NewButton>
+            </>
+          ) : null
+        }
+      />
 
       <ContentFilters
         placeholder="Course name or address"
@@ -84,61 +93,54 @@ export default async function CoursesPage({
           },
         ]}
       />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          No courses match. Clear the filters, <Link href="/admin/courses/new">add a course</Link> or{" "}
-          <Link href="/admin/courses/import">import a spreadsheet</Link>.
-        </p>
+        <EmptyState>No courses match. Clear the filters, add a course or import a spreadsheet.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Course</th>
-              <th>Institution</th>
-              <th>Level</th>
-              <th>Subject area</th>
-              <th>Length</th>
-              <th>Status</th>
-              <th>On the site</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Course</TableHead>
+              <TableHead>Institution</TableHead>
+              <TableHead>Level</TableHead>
+              <TableHead>Subject area</TableHead>
+              <TableHead>Length</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                <td>{row.institution ?? "Not set"}</td>
-                <td>{row.qualificationLevel ? QUALIFICATION_LABEL[row.qualificationLevel] : "Not set"}</td>
-                <td>{row.category ?? "Not set"}</td>
-                <td>{row.durationLabel ?? "Not set"}</td>
-                <td>{row.status}</td>
-                <td>
-                  <a href={coursePath(row.slug)} target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/courses/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="font-medium">{row.name}</span>
+                </TableCell>
+                <TableCell>{row.institution ?? "Not set"}</TableCell>
+                <TableCell>
+                  <FlatBadge variant="outline">
+                    {row.qualificationLevel ? QUALIFICATION_LABEL[row.qualificationLevel] : "Not set"}
+                  </FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge variant="outline">{row.category ?? "Not set"}</FlatBadge>
+                </TableCell>
+                <TableCell>{row.durationLabel ?? "Not set"}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <ViewSiteLink href={coursePath(row.slug)} />
+                    <EditLink href={`/admin/courses/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link> : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link> : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

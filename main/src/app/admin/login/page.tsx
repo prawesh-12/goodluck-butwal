@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { requestPasswordReset, signIn } from "@/lib/auth-client";
+import { Button } from "@/components/admin/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/admin/ui/card";
+import { Input } from "@/components/admin/ui/input";
+import { Label } from "@/components/admin/ui/label";
+import { Alert, AlertDescription } from "@/components/admin/ui/alert";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,69 +48,70 @@ export default function LoginPage() {
 
   if (forgot) {
     return (
-      <div className="admin admin-login">
-        <form onSubmit={onReset} className="admin-login-card">
-          <h1 className="t-h4">Reset your password</h1>
-
-          {sent ? (
-            <p className="t-small">
-              If that address has an account, a link to choose a new password is on its way. It
-              works once and expires in an hour.
-            </p>
-          ) : (
-            <>
-              <label className="admin-field">
-                <span className="t-small">Email</span>
-                <input name="email" type="email" required autoComplete="username" />
-              </label>
-              <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-                {busy ? "Sending" : "Send the link"}
-              </button>
-            </>
-          )}
-
-          <button type="button" className="admin-btn" onClick={() => setForgot(false)}>
-            Back to sign in
-          </button>
-        </form>
+      <div className="admin flex min-h-screen items-center justify-center bg-secondary/40 p-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>Reset your password</CardTitle>
+            <CardDescription>We send a one-time link that expires in an hour.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {sent ? (
+              <Alert>
+                <AlertDescription>
+                  If that address has an account, a link to choose a new password is on its way.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <form onSubmit={onReset} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reset-email">Email</Label>
+                  <Input id="reset-email" name="email" type="email" required autoComplete="username" />
+                </div>
+                <Button type="submit" className="w-full" disabled={busy}>
+                  {busy ? "Sending" : "Send the link"}
+                </Button>
+              </form>
+            )}
+            <Button type="button" variant="ghost" className="mt-3 w-full" onClick={() => setForgot(false)}>
+              Back to sign in
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="admin admin-login">
-      <form onSubmit={onSubmit} className="admin-login-card">
-        <h1 className="t-h4">Sign in</h1>
-
-        <label className="admin-field">
-          <span className="t-small">Email</span>
-          <input name="email" type="email" required autoComplete="username" />
-        </label>
-
-        <label className="admin-field">
-          <span className="t-small">Password</span>
-          <input
-            name="password"
-            type="password"
-            required
-            autoComplete="current-password"
-          />
-        </label>
-
-        {error ? (
-          <p role="alert" className="t-small admin-error">
-            {error}
-          </p>
-        ) : null}
-
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-          {busy ? "Signing in" : "Sign in"}
-        </button>
-
-        <button type="button" className="admin-btn" onClick={() => setForgot(true)}>
-          Forgot your password
-        </button>
-      </form>
+    <div className="admin flex min-h-screen items-center justify-center bg-secondary/40 p-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle>Sign in</CardTitle>
+          <CardDescription>Goodluck admin. Your session lasts 7 days.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" name="email" type="email" required autoComplete="username" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" name="password" type="password" required autoComplete="current-password" />
+            </div>
+            {error ? (
+              <Alert variant="destructive">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            ) : null}
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? "Signing in" : "Sign in"}
+            </Button>
+          </form>
+          <Button type="button" variant="ghost" className="mt-3 w-full" onClick={() => setForgot(true)}>
+            Forgot your password
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

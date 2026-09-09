@@ -3,6 +3,7 @@ import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
 import { listMedia, PAGE_SIZE, type MediaFilters } from "@/server/queries/media";
 import { MediaGrid } from "@/components/admin/media-grid";
+import { ListHeader } from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +21,8 @@ export default async function MediaPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <h1 className="t-h4">Media</h1>
+    <div className="space-y-4">
+      <ListHeader title="Media" count={total} countNoun="files" />
       <MediaGrid
         rows={rows}
         folders={folders}
@@ -32,6 +33,6 @@ export default async function MediaPage({
         canDelete={can(actor, "media", "delete")}
         canUpload={can(actor, "media", "create")}
       />
-    </>
+    </div>
   );
 }

@@ -98,6 +98,7 @@ export async function updatePostCategory(input: unknown): Promise<Result> {
 
   revalidatePath("/admin/post-categories");
   revalidatePath("/news");
+  revalidatePath("/");
   return { ok: true, data: { id: data.id } };
 }
 
@@ -198,6 +199,7 @@ export async function updateTag(input: unknown): Promise<Result> {
 
   revalidatePath("/admin/tags");
   revalidatePath("/news");
+  revalidatePath("/");
   return { ok: true, data: { id: data.id } };
 }
 
@@ -227,5 +229,6 @@ export async function deleteTag(input: unknown): Promise<Result> {
 
   revalidatePath("/admin/tags");
   revalidatePath("/news");
+  revalidatePath("/");
   return { ok: true, data: { id: parsed.data.id } };
 }

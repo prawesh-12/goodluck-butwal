@@ -1,9 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { reorderPartners } from "@/server/actions/partners";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Button } from "./ui/button";
+import { EditLink, FlatBadge, RowAvatar, StatusBadge, ViewSiteLink } from "./list-ui";
+import { cn } from "./ui/cn";
 
 export type PartnerRow = {
   id: string;
@@ -35,55 +38,61 @@ export function PartnerList({ rows, canReorder }: { rows: PartnerRow[]; canReord
 
   return (
     <>
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Website</th>
-            <th>Featured</th>
-            <th>Status</th>
-            <th>On the site</th>
-            <th>Edit</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Website</TableHead>
+            <TableHead>Featured</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {order.map((row) => (
-            <tr
+            <TableRow
               key={row.id}
               draggable={canReorder}
               onDragStart={() => setDragging(row.id)}
               onDragOver={(e) => e.preventDefault()}
               onDrop={() => dropOn(row.id)}
               onDragEnd={() => setDragging(null)}
+              className={cn(dragging === row.id && "opacity-50", canReorder && "cursor-grab")}
             >
-              <td>{row.name}</td>
-              <td>{row.websiteUrl ?? "Not set"}</td>
-              <td>{row.isFeatured ? "Yes" : "No"}</td>
-              <td>{row.status}</td>
-              <td>
-                <a href="/" target="_blank" rel="noreferrer">
-                  View on site
-                </a>
-              </td>
-              <td>
-                <Link className="admin-btn" href={`/admin/partners/${row.id}`}>
-                  Edit
-                </Link>
-              </td>
-            </tr>
+              <TableCell>
+                <span className="flex items-center gap-2.5">
+                  <RowAvatar name={row.name} />
+                  <span className="font-medium">{row.name}</span>
+                </span>
+              </TableCell>
+              <TableCell className="max-w-56 truncate">{row.websiteUrl ?? "Not set"}</TableCell>
+              <TableCell>
+                {row.isFeatured ? <FlatBadge variant="default">Featured</FlatBadge> : <FlatBadge>No</FlatBadge>}
+              </TableCell>
+              <TableCell>
+                <StatusBadge status={row.status} />
+              </TableCell>
+              <TableCell>
+                <span className="flex items-center justify-end gap-1">
+                  <ViewSiteLink href="/" />
+                  <EditLink href={`/admin/partners/${row.id}`} />
+                </span>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
 
       {canReorder ? (
-        <div className="admin-actions">
-          <span className="t-small admin-help">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">
             Drag a row to change the order logos scroll past on the home page.
           </span>
           {moved ? (
-            <button
+            <Button
               type="button"
-              className="admin-btn"
+              variant="outline"
+              size="sm"
               disabled={busy}
               onClick={async () => {
                 setBusy(true);
@@ -94,9 +103,9 @@ export function PartnerList({ rows, canReorder }: { rows: PartnerRow[]; canReord
               }}
             >
               {busy ? "Saving" : "Save order"}
-            </button>
+            </Button>
           ) : null}
-          {message ? <span className="t-small">{message}</span> : null}
+          {message ? <span className="text-sm text-muted-foreground">{message}</span> : null}
         </div>
       ) : null}
     </>

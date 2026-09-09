@@ -5,6 +5,18 @@ import { can } from "@/lib/rbac";
 import { ContentFilters } from "@/components/admin/page-filters";
 import { listAdminCourses, PAGE_SIZE } from "@/server/queries/admin-test-prep";
 import { TEST_LABEL } from "@/components/test-prep/schedule";
+import { Button } from "@/components/admin/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  Pager,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -33,21 +45,24 @@ export default async function TestPrepListPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">Test preparation</h1>
-        <Link className="admin-btn" href="/admin/test-prep/batches">
-          Batches
-        </Link>
-        <Link className="admin-btn" href="/admin/test-prep/registrations">
-          Registrations
-        </Link>
-        {can(actor, "testPrep", "create") ? (
-          <Link className="admin-btn" href="/admin/test-prep/new">
-            New course
-          </Link>
-        ) : null}
-      </div>
+    <div className="space-y-4">
+      <ListHeader
+        title="Test preparation"
+        count={total}
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              <Link href="/admin/test-prep/batches">Batches</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/admin/test-prep/registrations">Registrations</Link>
+            </Button>
+            {can(actor, "testPrep", "create") ? (
+              <NewButton href="/admin/test-prep/new">New course</NewButton>
+            ) : null}
+          </>
+        }
+      />
 
       <ContentFilters
         placeholder="Course or address"
@@ -56,58 +71,52 @@ export default async function TestPrepListPage({
           { name: "testType", label: "Test", anyLabel: "Any", options: TESTS },
         ]}
       />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
+        <EmptyState>
           No courses match. Clear the filters, or <Link href="/admin/test-prep/new">add a course</Link>.
-        </p>
+        </EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Course</th>
-              <th>Test</th>
-              <th>Office</th>
-              <th>Fee</th>
-              <th>Status</th>
-              <th>On the site</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Course</TableHead>
+              <TableHead>Test</TableHead>
+              <TableHead>Office</TableHead>
+              <TableHead>Fee</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.name}</td>
-                <td>{TEST_LABEL[row.testType]}</td>
-                <td>{row.office ?? "Not set"}</td>
-                <td>{row.fee ? `${row.feeCurrency} ${row.fee}` : "Not set"}</td>
-                <td>{row.status}</td>
-                <td>
-                  <a href={`/test-preparation/${row.slug}`} target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/test-prep/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="font-medium">{row.name}</span>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge variant="outline">{TEST_LABEL[row.testType]}</FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge>{row.office ?? "Not set"}</FlatBadge>
+                </TableCell>
+                <TableCell>{row.fee ? `${row.feeCurrency} ${row.fee}` : "Not set"}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <ViewSiteLink href={`/test-preparation/${row.slug}`} />
+                    <EditLink href={`/admin/test-prep/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link> : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link> : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

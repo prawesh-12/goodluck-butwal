@@ -133,6 +133,7 @@ export async function createDestination(input: unknown): Promise<Result<{ id: st
   revalidatePath("/admin/destinations");
   revalidatePath("/study-abroad");
   revalidatePath(destinationPath(slug));
+  revalidatePath("/");
   return { ok: true, data: { id: row.id } };
 }
 
@@ -208,6 +209,7 @@ export async function updateDestination(input: unknown): Promise<Result<{ id: st
   revalidatePath("/study-abroad");
   revalidatePath(before);
   if (after !== before) revalidatePath(after);
+  revalidatePath("/");
   return { ok: true, data: { id: data.id } };
 }
 
@@ -243,6 +245,7 @@ export async function deleteDestination(input: unknown): Promise<Result<{ id: st
   revalidatePath("/admin/destinations");
   revalidatePath("/study-abroad");
   revalidatePath(destinationPath(existing.slug));
+  revalidatePath("/");
   return { ok: true, data: { id: existing.id } };
 }
 
@@ -296,6 +299,8 @@ export async function saveDestinationFaqs(input: unknown): Promise<Result<{ id: 
   });
 
   revalidatePath(destinationPath(owner.slug));
+  revalidatePath("/study-abroad");
   revalidatePath("/faq");
+  revalidatePath("/");
   return { ok: true, data: { id: owner.id } };
 }

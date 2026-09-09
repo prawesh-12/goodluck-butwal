@@ -4,6 +4,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { describeMedia, deleteMedia } from "@/server/actions/media";
 import { Select } from "./repeater";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Alert, AlertDescription } from "./ui/alert";
+import { EmptyState, FilterCard, SearchField, FlatBadge } from "./list-ui";
 
 type Row = {
   id: string;
@@ -60,117 +66,125 @@ export function MediaGrid({
 
   return (
     <>
-      <form className="admin-filters" onSubmit={(e) => e.preventDefault()}>
-        <label className="admin-field">
-          <span className="t-small">Search</span>
-          <input
+      <form onSubmit={(e) => e.preventDefault()}>
+        <FilterCard>
+          <SearchField
+            id="media-search"
             defaultValue={params.get("q") ?? ""}
             placeholder="Filename or alt text"
-            onChange={(e) => set("q", e.target.value)}
+            onChange={(value) => set("q", value)}
           />
-        </label>
-        <Select
-          label="Folder"
-          defaultValue={params.get("folder") ?? ""}
-          onChange={(value) => set("folder", value)}
-          options={[{ value: "", label: "All" }, ...folders.map((f) => ({ value: f, label: f }))]}
-        />
-        <Select
-          label="Type"
-          defaultValue={params.get("type") ?? ""}
-          onChange={(value) => set("type", value)}
-          options={[
-            { value: "", label: "All" },
-            { value: "image", label: "Image" },
-            { value: "video", label: "Video" },
-          ]}
-        />
-        <button
-          type="button"
-          className="admin-btn"
-          onClick={() => set("missing_alt", onlyMissing ? "" : "1")}
-        >
-          {onlyMissing ? "Show all" : `Needs alt text (${missingAlt})`}
-        </button>
+          <Select
+            label="Folder"
+            defaultValue={params.get("folder") ?? ""}
+            onChange={(value) => set("folder", value)}
+            options={[{ value: "", label: "All" }, ...folders.map((f) => ({ value: f, label: f }))]}
+          />
+          <Select
+            label="Type"
+            defaultValue={params.get("type") ?? ""}
+            onChange={(value) => set("type", value)}
+            options={[
+              { value: "", label: "All" },
+              { value: "image", label: "Image" },
+              { value: "video", label: "Video" },
+            ]}
+          />
+          <div className="flex items-end">
+            <Button
+              type="button"
+              variant={onlyMissing ? "default" : "outline"}
+              size="sm"
+              onClick={() => set("missing_alt", onlyMissing ? "" : "1")}
+            >
+              {onlyMissing ? "Show all" : `Needs alt text (${missingAlt})`}
+            </Button>
+          </div>
+        </FilterCard>
       </form>
 
-      <p className="t-small admin-count">
+      <p className="text-sm text-muted-foreground">
         {total} files. {missingAlt === 0 ? "Every image has alt text." : `${missingAlt} images still need alt text.`}
       </p>
-      {canUpload ? null : <p className="t-small admin-count">Your role cannot upload.</p>}
-      {message ? <p role="alert" className="t-small admin-error">{message}</p> : null}
+      {canUpload ? null : <p className="text-sm text-muted-foreground">Your role cannot upload.</p>}
+      {message ? (
+        <Alert>
+          <AlertDescription>{message}</AlertDescription>
+        </Alert>
+      ) : null}
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">No files match. Clear the filters, or upload one.</p>
+        <EmptyState>No files match. Clear the filters, or upload one.</EmptyState>
       ) : (
-        <div className="admin-media-grid">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {rows.map((row) => (
-            <figure key={row.id} className="admin-media-tile">
+            <Card key={row.id} className="overflow-hidden">
               {row.type === "video" ? (
-                <video src={src(row)} className="admin-media-thumb" muted />
+                <video src={src(row)} className="aspect-4/3 w-full bg-secondary object-contain" muted />
               ) : (
-                <img src={src(row)} alt={row.altText ?? ""} className="admin-media-thumb" loading="lazy" />
+                <img src={src(row)} alt={row.altText ?? ""} className="aspect-4/3 w-full bg-secondary object-contain" loading="lazy" />
               )}
-              <figcaption>
-                <p className="t-small admin-media-name">{row.filename}</p>
+              <CardContent className="space-y-2 pt-4">
+                <p className="truncate text-sm text-muted-foreground">{row.filename}</p>
                 {row.type === "image" && !row.altText ? (
-                  <p className="t-small admin-error">Needs alt text</p>
+                  <FlatBadge variant="destructive">Needs alt text</FlatBadge>
                 ) : null}
-                <button type="button" className="admin-btn" onClick={() => setOpen(open === row.id ? null : row.id)}>
-                  {open === row.id ? "Close" : "Edit"}
-                </button>
-              </figcaption>
+                <div>
+                  <Button type="button" variant="outline" size="sm" onClick={() => setOpen(open === row.id ? null : row.id)}>
+                    {open === row.id ? "Close" : "Edit"}
+                  </Button>
+                </div>
 
-              {open === row.id ? (
-                <form
-                  className="admin-editor admin-media-form"
-                  onSubmit={async (event) => {
-                    event.preventDefault();
-                    const form = new FormData(event.currentTarget);
-                    const result = await describeMedia({
-                      id: row.id,
-                      altText: form.get("altText"),
-                      caption: form.get("caption"),
-                    });
-                    setMessage(result.ok ? "Saved." : result.error);
-                    if (result.ok) router.refresh();
-                  }}
-                >
-                  <label className="admin-field">
-                    <span className="t-small">Alt text</span>
-                    <input name="altText" defaultValue={row.altText ?? ""} placeholder="What the image shows" />
-                  </label>
-                  <label className="admin-field">
-                    <span className="t-small">Caption</span>
-                    <input name="caption" defaultValue={row.caption ?? ""} />
-                  </label>
-                  <div className="admin-actions">
-                    <button type="submit" className="admin-btn admin-btn-primary">Save</button>
-                    {canDelete ? (
-                      <button
-                        type="button"
-                        className="admin-btn admin-btn-danger"
-                        onClick={async () => {
-                          const result = await deleteMedia({ id: row.id });
-                          setMessage(result.ok ? "Deleted." : result.error);
-                          if (result.ok) router.refresh();
-                        }}
-                      >
-                        Delete
-                      </button>
-                    ) : null}
-                  </div>
-                </form>
-              ) : null}
-            </figure>
+                {open === row.id ? (
+                  <form
+                    className="space-y-3"
+                    onSubmit={async (event) => {
+                      event.preventDefault();
+                      const form = new FormData(event.currentTarget);
+                      const result = await describeMedia({
+                        id: row.id,
+                        altText: form.get("altText"),
+                        caption: form.get("caption"),
+                      });
+                      setMessage(result.ok ? "Saved." : result.error);
+                      if (result.ok) router.refresh();
+                    }}
+                  >
+                    <div className="space-y-1.5">
+                      <Label htmlFor={`alt-${row.id}`}>Alt text</Label>
+                      <Input id={`alt-${row.id}`} name="altText" defaultValue={row.altText ?? ""} placeholder="What the image shows" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label htmlFor={`caption-${row.id}`}>Caption</Label>
+                      <Input id={`caption-${row.id}`} name="caption" defaultValue={row.caption ?? ""} />
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button type="submit" size="sm">Save</Button>
+                      {canDelete ? (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={async () => {
+                            const result = await deleteMedia({ id: row.id });
+                            setMessage(result.ok ? "Deleted." : result.error);
+                            if (result.ok) router.refresh();
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      ) : null}
+                    </div>
+                  </form>
+                ) : null}
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
 
       {pages > 1 ? (
-        <nav className="admin-pager">
-          <span className="t-small">Page {page} of {pages}</span>
-        </nav>
+        <p className="text-sm text-muted-foreground">Page {page} of {pages}</p>
       ) : null}
     </>
   );

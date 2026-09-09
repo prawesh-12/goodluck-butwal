@@ -12,6 +12,8 @@ import {
   type EventFilters,
 } from "@/server/queries/admin-events";
 import { seatsTaken } from "@/server/queries/events";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { EmptyState, ListHeader, NewButton, Pager, RowAvatar, StatusBadge } from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -53,75 +55,66 @@ export default async function EventRegistrationsPage({
             : null;
 
   return (
-    <>
+    <div className="space-y-4">
       <h1 className="t-h4">Registrations for {event.title}</h1>
       <p className="t-small admin-help">
         <Link href={`/admin/events/${event.id}`}>Back to the event</Link> · starts{" "}
         {formatInOfficeTz(event.startsAt, zone)}
       </p>
+      <ListHeader
+        title="Registrations"
+        count={total}
+        countNoun={`registered, ${taken} seats taken${capacity === null ? ", no limit set" : ` of ${capacity}`}`}
+        actions={
+          can(actor, "registrations", "export") ? (
+            <NewButton href={`/api/admin/export/event-registrations?event=${event.id}`}>Download CSV</NewButton>
+          ) : null
+        }
+      />
 
       {warning ? <p className="t-body admin-clash">{warning}</p> : null}
 
-      <div className="admin-actions">
-        <p className="t-small admin-count">
-          {total} registered, {taken} seats taken
-          {capacity === null ? ", no limit set" : ` of ${capacity}`}
-        </p>
-        {can(actor, "registrations", "export") ? (
-          <a className="admin-btn" href={`/api/admin/export/event-registrations?event=${event.id}`}>
-            Download CSV
-          </a>
-        ) : null}
-      </div>
-
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          Nobody has registered yet. Share the event page to start taking registrations.
-        </p>
+        <EmptyState>Nobody has registered yet. Share the event page to start taking registrations.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Coming</th>
-              <th>Registered</th>
-              <th>Status</th>
-              <th>Notes</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Coming</TableHead>
+              <TableHead>Registered</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Notes</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.fullName}</td>
-                <td>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="flex items-center gap-2.5">
+                    <RowAvatar name={row.fullName} />
+                    <span className="font-medium">{row.fullName}</span>
+                  </span>
+                </TableCell>
+                <TableCell>
                   <a href={`mailto:${row.email}`}>{row.email}</a>
-                </td>
-                <td>{row.phone ?? ""}</td>
-                <td>{row.attendees}</td>
-                <td>{formatInOfficeTz(row.createdAt, zone)}</td>
-                <td>{row.status}</td>
-                <td>{row.notes ?? ""}</td>
-              </tr>
+                </TableCell>
+                <TableCell>{row.phone ?? ""}</TableCell>
+                <TableCell>{row.attendees}</TableCell>
+                <TableCell>{formatInOfficeTz(row.createdAt, zone)}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>{row.notes ?? ""}</TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? (
-            <Link href={`?${new URLSearchParams({ ...query, page: String(page - 1) })}`}>Previous</Link>
-          ) : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? (
-            <Link href={`?${new URLSearchParams({ ...query, page: String(page + 1) })}`}>Next</Link>
-          ) : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={query} />
+    </div>
   );
 }

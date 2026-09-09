@@ -2,6 +2,7 @@ import { cache } from "react";
 import { and, asc, eq, sum } from "drizzle-orm";
 import { db } from "@db/client";
 import { eventRegistrations, events, mediaAssets, offices } from "@db/schema";
+import { mediaUrl } from "./catalogue";
 import { eventTypeLabels, type EventType } from "@/lib/content-meta";
 import { formatInOfficeTz } from "@/lib/datetime";
 import { utcToZonedInput } from "@/lib/validators/event";
@@ -38,7 +39,9 @@ export const listEvents = cache(async (): Promise<PublicEvent[]> => {
       eventType: events.eventType,
       summary: events.summary,
       html: events.descriptionHtml,
-      image: mediaAssets.staticPath,
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
       startsAt: events.startsAt,
       endsAt: events.endsAt,
       isOnline: events.isOnline,
@@ -63,7 +66,7 @@ export const listEvents = cache(async (): Promise<PublicEvent[]> => {
     ...row,
     summary: row.summary ?? "",
     html: row.html ?? "",
-    image: row.image ?? "",
+    image: mediaUrl(row, 960),
     officeCode: row.officeCode ?? "",
     officeName: row.officeName ?? "",
     // Every published event has an office, so this fallback only ever covers a draft made live

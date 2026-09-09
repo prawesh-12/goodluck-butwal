@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
@@ -11,6 +10,17 @@ import {
   PAGE_SIZE,
   type EditorialFilters as Filters,
 } from "@/server/queries/admin-editorial";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import {
+  EditLink,
+  EmptyState,
+  FlatBadge,
+  ListHeader,
+  NewButton,
+  Pager,
+  StatusBadge,
+  ViewSiteLink,
+} from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -32,8 +42,16 @@ export default async function PostsPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <h1 className="t-h4">Posts</h1>
+    <div className="space-y-4">
+      <ListHeader
+        title="Posts"
+        count={total}
+        actions={
+          can(actor, "posts", "create") ? (
+            <NewButton href="/admin/posts/new">Write a post</NewButton>
+          ) : null
+        }
+      />
 
       <EditorialFilters
         placeholder="Title, web address or excerpt"
@@ -60,71 +78,51 @@ export default async function PostsPage({
         ]}
       />
 
-      <div className="admin-actions">
-        <p className="t-small admin-count">{total} matching</p>
-        {can(actor, "posts", "create") ? (
-          <Link className="admin-btn" href="/admin/posts/new">
-            Write a post
-          </Link>
-        ) : null}
-      </div>
-
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          Nothing matches those filters. Clear the search, or write a post.
-        </p>
+        <EmptyState>Nothing matches those filters. Clear the search, or write a post.</EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Office</th>
-              <th>Status</th>
-              <th>Published</th>
-              <th>Minutes</th>
-              <th>Live page</th>
-              <th>Edit</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Title</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Office</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Published</TableHead>
+              <TableHead>Minutes</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.title}</td>
-                <td>{row.category ?? "Not set"}</td>
-                <td>{row.office ?? "Both"}</td>
-                <td>{row.status}</td>
-                <td>{row.publishedAt ? row.publishedAt.toISOString().slice(0, 10) : "Not set"}</td>
-                <td>{row.readingMinutes ?? ""}</td>
-                <td>
-                  <a href={`/news/${row.slug}`} target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  <Link className="admin-btn" href={`/admin/posts/${row.id}`}>
-                    Edit
-                  </Link>
-                </td>
-              </tr>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="font-medium">{row.title}</span>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge variant="outline">{row.category ?? "Not set"}</FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <FlatBadge>{row.office ?? "Both"}</FlatBadge>
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status} />
+                </TableCell>
+                <TableCell>{row.publishedAt ? row.publishedAt.toISOString().slice(0, 10) : "Not set"}</TableCell>
+                <TableCell>{row.readingMinutes ?? ""}</TableCell>
+                <TableCell>
+                  <span className="flex items-center justify-end gap-1">
+                    <ViewSiteLink href={`/news/${row.slug}`} />
+                    <EditLink href={`/admin/posts/${row.id}`} />
+                  </span>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? (
-            <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link>
-          ) : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? (
-            <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link>
-          ) : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

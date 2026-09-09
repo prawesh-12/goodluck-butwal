@@ -2,6 +2,7 @@ import { cache } from "react";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, offices, partners, teamMembers } from "@db/schema";
+import { mediaUrl } from "./catalogue";
 import type { OfficeId } from "@/lib/site";
 
 export type PublicMember = {
@@ -19,7 +20,9 @@ export const listTeam = cache(async (): Promise<PublicMember[]> => {
       name: teamMembers.fullName,
       role: teamMembers.position,
       office: offices.code,
-      photo: mediaAssets.staticPath,
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
     })
     .from(teamMembers)
     .leftJoin(offices, eq(teamMembers.officeId, offices.id))
@@ -32,17 +35,17 @@ export const listTeam = cache(async (): Promise<PublicMember[]> => {
     name: row.name,
     role: row.role ?? "",
     office: (row.office as OfficeId | null) ?? null,
-    photo: row.photo ?? "",
+    photo: mediaUrl(row, 640),
   }));
 });
 
 export const listPartnerLogos = cache(async (): Promise<string[]> => {
   const rows = await db
-    .select({ path: mediaAssets.staticPath })
+    .select({ kind: mediaAssets.kind, staticPath: mediaAssets.staticPath, cloudinaryPublicId: mediaAssets.cloudinaryPublicId })
     .from(partners)
     .leftJoin(mediaAssets, eq(partners.logoId, mediaAssets.id))
     .where(eq(partners.status, "published"))
     .orderBy(asc(partners.sortOrder));
 
-  return rows.map((row) => row.path).filter((path): path is string => Boolean(path));
+  return rows.map((row) => mediaUrl(row, 320)).filter(Boolean);
 });

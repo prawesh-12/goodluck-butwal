@@ -5,6 +5,9 @@ import { formatDate, formatInOfficeTz } from "@/lib/datetime";
 import { RegistrationFilters } from "@/components/admin/testprep-registration-filters";
 import { RegistrationStatus } from "@/components/admin/testprep-registration-status";
 import { batchOptions, listRegistrations, PAGE_SIZE } from "@/server/queries/admin-test-prep";
+import { Button } from "@/components/admin/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { EmptyState, ListHeader, Pager, RowAvatar } from "@/components/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -26,67 +29,66 @@ export default async function RegistrationsPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">Test prep registrations</h1>
-        <Link className="admin-btn" href="/admin/test-prep/batches">
-          Batches
-        </Link>
-      </div>
+    <div className="space-y-4">
+      <ListHeader
+        title="Test prep registrations"
+        count={total}
+        actions={
+          <Button variant="outline" asChild>
+            <Link href="/admin/test-prep/batches">Batches</Link>
+          </Button>
+        }
+      />
 
       <RegistrationFilters
         batches={batches.map((b) => ({ id: b.id, label: `${b.courseName}: ${b.batchName}, ${formatDate(b.startDate)}` }))}
         statuses={STATUSES}
         exportPath="/admin/test-prep/registrations/export"
       />
-      <p className="t-small admin-count">{total} matching</p>
 
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
+        <EmptyState>
           Nobody has registered for that. Widen the dates, or <Link href="/admin/test-prep/batches">check the batches</Link>.
-        </p>
+        </EmptyState>
       ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th>Course</th>
-              <th>Batch</th>
-              <th>Registered</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
+              <TableHead>Course</TableHead>
+              <TableHead>Batch</TableHead>
+              <TableHead>Registered</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td>{row.fullName}</td>
-                <td>{row.email}</td>
-                <td>{row.phone ?? "Not given"}</td>
-                <td>{row.courseName}</td>
-                <td>
+              <TableRow key={row.id}>
+                <TableCell>
+                  <span className="flex items-center gap-2.5">
+                    <RowAvatar name={row.fullName} />
+                    <span className="font-medium">{row.fullName}</span>
+                  </span>
+                </TableCell>
+                <TableCell>{row.email}</TableCell>
+                <TableCell>{row.phone ?? "Not given"}</TableCell>
+                <TableCell>{row.courseName}</TableCell>
+                <TableCell>
                   <Link href={`/admin/test-prep/batches/${row.batchId}`}>{row.batchName}</Link>
-                </td>
-                <td>{formatInOfficeTz(row.createdAt, row.timezone ?? "Asia/Kathmandu")}</td>
-                <td>
+                </TableCell>
+                <TableCell>{formatInOfficeTz(row.createdAt, row.timezone ?? "Asia/Kathmandu")}</TableCell>
+                <TableCell>
                   <RegistrationStatus id={row.id} status={row.status} />
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link> : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link> : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

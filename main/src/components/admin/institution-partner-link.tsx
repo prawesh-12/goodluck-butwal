@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { linkPartnersToInstitutions } from "@/server/actions/institutions";
+import { Button } from "./ui/button";
 
 // Partner logos and institutions are two tables today. This joins the rows whose names already
 // match, so the home page ticker and the institution pages read from one source.
@@ -12,10 +13,11 @@ export function InstitutionPartnerLink() {
   const [message, setMessage] = useState<string | null>(null);
 
   return (
-    <div className="admin-actions">
-      <button
+    <div className="flex flex-wrap items-center gap-2">
+      <Button
         type="button"
-        className="admin-btn"
+        variant="outline"
+        size="sm"
         disabled={busy}
         onClick={async () => {
           setBusy(true);
@@ -34,11 +36,11 @@ export function InstitutionPartnerLink() {
         }}
       >
         {busy ? "Matching" : "Match partner logos"}
-      </button>
-      <span className="t-small admin-help">
+      </Button>
+      <span className="text-xs text-muted-foreground">
         Links a partner logo to the institution with the same name. Nothing is renamed or guessed.
       </span>
-      {message ? <span className="t-small">{message}</span> : null}
+      {message ? <span className="text-sm text-muted-foreground">{message}</span> : null}
     </div>
   );
 }

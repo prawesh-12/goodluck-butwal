@@ -2,7 +2,12 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Download } from "lucide-react";
 import { Select } from "./repeater";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
 
 export type BatchOption = { id: string; label: string };
 
@@ -44,42 +49,50 @@ export function RegistrationFilters({
   };
 
   return (
-    <form className="admin-filters" onSubmit={(e) => e.preventDefault()}>
-      <label className="admin-field">
-        <span className="t-small">Search</span>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, email or phone" />
-      </label>
+    <Card>
+      <CardContent className="pt-6">
+        <form className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-4" onSubmit={(e) => e.preventDefault()}>
+          <div className="space-y-1.5">
+            <Label htmlFor="reg-search">Search</Label>
+            <Input id="reg-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, email or phone" />
+          </div>
 
-      <Select
-        label="Batch"
-        defaultValue={params.get("batch") ?? ""}
-        onChange={(value) => set("batch", value)}
-        options={[
-          { value: "", label: "Every batch" },
-          ...batches.map((b) => ({ value: b.id, label: b.label })),
-        ]}
-      />
+          <Select
+            label="Batch"
+            defaultValue={params.get("batch") ?? ""}
+            onChange={(value) => set("batch", value)}
+            options={[
+              { value: "", label: "Every batch" },
+              ...batches.map((b) => ({ value: b.id, label: b.label })),
+            ]}
+          />
 
-      <Select
-        label="Status"
-        defaultValue={params.get("status") ?? ""}
-        onChange={(value) => set("status", value)}
-        options={[{ value: "", label: "Any" }, ...statuses.map((s) => ({ value: s, label: s }))]}
-      />
+          <Select
+            label="Status"
+            defaultValue={params.get("status") ?? ""}
+            onChange={(value) => set("status", value)}
+            options={[{ value: "", label: "Any" }, ...statuses.map((s) => ({ value: s, label: s }))]}
+          />
 
-      <label className="admin-field">
-        <span className="t-small">From</span>
-        <input type="date" defaultValue={params.get("from") ?? ""} onChange={(e) => set("from", e.target.value)} />
-      </label>
+          <div className="space-y-1.5">
+            <Label htmlFor="reg-from">From</Label>
+            <Input id="reg-from" type="date" defaultValue={params.get("from") ?? ""} onChange={(e) => set("from", e.target.value)} />
+          </div>
 
-      <label className="admin-field">
-        <span className="t-small">To</span>
-        <input type="date" defaultValue={params.get("to") ?? ""} onChange={(e) => set("to", e.target.value)} />
-      </label>
+          <div className="space-y-1.5">
+            <Label htmlFor="reg-to">To</Label>
+            <Input id="reg-to" type="date" defaultValue={params.get("to") ?? ""} onChange={(e) => set("to", e.target.value)} />
+          </div>
 
-      <a className="admin-btn" href={`${exportPath}?${params}`}>
-        Export CSV
-      </a>
-    </form>
+          <div className="sm:col-span-2 lg:col-span-4">
+            <Button type="button" variant="outline" size="sm" asChild>
+              <a href={`${exportPath}?${params}`}>
+                <Download /> Export CSV
+              </a>
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

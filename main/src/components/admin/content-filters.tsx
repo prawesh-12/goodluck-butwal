@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { FilterCard, SearchField } from "./list-ui";
 import { Select } from "./repeater";
 
 const STATUSES = ["draft", "scheduled", "published", "archived"];
@@ -45,30 +46,29 @@ export function ContentFilters({
   };
 
   return (
-    <form className="admin-filters" onSubmit={(e) => e.preventDefault()}>
-      <label className="admin-field">
-        <span className="t-small">Search</span>
-        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={placeholder} />
-      </label>
+    <form onSubmit={(e) => e.preventDefault()}>
+      <FilterCard>
+        <SearchField id="content-search" value={q} onChange={setQ} placeholder={placeholder} />
 
-      <Select
-        label="Status"
-        defaultValue={params.get("status") ?? ""}
-        onChange={(value) => set("status", value)}
-        options={[{ value: "", label: "Any" }, ...STATUSES.map((s) => ({ value: s, label: s }))]}
-      />
-
-      {offices ? (
         <Select
-          label="Office"
-          defaultValue={params.get("office") ?? ""}
-          onChange={(value) => set("office", value)}
-          options={[
-            { value: "", label: "Any" },
-            ...offices.map((office) => ({ value: office.id, label: office.name })),
-          ]}
+          label="Status"
+          defaultValue={params.get("status") ?? ""}
+          onChange={(value) => set("status", value)}
+          options={[{ value: "", label: "Any" }, ...STATUSES.map((s) => ({ value: s, label: s }))]}
         />
-      ) : null}
+
+        {offices ? (
+          <Select
+            label="Office"
+            defaultValue={params.get("office") ?? ""}
+            onChange={(value) => set("office", value)}
+            options={[
+              { value: "", label: "Any" },
+              ...offices.map((office) => ({ value: office.id, label: office.name })),
+            ]}
+          />
+        ) : null}
+      </FilterCard>
     </form>
   );
 }

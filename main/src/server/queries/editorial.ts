@@ -5,6 +5,20 @@ import { db } from "@db/client";
 import { allSettings } from "./shared";
 import { mediaAssets, postCategories, postTags, posts, tags, testimonials } from "@db/schema";
 
+type MediaRow = {
+  kind: "static" | "cloudinary" | null;
+  staticPath: string | null;
+  cloudinaryPublicId: string | null;
+};
+
+// Same rule as the catalogue and the admin picker: Cloudinary rows resolve to a
+// delivery URL, everything else falls back to the file in public/.
+function mediaUrl(row: MediaRow, width = 640) {
+  if (row.kind !== "cloudinary") return row.staticPath ?? "";
+  const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,q_auto,w_${width}/${row.cloudinaryPublicId}`;
+}
+
 export type PublicArticle = {
   slug: string;
   title: string;
@@ -24,7 +38,9 @@ export const listArticles = cache(async (): Promise<PublicArticle[]> => {
       title: posts.title,
       date: posts.publishedAt,
       category: postCategories.name,
-      image: mediaAssets.staticPath,
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
       width: mediaAssets.width,
       height: mediaAssets.height,
       excerpt: posts.excerpt,
@@ -46,7 +62,7 @@ export const listArticles = cache(async (): Promise<PublicArticle[]> => {
     title: row.title,
     date: row.date ? row.date.toISOString().slice(0, 10) : "",
     category: row.category ?? "",
-    image: row.image ?? "",
+    image: mediaUrl(row, 960),
     excerpt: row.excerpt ?? "",
     html: row.html ?? "",
     width: row.width ?? undefined,
@@ -65,18 +81,26 @@ export const listReviews = cache(async (): Promise<PublicReview[]> => {
   const rows = await db
     .select({
       name: testimonials.displayName,
-      avatar: mediaAssets.staticPath,
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
       quote: testimonials.quote,
       createdAt: testimonials.publishedAt,
     })
     .from(testimonials)
     .leftJoin(mediaAssets, eq(testimonials.authorPhotoId, mediaAssets.id))
-    .where(and(eq(testimonials.status, "published"), eq(testimonials.type, "text")))
+    .where(
+      and(
+        eq(testimonials.status, "published"),
+        eq(testimonials.type, "text"),
+        eq(testimonials.consentGiven, true),
+      ),
+    )
     .orderBy(asc(testimonials.sortOrder));
 
   return rows.map((row) => ({
     name: row.name ?? "",
-    avatar: row.avatar ?? "",
+    avatar: mediaUrl(row, 320),
     date: row.createdAt ? row.createdAt.toISOString().slice(0, 7) : "",
     quote: row.quote ?? "",
   }));
@@ -84,13 +108,24 @@ export const listReviews = cache(async (): Promise<PublicReview[]> => {
 
 export const listSuccessStories = cache(async (): Promise<{ image: string; alt: string }[]> => {
   const rows = await db
-    .select({ image: mediaAssets.staticPath, alt: testimonials.displayName })
+    .select({
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
+      alt: testimonials.displayName,
+    })
     .from(testimonials)
     .leftJoin(mediaAssets, eq(testimonials.imageId, mediaAssets.id))
-    .where(and(eq(testimonials.status, "published"), eq(testimonials.type, "image")))
+    .where(
+      and(
+        eq(testimonials.status, "published"),
+        eq(testimonials.type, "image"),
+        eq(testimonials.consentGiven, true),
+      ),
+    )
     .orderBy(asc(testimonials.sortOrder));
 
-  return rows.map((row) => ({ image: row.image ?? "", alt: row.alt ?? "" }));
+  return rows.map((row) => ({ image: mediaUrl(row, 640), alt: row.alt ?? "" }));
 });
 
 export const getGoogleRating = cache(async () => {

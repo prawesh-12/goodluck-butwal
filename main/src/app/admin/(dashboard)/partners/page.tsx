@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { requireActor } from "@/lib/session";
 import { allow } from "@/lib/guard";
 import { can } from "@/lib/rbac";
 import { ContentFilters } from "@/components/admin/content-filters";
 import { PartnerList } from "@/components/admin/partner-list";
+import { EmptyState, ListHeader, NewButton, Pager } from "@/components/admin/list-ui";
 import { listAdminPartners, PAGE_SIZE, type AdminFilters } from "@/server/queries/admin-people";
 
 export const dynamic = "force-dynamic";
@@ -22,22 +22,17 @@ export default async function PartnersPage({
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <>
-      <h1 className="t-h4">Partners</h1>
+    <div className="space-y-4">
+      <ListHeader
+        title="Partners"
+        count={total}
+        actions={<NewButton href="/admin/partners/new">Add a partner</NewButton>}
+      />
 
       <ContentFilters placeholder="Partner name" />
 
-      <div className="admin-actions">
-        <Link href="/admin/partners/new" className="admin-btn">
-          Add a partner
-        </Link>
-        <span className="t-small admin-count">{total} matching</span>
-      </div>
-
       {rows.length === 0 ? (
-        <p className="t-body admin-empty">
-          No partners match those filters. Clear the search, or add a partner.
-        </p>
+        <EmptyState>No partners match those filters. Clear the search, or add a partner.</EmptyState>
       ) : (
         <PartnerList
           key={rows.map((row) => row.id).join("-")}
@@ -46,19 +41,7 @@ export default async function PartnersPage({
         />
       )}
 
-      {pages > 1 ? (
-        <nav className="admin-pager">
-          {page > 1 ? (
-            <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link>
-          ) : null}
-          <span className="t-small">
-            Page {page} of {pages}
-          </span>
-          {page < pages ? (
-            <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link>
-          ) : null}
-        </nav>
-      ) : null}
-    </>
+      <Pager page={page} pages={pages} params={params} />
+    </div>
   );
 }

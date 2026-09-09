@@ -151,6 +151,7 @@ export async function createService(input: unknown): Promise<Result<{ id: string
   revalidatePath("/admin/services");
   revalidatePath("/services");
   revalidatePath(servicePath(slug));
+  revalidatePath("/");
   return { ok: true, data: { id: row.id } };
 }
 
@@ -225,6 +226,7 @@ export async function updateService(input: unknown): Promise<Result<{ id: string
   revalidatePath("/services");
   revalidatePath(before);
   if (after !== before) revalidatePath(after);
+  revalidatePath("/");
   return { ok: true, data: { id: data.id } };
 }
 
@@ -256,6 +258,7 @@ export async function deleteService(input: unknown): Promise<Result<{ id: string
   revalidatePath("/admin/services");
   revalidatePath("/services");
   revalidatePath(servicePath(existing.slug));
+  revalidatePath("/");
   return { ok: true, data: { id: existing.id } };
 }
 
@@ -310,6 +313,9 @@ export async function saveServiceFaqs(input: unknown): Promise<Result<{ id: stri
   });
 
   revalidatePath(servicePath(owner.slug));
+  revalidatePath("/services");
+  revalidatePath("/study-abroad");
   revalidatePath("/faq");
+  revalidatePath("/");
   return { ok: true, data: { id: owner.id } };
 }

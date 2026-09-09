@@ -1,7 +1,14 @@
 "use client";
 
 import { useId, type ReactNode } from "react";
+import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
 import { Dropdown, type DropdownOption } from "./dropdown";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
+import { Label } from "./ui/label";
+import { Button } from "./ui/button";
+import { Card, CardContent } from "./ui/card";
+import { Alert, AlertDescription } from "./ui/alert";
 
 export function Field({
   label,
@@ -20,13 +27,14 @@ export function Field({
   placeholder?: string;
   type?: string;
 }) {
+  const id = useId();
   return (
-    <label className="admin-field">
-      <span className="t-small">{label}</span>
-      <input type={type} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
-      {help ? <span className="t-small admin-help">{help}</span> : null}
-      {error ? <span className="admin-clash">{error}</span> : null}
-    </label>
+    <div className="space-y-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Input id={id} type={type} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
+      {help ? <p className="text-xs text-muted-foreground">{help}</p> : null}
+      {error ? <p className="text-xs font-medium text-destructive">{error}</p> : null}
+    </div>
   );
 }
 
@@ -45,13 +53,14 @@ export function TextArea({
   onChange: (value: string) => void;
   rows?: number;
 }) {
+  const id = useId();
   return (
-    <label className="admin-field">
-      <span className="t-small">{label}</span>
-      <textarea value={value} rows={rows} onChange={(e) => onChange(e.target.value)} />
-      {help ? <span className="t-small admin-help">{help}</span> : null}
-      {error ? <span className="admin-clash">{error}</span> : null}
-    </label>
+    <div className="space-y-1.5">
+      <Label htmlFor={id}>{label}</Label>
+      <Textarea id={id} value={value} rows={rows} onChange={(e) => onChange(e.target.value)} />
+      {help ? <p className="text-xs text-muted-foreground">{help}</p> : null}
+      {error ? <p className="text-xs font-medium text-destructive">{error}</p> : null}
+    </div>
   );
 }
 
@@ -78,12 +87,9 @@ export function Select({
 }) {
   const labelId = useId();
 
-  // A div, not a label: the control is a button and a label names nothing that a button answers to.
   return (
-    <div className="admin-field">
-      <span className="t-small" id={labelId}>
-        {label}
-      </span>
+    <div className="space-y-1.5">
+      <Label id={labelId}>{label}</Label>
       <Dropdown
         options={options}
         value={value}
@@ -93,8 +99,8 @@ export function Select({
         disabled={disabled}
         labelledBy={labelId}
       />
-      {help ? <span className="t-small admin-help">{help}</span> : null}
-      {error ? <span className="admin-clash">{error}</span> : null}
+      {help ? <div className="text-xs text-muted-foreground">{help}</div> : null}
+      {error ? <p className="text-xs font-medium text-destructive">{error}</p> : null}
     </div>
   );
 }
@@ -110,13 +116,24 @@ export function Toggle({
   checked: boolean;
   onChange: (checked: boolean) => void;
 }) {
+  const id = useId();
   return (
-    <label className="admin-field">
-      <span className="t-small">
-        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} /> {label}
-      </span>
-      {help ? <span className="t-small admin-help">{help}</span> : null}
-    </label>
+    <div className="space-y-1.5">
+      <label
+        htmlFor={id}
+        className="flex cursor-pointer items-center gap-2.5 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm"
+      >
+        <input
+          id={id}
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onChange(e.target.checked)}
+          className="size-4 accent-primary"
+        />
+        <span className="font-medium">{label}</span>
+      </label>
+      {help ? <p className="text-xs text-muted-foreground">{help}</p> : null}
+    </div>
   );
 }
 
@@ -152,42 +169,43 @@ export function Repeater<T>({
     onChange(items.map((row, i) => (i === index ? { ...row, ...patch } : row)));
 
   return (
-    <section className="admin-field">
-      <span className="t-small">{label}</span>
-      {help ? <span className="t-small admin-help">{help}</span> : null}
+    <section className="space-y-3">
+      <div className="space-y-1">
+        <Label>{label}</Label>
+        {help ? <p className="text-xs text-muted-foreground">{help}</p> : null}
+      </div>
 
-      {items.length === 0 ? <p className="t-small admin-empty">{emptyLabel}</p> : null}
+      {items.length === 0 ? <p className="text-sm text-muted-foreground">{emptyLabel}</p> : null}
 
       {items.map((item, index) => (
-        <div key={index} className="admin-tile">
-          {children(item, update(index), index)}
-          <div className="admin-actions">
-            <button type="button" className="admin-btn" onClick={() => move(index, index - 1)} disabled={index === 0}>
-              Up
-            </button>
-            <button
-              type="button"
-              className="admin-btn"
-              onClick={() => move(index, index + 1)}
-              disabled={index === items.length - 1}
-            >
-              Down
-            </button>
-            <button
-              type="button"
-              className="admin-btn admin-btn-danger"
-              onClick={() => onChange(items.filter((_, i) => i !== index))}
-            >
-              Remove
-            </button>
-          </div>
-        </div>
+        <Card key={index}>
+          <CardContent className="space-y-4 pt-6">
+            {children(item, update(index), index)}
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="button" variant="outline" size="sm" onClick={() => move(index, index - 1)} disabled={index === 0}>
+                <ArrowUp /> Up
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => move(index, index + 1)}
+                disabled={index === items.length - 1}
+              >
+                <ArrowDown /> Down
+              </Button>
+              <Button type="button" variant="destructive" size="sm" onClick={() => onChange(items.filter((_, i) => i !== index))}>
+                <Trash2 /> Remove
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       ))}
 
-      <div className="admin-actions">
-        <button type="button" className="admin-btn" onClick={() => onChange([...items, blank()])}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="button" variant="outline" size="sm" onClick={() => onChange([...items, blank()])}>
           {addLabel}
-        </button>
+        </Button>
       </div>
     </section>
   );
@@ -209,30 +227,34 @@ export function SaveBar({
   return (
     <>
       {problems && problems.length > 0 ? (
-        <ul className="admin-field">
-          {problems.map((problem) => (
-            <li key={problem} className="admin-clash">
-              {problem}
-            </li>
-          ))}
-        </ul>
+        <Alert variant="destructive">
+          <AlertDescription>
+            <ul className="list-disc space-y-0.5 pl-4">
+              {problems.map((problem) => (
+                <li key={problem}>{problem}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
       ) : null}
 
-      <div className="admin-actions">
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="submit" disabled={busy}>
           {busy ? "Saving" : "Save"}
-        </button>
+        </Button>
         {viewHref ? (
-          <a className="admin-btn" href={viewHref} target="_blank" rel="noreferrer">
-            View on site
-          </a>
+          <Button type="button" variant="outline" asChild>
+            <a href={viewHref} target="_blank" rel="noreferrer">
+              View on site
+            </a>
+          </Button>
         ) : null}
         {onDelete ? (
-          <button type="button" className="admin-btn admin-btn-danger" onClick={onDelete} disabled={busy}>
-            Delete
-          </button>
+          <Button type="button" variant="destructive" onClick={onDelete} disabled={busy}>
+            <Trash2 /> Delete
+          </Button>
         ) : null}
-        {message ? <span className="t-small">{message}</span> : null}
+        {message ? <span className="text-sm text-muted-foreground">{message}</span> : null}
       </div>
     </>
   );

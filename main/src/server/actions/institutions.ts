@@ -70,6 +70,7 @@ async function publishProblems(data: InstitutionInput, id?: string) {
 function refresh(paths: string[]) {
   revalidatePath("/admin/institutions");
   revalidatePath("/institutions");
+  revalidatePath("/courses");
   for (const path of paths) revalidatePath(path);
 }
 

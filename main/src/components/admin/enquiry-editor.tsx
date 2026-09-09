@@ -4,6 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateEnquiry } from "@/server/actions/leads";
 import { Select } from "./repeater";
+import { Button } from "./ui/button";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 const STATUSES = ["new", "in_progress", "contacted", "converted", "closed", "spam"];
 
@@ -13,42 +17,47 @@ export function EnquiryEditor({ id, status, notes }: { id: string; status: strin
   const [message, setMessage] = useState<string | null>(null);
 
   return (
-    <form
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const form = new FormData(event.currentTarget);
-        const result = await updateEnquiry({
-          id,
-          status: form.get("status"),
-          internalNotes: form.get("internalNotes"),
-        });
-        setBusy(false);
-        setMessage(result.ok ? "Saved." : result.error);
-        if (result.ok) router.refresh();
-      }}
-    >
-      <h2 className="t-h5 admin-subhead">Handling</h2>
+    <Card className="max-w-2xl">
+      <CardHeader>
+        <CardTitle className="text-base">Handling</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form
+          className="space-y-4"
+          onSubmit={async (event) => {
+            event.preventDefault();
+            setBusy(true);
+            const form = new FormData(event.currentTarget);
+            const result = await updateEnquiry({
+              id,
+              status: form.get("status"),
+              internalNotes: form.get("internalNotes"),
+            });
+            setBusy(false);
+            setMessage(result.ok ? "Saved." : result.error);
+            if (result.ok) router.refresh();
+          }}
+        >
+          <Select
+            label="Status"
+            name="status"
+            defaultValue={status}
+            options={STATUSES.map((s) => ({ value: s, label: s.replace(/_/g, " ") }))}
+          />
 
-      <Select
-        label="Status"
-        name="status"
-        defaultValue={status}
-        options={STATUSES.map((s) => ({ value: s, label: s.replace(/_/g, " ") }))}
-      />
+          <div className="space-y-1.5">
+            <Label htmlFor="enquiry-notes">Internal notes</Label>
+            <Textarea id="enquiry-notes" name="internalNotes" defaultValue={notes} rows={4} />
+          </div>
 
-      <label className="admin-field">
-        <span className="t-small">Internal notes</span>
-        <textarea name="internalNotes" defaultValue={notes} rows={4} />
-      </label>
-
-      <div className="admin-actions">
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-          {busy ? "Saving" : "Save"}
-        </button>
-        {message ? <span className="t-small">{message}</span> : null}
-      </div>
-    </form>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="submit" disabled={busy}>
+              {busy ? "Saving" : "Save"}
+            </Button>
+            {message ? <span className="text-sm text-muted-foreground">{message}</span> : null}
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

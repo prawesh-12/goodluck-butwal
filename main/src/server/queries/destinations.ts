@@ -2,6 +2,7 @@ import { cache } from "react";
 import { asc, eq, like } from "drizzle-orm";
 import { db } from "@db/client";
 import { destinations, mediaAssets, serviceFaqs, services, uiStrings } from "@db/schema";
+import { mediaUrl } from "./catalogue";
 
 // The shape the approved destination pages already render.
 export type PublicDestination = {
@@ -41,19 +42,30 @@ export const listDestinations = cache(async (): Promise<PublicDestination[]> => 
       .select({ key: uiStrings.key, value: uiStrings.value })
       .from(uiStrings)
       .where(like(uiStrings.key, "destination.%")),
-    db.select({ id: hero.id, path: hero.staticPath, alt: hero.altText }).from(hero),
+    db
+      .select({
+        id: hero.id,
+        kind: hero.kind,
+        staticPath: hero.staticPath,
+        cloudinaryPublicId: hero.cloudinaryPublicId,
+        alt: hero.altText,
+      })
+      .from(hero),
   ]);
 
   const text = new Map(strings.map((s) => [s.key, s.value]));
   const media = new Map(paths.map((m) => [m.id, m]));
-  const path = (id: string | null) => (id ? (media.get(id)?.path ?? "") : "");
+  const path = (id: string | null, width: number) => {
+    const row = id ? media.get(id) : undefined;
+    return row ? mediaUrl(row, width) : "";
+  };
 
   return rows.map((row) => ({
     slug: row.slug,
     name: row.name,
-    flag: path(row.flagImageId),
-    card: path(row.cardImageId),
-    hero: path(row.heroImageId),
+    flag: path(row.flagImageId, 320),
+    card: path(row.cardImageId, 640),
+    hero: path(row.heroImageId, 1920),
     heroAlt: row.heroImageId ? (media.get(row.heroImageId)?.alt ?? "") : "",
     overview: row.overviewHtml ?? "",
     highlights: (row.highlights ?? []).map((h) => ({ title: h.label, line: h.value })),
