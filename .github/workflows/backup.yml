@@ -3,6 +3,7 @@ name: Backup
 on:
   schedule:
     - cron: "0 18 * * *"
+    - cron: "0 20 * * 0"
     - cron: "0 19 * * 1"
   workflow_dispatch:
 
@@ -26,7 +27,7 @@ env:
 
 jobs:
   backup:
-    if: github.event.schedule != '0 19 * * 1'
+    if: github.event.schedule != '0 20 * * 0' && github.event.schedule != '0 19 * * 1'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -77,19 +78,107 @@ jobs:
             --title "Backup failed on $(date -u +%Y-%m-%d)" \
             --body "The nightly database backup did not finish. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
+  media:
+    if: github.event.schedule == '0 20 * * 0' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install psql 17
+        run: |
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/pgdg.gpg
+          echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Check the secrets are set
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CLOUD_NAME: ${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
+        run: |
+          set -euo pipefail
+          MISSING=""
+          for name in AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY CLOUDFLARE_ACCOUNT_ID DATABASE_URL CLOUD_NAME; do
+            [ -n "${!name-}" ] || MISSING="$MISSING $name"
+          done
+          if [ -n "$MISSING" ]; then
+            echo "Set these repository secrets before this job can run:$MISSING"
+            echo "AWS_ACCESS_KEY_ID is R2_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY is R2_SECRET_ACCESS_KEY and CLOUD_NAME is NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME."
+            exit 1
+          fi
+
+      - name: Copy the Cloudinary originals to R2
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CLOUD_NAME: ${{ secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
+        run: |
+          set -euo pipefail
+          psql "$DATABASE_URL" --no-psqlrc --tuples-only --no-align --field-separator=$'\t' \
+            --command "select cloudinary_public_id, coalesce(size_bytes, 0), coalesce(mime_type, 'application/octet-stream') from media_assets where kind = 'cloudinary' and cloudinary_public_id is not null and cloudinary_public_id <> ''" \
+            > rows.tsv
+          COPIED=0
+          SKIPPED=0
+          while IFS=$'\t' read -r ID SIZE MIME; do
+            KEY="media/$ID"
+            HAVE=$(aws s3api head-object --bucket gem-backups --key "$KEY" \
+              --query ContentLength --output text 2>/dev/null || echo missing)
+            # A size of 0 means the row never recorded one, so having any copy is enough.
+            if [ "$HAVE" != "missing" ] && { [ "$SIZE" = "0" ] || [ "$HAVE" = "$SIZE" ]; }; then
+              SKIPPED=$((SKIPPED + 1))
+              continue
+            fi
+            curl -fsSL "https://res.cloudinary.com/$CLOUD_NAME/image/upload/$ID" -o asset
+            aws s3 cp asset "$BUCKET/$KEY" --content-type "$MIME"
+            COPIED=$((COPIED + 1))
+          done < rows.tsv
+          echo "Media backup: $COPIED copied, $SKIPPED already in R2." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Write the last_success marker
+        run: date -u +%Y-%m-%dT%H:%M:%SZ | aws s3 cp - "$BUCKET/media/last_success"
+
+      - name: Report the failure
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create backup-failure --color B60205 --description "Nightly database backup" || true
+          gh issue create --label backup-failure \
+            --title "Media backup failed on $(date -u +%Y-%m-%d)" \
+            --body "The weekly media backup did not finish. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
   freshness:
     if: github.event.schedule == '0 19 * * 1' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fail if the last backup is over 48 hours old
+      - name: Fail if the last database backup is over 48 hours old
         run: |
           set -euo pipefail
           MARKER=$(aws s3 cp "$BUCKET/db/last_success" -)
           AGE=$(( ( $(date -u +%s) - $(date -u -d "$MARKER" +%s) ) / 3600 ))
-          echo "Last backup succeeded $AGE hours ago, at $MARKER."
+          echo "Last database backup succeeded $AGE hours ago, at $MARKER."
           [ "$AGE" -le 48 ]
+
+      # The media job runs weekly, so 8 days means one run was missed. No marker at all means
+      # the job has never run yet, which is not a failure. The database check above has already
+      # proved the credentials and the bucket work.
+      - name: Fail if the last media backup is over 8 days old
+        run: |
+          set -euo pipefail
+          if ! aws s3api head-object --bucket gem-backups --key media/last_success >/dev/null 2>&1; then
+            echo "Media backup: not enabled yet, there is no media/last_success in the bucket." \
+              | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          MARKER=$(aws s3 cp "$BUCKET/media/last_success" -)
+          AGE=$(( ( $(date -u +%s) - $(date -u -d "$MARKER" +%s) ) / 3600 ))
+          echo "Media backup: last succeeded $AGE hours ago, at $MARKER." \
+            | tee -a "$GITHUB_STEP_SUMMARY"
+          [ "$AGE" -le 192 ]
 
       - name: Report the stale backup
         if: failure()
@@ -98,5 +187,5 @@ jobs:
         run: |
           gh label create backup-failure --color B60205 --description "Nightly database backup" || true
           gh issue create --label backup-failure \
-            --title "No successful backup in 48 hours" \
-            --body "The weekly freshness check could not find a backup from the last 48 hours. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            --title "A backup is out of date" \
+            --body "The weekly freshness check wants a database backup from the last 48 hours and a media backup from the last 8 days, and did not find both. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

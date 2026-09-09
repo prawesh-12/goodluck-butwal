@@ -9,14 +9,14 @@ What to do when the database is gone, wrong, or somebody deleted something they 
 
 ## Where the backups are
 
-| | |
-|---|---|
-| Bucket | `gem-backups` on Cloudflare R2 |
-| Path | `db/{yyyy}/{mm}/gem-{date}.dump.gz` |
-| Written by | `.github/workflows/backup.yml`, daily at 18:00 UTC |
-| Kept for | 30 days, older files are deleted by the same job |
-| Marker | `db/last_success`, rewritten on every successful run |
-| Watchdog | a weekly job fails, and opens an issue, if the marker is over 48 hours old |
+| | Database | Uploaded media |
+|---|---|---|
+| Bucket | `gem-backups` on Cloudflare R2 | the same bucket |
+| Path | `db/{yyyy}/{mm}/gem-{date}.dump.gz` | `media/{cloudinary public id}` |
+| Written by | `.github/workflows/backup.yml`, daily at 18:00 UTC | the same workflow, Sundays at 20:00 UTC |
+| Kept for | 30 days, older files are deleted by the same job | forever, nothing deletes them |
+| Marker | `db/last_success`, rewritten on every successful run | `media/last_success`, same |
+| Watchdog | a weekly job fails, and opens an issue, if the marker is over 48 hours old | the same job, if that marker is over 8 days old |
 
 R2 is reached over the S3 API with the AWS CLI. The site itself does not touch it, only the
 backup workflow does, so the bucket is independent of where the site is hosted.
@@ -89,11 +89,38 @@ Most content is archived rather than deleted, so check the admin first: set the 
 Archived and look for it. That takes a minute and needs no restore. Only a hard delete, which is
 restricted to a super admin and asks for typed confirmation, actually removes a row.
 
+## Restoring one image
+
+Images are not in the dump. A weekly job copies every Cloudinary original into the same bucket at
+`media/{public id}`, and nothing ever deletes one, so an image someone removed a year ago is still
+there. The public id is the `cloudinary_public_id` column on the `media_assets` row, for example
+`goodluck/news/kf3xk2ab`.
+
+1. **Find it.** If you know the row, read the public id off it. If you do not, list the folder.
+   ```bash
+   aws s3 ls s3://gem-backups/media/goodluck/news/ \
+     --endpoint-url https://<account-id>.r2.cloudflarestorage.com
+   ```
+
+2. **Download it.** The object has no file extension. Its content type is on the object, and
+   `media_assets.mime_type` says the same thing, so rename it with the matching extension.
+   ```bash
+   aws s3 cp s3://gem-backups/media/goodluck/news/kf3xk2ab kf3xk2ab.jpg \
+     --endpoint-url https://<account-id>.r2.cloudflarestorage.com
+   ```
+
+3. **Put it back.** In the Cloudinary console, upload it into the same folder with the same public
+   id. Every page that referenced it then works again with no database change. Uploading through
+   the admin media library instead gives the image a new public id and a new row, so anything that
+   pointed at the old row has to be pointed at the new one by hand.
+
 ## What is not in the database
 
 Restoring Postgres does not bring these back:
 
-- **Uploaded images** live in Cloudinary and are not in the dump. They have their own retention.
+- **Uploaded images** live in Cloudinary and are not in the dump. The weekly media backup keeps a
+  copy of each one in R2 under `media/`, so they are recoverable, but separately: see "Restoring
+  one image" above.
 - **Files in `public/`** are in git, so a `git checkout` is the restore.
 - **Secrets** are in Vercel and GitHub, not in the dump. Keep a copy somewhere safe and offline.
 
