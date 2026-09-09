@@ -300,6 +300,7 @@ const formRows: StringRow[] = [
 
 const chromeRows: StringRow[] = [
   { key: "nav.book_cta", value: "Book a consultation", group: "nav", label: "Header button", help: "The dark button in the site header. It is hidden on the contact pages." },
+  { key: "nav.login_cta", value: "Login", group: "nav", label: "Login button text", help: "The button in the header that opens the admin sign in page." },
   { key: "nav.menu_open", value: "Open menu", group: "nav", label: "Menu button, closed", help: "Read aloud for the small menu button on phones when the menu is shut." },
   { key: "nav.menu_close", value: "Close menu", group: "nav", label: "Menu button, open", help: "Read aloud for the small menu button on phones when the menu is open." },
 

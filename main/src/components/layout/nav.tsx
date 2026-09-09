@@ -22,7 +22,7 @@ function BlurTop() {
   );
 }
 
-export type NavText = { bookCta: string; menuOpen: string; menuClose: string };
+export type NavText = { bookCta: string; loginCta: string; menuOpen: string; menuClose: string };
 
 export function Nav({ text }: { text: NavText }) {
   const [open, setOpen] = useState(false);
@@ -39,7 +39,7 @@ export function Nav({ text }: { text: NavText }) {
     <>
       <BlurTop />
       <div className="fixed inset-x-0 top-0 z-[9] flex flex-col items-center py-4 md:py-5">
-        <div className="w-full px-4 md:w-auto md:max-w-[860px] md:px-5 lg:max-w-[1220px] lg:px-[30px]">
+        <div className="w-full px-4 md:w-auto md:max-w-[860px] md:px-5 lg:max-w-[1280px] lg:px-6">
           <div className="flex h-[52px] items-center gap-4 overflow-hidden rounded-full bg-white p-[10px] shadow-[0_0_0_2px_rgba(221,229,237,0.7)] md:h-[54px] md:shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:h-[58px] lg:gap-5">
             <Link href="/" aria-label="Goodluck Education and Migration, home" className="block h-7 shrink-0 md:h-8">
               <img src={gl.logo} alt="Goodluck Education and Migration" className="h-full w-auto object-contain" />
@@ -48,7 +48,7 @@ export function Nav({ text }: { text: NavText }) {
               {nav.map((l) => {
                 const active = path === l.href || path.startsWith(l.href + "/");
                 return (
-                  <Link key={l.href} href={l.href} className={`whitespace-nowrap rounded-full px-4 py-2 text-[16px] font-semibold leading-[20.8px] transition-colors duration-200 hover:bg-surface hover:text-ink ${active ? "bg-surface text-ink" : "text-muted"}`}>
+                  <Link key={l.href} href={l.href} className={`whitespace-nowrap rounded-full px-3 py-2 text-[16px] font-semibold leading-[20.8px] transition-colors duration-200 hover:bg-surface hover:text-ink ${active ? "bg-surface text-ink" : "text-muted"}`}>
                     {l.label}
                   </Link>
                 );
@@ -62,6 +62,9 @@ export function Nav({ text }: { text: NavText }) {
                   </PillButton>
                 </div>
               )}
+              <Link href="/admin/login" className="hidden h-[34px] shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-surface px-3 text-[14px] font-semibold leading-[18.2px] text-ink transition-colors duration-200 hover:bg-hairline md:inline-flex lg:h-[38px] lg:px-4">
+                {text.loginCta}
+              </Link>
               <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label={open ? text.menuClose : text.menuOpen} className="relative flex size-8 items-center justify-center rounded-full bg-ink md:size-[34px] lg:hidden">
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-1"}`} />
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-1"}`} />
@@ -76,13 +79,18 @@ export function Nav({ text }: { text: NavText }) {
                     {l.label}
                   </Link>
                 ))}
-                {!onContact && (
-                  <div className="mt-2 flex items-center justify-center border-t border-hairline px-2 pt-3 md:hidden">
-                    <PillButton href="/contact/book-consultation" tone="dark" size="sm">
-                      {text.bookCta}
-                    </PillButton>
-                  </div>
-                )}
+                <div className="mt-2 flex items-center justify-center gap-2 border-t border-hairline px-2 pt-3">
+                  {!onContact && (
+                    <span className="md:hidden">
+                      <PillButton href="/contact/book-consultation" tone="dark" size="sm">
+                        {text.bookCta}
+                      </PillButton>
+                    </span>
+                  )}
+                  <Link href="/admin/login" className="inline-flex h-[34px] items-center justify-center whitespace-nowrap rounded-full bg-surface px-4 text-[14px] font-semibold leading-[18.2px] text-ink hover:bg-hairline md:hidden">
+                    {text.loginCta}
+                  </Link>
+                </div>
               </motion.nav>
             )}
           </AnimatePresence>
