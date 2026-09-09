@@ -409,6 +409,16 @@ const lastRows: StringRow[] = [
   { key: "home.partners.badge", value: "Our partners", group: "home", label: "Partner strip badge", help: "The pill above the drifting row of partner logos." },
   { key: "home.partners.logo_alt", value: "Partner logo", group: "home", label: "Partner logo description", help: "Read aloud for each logo in that row. Not seen on screen." },
 
+  { key: "about.profile.badge", value: "Company profile", group: "about", label: "Company profile badge", help: "The pill above the heading on the company profile page." },
+  { key: "about.profile.title", value: "Company profile", group: "about", label: "Company profile heading", help: "The main heading on the company profile page." },
+  { key: "about.profile.lead", value: "Goodluck Education and Migration strives to give excellent services and guidance to our clients, we understand the value of client support and aim to always provide reliable information.", group: "about", label: "Company profile intro", help: "The sentence under that heading. An intro typed on the page record in Pages wins over this." },
+  { key: "about.profile.details_title", value: "Company details", group: "about", label: "Company details heading", help: "Above the registered name, founding year, email and website." },
+  { key: "about.profile.label_name", value: "Registered name", group: "about", label: "Registered name label", help: "Label beside the company name." },
+  { key: "about.profile.label_founded", value: "Established", group: "about", label: "Established label", help: "Label beside the founding year." },
+  { key: "about.profile.label_email", value: "Email", group: "about", label: "Email label", help: "Label beside the company email address." },
+  { key: "about.profile.label_website", value: "Website", group: "about", label: "Website label", help: "Label beside the website address." },
+  { key: "about.profile.offices_title", value: "Offices", group: "about", label: "Offices heading", help: "Above the list of offices on the company profile page." },
+
   { key: "search.hero.title", value: "Search", group: "search", label: "Search page heading", help: "The heading on the search page before anything has been searched for." },
   { key: "search.hero.lead", value: "Courses, institutions, destinations, services, events and news.", group: "search", label: "Search page intro", help: "The line under that heading before anything has been searched for." },
   { key: "search.results.title", value: "Results for \u201c{q}\u201d", group: "search", label: "Results heading", help: "The heading once a search has run. Write {q} where the words searched for should go." },

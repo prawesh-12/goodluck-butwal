@@ -86,6 +86,7 @@ export const footerLinks = {
     { label: "Our team", href: "/about/team" },
     { label: "Social responsibility", href: "/about/corporate-social-responsibility" },
     { label: "Careers", href: "/about/careers" },
+    { label: "Company profile", href: "/about/company-profile" },
   ],
   Countries: [
     { label: "Australia", href: "/study-abroad/australia" },

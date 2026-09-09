@@ -64,6 +64,14 @@ export async function seedPages() {
         apply_email: null,
       },
     },
+    {
+      // The registered particulars a regulator wants are not in this repo. The row ships with no
+      // body so the page shows only what is already verified, and the admin fills in the rest.
+      slug: "company-profile",
+      title: "Company profile",
+      intro: null,
+      blocks: null,
+    },
   ];
 
   for (const [index, row] of rows.entries()) {
