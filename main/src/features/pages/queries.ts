@@ -39,22 +39,29 @@ type CareersBlocks = {
 const SLUGS = ["about", "message-from-co-founders", "corporate-social-responsibility", "careers"];
 
 export const getAboutContent = cache(async (): Promise<AboutContent> => {
-  const [rows, media] = await Promise.all([
-    db
-      .select({ slug: pages.slug, intro: pages.intro, blocks: pages.blocks })
-      .from(pages)
-      .where(inArray(pages.slug, SLUGS)),
-    db
-      .select({
-        id: mediaAssets.id,
-        kind: mediaAssets.kind,
-        staticPath: mediaAssets.staticPath,
-        cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
-      })
-      .from(mediaAssets),
-  ]);
+  const rows = await db
+    .select({ slug: pages.slug, intro: pages.intro, blocks: pages.blocks })
+    .from(pages)
+    .where(inArray(pages.slug, SLUGS));
 
   const bySlug = new Map(rows.map((row) => [row.slug, row]));
+
+  // Only the CSR partners carry images, so the media read is limited to the ids they name.
+  const csrBlocks = bySlug.get("corporate-social-responsibility")?.blocks as CsrBlocks | undefined;
+  const wanted = [...new Set(
+    (csrBlocks?.partners ?? []).flatMap((p) => [p.logo_id, p.photo_id]).filter((id): id is string => Boolean(id)),
+  )];
+  const media = wanted.length
+    ? await db
+        .select({
+          id: mediaAssets.id,
+          kind: mediaAssets.kind,
+          staticPath: mediaAssets.staticPath,
+          cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
+        })
+        .from(mediaAssets)
+        .where(inArray(mediaAssets.id, wanted))
+    : [];
   const path = new Map(media.map((m) => [m.id, mediaUrl(m, 640)]));
 
   const about = bySlug.get("about")?.blocks as AboutBlocks;

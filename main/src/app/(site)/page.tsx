@@ -31,10 +31,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const [logos, faces, services, allFaqs, cards, articles, reviews, successStories, googleRating, about] =
-    await Promise.all([
+  // Nothing here depends on anything else here, so the page waits once rather than fourteen times.
+  const [
+    logos, faces, services, allFaqs, cards, articles, reviews, successStories, googleRating, about,
+    upcomingEvents, socials, heroImage, t,
+  ] = await Promise.all([
     listPartnerLogos(),
-    listTeam().then((t) => t.slice(0, 3)),
+    listTeam().then((rows) => rows.slice(0, 3)),
     listServices(),
     listAllFaqs(),
     listDestinations().then((rows) => destinationCards(rows)),
@@ -43,12 +46,11 @@ export default async function Home() {
     listSuccessStories(),
     getGoogleRating(),
     getAboutContent(),
+    listUpcomingEvents(),
+    getSocialLinks(),
+    getHeroImage(),
+    loadText(),
   ]);
-
-  const upcomingEvents = await listUpcomingEvents();
-  const socials = await getSocialLinks();
-  const heroImage = await getHeroImage();
-  const t = await loadText();
 
   return (
     <>

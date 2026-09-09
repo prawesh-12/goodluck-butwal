@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { asc, eq, like } from "drizzle-orm";
+import { asc, eq, inArray, like } from "drizzle-orm";
 import { db } from "@db/client";
 import { destinations, mediaAssets, uiStrings } from "@db/schema";
 import { mediaUrl } from "@/lib/utils/media-url";
@@ -32,9 +32,25 @@ export type FaqItem = { q: string; a: string };
 const hero = mediaAssets;
 
 export const listDestinations = cache(async (): Promise<PublicDestination[]> => {
-  const [rows, strings, paths] = await Promise.all([
+  const [rows, strings] = await Promise.all([
     db
-      .select()
+      .select({
+        slug: destinations.slug,
+        name: destinations.name,
+        flagImageId: destinations.flagImageId,
+        cardImageId: destinations.cardImageId,
+        heroImageId: destinations.heroImageId,
+        overviewHtml: destinations.overviewHtml,
+        highlights: destinations.highlights,
+        academicHtml: destinations.academicHtml,
+        workHtml: destinations.workHtml,
+        migration: destinations.migration,
+        why: destinations.why,
+        costs: destinations.costs,
+        checklist: destinations.checklist,
+        help: destinations.help,
+        hasPage: destinations.hasPage,
+      })
       .from(destinations)
       .where(eq(destinations.status, "published"))
       .orderBy(asc(destinations.sortOrder)),
@@ -42,16 +58,24 @@ export const listDestinations = cache(async (): Promise<PublicDestination[]> => 
       .select({ key: uiStrings.key, value: uiStrings.value })
       .from(uiStrings)
       .where(like(uiStrings.key, "destination.%")),
-    db
-      .select({
-        id: hero.id,
-        kind: hero.kind,
-        staticPath: hero.staticPath,
-        cloudinaryPublicId: hero.cloudinaryPublicId,
-        alt: hero.altText,
-      })
-      .from(hero),
   ]);
+
+  const wanted = [...new Set(
+    rows.flatMap((row) => [row.flagImageId, row.cardImageId, row.heroImageId])
+      .filter((id): id is string => Boolean(id)),
+  )];
+  const paths = wanted.length
+    ? await db
+        .select({
+          id: hero.id,
+          kind: hero.kind,
+          staticPath: hero.staticPath,
+          cloudinaryPublicId: hero.cloudinaryPublicId,
+          alt: hero.altText,
+        })
+        .from(hero)
+        .where(inArray(hero.id, wanted))
+    : [];
 
   const text = new Map(strings.map((s) => [s.key, s.value]));
   const media = new Map(paths.map((m) => [m.id, m]));

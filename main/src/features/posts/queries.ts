@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, postCategories, postTags, posts, tags } from "@db/schema";
 import { slugify } from "@/lib/utils/slug";
@@ -12,10 +12,11 @@ export type PublicArticle = {
   category: string;
   image: string;
   excerpt: string;
-  html: string;
   width?: number;
   height?: number;
 };
+
+export type FullArticle = PublicArticle & { html: string };
 
 export const listArticles = cache(async (): Promise<PublicArticle[]> => {
   const rows = await db
@@ -30,7 +31,6 @@ export const listArticles = cache(async (): Promise<PublicArticle[]> => {
       width: mediaAssets.width,
       height: mediaAssets.height,
       excerpt: posts.excerpt,
-      html: posts.bodyHtml,
       sortOrder: posts.sortOrder,
     })
     .from(posts)
@@ -50,15 +50,47 @@ export const listArticles = cache(async (): Promise<PublicArticle[]> => {
     category: row.category ?? "",
     image: mediaUrl(row, 960),
     excerpt: row.excerpt ?? "",
-    html: row.html ?? "",
     width: row.width ?? undefined,
     height: row.height ?? undefined,
   }));
 });
 
-export const getArticle = cache(async (slug: string) =>
-  (await listArticles()).find((article) => article.slug === slug),
-);
+// The body is only ever rendered on the article page, so it is read one row at a time rather
+// than on every page that shows a card.
+export const getArticle = cache(async (slug: string): Promise<FullArticle | undefined> => {
+  const [row] = await db
+    .select({
+      slug: posts.slug,
+      title: posts.title,
+      date: posts.publishedAt,
+      category: postCategories.name,
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
+      width: mediaAssets.width,
+      height: mediaAssets.height,
+      excerpt: posts.excerpt,
+      html: posts.bodyHtml,
+    })
+    .from(posts)
+    .leftJoin(postCategories, eq(posts.categoryId, postCategories.id))
+    .leftJoin(mediaAssets, eq(posts.bannerImageId, mediaAssets.id))
+    .where(and(eq(posts.slug, slug), eq(posts.status, "published")))
+    .limit(1);
+
+  if (!row) return undefined;
+  return {
+    slug: row.slug,
+    title: row.title,
+    date: row.date ? row.date.toISOString().slice(0, 10) : "",
+    category: row.category ?? "",
+    image: mediaUrl(row, 960),
+    excerpt: row.excerpt ?? "",
+    html: row.html ?? "",
+    width: row.width ?? undefined,
+    height: row.height ?? undefined,
+  };
+});
 
 export const listArticlesByCategory = cache(async (slug: string) => {
   const all = await listArticles();

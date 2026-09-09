@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { asc, eq, like } from "drizzle-orm";
+import { asc, eq, inArray, like } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, serviceFaqs, services, uiStrings } from "@db/schema";
 import { mediaUrl } from "@/lib/utils/media-url";
@@ -53,9 +53,13 @@ export const listServices = cache(async (): Promise<PublicService[]> => {
       .where(like(uiStrings.key, "service.%")),
   ]);
 
-  const reels = await db
-    .select({ id: mediaAssets.id, path: mediaAssets.staticPath })
-    .from(mediaAssets);
+  const reelIds = [...new Set(rows.map((row) => row.reelId).filter((id): id is string => Boolean(id)))];
+  const reels = reelIds.length
+    ? await db
+        .select({ id: mediaAssets.id, path: mediaAssets.staticPath })
+        .from(mediaAssets)
+        .where(inArray(mediaAssets.id, reelIds))
+    : [];
   const reelPath = new Map(reels.map((r) => [r.id, r.path]));
   const text = new Map(strings.map((s) => [s.key, s.value]));
 
