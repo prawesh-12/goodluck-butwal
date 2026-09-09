@@ -1,0 +1,306 @@
+@import "tailwindcss";
+
+@theme {
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 810px;
+  --breakpoint-lg: 1200px;
+  --breakpoint-xl: 1440px;
+  --color-ink: #1d1d1d;
+  --color-muted: #4d585f;
+  --color-surface: #edf1f4;
+  --color-hairline: #dde5ed;
+  --color-blue: #3b82f6;
+  --color-blue-deep: #406ae4;
+  --color-green: #10b981;
+  --color-gray-text: #bababa;
+  /* shadcn tokens, admin only. Names were picked so none collides with the
+     public tokens above: no public markup uses background, foreground, card,
+     popover, primary, secondary, accent, destructive, border, input, ring or
+     sidebar, and --color-muted is deliberately left as the public muted. */
+  --color-background: #ffffff;
+  --color-foreground: #1d1d1d;
+  --color-card: #ffffff;
+  --color-card-foreground: #1d1d1d;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #1d1d1d;
+  --color-primary: #1d1d1d;
+  --color-primary-foreground: #fafafa;
+  --color-secondary: #edf1f4;
+  --color-secondary-foreground: #1d1d1d;
+  --color-muted-foreground: #4d585f;
+  --color-accent: #edf1f4;
+  --color-accent-foreground: #1d1d1d;
+  --color-destructive: #b42318;
+  --color-destructive-foreground: #fafafa;
+  --color-success: #15803d;
+  --color-success-foreground: #fafafa;
+  --color-border: #dde5ed;
+  --color-input: #dde5ed;
+  --color-ring: #3b82f6;
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #1d1d1d;
+  --color-sidebar-accent: #edf1f4;
+  --color-sidebar-accent-foreground: #1d1d1d;
+  --radius-lg: 0.625rem;
+  --radius-md: 0.5rem;
+  --radius-sm: 0.375rem;
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", sans-serif;
+  --font-body: var(--font-inter-display), "Inter Display", "Inter", sans-serif;
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(calc(-100% - var(--gap))); } }
+  @keyframes marquee-vertical { from { transform: translateY(0); } to { transform: translateY(calc(-100% - var(--gap))); } }
+}
+
+/* inline, so var(--duration) is read on the marquee element instead of :root where it is unset. */
+@theme inline {
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+}
+
+@layer base {
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+  .lenis.lenis-stopped { overflow: hidden; }
+  .lenis.lenis-scrolling iframe { pointer-events: none; }
+  body {
+    background: #fff;
+    color: var(--color-muted);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.3;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; color: var(--color-ink); }
+  h1, h2, h3, h4, h5, p { text-wrap: balance; }
+  p { margin: 0; }
+  img { display: block; max-width: 100%; }
+  button { font: inherit; color: inherit; }
+}
+
+/* Framer type scale, measured at 390 / 1000 / 1440px (phone, tablet, desktop). */
+.t-h1 { font-family: var(--font-display); font-weight: 600; font-size: 40px; line-height: 1; letter-spacing: -1.4px; color: var(--color-ink); }
+.t-h1-md { font-family: var(--font-display); font-weight: 600; font-size: 44px; line-height: 1.2; letter-spacing: -1.4px; color: var(--color-ink); }
+.t-404 { font-family: var(--font-display); font-weight: 600; font-size: 80px; line-height: 56px; letter-spacing: -1.4px; color: var(--color-ink); }
+.t-h2 { font-family: var(--font-display); font-weight: 600; font-size: 34px; line-height: 1.2; letter-spacing: -1px; color: var(--color-ink); }
+.t-h3 { font-family: var(--font-display); font-weight: 600; font-size: 24px; line-height: 1.2; color: var(--color-ink); }
+.t-h4 { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.2; color: var(--color-ink); }
+.t-h5 { font-family: var(--font-display); font-weight: 600; font-size: 20px; line-height: 1.2; color: var(--color-ink); }
+.t-stat { font-family: var(--font-display); font-weight: 600; font-size: 32px; line-height: 1.2; letter-spacing: -1px; color: var(--color-ink); }
+.t-lead { font-size: 18px; line-height: 1.3; font-weight: 500; }
+.t-body { font-size: 16px; line-height: 1.3; font-weight: 500; }
+.t-base { font-size: 15px; line-height: 1.3; font-weight: 500; }
+.t-small { font-size: 14px; line-height: 1.3; font-weight: 500; }
+@media (min-width: 810px) {
+  .t-h1 { font-size: 60px; }
+  .t-h1-md { font-size: 54px; }
+  .t-404 { font-size: 120px; line-height: 84px; }
+  .t-h2 { font-size: 44px; }
+  .t-h3 { font-size: 30px; }
+  .t-h4 { font-size: 28px; }
+  .t-h5 { font-size: 22px; }
+  .t-stat { font-size: 36px; }
+  .t-lead { font-size: 20px; }
+  .t-body { font-size: 18px; }
+  .t-base { font-size: 16px; }
+}
+@media (min-width: 1200px) {
+  .t-h1 { font-size: 84px; }
+  .t-h1-md { font-size: 72px; }
+  .t-404 { font-size: 200px; line-height: 140px; }
+  .t-h2 { font-size: 48px; }
+  .t-h3 { font-size: 32px; }
+  .t-h5 { font-size: 24px; }
+  .t-stat { font-size: 40px; }
+}
+
+/* Section shells: 1260px container with 30px gutters, 1200px content. */
+.container-x { width: 100%; max-width: 1260px; margin-inline: auto; padding-inline: 16px; }
+@media (min-width: 810px) { .container-x { padding-inline: 20px; } }
+@media (min-width: 1200px) { .container-x { padding-inline: 30px; } }
+/* Section rhythm: 80 / 120 / 140 (the FintechX 100/160/200 read too loose on this site). */
+.py-section { padding-block: 80px; } .pt-section { padding-top: 80px; } .pb-section { padding-bottom: 80px; }
+@media (min-width: 810px) { .py-section { padding-block: 120px; } .pt-section { padding-top: 120px; } .pb-section { padding-bottom: 120px; } }
+@media (min-width: 1200px) { .py-section { padding-block: 140px; } .pt-section { padding-top: 140px; } .pb-section { padding-bottom: 140px; } }
+
+/* Framer's gradient hairline. */
+.hairline-fade { background-image: linear-gradient(90deg, rgba(255,255,255,0) 0%, #dde5ed 50%, rgba(255,255,255,0) 100%); }
+
+/* Button surfaces. */
+.btn-blue { background-image: linear-gradient(110deg, #3b82f6 0%, #406ae4 100%); box-shadow: rgba(255,255,255,.3) 4px 4px 8px 0 inset, rgba(255,255,255,.3) -4px -4px 8px 0 inset, rgba(58,119,229,.5) 0 8px 16px 0; }
+.btn-black { background-image: linear-gradient(110deg, #323232 0%, #000 100%); box-shadow: rgba(255,255,255,.3) 4px 4px 8px 0 inset, rgba(255,255,255,.3) -4px -4px 8px 0 inset, rgba(29,29,29,.5) 0 8px 16px 0; }
+.btn-black-sm { background-image: linear-gradient(110deg, #323232 0%, #000 100%); box-shadow: rgba(255,255,255,.3) 4px 4px 8px 0 inset, rgba(255,255,255,.3) -4px -4px 8px 0 inset, rgba(29,29,29,.5) 0 4px 16px 0; }
+.icon-dark { background-image: linear-gradient(135deg, #323232 0%, #000 100%); }
+
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(calc(-50% - var(--gap) / 2)); } }
+.ticker-track { display: flex; width: max-content; gap: var(--gap); animation: ticker var(--speed) linear infinite; }
+.ticker-track.reverse { animation-direction: reverse; }
+.ticker:hover .ticker-track { animation-play-state: paused; }
+@keyframes float { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-14px) rotate(-1.5deg); } }
+@keyframes orbit { to { transform: rotate(360deg); } }
+@keyframes orbit-back { to { transform: rotate(-360deg); } }
+.animate-float { animation: float 7s ease-in-out infinite; }
+.animate-orbit { animation: orbit 70s linear infinite; }
+.animate-orbit-back { animation: orbit-back 70s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .ticker-track, .animate-marquee, .animate-marquee-vertical, .animate-float, .animate-orbit, .animate-orbit-back { animation: none; } }
+
+/* Article bodies come from goodluck_main as HTML. */
+.article > * + * { margin-top: 10px; }
+.article h2, .article h3, .article h4 { font-family: var(--font-display); font-weight: 600; color: var(--color-ink); letter-spacing: -1px; text-wrap: balance; }
+.article h2 { font-size: 26px; line-height: 1.2; margin-top: 40px; }
+.article h3 { font-size: 24px; line-height: 1.2; margin-top: 30px; }
+.article h4 { font-size: 20px; line-height: 1.2; margin-top: 20px; }
+.article p, .article li { font-size: 16px; line-height: 1.3; font-weight: 500; color: var(--color-muted); text-wrap: pretty; }
+.article ul, .article ol { padding-left: 22px; }
+.article ul { list-style: disc; } .article ol { list-style: decimal; }
+.article li:empty { display: none; }
+.article strong { color: var(--color-ink); font-weight: 600; }
+.article a { color: var(--color-blue); text-decoration: underline; text-underline-offset: 2px; }
+.article img { border-radius: 10px; margin-block: 20px; }
+.article table { width: 100%; border-collapse: separate; border-spacing: 0; margin-block: 20px; font-size: 15px; line-height: 1.3; color: var(--color-muted); border: 1px solid var(--color-hairline); border-radius: 10px; overflow: hidden; }
+.article th, .article td { padding: 12px 16px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--color-hairline); }
+.article th { background: var(--color-surface); color: var(--color-ink); font-weight: 600; }
+.article tr:last-child td { border-bottom: 0; }
+.article-scroll { overflow-x: auto; }
+@media (min-width: 810px) {
+  .article h2 { font-size: 30px; } .article h3 { font-size: 28px; } .article h4 { font-size: 22px; }
+  .article p, .article li { font-size: 18px; }
+}
+@media (min-width: 1200px) { .article h2 { font-size: 32px; } }
+
+/* Admin panel. Every rule is scoped under .admin so the public pages cannot be reached. */
+/* shadcn baseline for the admin tree only: plain divs read as foreground on
+   background, and every control inherits the app font. */
+.admin { background: var(--color-background); color: var(--color-foreground); font-family: var(--font-body); }
+.admin * { border-color: var(--color-border); }
+/* The sidebar list is the only scrollable column in the admin shell. Thin,
+   quiet, overlay-free: the layout must not shift when it appears, and a
+   scroll in the nav must never move the page behind it. */
+.admin-sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.admin-sidebar-nav::-webkit-scrollbar { width: 10px; }
+.admin-sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+.admin-sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+.admin-sidebar-nav::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); border: 3px solid transparent; background-clip: content-box; }
+/* Chrome draws its old stepper scrollbar in the sidebar otherwise. Both properties inherit, so
+   the one rule covers the page, the sidebar and the media picker. */
+.admin-root { scrollbar-width: thin; scrollbar-color: var(--color-gray-text) transparent; }
+.admin { display: flex; min-height: 100vh; background: var(--color-surface); font-family: var(--font-body); }
+.admin-sidebar { position: sticky; top: 0; align-self: flex-start; width: 240px; height: 100vh; flex-shrink: 0; background: #fff; border-right: 1px solid var(--color-hairline); padding: 20px 0; overflow-y: auto; }
+.admin-brand { display: block; padding: 0 20px 20px; font-family: var(--font-display); font-weight: 600; font-size: 20px; color: var(--color-ink); }
+.admin-nav-group { padding: 12px 0; }
+.admin-nav-heading { padding: 0 20px 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--color-gray-text); }
+.admin-nav-link { display: block; padding: 7px 20px; font-size: 15px; font-weight: 500; color: var(--color-muted); }
+.admin-nav-link:hover { background: var(--color-surface); color: var(--color-ink); }
+.admin-nav-link[aria-current="page"] { color: var(--color-blue-deep); background: var(--color-surface); box-shadow: inset 3px 0 0 var(--color-blue-deep); }
+
+.admin-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+/* The bar spans the width so its rule does, but its contents line up with the column below. */
+.admin-topbar { position: sticky; top: 0; z-index: 4; padding: 14px 28px; background: #fff; border-bottom: 1px solid var(--color-hairline); }
+.admin-topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; max-width: 1344px; margin: 0 auto; }
+.admin-identity { display: flex; align-items: center; gap: 10px; }
+.admin-badge { padding: 3px 9px; border-radius: 999px; background: var(--color-surface); border: 1px solid var(--color-hairline); font-size: 12px; font-weight: 600; color: var(--color-muted); }
+.admin-content { width: 100%; max-width: 1400px; margin: 0 auto; padding: 28px; flex: 1; }
+
+.admin-tiles { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); margin-top: 18px; }
+.admin-tile { display: flex; flex-direction: column; gap: 4px; padding: 18px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; color: var(--color-muted); }
+.admin-tile:hover { border-color: var(--color-blue); }
+
+.admin-login { align-items: center; justify-content: center; }
+.admin-login-card { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 360px; padding: 28px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 12px; }
+.admin-field { display: flex; flex-direction: column; gap: 5px; color: var(--color-muted); }
+/* One box for every field. */
+.admin input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin select,
+.admin textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; color: var(--color-ink); background: #fff; }
+.admin textarea { min-height: 84px; resize: vertical; }
+/* The only select left is the multiple one on the post form, which is a list box in the page
+   rather than a dropdown the operating system draws. */
+.admin select { appearance: none; cursor: default; }
+
+/* The dropdown replacing the native select. The closed button copies the field box above so a
+   form reads as one set of controls. */
+.admin-dropdown { display: flex; align-items: center; width: 100%; min-height: 38px; padding: 9px 34px 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; text-align: left; color: var(--color-ink); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%234d585f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center; cursor: pointer; }
+.admin-dropdown:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
+.admin-dropdown:disabled { cursor: not-allowed; opacity: .55; }
+.admin-dropdown-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Fixed, so a list opening from the last row of a table is not cut off by its clipped corners.
+   Above the media picker, which is the highest thing an admin can open under it. */
+.admin-dropdown-list { position: fixed; z-index: 60; max-height: 264px; margin: 0; padding: 4px; overflow-y: auto; list-style: none; background: #fff; border: 1px solid var(--color-hairline); border-radius: 8px; box-shadow: 0 10px 30px rgba(29,29,29,.14); }
+.admin-dropdown-option { padding: 8px 10px; border-radius: 6px; font-size: 15px; color: var(--color-ink); cursor: pointer; }
+.admin-dropdown-option[data-active] { background: var(--color-surface); }
+.admin-dropdown-option[aria-selected="true"] { font-weight: 600; color: var(--color-blue-deep); }
+.admin-dropdown-option[aria-disabled] { color: var(--color-gray-text); cursor: not-allowed; }
+.admin input:focus-visible,
+.admin select:focus-visible,
+.admin textarea:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
+.admin-error { color: #b42318; }
+.admin-empty { color: var(--color-muted); margin-top: 16px; }
+.admin-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin: 18px 0; }
+.admin-filters .admin-field { flex: 1 1 180px; min-width: 160px; }
+.admin-table { width: 100%; margin-top: 18px; border-collapse: collapse; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; overflow: hidden; font-size: 15px; }
+.admin-table th { text-align: left; padding: 10px 14px; background: var(--color-surface); font-weight: 600; color: var(--color-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+.admin-table td { padding: 10px 14px; border-top: 1px solid var(--color-hairline); color: var(--color-ink); }
+/* A link inherits its colour from the reset, so every one in a table read as plain text. The row
+   name is not a link at all now, it has an Edit button of its own. */
+.admin-table a:not(.admin-btn), .admin-pager a { color: var(--color-blue-deep); text-decoration: underline; text-underline-offset: 2px; }
+.admin-table a:not(.admin-btn):hover, .admin-pager a:hover { color: var(--color-blue); }
+/* Three short words, so they belong on one line. */
+.admin-table a[target="_blank"] { white-space: nowrap; }
+.admin-count { color: var(--color-muted); margin-bottom: 4px; }
+.admin-subhead { margin-top: 26px; }
+.admin-facts { display: grid; gap: 12px 24px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin-top: 18px; }
+.admin-facts dt { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-text); }
+.admin-facts dd { margin: 2px 0 0; color: var(--color-ink); }
+.admin-message { margin-top: 10px; padding: 16px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; white-space: pre-wrap; }
+.admin-editor { display: flex; flex-direction: column; gap: 12px; max-width: 620px; }
+.admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* The public pill, minus the arrow chip. btn-black-sm carries only a background and a shadow, so
+   admin buttons using it alone had no padding, no radius and black text on a black gradient.
+   Quiet is the default because most of these are toolbar and navigation buttons; the one action
+   that submits a form is the solid one. */
+.admin-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 7px 18px; border: 1px solid var(--color-hairline); border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; line-height: 18.2px; white-space: nowrap; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; background: #fff; color: var(--color-ink); }
+.admin-btn:hover { background: var(--color-surface); }
+.admin-btn:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; }
+.admin-btn:disabled { cursor: not-allowed; opacity: .45; }
+.admin-btn:disabled:hover { background: #fff; }
+
+.admin-btn-primary { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+.admin-btn-primary:hover { background: #000; border-color: #000; }
+.admin-btn-primary:disabled:hover { background: var(--color-ink); }
+
+/* Delete looked exactly like Save. The only thing between an admin and a lost row was the
+   confirm dialog. */
+.admin-btn-danger { color: #b42318; border-color: #f0c2bd; }
+.admin-btn-danger:hover { background: #b42318; color: #fff; border-color: #b42318; }
+.admin-btn-danger:disabled:hover { background: #fff; color: #b42318; }
+
+.admin-pager { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
+.admin-clash { display: block; font-size: 12px; font-weight: 600; color: #b42318; }
+.admin-media-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-top: 18px; }
+.admin-media-tile { margin: 0; padding: 10px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; }
+.admin-media-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--color-surface); border-radius: 6px; }
+.admin-media-name { margin: 8px 0 6px; word-break: break-all; color: var(--color-muted); }
+.admin-media-form { margin-top: 10px; max-width: none; }
+.admin-help { color: var(--color-muted); }
+.admin-picker-current { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 8px; }
+.admin-picker-thumb { width: 76px; height: 58px; object-fit: contain; background: var(--color-surface); border-radius: 6px; }
+.admin-picker-dialog { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(29,29,29,0.45); }
+.admin-picker-panel { display: flex; flex-direction: column; gap: 14px; width: min(900px, 100%); max-height: 80vh; overflow: auto; padding: 20px; background: #fff; border-radius: 12px; }
+.admin-picker-head { display: flex; gap: 10px; }
+.admin-picker-head input { flex: 1; padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; }
+.admin-picker-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.admin-picker-item { display: flex; flex-direction: column; gap: 4px; padding: 8px; text-align: left; background: #fff; border: 1px solid var(--color-hairline); border-radius: 8px; cursor: pointer; }
+.admin-picker-item:hover { border-color: var(--color-blue); }
+.admin-picker-item img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--color-surface); border-radius: 6px; }

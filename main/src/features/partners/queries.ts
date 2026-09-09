@@ -1,0 +1,16 @@
+import { cache } from "react";
+import { asc, eq } from "drizzle-orm";
+import { db } from "@db/client";
+import { mediaAssets, partners } from "@db/schema";
+import { mediaUrl } from "@/lib/utils/media-url";
+
+export const listPartnerLogos = cache(async (): Promise<string[]> => {
+  const rows = await db
+    .select({ kind: mediaAssets.kind, staticPath: mediaAssets.staticPath, cloudinaryPublicId: mediaAssets.cloudinaryPublicId })
+    .from(partners)
+    .leftJoin(mediaAssets, eq(partners.logoId, mediaAssets.id))
+    .where(eq(partners.status, "published"))
+    .orderBy(asc(partners.sortOrder));
+
+  return rows.map((row) => mediaUrl(row, 240)).filter(Boolean);
+});

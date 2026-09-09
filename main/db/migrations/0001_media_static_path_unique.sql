@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "media_assets_static_path_idx" ON "media_assets" USING btree ("static_path");

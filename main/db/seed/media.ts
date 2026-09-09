@@ -1,0 +1,58 @@
+import { readdir } from "node:fs/promises";
+import { join, extname } from "node:path";
+import { sql } from "drizzle-orm";
+import { db } from "@db/client";
+import { mediaAssets } from "@db/schema";
+
+const MIME: Record<string, string> = {
+  ".webp": "image/webp",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".gif": "image/gif",
+  ".mp4": "video/mp4",
+  ".webm": "video/webm",
+};
+
+async function walk(dir: string, base = ""): Promise<string[]> {
+  const entries = await readdir(dir, { withFileTypes: true });
+  const files: string[] = [];
+
+  for (const entry of entries) {
+    const rel = base ? `${base}/${entry.name}` : entry.name;
+    if (entry.isDirectory()) {
+      files.push(...(await walk(join(dir, entry.name), rel)));
+    } else if (MIME[extname(entry.name).toLowerCase()]) {
+      files.push(rel);
+    }
+  }
+  return files;
+}
+
+export async function seedMedia(publicDir: string) {
+  const files = await walk(publicDir);
+
+  const rows = files.map((path) => {
+    const ext = extname(path).toLowerCase();
+    return {
+      kind: "static" as const,
+      type: MIME[ext].startsWith("video") ? "video" : "image",
+      staticPath: `/${path}`,
+      filename: path.split("/").pop()!,
+      mimeType: MIME[ext],
+      // The top folder is how the admin media library groups these.
+      folder: path.includes("/") ? path.split("/")[0] : "general",
+    };
+  });
+
+  await db
+    .insert(mediaAssets)
+    .values(rows)
+    .onConflictDoUpdate({
+      target: mediaAssets.staticPath,
+      set: { mimeType: sql`excluded.mime_type`, folder: sql`excluded.folder`, updatedAt: new Date() },
+    });
+  return rows.length;
+}

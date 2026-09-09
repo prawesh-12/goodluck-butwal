@@ -1,0 +1,32 @@
+name: Migrate
+
+on:
+  push:
+    branches: [main]
+
+defaults:
+  run:
+    working-directory: main
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: main/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: main/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      # Vercel builds and deploys the app from the same push. This only moves the schema.
+      - run: pnpm exec drizzle-kit migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
