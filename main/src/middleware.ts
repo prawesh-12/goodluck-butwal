@@ -14,7 +14,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(rule.to, request.url), rule.status);
   }
 
-  if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
+  // Both are for someone who cannot sign in yet, so neither can require a session.
+  const openToAnyone = pathname === "/admin/login" || pathname === "/admin/reset-password";
+
+  if (pathname.startsWith("/admin") && !openToAnyone) {
     const signedIn = request.cookies.has(COOKIE) || request.cookies.has(`__Secure-${COOKIE}`);
     if (!signedIn) return NextResponse.redirect(new URL("/admin/login", request.url));
   }

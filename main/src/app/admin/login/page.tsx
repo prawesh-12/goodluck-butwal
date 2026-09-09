@@ -2,12 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "@/lib/auth-client";
+import { requestPasswordReset, signIn } from "@/lib/auth-client";
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [forgot, setForgot] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  async function onReset(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    const email = String(new FormData(event.currentTarget).get("email"));
+    await requestPasswordReset({ email, redirectTo: "/admin/reset-password" });
+    setBusy(false);
+    // Always the same answer, so this cannot be used to find out which emails exist.
+    setSent(true);
+  }
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,6 +39,37 @@ export default function LoginPage() {
       return;
     }
     router.replace("/admin");
+  }
+
+  if (forgot) {
+    return (
+      <div className="admin admin-login">
+        <form onSubmit={onReset} className="admin-login-card">
+          <h1 className="t-h4">Reset your password</h1>
+
+          {sent ? (
+            <p className="t-small">
+              If that address has an account, a link to choose a new password is on its way. It
+              works once and expires in an hour.
+            </p>
+          ) : (
+            <>
+              <label className="admin-field">
+                <span className="t-small">Email</span>
+                <input name="email" type="email" required autoComplete="username" />
+              </label>
+              <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
+                {busy ? "Sending" : "Send the link"}
+              </button>
+            </>
+          )}
+
+          <button type="button" className="admin-btn" onClick={() => setForgot(false)}>
+            Back to sign in
+          </button>
+        </form>
+      </div>
+    );
   }
 
   return (
@@ -57,6 +100,10 @@ export default function LoginPage() {
 
         <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
           {busy ? "Signing in" : "Sign in"}
+        </button>
+
+        <button type="button" className="admin-btn" onClick={() => setForgot(true)}>
+          Forgot your password
         </button>
       </form>
     </div>

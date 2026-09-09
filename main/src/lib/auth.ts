@@ -75,6 +75,16 @@ export const auth = betterAuth({
   },
 
   hooks: {
+    // Signing up is how an admin creates a colleague's account, never something a visitor may do
+    // for themselves. Better Auth's disableSignUp would also block createUser, which calls the
+    // same handler, so the block is on the HTTP route only: a direct auth.api call carries no
+    // request object, an incoming one does.
+    before: createAuthMiddleware(async (ctx) => {
+      if (ctx.path === "/sign-up/email" && ctx.request) {
+        throw new APIError("FORBIDDEN", { message: "An administrator creates accounts." });
+      }
+    }),
+
     after: createAuthMiddleware(async (ctx) => {
       if (ctx.path !== "/sign-in/email") return;
 
