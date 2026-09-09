@@ -264,6 +264,7 @@ const formRows: StringRow[] = [
 
   { key: "forms.consultation.intro", value: "", group: "forms", label: "Above the booking form", help: "Shown above the booking form. Leave it empty and nothing appears." },
   { key: "forms.consultation.success", value: "Request received. We will confirm by email within one business day.", group: "forms", label: "After requesting an appointment", help: "Replaces the booking form once it has been sent." },
+  { key: "forms.consultation.not_held", value: "That time is not held until we confirm it.", group: "forms", label: "Booking not held note", help: "The quiet line under the appointment summary after someone books." },
   { key: "forms.consultation.submit", value: "Book appointment", group: "forms", label: "Booking form button", help: "The button at the foot of the booking form." },
 
   { key: "forms.event.success", value: "You are registered. We have emailed you the details. Reply to that email if you can no longer make it.", group: "forms", label: "After registering for an event", help: "Replaces the registration form on an event page once it has been sent." },

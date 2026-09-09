@@ -2,6 +2,7 @@
 
 import { useCallback, useState, type FormEvent } from "react";
 import { Field } from "@/components/shared/inner";
+import { formatDate } from "@/lib/utils/datetime";
 import { useOffice } from "@/features/offices/components/office";
 import type { PublicOffice } from "@/features/offices/queries";
 import type { PublicDestination } from "@/features/destinations/queries";
@@ -184,7 +185,8 @@ export function EnquiryForm({ destinations, services, text }: { destinations: Pu
 export function BookingForm({ offices, services, text }: { offices: PublicOffice[]; services: PublicService[]; text: FormText }) {
   const { office } = useOffice();
   const { ready, check } = useReady(["Name", "Email", "Phone", "Date", "Time", "Service"]);
-  const [sent, setSent] = useState<string | null>(null);
+  type Booked = { service: string; when: string; office: string };
+  const [sent, setSent] = useState<Booked | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [token, setToken] = useState("");
@@ -215,18 +217,47 @@ export function BookingForm({ offices, services, text }: { offices: PublicOffice
     setBusy(false);
     if (result.ok) {
       trackFormSubmit("booking", result.reference);
-      setSent(result.reference ?? "");
+      const picked = offices.find((o) => o.id === form.get("Office"));
+      const date = String(form.get("Date") ?? "");
+      setSent({
+        service: services.find((item) => item.slug === form.get("Service"))?.title ?? "",
+        when: [date && formatDate(date), form.get("Time")].filter(Boolean).join(", "),
+        office: picked ? `${picked.city}, ${picked.country}` : "",
+      });
     } else {
       setError(result.error ?? text.error);
     }
   };
 
+  // Repeating the appointment back is the only confirmation the visitor has until staff reply,
+  // so the panel shows what was asked for rather than an internal reference.
   if (sent)
     return (
-      <p className="t-body text-ink">
-        {text.consultation.success}
-        {sent ? <> {text.reference} <strong>{sent}</strong>.</> : null}
-      </p>
+      <div className="flex w-full flex-col items-start gap-5">
+        <p className="flex items-start gap-3 t-body text-ink">
+          <span aria-hidden className="mt-[2px] flex size-6 shrink-0 items-center justify-center rounded-full bg-green/15">
+            <svg viewBox="0 0 12 10" className="h-[8px] w-[10px]" aria-hidden>
+              <path d="M1 5l3.5 3.5L11 1.5" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          {text.consultation.success}
+        </p>
+        <dl className="grid w-full gap-[10px] rounded-[10px] bg-white p-5 ring-1 ring-inset ring-hairline">
+          {[
+            [text.field.serviceRequired, sent.service],
+            [text.field.date, sent.when],
+            [text.field.office, sent.office],
+          ]
+            .filter(([, value]) => value)
+            .map(([label, value]) => (
+              <div key={label} className="flex flex-wrap items-baseline justify-between gap-2">
+                <dt className="t-small text-muted">{label.replace(/\*$/, "")}</dt>
+                <dd className="t-base font-semibold text-ink">{value}</dd>
+              </div>
+            ))}
+        </dl>
+        <p className="t-small text-muted">{text.consultation.notHeld}</p>
+      </div>
     );
   return (
     <form onSubmit={submit} onChange={(e) => check(e.currentTarget)} className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">

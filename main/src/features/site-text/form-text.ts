@@ -37,7 +37,7 @@ export type FormText = {
     seatsLeft: string;
   };
   enquiry: { intro: string; success: string; submit: string };
-  consultation: { intro: string; success: string; submit: string };
+  consultation: { intro: string; success: string; submit: string; notHeld: string };
   event: { success: string; submit: string };
 };
 
@@ -88,6 +88,7 @@ export async function formText(): Promise<FormText> {
       intro: t("forms.consultation.intro", ""),
       success: t("forms.consultation.success", "Request received. We will confirm by email within one business day."),
       submit: t("forms.consultation.submit", "Book appointment"),
+      notHeld: t("forms.consultation.not_held", "That time is not held until we confirm it."),
     },
     event: {
       success: t("forms.event.success", "You are registered. We have emailed you the details. Reply to that email if you can no longer make it."),
