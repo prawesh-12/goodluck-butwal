@@ -30,7 +30,7 @@ export const listReviews = cache(async (): Promise<PublicReview[]> => {
 
   return rows.map((row) => ({
     name: row.name ?? "",
-    avatar: mediaUrl(row, 320),
+    avatar: mediaUrl(row, 96),
     date: row.createdAt ? row.createdAt.toISOString().slice(0, 7) : "",
     quote: row.quote ?? "",
   }));

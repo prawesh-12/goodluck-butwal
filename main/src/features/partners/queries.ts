@@ -12,5 +12,5 @@ export const listPartnerLogos = cache(async (): Promise<string[]> => {
     .where(eq(partners.status, "published"))
     .orderBy(asc(partners.sortOrder));
 
-  return rows.map((row) => mediaUrl(row, 320)).filter(Boolean);
+  return rows.map((row) => mediaUrl(row, 240)).filter(Boolean);
 });
