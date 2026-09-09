@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { db } from "@db/client";
 import { settings, uiStrings } from "@db/schema";
 import { footerLinks, social } from "@/config/site";
@@ -46,16 +47,14 @@ export function uiStringRows(): StringRow[] {
 export async function seedUiStrings() {
   const rows = uiStringRows();
 
-  for (const row of rows) {
-    await db
-      .insert(uiStrings)
-      .values(row)
-      // Only the wording an admin has not touched is refreshed; the value is left alone.
-      .onConflictDoUpdate({
-        target: uiStrings.key,
-        set: { label: row.label, help: row.help, group: row.group },
-      });
-  }
+  await db
+    .insert(uiStrings)
+    .values(rows)
+    // Only the wording an admin has not touched is refreshed; the value is left alone.
+    .onConflictDoUpdate({
+      target: uiStrings.key,
+      set: { label: sql`excluded.label`, help: sql`excluded.help`, group: sql`excluded."group"` },
+    });
   return rows.length;
 }
 
@@ -67,12 +66,7 @@ export async function seedSettings() {
     },
   ];
 
-  for (const row of rows) {
-    await db
-      .insert(settings)
-      .values(row)
-      .onConflictDoNothing({ target: settings.key });
-  }
+  await db.insert(settings).values(rows).onConflictDoNothing({ target: settings.key });
   return rows.length;
 }
 
@@ -89,7 +83,7 @@ const innerPageRows: StringRow[] = [
   { key: "about.vision.title", value: "Our vision", group: "about", label: "Vision heading", help: "Sits above the vision text on the About page." },
   { key: "about.mission.cta", value: "Meet the team", group: "about", label: "Team button under the mission", help: "Button under the mission and vision text on the About page." },
   { key: "about.values.title", value: "Our values and ethics", group: "about", label: "Values heading", help: "Sits above the values text on the About page." },
-  { key: "about.founders.title", value: "Message from co-founders", group: "about", label: "Co-founders section heading", help: "Heading above the co-founders panel on the About page." },
+  { key: "about.founders.title", value: "Message from co-founders", group: "about", label: "Co-founders heading", help: "Heads the co-founders panel on the About page and the co-founders page itself." },
   { key: "about.founders.role", value: "Co-founders", group: "about", label: "Co-founders job title", help: "Printed under the founders' names on their photo." },
   { key: "about.journey.title", value: "Our journey", group: "about", label: "Journey heading", help: "Heading inside the co-founders panel." },
   { key: "about.journey.lead", value: "A note from the co-founders", group: "about", label: "Journey subheading", help: "The line under the journey heading." },
@@ -332,7 +326,6 @@ const chromeRows: StringRow[] = [
   { key: "home.events.title", value: "Coming up near you", group: "home", label: "Events block heading", help: "The heading above the events on the homepage." },
   { key: "home.events.cta", value: "All events", group: "home", label: "Events block button", help: "The button beside that heading." },
 
-  { key: "about.founders.title", value: "Message from co-founders", group: "about", label: "Co-founders page heading", help: "The heading at the top of the co-founders page." },
 
   { key: "courses.filter.keyword", value: "Keyword", group: "courses", label: "Keyword box", help: "The label above the keyword box on the courses page." },
   { key: "courses.filter.keyword_hint", value: "Course, institution or country", group: "courses", label: "Keyword box hint", help: "The grey wording inside the empty keyword box." },

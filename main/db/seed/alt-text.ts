@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
 import { team } from "./source/team";
@@ -61,8 +61,8 @@ export async function seedAltText() {
     .from(mediaAssets)
     .where(eq(mediaAssets.type, "image"));
 
-  let described = 0;
-  let decorative = 0;
+  const described: { id: string; value: string }[] = [];
+  const decorative: string[] = [];
 
   for (const row of rows) {
     if (!row.path) continue;
@@ -70,13 +70,20 @@ export async function seedAltText() {
     let value: string | null = source[row.path] ?? null;
     if (!value && row.path.startsWith("/images/flags/")) value = flagAlt(row.path);
 
-    if (value) {
-      await db.update(mediaAssets).set({ altText: value }).where(eq(mediaAssets.id, row.id));
-      described += 1;
-    } else if (DECORATIVE.some((rule) => rule.test(row.path!))) {
-      await db.update(mediaAssets).set({ altText: "" }).where(eq(mediaAssets.id, row.id));
-      decorative += 1;
-    }
+    if (value) described.push({ id: row.id, value });
+    else if (DECORATIVE.some((rule) => rule.test(row.path!))) decorative.push(row.id);
+  }
+
+  // Every row gets a different string, so this is one statement with the pairs inlined rather than
+  // an update each. Over the HTTP driver that is one round trip instead of a couple of hundred.
+  if (described.length) {
+    const pairs = sql.join(described.map((r) => sql`(${r.id}::uuid, ${r.value})`), sql`, `);
+    await db.execute(
+      sql`update ${mediaAssets} set alt_text = v.value from (values ${pairs}) as v(id, value) where ${mediaAssets.id} = v.id`,
+    );
+  }
+  if (decorative.length) {
+    await db.update(mediaAssets).set({ altText: "" }).where(inArray(mediaAssets.id, decorative));
   }
 
   const [left] = await db
@@ -84,6 +91,6 @@ export async function seedAltText() {
     .from(mediaAssets)
     .where(and(eq(mediaAssets.type, "image"), isNull(mediaAssets.altText)));
 
-  console.log(`    described ${described}, marked ${decorative} decorative, ${left.n} still undescribed`);
-  return described + decorative;
+  console.log(`    described ${described.length}, marked ${decorative.length} decorative, ${left.n} still undescribed`);
+  return described.length + decorative.length;
 }

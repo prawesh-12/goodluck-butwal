@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { inArray, sql } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, offices, partners, teamMembers } from "@db/schema";
 import { team } from "./source/team";
@@ -20,52 +20,71 @@ export async function seedTeam() {
   const media = await mediaIdByPath();
   const office = await officeIdByCode();
 
-  for (const [index, person] of team.entries()) {
-    const row = {
-      slug: person.slug,
-      fullName: person.name,
-      position: person.role,
-      officeId: person.office ? (office.get(person.office) ?? null) : null,
-      photoId: media.get(person.photo) ?? null,
-      // Bio, qualifications and expertise wait on the client, which is why /team/[slug] is later.
-      isCoFounder: person.role.toLowerCase().includes("cofounder"),
-      status: "published" as const,
-      publishedAt: new Date(),
-      sortOrder: index,
-    };
+  const rows = team.map((person, index) => ({
+    slug: person.slug,
+    fullName: person.name,
+    position: person.role,
+    officeId: person.office ? (office.get(person.office) ?? null) : null,
+    photoId: media.get(person.photo) ?? null,
+    // Bio, qualifications and expertise wait on the client, which is why /team/[slug] is later.
+    isCoFounder: person.role.toLowerCase().includes("cofounder"),
+    status: "published" as const,
+    publishedAt: new Date(),
+    sortOrder: index,
+  }));
 
-    await db
-      .insert(teamMembers)
-      .values(row)
-      .onConflictDoUpdate({ target: teamMembers.slug, set: { ...row, updatedAt: new Date() } });
-  }
-  return team.length;
+  await db
+    .insert(teamMembers)
+    .values(rows)
+    .onConflictDoUpdate({
+      target: teamMembers.slug,
+      set: {
+        fullName: sql`excluded.full_name`,
+        position: sql`excluded.position`,
+        officeId: sql`excluded.office_id`,
+        photoId: sql`excluded.photo_id`,
+        isCoFounder: sql`excluded.is_co_founder`,
+        status: sql`excluded.status`,
+        publishedAt: sql`excluded.published_at`,
+        sortOrder: sql`excluded.sort_order`,
+        updatedAt: new Date(),
+      },
+    });
+  return rows.length;
 }
 
 export async function seedPartners() {
   const media = await mediaIdByPath();
 
-  for (const [index, logo] of partnerLogos.entries()) {
-    const logoId = media.get(logo) ?? null;
-    const existing = await db
-      .select({ id: partners.id })
-      .from(partners)
-      .where(eq(partners.name, `Partner ${index + 1}`));
+  const rows = partnerLogos.map((logo, index) => ({
+    // The carousel shows no names, so the row is identified by its position.
+    name: `Partner ${index + 1}`,
+    logoId: media.get(logo) ?? null,
+    status: "published" as const,
+    publishedAt: new Date(),
+    sortOrder: index,
+  }));
 
-    const row = {
-      // The carousel shows no names, so the row is identified by its position.
-      name: `Partner ${index + 1}`,
-      logoId,
-      status: "published" as const,
-      publishedAt: new Date(),
-      sortOrder: index,
-    };
+  // partners.name carries no unique index, so there is nothing to upsert against. Reading the
+  // existing names once splits the rows into one insert and one update.
+  const names = rows.map((row) => row.name);
+  const existing = new Map(
+    (await db.select({ id: partners.id, name: partners.name }).from(partners).where(inArray(partners.name, names)))
+      .map((row) => [row.name, row.id]),
+  );
 
-    if (existing.length) {
-      await db.update(partners).set({ ...row, updatedAt: new Date() }).where(eq(partners.id, existing[0].id));
-    } else {
-      await db.insert(partners).values(row);
-    }
+  const fresh = rows.filter((row) => !existing.has(row.name));
+  if (fresh.length) await db.insert(partners).values(fresh);
+
+  const known = rows.filter((row) => existing.has(row.name));
+  if (known.length) {
+    const pairs = sql.join(
+      known.map((row) => sql`(${existing.get(row.name)}::uuid, ${row.logoId}::uuid, ${row.sortOrder}::int)`),
+      sql`, `,
+    );
+    await db.execute(
+      sql`update ${partners} set logo_id = v.logo_id, sort_order = v.sort_order, updated_at = now() from (values ${pairs}) as v(id, logo_id, sort_order) where ${partners.id} = v.id`,
+    );
   }
-  return partnerLogos.length;
+  return rows.length;
 }

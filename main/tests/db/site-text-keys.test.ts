@@ -30,6 +30,13 @@ test("every seeded key is read by a page", () => {
   expect([...seeded].filter((key) => !footer(key) && !isUsed(key)).sort()).toEqual([]);
 });
 
+// The seed inserts these in one statement, which Postgres rejects outright if two rows carry the
+// same key. Listing a key twice used to be invisible: the later row just overwrote the earlier one.
+test("no key is listed twice", () => {
+  const keys = uiStringRows().map((row) => row.key);
+  expect(keys.filter((key, i) => keys.indexOf(key) !== i)).toEqual([]);
+});
+
 test("every row carries a label and a help line for the admin", () => {
   expect(uiStringRows().filter((row) => !row.label.trim() || !row.help.trim())).toEqual([]);
 });

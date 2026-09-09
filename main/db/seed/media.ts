@@ -1,5 +1,6 @@
 import { readdir } from "node:fs/promises";
 import { join, extname } from "node:path";
+import { sql } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
 
@@ -46,14 +47,12 @@ export async function seedMedia(publicDir: string) {
     };
   });
 
-  for (const row of rows) {
-    await db
-      .insert(mediaAssets)
-      .values(row)
-      .onConflictDoUpdate({
-        target: mediaAssets.staticPath,
-        set: { mimeType: row.mimeType, folder: row.folder, updatedAt: new Date() },
-      });
-  }
+  await db
+    .insert(mediaAssets)
+    .values(rows)
+    .onConflictDoUpdate({
+      target: mediaAssets.staticPath,
+      set: { mimeType: sql`excluded.mime_type`, folder: sql`excluded.folder`, updatedAt: new Date() },
+    });
   return rows.length;
 }
