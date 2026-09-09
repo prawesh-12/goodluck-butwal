@@ -10,7 +10,7 @@ import { requireOwnership, requirePermission } from "@/lib/auth/rbac";
 import { writeAudit } from "@/lib/security/audit";
 import { sendEmailQuietly } from "@/lib/email";
 import { consultationConfirmed } from "@/lib/email/templates";
-import { formatInOfficeTz } from "@/lib/utils/datetime";
+import { formatInOfficeTz, officeSlot } from "@/lib/utils/datetime";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -85,13 +85,16 @@ export async function confirmConsultation(input: unknown): Promise<Result> {
   if (!row) return { ok: false, error: "That request no longer exists." };
   requireOwnership(actor, row);
 
+  const at = officeSlot(row.date, row.time);
+  if (!at) return { ok: false, error: "That request has no date and time to confirm." };
+
   await db
     .update(consultations)
     .set({ status: "confirmed", confirmedAt: new Date(), updatedBy: actor.id, updatedAt: new Date() })
     .where(eq(consultations.id, row.id));
 
   // The visitor reads the time in the office's zone, with the zone named.
-  const when = formatInOfficeTz(`${row.date}T${row.time}:00Z`, row.timezone ?? "Australia/Melbourne");
+  const when = formatInOfficeTz(at, row.timezone ?? "Australia/Melbourne");
 
   await sendEmailQuietly({
     ...consultationConfirmed(

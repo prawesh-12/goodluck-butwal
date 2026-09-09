@@ -23,6 +23,17 @@ export function formatInOfficeTz(
   }).format(date);
 }
 
+// A time typed into a form is HH:MM, the same column read back from Postgres is HH:MM:SS, and
+// the two used to be pasted into the same template. Appending seconds to a value that already
+// had them produced an invalid date, which threw at format time rather than here.
+export function officeSlot(date?: string | null, time?: string | null): Date | null {
+  if (!date || !time) return null;
+  const [hour, minute] = time.split(":");
+  if (hour === undefined || minute === undefined) return null;
+  const at = new Date(`${date}T${hour.padStart(2, "0")}:${minute.padStart(2, "0")}:00Z`);
+  return Number.isNaN(at.getTime()) ? null : at;
+}
+
 const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 const clock = (time: string) => {

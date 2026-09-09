@@ -9,7 +9,7 @@ import { overRateLimit } from "@/lib/security/rate-limit";
 import { sendEmailQuietly } from "@/lib/email";
 import { consultationToStaff, consultationToVisitor } from "@/lib/email/templates";
 import { staffAddress } from "@/lib/email/recipients";
-import { formatInOfficeTz } from "@/lib/utils/datetime";
+import { formatInOfficeTz, officeSlot } from "@/lib/utils/datetime";
 
 export const dynamic = "force-dynamic";
 
@@ -81,7 +81,8 @@ export async function POST(request: Request) {
   });
 
   // Shown in the office's own zone, which is the only reading of the time that means anything.
-  const when = formatInOfficeTz(`${data.preferredDate}T${data.preferredTime}:00Z`, office.timezone);
+  const slot = officeSlot(data.preferredDate, data.preferredTime);
+  const when = slot ? formatInOfficeTz(slot, office.timezone) : `${data.preferredDate} ${data.preferredTime}`;
 
   const payload = {
     reference,
