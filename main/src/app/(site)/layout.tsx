@@ -9,15 +9,21 @@ import { OfficeProvider } from "@/components/office";
 import { Analytics } from "@/components/analytics";
 import { listOffices } from "@/server/queries/offices";
 import { getFooterColumns, getSocialLinks } from "@/server/queries/site";
+import { allSettings } from "@/server/queries/shared";
 import { loadText } from "@/server/queries/text";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(company.url),
-  title: { default: company.name, template: `%s – ${company.short}` },
-  description: "Education counselling, visa guidance, scholarship guidance and IELTS coaching from offices in Melbourne, Butwal and Cebu.",
-  icons: { icon: "/brand/icon.png" },
-  openGraph: { siteName: company.name, type: "website" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const verification = String((await allSettings()).get("google_site_verification") ?? "").trim();
+
+  return {
+    metadataBase: new URL(company.url),
+    title: { default: company.name, template: `%s – ${company.short}` },
+    description: "Education counselling, visa guidance, scholarship guidance and IELTS coaching from offices in Melbourne, Butwal and Cebu.",
+    icons: { icon: "/brand/icon.png" },
+    openGraph: { siteName: company.name, type: "website" },
+    ...(verification ? { verification: { google: verification } } : {}),
+  };
+}
 
 // Published content is live within five minutes without a deploy. Admin routes opt out with
 // force-dynamic.

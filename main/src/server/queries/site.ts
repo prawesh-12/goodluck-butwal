@@ -1,5 +1,9 @@
 import { cache } from "react";
+import { eq } from "drizzle-orm";
+import { db } from "@db/client";
+import { mediaAssets } from "@db/schema";
 import { allSettings, allUiStrings } from "./shared";
+import { mediaUrl } from "./catalogue";
 
 export type FooterColumn = { title: string; links: { label: string; href: string }[] };
 export type SocialLink = { label: string; href: string; icon: string };
@@ -32,4 +36,22 @@ export const getFooterColumns = cache(async (): Promise<FooterColumn[]> => {
 export const getSocialLinks = cache(async (): Promise<SocialLink[]> => {
   const links = ((await allSettings()).get("social_links") as SocialLink[] | undefined) ?? [];
   return links.filter((link) => link.href && link.href !== "#");
+});
+
+// Undefined rather than an empty string: the hero keeps its own default image, so nothing set
+// here means the page looks the way it ships.
+export const getHeroImage = cache(async (): Promise<string | undefined> => {
+  const id = String((await allSettings()).get("hero_image_id") ?? "");
+  if (!id) return undefined;
+
+  const [asset] = await db
+    .select({
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
+    })
+    .from(mediaAssets)
+    .where(eq(mediaAssets.id, id));
+
+  return (asset ? mediaUrl(asset, 2000) : "") || undefined;
 });

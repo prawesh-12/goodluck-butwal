@@ -16,7 +16,15 @@ const destinationFlags = [
 
 export type HeroText = { titleBefore: string; titleAfter: string; bookCta: string; servicesCta: string; videoTitle: string };
 
-export function Hero({ googleRating, text }: { googleRating: GoogleRating; text: HeroText }) {
+export function Hero({
+  googleRating,
+  text,
+  sky = img.heroSky,
+}: {
+  googleRating: GoogleRating;
+  text: HeroText;
+  sky?: string;
+}) {
   const { scrollY } = useScroll();
   const grass = useTransform(scrollY, [380, 460], [1, 0], { ease: easeInOut });
   // The reference hero is max(175vh, 1262px) tall and the meadow's scroll rate grows with that height
@@ -114,7 +122,7 @@ export function Hero({ googleRating, text }: { googleRating: GoogleRating; text:
   return (
     <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
       <div aria-hidden className="absolute inset-0 z-0 flex items-center justify-center overflow-clip">
-        <img src={img.heroSky} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
+        <img src={sky} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
       </div>
 
       <div className="container-x relative z-[1]">

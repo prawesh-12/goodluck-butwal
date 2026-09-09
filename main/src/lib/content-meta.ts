@@ -59,6 +59,7 @@ export type SocialLink = { label: string; href: string; icon?: string };
 
 export type SettingsValues = {
   site_name: string;
+  hero_image_id: string;
   default_seo_title: string;
   default_seo_description: string;
   default_og_image_id: string;
@@ -67,6 +68,7 @@ export type SettingsValues = {
   notify_email_np: string;
   ga4_id: string;
   gtm_id: string;
+  google_site_verification: string;
   announcement_bar: string;
   google_rating: string;
   google_review_count: number;

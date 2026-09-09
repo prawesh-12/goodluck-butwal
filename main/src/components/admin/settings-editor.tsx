@@ -3,11 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateSettings } from "@/server/actions/settings";
+import { MediaPicker, type PickedMedia } from "@/components/admin/media-picker";
 import type { SettingsValues } from "@/lib/content-meta";
 
 type FieldErrors = Record<string, string[] | undefined>;
 
-export function SettingsEditor({ values, readOnly }: { values: SettingsValues; readOnly: boolean }) {
+export function SettingsEditor({
+  values,
+  heroImage,
+  readOnly,
+}: {
+  values: SettingsValues;
+  heroImage: PickedMedia | null;
+  readOnly: boolean;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -22,6 +31,7 @@ export function SettingsEditor({ values, readOnly }: { values: SettingsValues; r
         const form = new FormData(event.currentTarget);
         const result = await updateSettings({
           site_name: form.get("site_name"),
+          hero_image_id: form.get("hero_image_id"),
           default_seo_title: form.get("default_seo_title"),
           default_seo_description: form.get("default_seo_description"),
           default_og_image_id: form.get("default_og_image_id"),
@@ -34,6 +44,7 @@ export function SettingsEditor({ values, readOnly }: { values: SettingsValues; r
           notify_email_np: form.get("notify_email_np"),
           ga4_id: form.get("ga4_id"),
           gtm_id: form.get("gtm_id"),
+          google_site_verification: form.get("google_site_verification"),
           announcement_bar: form.get("announcement_bar"),
           google_rating: form.get("google_rating"),
           google_review_count: form.get("google_review_count"),
@@ -53,6 +64,15 @@ export function SettingsEditor({ values, readOnly }: { values: SettingsValues; r
         readOnly={readOnly}
         error={errors.site_name?.[0]}
       />
+
+      <h2 className="t-h5 admin-subhead">Home page</h2>
+      <MediaPicker
+        label="Hero image"
+        name="hero_image_id"
+        value={heroImage}
+        help="The picture behind the heading at the top of the home page. Leave it empty for the sky the site ships with."
+      />
+      {errors.hero_image_id ? <span className="admin-clash">{errors.hero_image_id[0]}</span> : null}
 
       <h2 className="t-h5 admin-subhead">SEO defaults</h2>
       <Field
@@ -138,6 +158,14 @@ export function SettingsEditor({ values, readOnly }: { values: SettingsValues; r
         defaultValue={values.gtm_id}
         readOnly={readOnly}
         error={errors.gtm_id?.[0]}
+      />
+      <Field
+        name="google_site_verification"
+        label="Google Search Console"
+        help="The content value from the verification tag Google gives you, not the whole tag. Leave empty to verify another way."
+        defaultValue={values.google_site_verification}
+        readOnly={readOnly}
+        error={errors.google_site_verification?.[0]}
       />
 
       <h2 className="t-h5 admin-subhead">Announcement bar</h2>
