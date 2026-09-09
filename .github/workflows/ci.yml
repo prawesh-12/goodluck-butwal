@@ -28,11 +28,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
 
-      # Builds the Next app on its way to the worker, so there is no separate next build step.
       # Better Auth builds its adapter when its module loads and Next loads every route module
       # during a build. Nothing queries, so a placeholder connection string is enough.
-      - run: pnpm build:worker
+      - run: pnpm build
         env:
           DATABASE_URL: postgresql://build:build@localhost:5432/build
-
-      - run: pnpm bundle:check

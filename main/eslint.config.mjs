@@ -10,9 +10,6 @@ export default defineConfig([
     ".next/**",
     "out/**",
     "build/**",
-    ".open-next/**",
-    ".wrangler/**",
-    "bundled/**",
     "next-env.d.ts",
   ]),
 ]);

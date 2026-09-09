@@ -53,7 +53,7 @@ const ENTITIES: { name: string; table: Publishable; paths: (slug: string) => str
   { name: "testimonials", table: testimonials, paths: () => ["/", "/success-stories"] },
 ];
 
-export async function POST(request: Request) {
+export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET ?? "";
   const token = (request.headers.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
   if (!secret || !(await sameSecret(token, secret))) {

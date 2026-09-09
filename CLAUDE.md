@@ -302,7 +302,6 @@ pnpm build
 pnpm typecheck
 pnpm lint
 pnpm test
-pnpm bundle:check     # Worker bundle must stay under 2.50 MB
 ```
 
 pnpm only. Never create `package-lock.json` or `yarn.lock`.
