@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@db/client";
-import { consultations, offices, services, settings } from "@db/schema";
+import { consultations, offices, services } from "@db/schema";
 import { consultationSchema } from "@/features/leads/validators";
 import { verifyTurnstile } from "@/lib/security/turnstile";
 import { clientIp, hashIp, referenceCode } from "@/lib/utils/request";
 import { overRateLimit } from "@/lib/security/rate-limit";
 import { sendEmailQuietly } from "@/lib/email";
 import { consultationToStaff, consultationToVisitor } from "@/lib/email/templates";
+import { staffAddress } from "@/lib/email/recipients";
 import { formatInOfficeTz } from "@/lib/utils/datetime";
 
 export const dynamic = "force-dynamic";
@@ -93,9 +94,7 @@ export async function POST(request: Request) {
     contactMethod: data.preferredContactMethod,
   };
 
-  const key = office.code === "np" ? "notify_email_np" : "notify_email_au";
-  const [notify] = await db.select({ value: settings.value }).from(settings).where(eq(settings.key, key));
-  const staff = String(notify?.value ?? "info@goodluck.services");
+  const staff = await staffAddress(office.code);
 
   await Promise.all([
     sendEmailQuietly({ ...consultationToStaff(payload, office), to: staff, replyTo: data.email }),

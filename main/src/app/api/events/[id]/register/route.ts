@@ -12,7 +12,8 @@ import { verifyTurnstile } from "@/lib/security/turnstile";
 import { clientIp, hashIp } from "@/lib/utils/request";
 import { overRateLimit } from "@/lib/security/rate-limit";
 import { sendEmailQuietly } from "@/lib/email";
-import { eventRegistered } from "@/lib/email/templates";
+import { eventRegistered, eventRegisteredToStaff } from "@/lib/email/templates";
+import { staffAddress } from "@/lib/email/recipients";
 import { formatInOfficeTz } from "@/lib/utils/datetime";
 import { seatsTaken } from "@/features/events/queries";
 
@@ -43,6 +44,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       registrationEnabled: events.registrationEnabled,
       registrationDeadline: events.registrationDeadline,
       timezone: offices.timezone,
+      officeCode: offices.code,
       officeName: offices.name,
       officeAddress: offices.addressLine1,
       officePhone: offices.phoneDisplay,
@@ -128,22 +130,27 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     ? (event.onlineUrl ?? "Online")
     : [event.venueName, event.venueAddress].filter(Boolean).join(", ");
 
-  await sendEmailQuietly({
-    ...eventRegistered(
-      {
-        fullName: data.fullName,
-        event: event.title,
-        when: formatInOfficeTz(event.startsAt, zone),
-        where,
-      },
-      {
-        name: event.officeName ?? "",
-        addressLine1: event.officeAddress,
-        phoneDisplay: event.officePhone,
-      },
-    ),
-    to: data.email,
-  });
+  const office = {
+    name: event.officeName ?? "",
+    addressLine1: event.officeAddress,
+    phoneDisplay: event.officePhone,
+  };
+  const details = {
+    fullName: data.fullName,
+    event: event.title,
+    when: formatInOfficeTz(event.startsAt, zone),
+    where,
+  };
+
+  const staff = await staffAddress(event.officeCode);
+  await Promise.all([
+    sendEmailQuietly({ ...eventRegistered(details, office), to: data.email }),
+    sendEmailQuietly({
+      ...eventRegisteredToStaff({ ...details, email: data.email, phone: data.phone, attendees: data.attendees }, office),
+      to: staff,
+      replyTo: data.email,
+    }),
+  ]);
 
   return NextResponse.json({ ok: true });
 }

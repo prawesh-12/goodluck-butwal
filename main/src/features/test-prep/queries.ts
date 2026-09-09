@@ -155,10 +155,18 @@ export async function batchForRegistration(id: string) {
       totalSeats: testPrepBatches.totalSeats,
       seatsTaken: testPrepBatches.seatsTaken,
       status: testPrepBatches.status,
+      startDate: testPrepBatches.startDate,
+      mode: testPrepBatches.mode,
       courseStatus: testPrepCourses.status,
+      courseName: testPrepCourses.name,
+      officeCode: offices.code,
+      officeName: offices.name,
+      officeAddress: offices.addressLine1,
+      officePhone: offices.phoneDisplay,
     })
     .from(testPrepBatches)
     .innerJoin(testPrepCourses, eq(testPrepBatches.courseId, testPrepCourses.id))
+    .leftJoin(offices, eq(testPrepCourses.officeId, offices.id))
     .where(eq(testPrepBatches.id, id));
   return row;
 }

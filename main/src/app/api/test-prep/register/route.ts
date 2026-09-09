@@ -8,6 +8,10 @@ import { verifyTurnstile } from "@/lib/security/turnstile";
 import { clientIp, hashIp } from "@/lib/utils/request";
 import { overRateLimit } from "@/lib/security/rate-limit";
 import { batchForRegistration } from "@/features/test-prep/queries";
+import { MODE_LABEL } from "@/features/test-prep/schedule";
+import { sendEmailQuietly } from "@/lib/email";
+import { testPrepToRegistrant, testPrepToStaff } from "@/lib/email/templates";
+import { staffAddress } from "@/lib/email/recipients";
 
 export const dynamic = "force-dynamic";
 
@@ -77,6 +81,33 @@ export async function POST(request: Request) {
     sourcePage: data.sourcePage,
     ipHash,
   });
+
+  // The seat is taken and the row is written. Mail is sent after that and never fails the
+  // request, the same as every other form on the site.
+  const details = {
+    fullName: data.fullName,
+    email: data.email,
+    phone: data.phone,
+    course: batch.courseName,
+    batch: batch.batchName,
+    starts: batch.startDate,
+    mode: MODE_LABEL[batch.mode] ?? batch.mode,
+    notes: data.notes,
+  };
+  const office = {
+    name: batch.officeName ?? "",
+    addressLine1: batch.officeAddress,
+    phoneDisplay: batch.officePhone,
+  };
+
+  await Promise.all([
+    sendEmailQuietly({ ...testPrepToRegistrant(details, office), to: data.email }),
+    sendEmailQuietly({
+      ...testPrepToStaff(details, office),
+      to: await staffAddress(batch.officeCode),
+      replyTo: data.email,
+    }),
+  ]);
 
   return NextResponse.json({ ok: true, batch: batch.batchName });
 }

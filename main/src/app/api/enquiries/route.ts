@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@db/client";
-import { destinations, enquiries, offices, services, settings } from "@db/schema";
+import { destinations, enquiries, offices, services } from "@db/schema";
 import { enquirySchema } from "@/features/leads/validators";
 import { verifyTurnstile } from "@/lib/security/turnstile";
 import { clientIp, hashIp, referenceCode } from "@/lib/utils/request";
 import { overRateLimit } from "@/lib/security/rate-limit";
 import { sendEmailQuietly } from "@/lib/email";
 import { enquiryToStaff, enquiryToVisitor } from "@/lib/email/templates";
+import { staffAddress } from "@/lib/email/recipients";
 
 export const dynamic = "force-dynamic";
 
@@ -102,8 +103,3 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true, reference });
 }
 
-async function staffAddress(officeCode?: string) {
-  const key = officeCode === "np" ? "notify_email_np" : "notify_email_au";
-  const [row] = await db.select({ value: settings.value }).from(settings).where(eq(settings.key, key));
-  return String(row?.value ?? "info@goodluck.services");
-}
