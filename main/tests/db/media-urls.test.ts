@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
 import { mediaUrl } from "@/lib/utils/media-url";
@@ -45,12 +45,10 @@ test.runIf(hasDb)("no public query hands back a path for an image that lives on 
   expect(urls.length).toBeGreaterThan(0);
 
   const paths = [...new Set(urls.filter((url) => url.startsWith("/images/")))];
-  const stillStatic = await Promise.all(
-    paths.map(async (path) => {
-      const [row] = await db.select({ kind: mediaAssets.kind }).from(mediaAssets).where(eq(mediaAssets.staticPath, path));
-      return { path, kind: row?.kind };
-    }),
-  );
+  const moved = await db
+    .select({ path: mediaAssets.staticPath })
+    .from(mediaAssets)
+    .where(and(inArray(mediaAssets.staticPath, paths), eq(mediaAssets.kind, "cloudinary")));
 
-  expect(stillStatic.filter((row) => row.kind === "cloudinary")).toEqual([]);
+  expect(moved).toEqual([]);
 });
