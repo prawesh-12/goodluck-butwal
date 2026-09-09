@@ -4,6 +4,7 @@ import { settingsSchema, uiStringSchema } from "@/lib/validators/settings";
 const valid = {
   site_name: "Goodluck Education and Migration",
   hero_image_id: "",
+  hero_video_id: "",
   default_seo_title: "Study abroad with Goodluck",
   default_seo_description: "Education and migration advice for Australia and Nepal.",
   default_og_image_id: "",
@@ -21,6 +22,10 @@ const valid = {
 test("a full settings payload passes", () => {
   const result = settingsSchema.safeParse(valid);
   expect(result.success).toBe(true);
+});
+
+test("a hero video given as a file path instead of a media library id is refused", () => {
+  expect(settingsSchema.safeParse({ ...valid, hero_video_id: "/videos/goodluck-education.mp4" }).success).toBe(false);
 });
 
 test("a bad notification address is refused", () => {

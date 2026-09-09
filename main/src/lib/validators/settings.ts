@@ -13,6 +13,7 @@ export const socialLinkSchema = z.object({
 export const settingsSchema = z.object({
   site_name: z.string().trim().min(1, "The site needs a name."),
   hero_image_id: z.uuid("That is not a media library id.").or(z.literal("")),
+  hero_video_id: z.uuid("That is not a media library id.").or(z.literal("")),
   default_seo_title: z.string().trim(),
   default_seo_description: z.string().trim(),
   default_og_image_id: z.uuid("That is not a media library id.").or(z.literal("")),

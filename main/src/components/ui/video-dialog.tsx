@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 
 // Magic UI's HeroVideoDialog ("from-center"), playing a local mp4 instead of an iframe.
 // The modal is portalled to <body> because the thumbnail lives inside a card link, and the play button stops that link from navigating.
-export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bare, className = "" }: { src: string; loopSrc?: string; poster: string; title: string; inline?: boolean; prefetch?: boolean; bare?: boolean; className?: string }) {
+export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bare, className = "" }: { src: string; loopSrc?: string; poster?: string; title: string; inline?: boolean; prefetch?: boolean; bare?: boolean; className?: string }) {
   const [open, setOpen] = useState(false);
   // `inline` is a live "should be rolling" flag. The element is kept once mounted so scrolling back
   // and forth does not restart the download; it just plays or rewinds and pauses.
@@ -46,10 +46,12 @@ export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bar
         }}
         className={`relative block cursor-pointer ${className}`}
       >
-        <img src={poster} alt="" className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" loading="lazy" decoding="async" />
-        {/* Layered over the poster rather than swapped with it, so buffering and loop restarts cannot flash through. */}
-        {mounted && (
-          <video ref={loop} src={loopSrc ?? src} poster={poster} muted loop playsInline preload="auto" disablePictureInPicture disableRemotePlayback className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" />
+        {poster && <img src={poster} alt="" className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" loading="lazy" decoding="async" />}
+        {/* Layered over the poster rather than swapped with it, so buffering and loop restarts cannot
+            flash through. With no poster the video mounts straight away and paints its own first
+            frame, reading only the header until the card is warmed. */}
+        {(mounted || !poster) && (
+          <video ref={loop} src={loopSrc ?? src} poster={poster} muted loop playsInline preload={mounted ? "auto" : "metadata"} disablePictureInPicture disableRemotePlayback className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" />
         )}
         {!bare && (
           <span className="absolute inset-0 flex scale-90 items-center justify-center transition-transform duration-200 ease-out group-hover:scale-100">

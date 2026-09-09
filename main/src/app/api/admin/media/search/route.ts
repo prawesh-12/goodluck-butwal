@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { desc, ilike, or } from "drizzle-orm";
+import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
 import { requireActor } from "@/lib/session";
@@ -14,7 +14,9 @@ export async function GET(request: Request) {
     return NextResponse.json({ ok: false, error: "Not your area." }, { status: 403 });
   }
 
-  const q = new URL(request.url).searchParams.get("q")?.trim();
+  const params = new URL(request.url).searchParams;
+  const q = params.get("q")?.trim();
+  const type = params.get("type")?.trim();
   const like = q ? `%${q}%` : undefined;
 
   const rows = await db
@@ -27,7 +29,12 @@ export async function GET(request: Request) {
       altText: mediaAssets.altText,
     })
     .from(mediaAssets)
-    .where(like ? or(ilike(mediaAssets.filename, like), ilike(mediaAssets.altText, like)) : undefined)
+    .where(
+      and(
+        like ? or(ilike(mediaAssets.filename, like), ilike(mediaAssets.altText, like)) : undefined,
+        type ? eq(mediaAssets.type, type) : undefined,
+      ),
+    )
     .orderBy(desc(mediaAssets.createdAt))
     .limit(60);
 

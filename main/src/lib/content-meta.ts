@@ -60,6 +60,7 @@ export type SocialLink = { label: string; href: string; icon?: string };
 export type SettingsValues = {
   site_name: string;
   hero_image_id: string;
+  hero_video_id: string;
   default_seo_title: string;
   default_seo_description: string;
   default_og_image_id: string;

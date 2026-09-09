@@ -11,10 +11,12 @@ type FieldErrors = Record<string, string[] | undefined>;
 export function SettingsEditor({
   values,
   heroImage,
+  heroVideo,
   readOnly,
 }: {
   values: SettingsValues;
   heroImage: PickedMedia | null;
+  heroVideo: PickedMedia | null;
   readOnly: boolean;
 }) {
   const router = useRouter();
@@ -32,6 +34,7 @@ export function SettingsEditor({
         const result = await updateSettings({
           site_name: form.get("site_name"),
           hero_image_id: form.get("hero_image_id"),
+          hero_video_id: form.get("hero_video_id"),
           default_seo_title: form.get("default_seo_title"),
           default_seo_description: form.get("default_seo_description"),
           default_og_image_id: form.get("default_og_image_id"),
@@ -73,6 +76,14 @@ export function SettingsEditor({
         help="The picture behind the heading at the top of the home page. Leave it empty for the sky the site ships with."
       />
       {errors.hero_image_id ? <span className="admin-clash">{errors.hero_image_id[0]}</span> : null}
+      <MediaPicker
+        label="Hero video"
+        name="hero_video_id"
+        type="video"
+        value={heroVideo}
+        help="The film that plays in the card below the heading. Leave it empty for the film the site ships with."
+      />
+      {errors.hero_video_id ? <span className="admin-clash">{errors.hero_video_id[0]}</span> : null}
 
       <h2 className="t-h5 admin-subhead">SEO defaults</h2>
       <Field

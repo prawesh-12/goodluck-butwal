@@ -20,6 +20,7 @@ export default async function SettingsPage() {
   const values = {
     site_name: text("site_name"),
     hero_image_id: text("hero_image_id"),
+    hero_video_id: text("hero_video_id"),
     default_seo_title: text("default_seo_title"),
     default_seo_description: text("default_seo_description"),
     default_og_image_id: text("default_og_image_id"),
@@ -34,7 +35,7 @@ export default async function SettingsPage() {
     google_review_count: Number(byKey.get("google_review_count") ?? 0),
   };
 
-  const media = await pickedMedia([values.hero_image_id]);
+  const media = await pickedMedia([values.hero_image_id, values.hero_video_id]);
 
   return (
     <>
@@ -42,6 +43,7 @@ export default async function SettingsPage() {
       <SettingsEditor
         values={values}
         heroImage={media[values.hero_image_id] ?? null}
+        heroVideo={media[values.hero_video_id] ?? null}
         readOnly={!can(actor, "settings", "update")}
       />
     </>

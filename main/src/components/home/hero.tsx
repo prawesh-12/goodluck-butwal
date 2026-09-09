@@ -20,10 +20,12 @@ export function Hero({
   googleRating,
   text,
   sky = img.heroSky,
+  filmSrc,
 }: {
   googleRating: GoogleRating;
   text: HeroText;
   sky?: string;
+  filmSrc?: string;
 }) {
   const { scrollY } = useScroll();
   const grass = useTransform(scrollY, [380, 460], [1, 0], { ease: easeInOut });
@@ -181,7 +183,9 @@ export function Hero({
                 style={{ transform: filmTransform }}
                 className="group relative w-full overflow-hidden rounded-[22px] bg-ink shadow-[0_40px_90px_-40px_rgba(29,29,29,0.55)] ring-1 ring-white/50 will-change-transform"
               >
-                <VideoDialog src={gl.film} loopSrc={gl.filmLoop} poster={gl.filmPoster} title={text.videoTitle} inline={rolling} prefetch={warm} bare className="aspect-video w-full" />
+                {/* A chosen film has no short silent cut and no still of its own, so it plays in the card as
+                    well and shows its own first frame. The shipped poster belongs to the shipped film only. */}
+                <VideoDialog src={filmSrc ?? gl.film} loopSrc={filmSrc ?? gl.filmLoop} poster={filmSrc ? undefined : gl.filmPoster} title={text.videoTitle} inline={rolling} prefetch={warm} bare className="aspect-video w-full" />
               </motion.div>
             </div>
           </Appear>

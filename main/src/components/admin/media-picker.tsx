@@ -24,12 +24,14 @@ export function MediaPicker({
   name,
   value,
   help,
+  type,
   onChange,
 }: {
   label: string;
   name: string;
   value?: PickedMedia | null;
   help?: string;
+  type?: "image" | "video";
   onChange?: (id: string | null) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -45,7 +47,9 @@ export function MediaPicker({
 
     const timer = setTimeout(async () => {
       setLoading(true);
-      const res = await fetch(`/api/admin/media/search?q=${encodeURIComponent(q)}`);
+      const res = await fetch(
+        `/api/admin/media/search?q=${encodeURIComponent(q)}${type ? `&type=${type}` : ""}`,
+      );
       const body = (await res.json()) as { ok: boolean; data?: PickedMedia[] };
       if (cancelled) return;
       setItems(body.data ?? []);
@@ -56,7 +60,7 @@ export function MediaPicker({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [open, q]);
+  }, [open, q, type]);
 
   const choose = (item: PickedMedia | null) => {
     setPicked(item);
@@ -72,10 +76,16 @@ export function MediaPicker({
       <div className="admin-picker-current">
         {picked ? (
           <>
-            <img src={mediaSrc(picked)} alt={picked.altText ?? ""} className="admin-picker-thumb" />
+            {type === "video" ? (
+              <video src={mediaSrc(picked)} className="admin-picker-thumb" muted />
+            ) : (
+              <img src={mediaSrc(picked)} alt={picked.altText ?? ""} className="admin-picker-thumb" />
+            )}
             <div>
               <p className="t-small">{picked.filename}</p>
-              {picked.altText ? null : <p className="t-small admin-error">This image has no alt text yet.</p>}
+              {type === "video" || picked.altText ? null : (
+                <p className="t-small admin-error">This image has no alt text yet.</p>
+              )}
             </div>
           </>
         ) : (
@@ -119,9 +129,15 @@ export function MediaPicker({
               <div className="admin-picker-grid">
                 {items.map((item) => (
                   <button key={item.id} type="button" className="admin-picker-item" onClick={() => choose(item)}>
-                    <img src={mediaSrc(item)} alt={item.altText ?? ""} />
+                    {type === "video" ? (
+                      <video src={mediaSrc(item)} className="admin-media-thumb" muted />
+                    ) : (
+                      <img src={mediaSrc(item)} alt={item.altText ?? ""} />
+                    )}
                     <span className="t-small">{item.filename}</span>
-                    {item.altText ? null : <span className="t-small admin-error">No alt text</span>}
+                    {type === "video" || item.altText ? null : (
+                      <span className="t-small admin-error">No alt text</span>
+                    )}
                   </button>
                 ))}
               </div>
