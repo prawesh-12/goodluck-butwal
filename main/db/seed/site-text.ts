@@ -407,6 +407,7 @@ const pageRows: StringRow[] = [
 const lastRows: StringRow[] = [
   { key: "home.partners.badge", value: "Our partners", group: "home", label: "Partner strip badge", help: "The pill above the drifting row of partner logos." },
   { key: "home.partners.logo_alt", value: "Partner logo", group: "home", label: "Partner logo description", help: "Read aloud for each logo in that row. Not seen on screen." },
+  { key: "home.hero.video_title", value: "Inside Goodluck Education and Migration", group: "home", label: "Homepage video title", help: "Read aloud for the video under the homepage headline." },
 
   { key: "search.hero.title", value: "Search", group: "search", label: "Search page heading", help: "The heading on the search page before anything has been searched for." },
   { key: "search.hero.lead", value: "Courses, institutions, destinations, services, events and news.", group: "search", label: "Search page intro", help: "The line under that heading before anything has been searched for." },
