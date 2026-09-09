@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs, course as courseSchema } from "@/components/seo/schema";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs, course as courseSchema } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
-import { getCourse, getInstitution } from "@/server/queries/catalogue";
+import { getCourse } from "@/features/courses/queries";
+import { getInstitution } from "@/features/institutions/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Chip } from "@/components/ui/bits";
-import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
-import { InstitutionCard } from "@/components/catalogue/institution-card";
-import { loadText } from "@/server/queries/text";
+import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
+import { InstitutionCard } from "@/features/institutions/components/institution-card";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }> };
 

@@ -3,7 +3,7 @@ import {
   createBatchSchema,
   registerSchema,
   testPrepPublishProblems,
-} from "@/lib/validators/test-prep";
+} from "@/features/test-prep/validators";
 
 const batch = {
   courseId: "11111111-1111-4111-8111-111111111111",

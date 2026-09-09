@@ -1,19 +1,19 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow, allowOwn } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { formatInOfficeTz } from "@/lib/datetime";
+import { requireActor } from "@/lib/auth/session";
+import { allow, allowOwn } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { formatInOfficeTz } from "@/lib/utils/datetime";
 import {
   getAdminEvent,
   listEventRegistrations,
   officeTimezone,
   PAGE_SIZE,
   type EventFilters,
-} from "@/server/queries/admin-events";
-import { seatsTaken } from "@/server/queries/events";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
-import { EmptyState, ListHeader, NewButton, Pager, RowAvatar, StatusBadge } from "@/components/admin/list-ui";
+} from "@/features/events/admin-queries";
+import { seatsTaken } from "@/features/events/queries";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
+import { EmptyState, ListHeader, NewButton, Pager, RowAvatar, StatusBadge } from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

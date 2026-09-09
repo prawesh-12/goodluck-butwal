@@ -7,7 +7,7 @@ import {
   requiredFieldsFor,
   testimonialPublishProblems,
   type TestimonialInput,
-} from "@/lib/validators/testimonial";
+} from "@/features/testimonials/validators";
 
 const written: TestimonialInput = {
   type: "text",

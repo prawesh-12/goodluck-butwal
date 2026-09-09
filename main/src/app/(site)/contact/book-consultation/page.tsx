@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
-import { img } from "@/lib/assets";
-import { officeById } from "@/lib/site";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
+import { img } from "@/config/assets";
+import { officeById } from "@/config/site";
 import { Appear } from "@/components/ui/appear";
-import { InnerHero } from "@/components/inner";
-import { BookingForm } from "@/components/forms";
-import { Partners } from "@/components/home/partners";
-import { listPartnerLogos } from "@/server/queries/people";
-import { listOffices } from "@/server/queries/offices";
-import { listServices } from "@/server/queries/services";
-import { loadText } from "@/server/queries/text";
-import { formText } from "@/server/queries/form-text";
+import { InnerHero } from "@/components/shared/inner";
+import { BookingForm } from "@/features/leads/components/forms";
+import { Partners } from "@/features/partners/components/partners";
+import { listPartnerLogos } from "@/features/partners/queries";
+import { listOffices } from "@/features/offices/queries";
+import { listServices } from "@/features/services/queries";
+import { loadText } from "@/features/site-text/queries";
+import { formText } from "@/features/site-text/form-text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({

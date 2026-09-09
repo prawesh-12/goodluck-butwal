@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { listInstitutions } from "@/server/queries/catalogue";
-import { InnerHero } from "@/components/inner";
-import { InstitutionList } from "@/components/catalogue/institution-list";
-import { Empty } from "@/components/catalogue/empty";
-import { loadText } from "@/server/queries/text";
+import { listInstitutions } from "@/features/institutions/queries";
+import { InnerHero } from "@/components/shared/inner";
+import { InstitutionList } from "@/features/institutions/components/institution-list";
+import { Empty } from "@/components/shared/empty";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   const institutions = await listInstitutions();

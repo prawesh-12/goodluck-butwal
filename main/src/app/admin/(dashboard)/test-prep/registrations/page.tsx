@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { formatDate, formatInOfficeTz } from "@/lib/datetime";
-import { RegistrationFilters } from "@/components/admin/testprep-registration-filters";
-import { RegistrationStatus } from "@/components/admin/testprep-registration-status";
-import { batchOptions, listRegistrations, PAGE_SIZE } from "@/server/queries/admin-test-prep";
-import { Button } from "@/components/admin/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
-import { EmptyState, ListHeader, Pager, RowAvatar } from "@/components/admin/list-ui";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { formatDate, formatInOfficeTz } from "@/lib/utils/datetime";
+import { RegistrationFilters } from "@/features/test-prep/components/registration-filters";
+import { RegistrationStatus } from "@/features/test-prep/components/registration-status";
+import { batchOptions, listRegistrations, PAGE_SIZE } from "@/features/test-prep/admin-queries";
+import { Button } from "@/components/ui/admin/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
+import { EmptyState, ListHeader, Pager, RowAvatar } from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

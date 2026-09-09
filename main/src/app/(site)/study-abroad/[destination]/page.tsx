@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
-import { getDestination, listDestinations, listAllFaqs } from "@/server/queries/destinations";
-import { listArticles } from "@/server/queries/editorial";
+import { getDestination, listDestinations } from "@/features/destinations/queries";
+import { listAllFaqs } from "@/features/services/queries";
+import { listArticles } from "@/features/posts/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, CheckRow, Chip } from "@/components/ui/bits";
-import { InfoCard, InnerHero, NewsCard, SectionHead } from "@/components/inner";
-import { Accordion, FaqCta } from "@/components/home/faqs";
-import { listTeam } from "@/server/queries/people";
-import { listInstitutions } from "@/server/queries/catalogue";
-import { InstitutionCard } from "@/components/catalogue/institution-card";
-import { loadText } from "@/server/queries/text";
+import { InfoCard, InnerHero, NewsCard, SectionHead } from "@/components/shared/inner";
+import { Accordion, FaqCta } from "@/components/shared/faqs";
+import { listTeam } from "@/features/team/queries";
+import { listInstitutions } from "@/features/institutions/queries";
+import { InstitutionCard } from "@/features/institutions/components/institution-card";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ destination: string }> };
 export const generateStaticParams = async () =>

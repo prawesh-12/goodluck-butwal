@@ -36,7 +36,7 @@ test.runIf(hasDb).each(EXPECTED)("%s holds %s rows after the migration", async (
 test.runIf(hasDb)("every article slug is still one of the original 31", async () => {
   const { db } = await import("@db/client");
   const rows = await db.select({ slug: posts.slug }).from(posts);
-  const articles: { slug: string }[] = (await import("../../db/seed/source/articles.json")).default;
+  const articles: { slug: string }[] = (await import("@db/seed/source/articles.json")).default;
   const original = new Set(articles.map((a) => a.slug));
 
   expect(rows).toHaveLength(31);

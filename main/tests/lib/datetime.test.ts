@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { formatDate, formatInOfficeTz } from "@/lib/datetime";
+import { formatDate, formatInOfficeTz } from "@/lib/utils/datetime";
 
 test("formats an article date the way the news pages already show it", () => {
   expect(formatDate("2025-03-14")).toBe("14 March 2025");

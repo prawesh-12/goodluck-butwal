@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { listCourseFilterOptions, listCourses } from "@/server/queries/catalogue";
-import { loadText } from "@/server/queries/text";
-import { filterHref, pageCount, parseCourseFilters, type SearchParams } from "@/components/catalogue/filters";
-import { InnerHero, SectionHead } from "@/components/inner";
-import { CourseFilters } from "@/components/catalogue/course-filters";
-import { CourseRow } from "@/components/catalogue/course-row";
-import { Pager } from "@/components/catalogue/pager";
-import { Empty } from "@/components/catalogue/empty";
+import { listCourseFilterOptions, listCourses } from "@/features/courses/queries";
+import { loadText } from "@/features/site-text/queries";
+import { filterHref, pageCount, parseCourseFilters, type SearchParams } from "@/features/courses/filters";
+import { InnerHero, SectionHead } from "@/components/shared/inner";
+import { CourseFilters } from "@/features/courses/components/course-filters";
+import { CourseRow } from "@/features/courses/components/course-row";
+import { Pager } from "@/components/shared/pager";
+import { Empty } from "@/components/shared/empty";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({

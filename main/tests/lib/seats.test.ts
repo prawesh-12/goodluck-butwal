@@ -7,7 +7,7 @@ import {
   seatLabel,
   seatsRemaining,
   type BatchStatus,
-} from "@/lib/seats";
+} from "@/features/test-prep/seats";
 
 const batch = (seatsTaken: number, totalSeats = 20, status: BatchStatus = "open") => ({
   totalSeats,

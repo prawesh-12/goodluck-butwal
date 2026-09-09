@@ -1,11 +1,11 @@
 import { db } from "@db/client";
 import { settings } from "@db/schema";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { SettingsEditor } from "@/components/admin/settings-editor";
-import { pickedMedia } from "@/server/queries/admin-content";
-import type { SocialLink } from "@/lib/validators/settings";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { SettingsEditor } from "@/features/settings/components/settings-editor";
+import { pickedMedia } from "@/features/media/admin-queries";
+import type { SocialLink } from "@/features/settings/validators";
 
 export const dynamic = "force-dynamic";
 

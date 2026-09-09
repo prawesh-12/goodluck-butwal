@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 function files(dir: string): string[] {
@@ -9,7 +9,27 @@ function files(dir: string): string[] {
   });
 }
 
-const admin = [...files("src/app/admin"), ...files("src/components/admin")];
+// The admin screens live in src/app/admin, but the components they use now sit in their own
+// feature or in the shared admin kit. Walking the imports keeps the set complete without naming
+// every directory here.
+function adminFiles(): string[] {
+  const seen = new Set(files("src/app/admin"));
+  const queue = [...seen];
+  for (let path = queue.shift(); path; path = queue.shift()) {
+    for (const [, spec] of readFileSync(path, "utf8").matchAll(/["']@\/((?:features|components)\/[^"']+)["']/g)) {
+      for (const ext of [".tsx", ".ts"]) {
+        const candidate = join("src", spec + ext);
+        if (existsSync(candidate) && !seen.has(candidate)) {
+          seen.add(candidate);
+          queue.push(candidate);
+        }
+      }
+    }
+  }
+  return [...seen].filter((path) => /\.tsx$/.test(path));
+}
+
+const admin = adminFiles();
 
 // btn-black, btn-black-sm and btn-blue carry a background and a shadow and nothing else. The
 // public site pairs them with Tailwind padding, radius and white text. Used bare, as the admin

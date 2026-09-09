@@ -1,4 +1,4 @@
-import { EmptyState, ListHeader, NewButton } from "@/components/admin/list-ui";
+import { EmptyState, ListHeader, NewButton } from "@/components/shared/admin/list-ui";
 
 export default function Forbidden() {
   return (

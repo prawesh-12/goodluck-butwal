@@ -1,7 +1,7 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { TestPrepCourseEditor } from "@/components/admin/testprep-course-editor";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { TestPrepCourseEditor } from "@/features/test-prep/components/course-editor";
 
 export const dynamic = "force-dynamic";
 

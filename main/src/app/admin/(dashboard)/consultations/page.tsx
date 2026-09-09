@@ -1,10 +1,10 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { LeadFilters } from "@/components/admin/lead-filters";
-import { ConfirmButton } from "@/components/admin/confirm-button";
-import { listConsultations, PAGE_SIZE, type LeadFilters as Filters } from "@/server/queries/leads";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
-import { EmptyState, FlatBadge, ListHeader, Pager, RowAvatar, StatusBadge } from "@/components/admin/list-ui";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { LeadFilters } from "@/features/leads/components/lead-filters";
+import { ConfirmButton } from "@/components/shared/admin/confirm-button";
+import { listConsultations, PAGE_SIZE, type LeadFilters as Filters } from "@/features/leads/queries";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
+import { EmptyState, FlatBadge, ListHeader, Pager, RowAvatar, StatusBadge } from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

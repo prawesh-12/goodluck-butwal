@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { article, breadcrumbs } from "@/components/seo/schema";
+import { JsonLd } from "@/components/shared/json-ld";
+import { article, breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
-import { getArticle, listArticles } from "@/server/queries/editorial";
+import { getArticle, listArticles } from "@/features/posts/queries";
 import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
-import { InnerHero, NewsCard, SectionHead } from "@/components/inner";
-import { formatDate } from "@/lib/datetime";
-import { FaqCta } from "@/components/home/faqs";
-import { listTeam } from "@/server/queries/people";
-import { loadText } from "@/server/queries/text";
+import { InnerHero, NewsCard, SectionHead } from "@/components/shared/inner";
+import { formatDate } from "@/lib/utils/datetime";
+import { FaqCta } from "@/components/shared/faqs";
+import { listTeam } from "@/features/team/queries";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }> };
 export const generateStaticParams = async () => (await listArticles()).map((a) => ({ slug: a.slug }));

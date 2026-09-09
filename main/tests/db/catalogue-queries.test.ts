@@ -2,8 +2,8 @@ import { test, expect } from "vitest";
 import { and, count, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { courses, institutions } from "@db/schema";
-import { listCourseFilterOptions, listCourses } from "@/server/queries/catalogue";
-import { PER_PAGE } from "@/components/catalogue/filters";
+import { listCourseFilterOptions, listCourses } from "@/features/courses/queries";
+import { PER_PAGE } from "@/features/courses/filters";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 

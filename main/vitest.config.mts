@@ -5,7 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
-      "@db": fileURLToPath(new URL("./db", import.meta.url)),
+      "@db": fileURLToPath(new URL("./src/db", import.meta.url)),
     },
   },
   envDir: ".",

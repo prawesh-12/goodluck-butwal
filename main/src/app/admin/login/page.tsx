@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { requestPasswordReset, signIn } from "@/lib/auth-client";
-import { Button } from "@/components/admin/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/admin/ui/card";
-import { Input } from "@/components/admin/ui/input";
-import { Label } from "@/components/admin/ui/label";
-import { Alert, AlertDescription } from "@/components/admin/ui/alert";
+import { requestPasswordReset, signIn } from "@/lib/auth/client";
+import { Button } from "@/components/ui/admin/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/admin/card";
+import { Input } from "@/components/ui/admin/input";
+import { Label } from "@/components/ui/admin/label";
+import { Alert, AlertDescription } from "@/components/ui/admin/alert";
 
 export default function LoginPage() {
   const router = useRouter();

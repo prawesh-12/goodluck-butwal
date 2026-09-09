@@ -10,8 +10,8 @@
     "lint": "NODE_OPTIONS=--max-old-space-size=8192 eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "db:seed": "tsx --env-file=.env.local db/seed/from-content.ts",
-    "db:seed:dev": "tsx --env-file=.env.local db/seed/from-content.ts --dev"
+    "db:seed": "tsx --env-file=.env.local src/db/seed/from-content.ts",
+    "db:seed:dev": "tsx --env-file=.env.local src/db/seed/from-content.ts --dev"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

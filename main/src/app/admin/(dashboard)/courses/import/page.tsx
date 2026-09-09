@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { CourseImportForm } from "@/components/admin/course-import-form";
-import { IMPORT_COLUMNS, INTAKE_SEPARATOR } from "@/lib/course-import";
-import { institutionOptions, listCourseCategories } from "@/server/queries/admin-catalogue";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { CourseImportForm } from "@/features/courses/components/course-import-form";
+import { IMPORT_COLUMNS, INTAKE_SEPARATOR } from "@/features/courses/import";
+import { institutionOptions } from "@/features/institutions/admin-queries";
+import { listCourseCategories } from "@/features/courses/admin-queries";
 
 export const dynamic = "force-dynamic";
 

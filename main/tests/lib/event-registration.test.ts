@@ -5,7 +5,7 @@ import {
   REGISTRATION_CLOSED,
   insertOutcome,
   registrationRefusal,
-} from "@/lib/validators/event";
+} from "@/features/events/validators";
 
 const now = new Date("2026-05-01T00:00:00Z");
 

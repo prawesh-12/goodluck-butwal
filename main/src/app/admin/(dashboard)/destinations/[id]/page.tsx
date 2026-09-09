@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { DestinationEditor } from "@/components/admin/destination-editor";
-import { getAdminDestination, pickedMedia, uiStringsFor } from "@/server/queries/admin-content";
-import { destinationPath } from "@/lib/validators/destination";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { DestinationEditor } from "@/features/destinations/components/destination-editor";
+import { getAdminDestination } from "@/features/destinations/admin-queries";
+import { pickedMedia } from "@/features/media/admin-queries";
+import { uiStringsFor } from "@/features/site-text/admin-queries";
+import { destinationPath } from "@/features/destinations/validators";
 
 export const dynamic = "force-dynamic";
 

@@ -1,17 +1,13 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { InstitutionEditor } from "@/components/admin/institution-editor";
-import { InstitutionGallery } from "@/components/admin/institution-gallery";
-import { institutionPath } from "@/components/admin/course-meta";
-import { pickedMedia } from "@/server/queries/admin-content";
-import {
-  courseCountFor,
-  destinationOptions,
-  getAdminInstitution,
-  institutionGallery,
-} from "@/server/queries/admin-catalogue";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { InstitutionEditor } from "@/features/institutions/components/institution-editor";
+import { InstitutionGallery } from "@/features/institutions/components/institution-gallery";
+import { institutionPath } from "@/config/course-meta";
+import { pickedMedia } from "@/features/media/admin-queries";
+import { courseCountFor, getAdminInstitution, institutionGallery } from "@/features/institutions/admin-queries";
+import { destinationOptions } from "@/features/courses/admin-queries";
 
 export const dynamic = "force-dynamic";
 

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { cache } from "react";
 import { db } from "@db/client";
 import { pages } from "@db/schema";
-import { InnerHero } from "@/components/inner";
+import { InnerHero } from "@/components/shared/inner";
 
 const SLUGS = ["privacy-policy", "terms"];
 

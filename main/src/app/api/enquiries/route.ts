@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { destinations, enquiries, offices, services, settings } from "@db/schema";
-import { enquirySchema } from "@/lib/validators/lead";
-import { verifyTurnstile } from "@/lib/turnstile";
-import { clientIp, hashIp, referenceCode } from "@/lib/request";
-import { overRateLimit } from "@/lib/rate-limit";
+import { enquirySchema } from "@/features/leads/validators";
+import { verifyTurnstile } from "@/lib/security/turnstile";
+import { clientIp, hashIp, referenceCode } from "@/lib/utils/request";
+import { overRateLimit } from "@/lib/security/rate-limit";
 import { sendEmailQuietly } from "@/lib/email";
-import { enquiryToStaff, enquiryToVisitor } from "@/lib/email-templates";
+import { enquiryToStaff, enquiryToVisitor } from "@/lib/email/templates";
 
 export const dynamic = "force-dynamic";
 

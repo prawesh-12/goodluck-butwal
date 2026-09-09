@@ -1,8 +1,8 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { InstitutionEditor } from "@/components/admin/institution-editor";
-import { destinationOptions } from "@/server/queries/admin-catalogue";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { InstitutionEditor } from "@/features/institutions/components/institution-editor";
+import { destinationOptions } from "@/features/courses/admin-queries";
 
 export const dynamic = "force-dynamic";
 

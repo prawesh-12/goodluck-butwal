@@ -4,7 +4,7 @@ import {
   destinationBlocks,
   destinationPublishProblems,
   intakeItem,
-} from "@/lib/validators/destination";
+} from "@/features/destinations/validators";
 
 const blocks = {
   highlights: [{ label: "Institutions", value: "1,100+", note: "" }],

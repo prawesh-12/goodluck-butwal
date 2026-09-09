@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow, allowOwn } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { BatchEditor } from "@/components/admin/batch-editor";
-import { courseOptions, getAdminBatch, trainerOptions } from "@/server/queries/admin-test-prep";
+import { requireActor } from "@/lib/auth/session";
+import { allow, allowOwn } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { BatchEditor } from "@/features/test-prep/components/batch-editor";
+import { courseOptions, getAdminBatch, trainerOptions } from "@/features/test-prep/admin-queries";
 
 export const dynamic = "force-dynamic";
 

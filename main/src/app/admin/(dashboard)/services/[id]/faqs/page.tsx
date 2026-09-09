@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { FaqEditor } from "@/components/admin/repeater-faqs";
-import { getAdminService, listServiceFaqs } from "@/server/queries/admin-content";
-import { saveServiceFaqs } from "@/server/actions/services";
-import { servicePath } from "@/lib/validators/service";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { FaqEditor } from "@/components/shared/admin/repeater-faqs";
+import { getAdminService, listServiceFaqs } from "@/features/services/admin-queries";
+import { saveServiceFaqs } from "@/features/services/actions";
+import { servicePath } from "@/features/services/validators";
 
 export const dynamic = "force-dynamic";
 

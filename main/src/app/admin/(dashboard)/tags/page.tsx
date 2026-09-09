@@ -1,8 +1,8 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { TagManager } from "@/components/admin/tag-manager";
-import { listTags } from "@/server/queries/admin-editorial";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { TagManager } from "@/features/posts/components/tag-manager";
+import { listTags } from "@/features/posts/admin-queries";
 
 export const dynamic = "force-dynamic";
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import type { Variants } from "motion/react";
-import { img } from "@/lib/assets";
+import { img } from "@/config/assets";
 
 const spring = { type: "spring", stiffness: 380, damping: 32 } as const;
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");

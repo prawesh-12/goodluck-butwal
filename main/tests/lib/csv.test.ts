@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { toCsv } from "@/lib/csv";
+import { toCsv } from "@/lib/utils/csv";
 
 test("starts with a byte order mark so Excel reads UTF-8", () => {
   const csv = toCsv([{ name: "Zoë Müller" }]);

@@ -1,10 +1,5 @@
 import { test, expect } from "vitest";
-import {
-  officePublishProblems,
-  openingHoursSchema,
-  updateOfficeSchema,
-  type OfficeInput,
-} from "@/lib/validators/office";
+import { officePublishProblems, openingHoursSchema, updateOfficeSchema, type OfficeInput } from "@/features/offices/validators";
 
 const week = [0, 1, 2, 3, 4, 5, 6].map((day) => ({
   day,

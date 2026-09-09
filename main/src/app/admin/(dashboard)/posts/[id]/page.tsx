@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow, allowOwn } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { PostForm } from "@/components/admin/post-form";
-import { pickedMedia } from "@/server/queries/admin-people";
-import { editorialOptions, getAdminPost } from "@/server/queries/admin-editorial";
+import { requireActor } from "@/lib/auth/session";
+import { allow, allowOwn } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { PostForm } from "@/features/posts/components/post-form";
+import { pickedMediaMap } from "@/features/media/admin-queries";
+import { editorialOptions } from "@/features/posts/admin-queries";
+import { getAdminPost } from "@/features/posts/admin-queries";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
 
   const [options, media] = await Promise.all([
     editorialOptions(),
-    pickedMedia([post.bannerImageId, post.seoOgImageId]),
+    pickedMediaMap([post.bannerImageId, post.seoOgImageId]),
   ]);
 
   return (

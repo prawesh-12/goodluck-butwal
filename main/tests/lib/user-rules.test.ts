@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { refusalReason, THIRD_SUPER_ADMIN_PHRASE } from "@/lib/user-rules";
+import { refusalReason, THIRD_SUPER_ADMIN_PHRASE } from "@/lib/auth/user-rules";
 
 const base = {
   actorId: "boss",

@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow, allowOwn } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { utcToZonedInput, type EventInput } from "@/lib/validators/event";
-import { EventForm } from "@/components/admin/event-form";
-import { pickedMedia } from "@/server/queries/admin-people";
-import { getAdminEvent, officeZones } from "@/server/queries/admin-events";
-import { seatsTaken } from "@/server/queries/events";
+import { requireActor } from "@/lib/auth/session";
+import { allow, allowOwn } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { utcToZonedInput, type EventInput } from "@/features/events/validators";
+import { EventForm } from "@/features/events/components/event-form";
+import { pickedMediaMap } from "@/features/media/admin-queries";
+import { getAdminEvent, officeZones } from "@/features/events/admin-queries";
+import { seatsTaken } from "@/features/events/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +21,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
 
   const [offices, media, taken] = await Promise.all([
     officeZones(),
-    pickedMedia([event.coverImageId, event.seoOgImageId]),
+    pickedMediaMap([event.coverImageId, event.seoOgImageId]),
     seatsTaken(event.id),
   ]);
 

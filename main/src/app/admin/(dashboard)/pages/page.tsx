@@ -1,10 +1,11 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { ContentFilters } from "@/components/admin/page-filters";
-import { listAdminPages, PAGE_SIZE } from "@/server/queries/admin-content";
-import { pagePath } from "@/lib/validators/page";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { ContentFilters } from "@/components/shared/admin/page-filters";
+import { listAdminPages } from "@/features/pages/admin-queries";
+import { PAGE_SIZE } from "@/lib/utils/admin-query";
+import { pagePath } from "@/features/pages/validators";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
   EditLink,
   EmptyState,
@@ -14,7 +15,7 @@ import {
   Pager,
   StatusBadge,
   ViewSiteLink,
-} from "@/components/admin/list-ui";
+} from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

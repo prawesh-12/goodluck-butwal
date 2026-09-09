@@ -1,11 +1,6 @@
 import { test, expect } from "vitest";
-import {
-  blocksSchemaFor,
-  missingAltProblems,
-  pagePath,
-  pagePublishProblems,
-  slugRedirect,
-} from "@/lib/validators/page";
+import { missingAltProblems } from "@/lib/validators/content-fields";
+import { blocksSchemaFor, pagePath, pagePublishProblems, slugRedirect } from "@/features/pages/validators";
 
 const about = {
   established: "Founded in 2015.",

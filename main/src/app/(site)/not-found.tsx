@@ -1,5 +1,5 @@
-import { ErrorBlock } from "@/components/error-block";
-import { loadText } from "@/server/queries/text";
+import { ErrorBlock } from "@/components/shared/error-block";
+import { loadText } from "@/features/site-text/queries";
 
 export default async function NotFound() {
   const t = await loadText();

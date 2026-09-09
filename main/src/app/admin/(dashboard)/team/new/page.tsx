@@ -1,8 +1,8 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { officeOptions } from "@/server/queries/admin-people";
-import { TeamEditor } from "@/components/admin/team-editor";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { officeOptions } from "@/features/offices/admin-queries";
+import { TeamEditor } from "@/features/team/components/team-editor";
 
 export const dynamic = "force-dynamic";
 

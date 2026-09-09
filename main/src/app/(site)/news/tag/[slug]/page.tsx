@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
-import { getTag, listArticlesByTag } from "@/server/queries/editorial";
-import { InnerHero } from "@/components/inner";
-import { NewsList } from "@/components/news-list";
-import { loadText } from "@/server/queries/text";
+import { getTag, listArticlesByTag } from "@/features/posts/queries";
+import { InnerHero } from "@/components/shared/inner";
+import { NewsList } from "@/features/posts/components/news-list";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }> };
 

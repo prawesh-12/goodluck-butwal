@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
-import { consultationSchema, enquirySchema } from "@/lib/validators/lead";
+import { consultationSchema, enquirySchema } from "@/features/leads/validators";
 import { toPlainText } from "@/lib/email";
-import { referenceCode } from "@/lib/request";
+import { referenceCode } from "@/lib/utils/request";
 
 const enquiry = { fullName: "Sam", email: "SAM@Example.COM", message: "Help please" };
 

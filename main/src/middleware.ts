@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { lookupRedirect } from "@/lib/redirects";
+import { lookupRedirect } from "@/lib/seo/redirects";
 
 // Presence of the cookie only, so the edge stays cheap and middleware pulls in no auth library.
 // The admin layout reads the real session and turns away anyone expired or deactivated.

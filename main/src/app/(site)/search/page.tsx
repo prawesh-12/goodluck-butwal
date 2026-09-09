@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { search } from "@/server/queries/search";
-import { loadText } from "@/server/queries/text";
-import { searchTerm } from "@/components/search/query";
+import { search } from "@/features/search/queries";
+import { loadText } from "@/features/site-text/queries";
+import { searchTerm } from "@/features/search/query";
 import { Chip } from "@/components/ui/bits";
-import { Field, InnerHero, NewsCard } from "@/components/inner";
-import { Empty } from "@/components/catalogue/empty";
+import { Field, InnerHero, NewsCard } from "@/components/shared/inner";
+import { Empty } from "@/components/shared/empty";
 
 type Props = { searchParams: Promise<{ q?: string | string[] }> };
 

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { currentUserName, requireActor } from "@/lib/session";
-import { Sidebar } from "@/components/admin/sidebar";
-import { TopBar } from "@/components/admin/topbar";
+import { currentUserName, requireActor } from "@/lib/auth/session";
+import { Sidebar } from "@/components/layout/admin/sidebar";
+import { TopBar } from "@/components/layout/admin/topbar";
 
 export const dynamic = "force-dynamic";
 

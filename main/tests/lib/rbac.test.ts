@@ -6,7 +6,7 @@ import {
   scopedWhere,
   ForbiddenError,
   type Actor,
-} from "@/lib/rbac";
+} from "@/lib/auth/rbac";
 import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
 import { enquiries, posts } from "@db/schema";

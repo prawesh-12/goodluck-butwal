@@ -1,16 +1,12 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { CourseEditor } from "@/components/admin/course-editor";
-import { coursePath } from "@/components/admin/course-meta";
-import { pickedMedia } from "@/server/queries/admin-content";
-import {
-  destinationOptions,
-  getAdminCourse,
-  institutionOptions,
-  listCourseCategories,
-} from "@/server/queries/admin-catalogue";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { CourseEditor } from "@/features/courses/components/course-editor";
+import { coursePath } from "@/config/course-meta";
+import { pickedMedia } from "@/features/media/admin-queries";
+import { destinationOptions, getAdminCourse, listCourseCategories } from "@/features/courses/admin-queries";
+import { institutionOptions } from "@/features/institutions/admin-queries";
 
 export const dynamic = "force-dynamic";
 

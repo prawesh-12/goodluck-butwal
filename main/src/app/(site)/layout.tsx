@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import "../globals.css";
-import { bricolage, interDisplay } from "@/lib/fonts";
-import { company } from "@/lib/site";
-import { Nav } from "@/components/nav";
-import { Footer } from "@/components/footer";
-import { SmoothScroll } from "@/components/smooth-scroll";
-import { OfficeProvider } from "@/components/office";
-import { Analytics } from "@/components/analytics";
-import { listOffices } from "@/server/queries/offices";
-import { getFooterColumns, getSocialLinks } from "@/server/queries/site";
-import { allSettings } from "@/server/queries/shared";
-import { loadText } from "@/server/queries/text";
+import "@/styles/globals.css";
+import { bricolage, interDisplay } from "@/styles/fonts";
+import { company } from "@/config/site";
+import { Nav } from "@/components/layout/nav";
+import { Footer } from "@/components/layout/footer";
+import { SmoothScroll } from "@/components/layout/smooth-scroll";
+import { OfficeProvider } from "@/features/offices/components/office";
+import { Analytics } from "@/components/shared/analytics";
+import { listOffices } from "@/features/offices/queries";
+import { getFooterColumns, getSocialLinks } from "@/features/settings/queries";
+import { allSettings } from "@db/settings";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   const verification = String((await allSettings()).get("google_site_verification") ?? "").trim();

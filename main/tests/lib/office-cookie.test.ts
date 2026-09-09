@@ -4,7 +4,7 @@ import {
   officeCookie,
   readOfficeCookie,
   resolveOffice,
-} from "@/lib/office-cookie";
+} from "@/features/offices/cookie";
 
 const known = ["au", "np", "ph"];
 

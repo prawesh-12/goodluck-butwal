@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { createServiceSchema, faqListSchema, servicePublishProblems } from "@/lib/validators/service";
+import { createServiceSchema, faqListSchema, servicePublishProblems } from "@/features/services/validators";
 
 const service = {
   slug: "visa-guidance",

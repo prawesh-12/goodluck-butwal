@@ -3,7 +3,7 @@ import {
   createTeamMemberSchema,
   teamPublishProblems,
   updateTeamMemberSchema,
-} from "@/lib/validators/team";
+} from "@/features/team/validators";
 
 const office = "11111111-1111-4111-8111-111111111111";
 const photo = "22222222-2222-4222-8222-222222222222";

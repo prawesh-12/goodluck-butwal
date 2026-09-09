@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { listArticles } from "@/server/queries/editorial";
-import { InnerHero } from "@/components/inner";
-import { NewsList } from "@/components/news-list";
-import { loadText } from "@/server/queries/text";
+import { listArticles } from "@/features/posts/queries";
+import { InnerHero } from "@/components/shared/inner";
+import { NewsList } from "@/features/posts/components/news-list";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   const articles = await listArticles();

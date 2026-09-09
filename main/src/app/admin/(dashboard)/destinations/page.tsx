@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { ContentFilters } from "@/components/admin/page-filters";
-import { listAdminDestinations, PAGE_SIZE } from "@/server/queries/admin-content";
-import { destinationPath } from "@/lib/validators/destination";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { ContentFilters } from "@/components/shared/admin/page-filters";
+import { listAdminDestinations } from "@/features/destinations/admin-queries";
+import { PAGE_SIZE } from "@/lib/utils/admin-query";
+import { destinationPath } from "@/features/destinations/validators";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
   EditLink,
   EmptyState,
@@ -14,7 +15,7 @@ import {
   Pager,
   StatusBadge,
   ViewSiteLink,
-} from "@/components/admin/list-ui";
+} from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

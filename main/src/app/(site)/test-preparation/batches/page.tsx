@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
-import { listUpcomingBatches } from "@/server/queries/test-prep";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
+import { listUpcomingBatches } from "@/features/test-prep/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
-import { InnerHero } from "@/components/inner";
-import { BatchTable } from "@/components/test-prep/batch-table";
-import { loadText } from "@/server/queries/text";
+import { InnerHero } from "@/components/shared/inner";
+import { BatchTable } from "@/features/test-prep/components/batch-table";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({ path: "/test-preparation/batches", title: "Upcoming batches" });

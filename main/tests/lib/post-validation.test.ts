@@ -6,7 +6,7 @@ import {
   readingMinutes,
   redirectForRename,
   type PostInput,
-} from "@/lib/validators/post";
+} from "@/features/posts/validators";
 
 const ready: PostInput = {
   title: "Studying in Australia",

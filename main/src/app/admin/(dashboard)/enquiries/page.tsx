@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { formatInOfficeTz } from "@/lib/datetime";
-import { LeadFilters } from "@/components/admin/lead-filters";
-import { listEnquiries, listServiceOptions, PAGE_SIZE, type LeadFilters as Filters } from "@/server/queries/leads";
-import { Button } from "@/components/admin/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
-import { StatusBadge } from "@/components/admin/list-ui";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { formatInOfficeTz } from "@/lib/utils/datetime";
+import { LeadFilters } from "@/features/leads/components/lead-filters";
+import { listEnquiries, listServiceOptions, PAGE_SIZE, type LeadFilters as Filters } from "@/features/leads/queries";
+import { Button } from "@/components/ui/admin/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
+import { StatusBadge } from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

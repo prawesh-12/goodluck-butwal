@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { can, type Actor, type Entity } from "@/lib/rbac";
-import { writeAudit } from "@/lib/audit";
-import { csvResponse, toCsv } from "@/lib/csv";
-import { exportConsultations, exportEnquiries, type LeadFilters } from "@/server/queries/leads";
-import { exportEventRegistrations } from "@/server/queries/admin-events";
+import { requireActor } from "@/lib/auth/session";
+import { can, type Actor, type Entity } from "@/lib/auth/rbac";
+import { writeAudit } from "@/lib/security/audit";
+import { csvResponse, toCsv } from "@/lib/utils/csv";
+import { exportConsultations, exportEnquiries, type LeadFilters } from "@/features/leads/queries";
+import { exportEventRegistrations } from "@/features/events/admin-queries";
 
 export const dynamic = "force-dynamic";
 

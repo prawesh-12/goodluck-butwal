@@ -4,12 +4,12 @@ import { notFound } from "next/navigation";
 import { and, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, offices, teamMembers } from "@db/schema";
-import { listTeam } from "@/server/queries/people";
+import { listTeam } from "@/features/team/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { CheckRow, SocialLinks } from "@/components/ui/bits";
-import { InnerHero } from "@/components/inner";
-import { loadText } from "@/server/queries/text";
+import { InnerHero } from "@/components/shared/inner";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }> };
 

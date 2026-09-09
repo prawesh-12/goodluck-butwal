@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import "../globals.css";
-import { bricolage, interDisplay } from "@/lib/fonts";
+import "@/styles/globals.css";
+import { bricolage, interDisplay } from "@/styles/fonts";
 
 export const metadata = { title: "Goodluck admin", robots: { index: false, follow: false } };
 

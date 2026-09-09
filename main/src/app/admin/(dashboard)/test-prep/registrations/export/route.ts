@@ -1,8 +1,8 @@
-import { requireActor } from "@/lib/session";
-import { can } from "@/lib/rbac";
-import { writeAudit } from "@/lib/audit";
-import { csvResponse, toCsv } from "@/lib/csv";
-import { exportTestPrepRegistrations, type RegistrationFilters } from "@/server/queries/admin-test-prep";
+import { requireActor } from "@/lib/auth/session";
+import { can } from "@/lib/auth/rbac";
+import { writeAudit } from "@/lib/security/audit";
+import { csvResponse, toCsv } from "@/lib/utils/csv";
+import { exportTestPrepRegistrations, type RegistrationFilters } from "@/features/test-prep/admin-queries";
 
 export const dynamic = "force-dynamic";
 

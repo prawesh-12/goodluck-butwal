@@ -1,16 +1,14 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { contentStatuses } from "@/lib/validators/office";
-import { testimonialTypes } from "@/lib/validators/testimonial";
-import { EditorialFilters } from "@/components/admin/editor-filters";
-import { officeOptions } from "@/server/queries/admin-people";
-import {
-  listAdminTestimonials,
-  PAGE_SIZE,
-  type EditorialFilters as Filters,
-} from "@/server/queries/admin-editorial";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import type { EditorialFilters as Filters } from "@/lib/utils/admin-query";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { contentStatuses } from "@/lib/validators/fields";
+import { testimonialTypes } from "@/features/testimonials/validators";
+import { EditorialFilters } from "@/components/shared/admin/editor-filters";
+import { officeOptions } from "@/features/offices/admin-queries";
+import { listAdminTestimonials } from "@/features/testimonials/admin-queries";
+import { PAGE_SIZE } from "@/lib/utils/admin-query";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
   ConsentBadge,
   EditLink,
@@ -22,7 +20,7 @@ import {
   RowAvatar,
   StatusBadge,
   ViewSiteLink,
-} from "@/components/admin/list-ui";
+} from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

@@ -1,5 +1,5 @@
-import { requireActor } from "@/lib/session";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { requireActor } from "@/lib/auth/session";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 
 export const dynamic = "force-dynamic";
 

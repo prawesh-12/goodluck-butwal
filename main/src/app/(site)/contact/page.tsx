@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { localBusiness } from "@/components/seo/schema";
-import { gl, img } from "@/lib/assets";
-import { company } from "@/lib/site";
+import { JsonLd } from "@/components/shared/json-ld";
+import { localBusiness } from "@/lib/seo/schema";
+import { gl, img } from "@/config/assets";
+import { company } from "@/config/site";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton } from "@/components/ui/button";
 import { Badge, SocialLinks } from "@/components/ui/bits";
-import { SectionHead } from "@/components/inner";
-import { EnquiryForm } from "@/components/forms";
-import { OfficeContactCards } from "@/components/contact-cards";
-import { listOffices } from "@/server/queries/offices";
-import { listAllFaqs, listDestinations } from "@/server/queries/destinations";
-import { listServices } from "@/server/queries/services";
-import { Accordion, FaqCta } from "@/components/home/faqs";
-import { listTeam } from "@/server/queries/people";
-import { loadText } from "@/server/queries/text";
-import { formText } from "@/server/queries/form-text";
+import { SectionHead } from "@/components/shared/inner";
+import { EnquiryForm } from "@/features/leads/components/forms";
+import { OfficeContactCards } from "@/features/offices/components/contact-cards";
+import { listOffices } from "@/features/offices/queries";
+import { listAllFaqs } from "@/features/services/queries";
+import { listDestinations } from "@/features/destinations/queries";
+import { listServices } from "@/features/services/queries";
+import { Accordion, FaqCta } from "@/components/shared/faqs";
+import { listTeam } from "@/features/team/queries";
+import { loadText } from "@/features/site-text/queries";
+import { formText } from "@/features/site-text/form-text";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({

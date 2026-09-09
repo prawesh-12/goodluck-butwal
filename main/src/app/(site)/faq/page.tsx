@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { faqPage } from "@/components/seo/schema";
-import { listServiceFaqs } from "@/server/queries/destinations";
+import { JsonLd } from "@/components/shared/json-ld";
+import { faqPage } from "@/lib/seo/schema";
+import { listServiceFaqs } from "@/features/services/queries";
 import { Appear } from "@/components/ui/appear";
-import { InnerHero } from "@/components/inner";
-import { Accordion, FaqCta } from "@/components/home/faqs";
-import { listTeam } from "@/server/queries/people";
-import { loadText } from "@/server/queries/text";
+import { InnerHero } from "@/components/shared/inner";
+import { Accordion, FaqCta } from "@/components/shared/faqs";
+import { listTeam } from "@/features/team/queries";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({ path: "/faq", title: "FAQ" });

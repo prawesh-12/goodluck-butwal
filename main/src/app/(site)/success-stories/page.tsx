@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { img } from "@/lib/assets";
-import { getGoogleRating, listReviews, listSuccessStories } from "@/server/queries/editorial";
-import { loadText } from "@/server/queries/text";
+import { img } from "@/config/assets";
+import { getGoogleRating } from "@/features/settings/queries";
+import { listReviews, listSuccessStories } from "@/features/testimonials/queries";
+import { loadText } from "@/features/site-text/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { SectionBg } from "@/components/ui/bits";
-import { InnerHero } from "@/components/inner";
-import { ReviewCard } from "@/components/home/reviews";
+import { InnerHero } from "@/components/shared/inner";
+import { ReviewCard } from "@/features/testimonials/components/reviews";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({

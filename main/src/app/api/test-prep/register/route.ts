@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { and, eq, lt, sql } from "drizzle-orm";
 import { db } from "@db/client";
 import { testPrepBatches, testPrepRegistrations } from "@db/schema";
-import { registerSchema } from "@/lib/validators/test-prep";
-import { BATCH_FULL, registrationRefusal } from "@/lib/seats";
-import { verifyTurnstile } from "@/lib/turnstile";
-import { clientIp, hashIp } from "@/lib/request";
-import { overRateLimit } from "@/lib/rate-limit";
-import { batchForRegistration } from "@/server/queries/test-prep";
+import { registerSchema } from "@/features/test-prep/validators";
+import { BATCH_FULL, registrationRefusal } from "@/features/test-prep/seats";
+import { verifyTurnstile } from "@/lib/security/turnstile";
+import { clientIp, hashIp } from "@/lib/utils/request";
+import { overRateLimit } from "@/lib/security/rate-limit";
+import { batchForRegistration } from "@/features/test-prep/queries";
 
 export const dynamic = "force-dynamic";
 

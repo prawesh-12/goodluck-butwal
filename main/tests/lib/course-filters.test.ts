@@ -7,7 +7,7 @@ import {
   parseCourseFilters,
   PER_PAGE,
   type CourseQuery,
-} from "@/components/catalogue/filters";
+} from "@/features/courses/filters";
 
 const known = {
   destinations: ["australia", "united-kingdom"],

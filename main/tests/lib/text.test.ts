@@ -7,7 +7,7 @@ vi.mock("@db/client", () => ({
 }));
 vi.mock("@db/schema", () => ({ uiStrings: { key: "key", value: "value" } }));
 
-const { loadText } = await import("@/server/queries/text");
+const { loadText } = await import("@/features/site-text/queries");
 
 test("an admin's wording wins over the one in the code", async () => {
   rows.current = [{ key: "home.hero.title", value: "Their words" }];

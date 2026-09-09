@@ -15,7 +15,7 @@ import {
   teamMembers,
   testPrepCourses,
 } from "@db/schema";
-import { company } from "@/lib/site";
+import { company } from "@/config/site";
 
 type Frequency = "weekly" | "monthly" | "yearly";
 

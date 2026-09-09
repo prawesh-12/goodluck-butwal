@@ -1,11 +1,11 @@
 import { asc } from "drizzle-orm";
 import { db } from "@db/client";
 import { offices, users } from "@db/schema";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
 import { eq } from "drizzle-orm";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
   EditLink,
   EmptyState,
@@ -14,7 +14,7 @@ import {
   NewButton,
   RowAvatar,
   StatusBadge,
-} from "@/components/admin/list-ui";
+} from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

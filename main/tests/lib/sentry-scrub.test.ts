@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { scrub, scrubText, PII_FIELDS } from "@/lib/sentry-scrub";
+import { scrub, scrubText, PII_FIELDS } from "@/lib/integrations/sentry-scrub";
 
 test("every field the plan names is redacted", () => {
   const event = { email: "sam@example.com", phone: "0400000000", full_name: "Sam", message: "help", notes: "private" };
@@ -48,14 +48,14 @@ test("a null value stays null rather than becoming the word redacted", () => {
 test("nothing is sent when no DSN is configured", async () => {
   delete process.env.SENTRY_DSN;
   delete process.env.NEXT_PUBLIC_SENTRY_DSN;
-  const { reportError, sentryConfigured } = await import("@/lib/sentry");
+  const { reportError, sentryConfigured } = await import("@/lib/integrations/sentry");
   expect(sentryConfigured()).toBe(false);
   await expect(reportError(new Error("boom"))).resolves.toBe(false);
 });
 
 test("a malformed DSN is treated as none, not a crash", async () => {
   process.env.SENTRY_DSN = "not-a-url";
-  const { sentryConfigured } = await import("@/lib/sentry");
+  const { sentryConfigured } = await import("@/lib/integrations/sentry");
   expect(sentryConfigured()).toBe(false);
   delete process.env.SENTRY_DSN;
 });

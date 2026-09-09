@@ -3,7 +3,7 @@ import {
   institutionPublishProblems,
   matchPartnersToInstitutions,
   normaliseName,
-} from "@/lib/validators/institution";
+} from "@/features/institutions/validators";
 
 const ready = {
   name: "[PLACEHOLDER] Institution 1",

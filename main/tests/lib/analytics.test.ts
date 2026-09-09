@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { gtmId, trackFormSubmit } from "@/lib/analytics";
+import { gtmId, trackFormSubmit } from "@/lib/integrations/analytics";
 
 afterEach(() => {
   vi.unstubAllEnvs();

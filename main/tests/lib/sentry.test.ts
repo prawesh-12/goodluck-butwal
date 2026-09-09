@@ -1,5 +1,5 @@
 import { test, expect, vi, beforeEach, afterEach } from "vitest";
-import { reportError, sentryConfigured } from "@/lib/sentry";
+import { reportError, sentryConfigured } from "@/lib/integrations/sentry";
 
 const DSN = "https://abc123@o12345.ingest.sentry.io/6789";
 const sent = vi.fn();

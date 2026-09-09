@@ -1,9 +1,9 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { listMedia, PAGE_SIZE, type MediaFilters } from "@/server/queries/media";
-import { MediaGrid } from "@/components/admin/media-grid";
-import { ListHeader } from "@/components/admin/list-ui";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { listMedia, PAGE_SIZE, type MediaFilters } from "@/features/media/queries";
+import { MediaGrid } from "@/features/media/components/media-grid";
+import { ListHeader } from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

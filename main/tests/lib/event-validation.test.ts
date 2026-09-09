@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { createEventSchema, eventPublishProblems, utcToZonedInput, zonedToUtc } from "@/lib/validators/event";
+import { createEventSchema, eventPublishProblems, utcToZonedInput, zonedToUtc } from "@/features/events/validators";
 
 const base = {
   title: "Placeholder event",

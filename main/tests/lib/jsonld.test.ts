@@ -3,7 +3,7 @@ import { test, expect, vi } from "vitest";
 vi.mock("@db/client", () => ({ db: {} }));
 
 const { toJsonLd, organization, event, breadcrumbs, faqPage } = await import(
-  "@/components/seo/schema"
+  "@/lib/seo/schema"
 );
 
 test("a < inside a value cannot close the script tag", () => {

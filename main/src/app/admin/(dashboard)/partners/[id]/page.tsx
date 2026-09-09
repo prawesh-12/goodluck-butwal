@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { getAdminPartner, pickedMedia } from "@/server/queries/admin-people";
-import { PartnerEditor } from "@/components/admin/partner-editor";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { getAdminPartner } from "@/features/partners/admin-queries";
+import { pickedMediaMap } from "@/features/media/admin-queries";
+import { PartnerEditor } from "@/features/partners/components/partner-editor";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ id: st
   const row = await getAdminPartner((await params).id);
   if (!row) notFound();
 
-  const media = await pickedMedia([row.logoId]);
+  const media = await pickedMediaMap([row.logoId]);
 
   return (
     <>

@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { IMPORT_COLUMNS, parseCourseCsv } from "@/lib/course-import";
+import { IMPORT_COLUMNS, parseCourseCsv } from "@/features/courses/import";
 
 const known = {
   institutionSlugs: ["placeholder-institution-1", "placeholder-institution-2"],

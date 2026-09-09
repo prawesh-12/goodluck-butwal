@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow, allowOwn } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { TestPrepCourseEditor } from "@/components/admin/testprep-course-editor";
-import { pickedMedia } from "@/server/queries/admin-content";
-import { getAdminCourse } from "@/server/queries/admin-test-prep";
+import { requireActor } from "@/lib/auth/session";
+import { allow, allowOwn } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { TestPrepCourseEditor } from "@/features/test-prep/components/course-editor";
+import { pickedMedia } from "@/features/media/admin-queries";
+import { getAdminCourse } from "@/features/test-prep/admin-queries";
 
 export const dynamic = "force-dynamic";
 

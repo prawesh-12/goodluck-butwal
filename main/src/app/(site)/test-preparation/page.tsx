@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import Link from "next/link";
-import { listTestPrepCourses } from "@/server/queries/test-prep";
-import { listServiceFaqs } from "@/server/queries/destinations";
-import { listTeam } from "@/server/queries/people";
+import { listTestPrepCourses } from "@/features/test-prep/queries";
+import { listServiceFaqs } from "@/features/services/queries";
+import { listTeam } from "@/features/team/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
-import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
-import { Accordion, FaqCta } from "@/components/home/faqs";
-import { loadText } from "@/server/queries/text";
+import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
+import { Accordion, FaqCta } from "@/components/shared/faqs";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   const courses = await listTestPrepCourses();

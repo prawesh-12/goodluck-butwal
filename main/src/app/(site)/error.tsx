@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { ErrorBlock } from "@/components/error-block";
-import { reportError } from "@/lib/sentry";
+import { ErrorBlock } from "@/components/shared/error-block";
+import { reportError } from "@/lib/integrations/sentry";
 
 // Shows the approved error panel rather than Next's default page, and reports the failure.
 // The message is never shown to the visitor: it can carry a query, a path or a stack.

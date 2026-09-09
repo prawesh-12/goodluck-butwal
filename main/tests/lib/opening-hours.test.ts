@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { formatOpeningHours } from "@/lib/datetime";
+import { formatOpeningHours } from "@/lib/utils/datetime";
 
 const weekdays = [0, 1, 2, 3, 4, 5, 6].map((day) => ({
   day,

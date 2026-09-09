@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { isDueToPublish } from "@/lib/scheduled";
+import { isDueToPublish } from "@/lib/utils/scheduled";
 
 const now = new Date("2026-01-15T10:00:00Z");
 const past = new Date("2026-01-15T09:45:00Z");

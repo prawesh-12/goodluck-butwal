@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { getFooterColumns } from "@/server/queries/site";
+import { getFooterColumns } from "@/features/settings/queries";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 

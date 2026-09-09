@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { Fragment } from "react";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { formatDate } from "@/lib/datetime";
-import { seatLabel } from "@/lib/seats";
-import { ContentFilters } from "@/components/admin/page-filters";
-import { classTime, MODE_LABEL, scheduleDays } from "@/components/test-prep/schedule";
-import { courseOptions, listAdminBatches, PAGE_SIZE } from "@/server/queries/admin-test-prep";
-import { Button } from "@/components/admin/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { formatDate } from "@/lib/utils/datetime";
+import { seatLabel } from "@/features/test-prep/seats";
+import { ContentFilters } from "@/components/shared/admin/page-filters";
+import { classTime, MODE_LABEL, scheduleDays } from "@/features/test-prep/schedule";
+import { courseOptions, listAdminBatches, PAGE_SIZE } from "@/features/test-prep/admin-queries";
+import { Button } from "@/components/ui/admin/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
   EditLink,
   EmptyState,
@@ -20,7 +20,7 @@ import {
   RowAvatar,
   StatusBadge,
   ViewSiteLink,
-} from "@/components/admin/list-ui";
+} from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

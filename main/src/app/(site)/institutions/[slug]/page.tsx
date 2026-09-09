@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
-import { getInstitution, listCourses, listInstitutionImages } from "@/server/queries/catalogue";
-import { pageCount, type SearchParams } from "@/components/catalogue/filters";
+import { getInstitution, listInstitutionImages } from "@/features/institutions/queries";
+import { listCourses } from "@/features/courses/queries";
+import { pageCount, type SearchParams } from "@/features/courses/filters";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton, PillButton } from "@/components/ui/button";
 import { Chip, Ticker } from "@/components/ui/bits";
-import { InnerHero, SectionHead } from "@/components/inner";
-import { CourseRow } from "@/components/catalogue/course-row";
-import { Pager } from "@/components/catalogue/pager";
-import { Empty } from "@/components/catalogue/empty";
-import { loadText } from "@/server/queries/text";
+import { InnerHero, SectionHead } from "@/components/shared/inner";
+import { CourseRow } from "@/features/courses/components/course-row";
+import { Pager } from "@/components/shared/pager";
+import { Empty } from "@/components/shared/empty";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<SearchParams> };
 

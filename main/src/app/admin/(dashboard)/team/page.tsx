@@ -1,15 +1,12 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { ContentFilters } from "@/components/admin/content-filters";
-import { TeamList } from "@/components/admin/team-list";
-import { EmptyState, ListHeader, NewButton, Pager } from "@/components/admin/list-ui";
-import {
-  listAdminTeam,
-  officeOptions,
-  PAGE_SIZE,
-  type AdminFilters,
-} from "@/server/queries/admin-people";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { ContentFilters } from "@/components/shared/admin/content-filters";
+import { TeamList } from "@/features/team/components/team-list";
+import { EmptyState, ListHeader, NewButton, Pager } from "@/components/shared/admin/list-ui";
+import { listAdminTeam } from "@/features/team/admin-queries";
+import { officeOptions } from "@/features/offices/admin-queries";
+import { PAGE_SIZE, type AdminFilters } from "@/lib/utils/admin-query";
 
 export const dynamic = "force-dynamic";
 

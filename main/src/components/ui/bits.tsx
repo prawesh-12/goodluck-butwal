@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
-import { img } from "@/lib/assets";
-import { social } from "@/lib/site";
+import { img } from "@/config/assets";
+import { social } from "@/config/site";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 

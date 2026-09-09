@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs, event as eventSchema } from "@/components/seo/schema";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs, event as eventSchema } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
-import { getEvent, listEvents, seatsTaken } from "@/server/queries/events";
-import { eventTypeLabels } from "@/lib/content-meta";
-import { formatInOfficeTz } from "@/lib/datetime";
-import { registrationRefusal } from "@/lib/validators/event";
+import { getEvent, listEvents, seatsTaken } from "@/features/events/queries";
+import { eventTypeLabels } from "@/config/content-meta";
+import { formatInOfficeTz } from "@/lib/utils/datetime";
+import { registrationRefusal } from "@/features/events/validators";
 import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
-import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
-import { RegistrationForm } from "@/components/events/registration-form";
-import { formText } from "@/server/queries/form-text";
-import { loadText } from "@/server/queries/text";
+import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
+import { RegistrationForm } from "@/features/events/components/registration-form";
+import { formText } from "@/features/site-text/form-text";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }> };
 

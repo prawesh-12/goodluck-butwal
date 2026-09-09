@@ -4,11 +4,11 @@ import { notFound } from "next/navigation";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { CheckRow } from "@/components/ui/bits";
-import { InnerHero, SectionHead, TeamCard } from "@/components/inner";
-import { OfficeContactCards } from "@/components/contact-cards";
-import { getOfficeProfile, listOfficeProfiles, listOffices, listServiceLinks } from "@/server/queries/offices";
-import { listTeam } from "@/server/queries/people";
-import { loadText } from "@/server/queries/text";
+import { InnerHero, SectionHead, TeamCard } from "@/components/shared/inner";
+import { OfficeContactCards } from "@/features/offices/components/contact-cards";
+import { getOfficeProfile, listOfficeProfiles, listOffices, listServiceLinks } from "@/features/offices/queries";
+import { listTeam } from "@/features/team/queries";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }> };
 

@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { contentStatuses } from "@/lib/validators/office";
-import { eventTypeLabels, eventTypes } from "@/lib/content-meta";
-import { formatInOfficeTz } from "@/lib/datetime";
-import { EditorialFilters } from "@/components/admin/editor-filters";
-import { officeOptions } from "@/server/queries/admin-people";
-import { listAdminEvents, PAGE_SIZE, type EventFilters } from "@/server/queries/admin-events";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { contentStatuses } from "@/lib/validators/fields";
+import { eventTypeLabels, eventTypes } from "@/config/content-meta";
+import { formatInOfficeTz } from "@/lib/utils/datetime";
+import { EditorialFilters } from "@/components/shared/admin/editor-filters";
+import { officeOptions } from "@/features/offices/admin-queries";
+import { listAdminEvents, PAGE_SIZE, type EventFilters } from "@/features/events/admin-queries";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
   EditLink,
   EmptyState,
@@ -18,7 +18,7 @@ import {
   Pager,
   StatusBadge,
   ViewSiteLink,
-} from "@/components/admin/list-ui";
+} from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

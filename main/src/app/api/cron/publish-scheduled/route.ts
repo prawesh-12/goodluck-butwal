@@ -17,8 +17,8 @@ import {
   testPrepCourses,
   testimonials,
 } from "@db/schema";
-import { writeAudit } from "@/lib/audit";
-import { isDueToPublish, type ScheduledRow } from "@/lib/scheduled";
+import { writeAudit } from "@/lib/security/audit";
+import { isDueToPublish, type ScheduledRow } from "@/lib/utils/scheduled";
 
 export const dynamic = "force-dynamic";
 

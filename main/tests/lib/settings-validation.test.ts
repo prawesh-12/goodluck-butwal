@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { settingsSchema, uiStringSchema } from "@/lib/validators/settings";
+import { settingsSchema, uiStringSchema } from "@/features/settings/validators";
 
 const valid = {
   site_name: "Goodluck Education and Migration",

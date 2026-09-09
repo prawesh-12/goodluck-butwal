@@ -12,13 +12,13 @@ import {
   testPrepCourses,
   testimonials,
 } from "@db/schema";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { previewMetadata } from "@/lib/preview";
-import { InnerHero } from "@/components/inner";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { previewMetadata } from "@/lib/security/preview";
+import { InnerHero } from "@/components/shared/inner";
 import { Chip } from "@/components/ui/bits";
-import type { Entity } from "@/lib/rbac";
-import { loadText } from "@/server/queries/text";
+import type { Entity } from "@/lib/auth/rbac";
+import { loadText } from "@/features/site-text/queries";
 
 export const metadata = previewMetadata;
 export const dynamic = "force-dynamic";

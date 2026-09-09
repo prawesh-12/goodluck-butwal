@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { listEventCards } from "@/server/queries/events";
-import { InnerHero } from "@/components/inner";
-import { EventTabs } from "@/components/events/event-tabs";
-import { loadText } from "@/server/queries/text";
+import { listEventCards } from "@/features/events/queries";
+import { InnerHero } from "@/components/shared/inner";
+import { EventTabs } from "@/features/events/components/event-tabs";
+import { loadText } from "@/features/site-text/queries";
 
 export const revalidate = 300;
 

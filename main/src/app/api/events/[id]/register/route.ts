@@ -7,14 +7,14 @@ import {
   eventRegistrationSchema,
   insertOutcome,
   registrationRefusal,
-} from "@/lib/validators/event";
-import { verifyTurnstile } from "@/lib/turnstile";
-import { clientIp, hashIp } from "@/lib/request";
-import { overRateLimit } from "@/lib/rate-limit";
+} from "@/features/events/validators";
+import { verifyTurnstile } from "@/lib/security/turnstile";
+import { clientIp, hashIp } from "@/lib/utils/request";
+import { overRateLimit } from "@/lib/security/rate-limit";
 import { sendEmailQuietly } from "@/lib/email";
-import { eventRegistered } from "@/lib/email-templates";
-import { formatInOfficeTz } from "@/lib/datetime";
-import { seatsTaken } from "@/server/queries/events";
+import { eventRegistered } from "@/lib/email/templates";
+import { formatInOfficeTz } from "@/lib/utils/datetime";
+import { seatsTaken } from "@/features/events/queries";
 
 export const dynamic = "force-dynamic";
 

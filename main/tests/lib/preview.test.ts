@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { previewMetadata, previewPath } from "@/lib/preview";
+import { previewMetadata, previewPath } from "@/lib/security/preview";
 
 test("a preview address is never indexed", () => {
   expect(previewPath("post", "draft-article")).toBe("/preview/post/draft-article");

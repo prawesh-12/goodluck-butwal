@@ -1,15 +1,15 @@
 import { and, desc, eq, gte, lte } from "drizzle-orm";
 import { db } from "@db/client";
 import { auditLog, users } from "@db/schema";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { formatInOfficeTz } from "@/lib/datetime";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
-import { EmptyState, ListHeader, RowAvatar } from "@/components/admin/list-ui";
-import { Button } from "@/components/admin/ui/button";
-import { Card, CardContent } from "@/components/admin/ui/card";
-import { Input } from "@/components/admin/ui/input";
-import { Label } from "@/components/admin/ui/label";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { formatInOfficeTz } from "@/lib/utils/datetime";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
+import { EmptyState, ListHeader, RowAvatar } from "@/components/shared/admin/list-ui";
+import { Button } from "@/components/ui/admin/button";
+import { Card, CardContent } from "@/components/ui/admin/card";
+import { Input } from "@/components/ui/admin/input";
+import { Label } from "@/components/ui/admin/label";
 
 export const dynamic = "force-dynamic";
 

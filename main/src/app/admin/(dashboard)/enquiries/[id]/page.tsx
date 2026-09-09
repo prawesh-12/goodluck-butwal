@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow, allowOwn } from "@/lib/guard";
-import { formatInOfficeTz } from "@/lib/datetime";
-import { getEnquiry } from "@/server/queries/leads";
-import { EnquiryEditor } from "@/components/admin/enquiry-editor";
+import { requireActor } from "@/lib/auth/session";
+import { allow, allowOwn } from "@/lib/auth/guard";
+import { formatInOfficeTz } from "@/lib/utils/datetime";
+import { getEnquiry } from "@/features/leads/queries";
+import { EnquiryEditor } from "@/features/leads/components/enquiry-editor";
 
 export const dynamic = "force-dynamic";
 

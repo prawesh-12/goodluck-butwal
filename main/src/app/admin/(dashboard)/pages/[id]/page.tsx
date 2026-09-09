@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { PageEditor } from "@/components/admin/page-editor";
-import { getAdminPage, pickedMedia } from "@/server/queries/admin-content";
-import { pagePath } from "@/lib/validators/page";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { PageEditor } from "@/features/pages/components/page-editor";
+import { getAdminPage } from "@/features/pages/admin-queries";
+import { pickedMedia } from "@/features/media/admin-queries";
+import { pagePath } from "@/features/pages/validators";
 
 export const dynamic = "force-dynamic";
 

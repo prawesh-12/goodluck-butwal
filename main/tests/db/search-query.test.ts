@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
-import { search } from "@/server/queries/search";
-import { KINDS } from "@/components/search/query";
+import { search } from "@/features/search/queries";
+import { KINDS } from "@/features/search/query";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 

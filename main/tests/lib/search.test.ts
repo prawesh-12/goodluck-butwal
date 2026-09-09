@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { groupHits, MAX_QUERY, searchTerm, type SearchHit } from "@/components/search/query";
+import { groupHits, MAX_QUERY, searchTerm, type SearchHit } from "@/features/search/query";
 
 const hit = (kind: SearchHit["kind"], slug: string): SearchHit => ({
   kind,

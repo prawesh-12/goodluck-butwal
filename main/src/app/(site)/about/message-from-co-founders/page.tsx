@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
-import { gl } from "@/lib/assets";
-import { getAboutContent } from "@/server/queries/pages";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
+import { gl } from "@/config/assets";
+import { getAboutContent } from "@/features/pages/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
-import { InnerHero } from "@/components/inner";
-import { loadText } from "@/server/queries/text";
+import { InnerHero } from "@/components/shared/inner";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildEntityMetadata("page", "message-from-co-founders", {

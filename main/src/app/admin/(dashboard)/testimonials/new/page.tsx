@@ -1,8 +1,8 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { TestimonialForm, type TestimonialValues } from "@/components/admin/testimonial-form";
-import { editorialOptions } from "@/server/queries/admin-editorial";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { TestimonialForm, type TestimonialValues } from "@/features/testimonials/components/testimonial-form";
+import { editorialOptions } from "@/features/posts/admin-queries";
 
 export const dynamic = "force-dynamic";
 

@@ -1,0 +1,243 @@
+"use client";
+
+import { useCallback, useState, type FormEvent } from "react";
+import { Field } from "@/components/shared/inner";
+import { useOffice } from "@/features/offices/components/office";
+import type { PublicOffice } from "@/features/offices/queries";
+import type { PublicDestination } from "@/features/destinations/queries";
+import type { PublicService } from "@/features/services/queries";
+import type { FormText } from "@/features/site-text/form-text";
+import { Turnstile } from "@/components/shared/turnstile";
+import { trackFormSubmit } from "@/lib/integrations/analytics";
+
+// The button stays translucent until the required fields are filled.
+function SubmitButton({ label, ready, className = "" }: { label: string; ready: boolean; className?: string }) {
+  return (
+    <button type="submit" disabled={!ready} className={`inline-flex h-[57px] items-center justify-center rounded-full px-11 text-[16px] font-semibold leading-[20.8px] text-white transition-colors duration-300 md:h-[59px] md:text-[18px] md:leading-[23.4px] ${ready ? "bg-ink hover:bg-black" : "bg-black/30 backdrop-blur-[5px]"} ${className}`}>
+      {label}
+    </button>
+  );
+}
+
+const selectClass = "h-[50px] w-full appearance-none rounded-[10px] bg-white px-5 text-[16px] font-medium text-ink outline-none ring-1 ring-inset ring-hairline focus:ring-ink/40";
+
+export function Select({ label, name, children, defaultValue = "", required, onChange }: { label: string; name: string; children: React.ReactNode; defaultValue?: string; required?: boolean; onChange?: (value: string) => void }) {
+  return (
+    <label className="flex flex-col items-start gap-[10px]">
+      <span className="t-base text-muted">{label}</span>
+      <span className="relative w-full">
+        <select name={name} defaultValue={defaultValue} required={required} onChange={(e) => onChange?.(e.currentTarget.value)} className={selectClass}>
+          {children}
+        </select>
+        <span aria-hidden className="pointer-events-none absolute right-5 top-1/2 h-2 w-2 -translate-y-1/2 rotate-45 border-b-2 border-r-2 border-muted" />
+      </span>
+    </label>
+  );
+}
+
+function useReady(required: string[]) {
+  const [ready, setReady] = useState(false);
+  const check = (form: HTMLFormElement) => setReady(required.every((n) => (form.elements.namedItem(n) as HTMLInputElement)?.value.trim()));
+  return { ready, check };
+}
+
+// Bots fill every field they find. This one is invisible and never focusable, so a value in it
+// only ever came from a script.
+function Honeypot() {
+  return (
+    <div aria-hidden className="hidden">
+      <label>
+        Company website
+        <input name="company_website" tabIndex={-1} autoComplete="off" />
+      </label>
+    </div>
+  );
+}
+
+function Intro({ lines }: { lines: string[] }) {
+  const shown = lines.filter(Boolean);
+  if (shown.length === 0) return null;
+  return (
+    <div className="flex w-full flex-col gap-[10px] lg:col-span-2">
+      {shown.map((line) => <p key={line} className="t-base text-muted">{line}</p>)}
+    </div>
+  );
+}
+
+// Where the visitor was and how they got there, so a lead can be traced back to a campaign.
+function context() {
+  if (typeof window === "undefined") return {};
+  const params = new URLSearchParams(window.location.search);
+  return {
+    sourcePage: window.location.pathname,
+    referrer: document.referrer || undefined,
+    utmSource: params.get("utm_source") ?? undefined,
+    utmMedium: params.get("utm_medium") ?? undefined,
+    utmCampaign: params.get("utm_campaign") ?? undefined,
+  };
+}
+
+async function post(url: string, body: Record<string, unknown>) {
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return (await res.json()) as { ok: boolean; reference?: string; error?: string };
+}
+
+// The date picker never offers today or anything past two months out.
+function dateRange() {
+  const from = new Date();
+  from.setDate(from.getDate() + 1);
+  const to = new Date();
+  to.setDate(to.getDate() + 60);
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  return { min: iso(from), max: iso(to) };
+}
+
+export function EnquiryForm({ destinations, services, text }: { destinations: PublicDestination[]; services: PublicService[]; text: FormText }) {
+  const { office } = useOffice();
+  const { ready, check } = useReady(["Name", "Email", "Message"]);
+  const [sent, setSent] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [token, setToken] = useState("");
+  const onToken = useCallback((t: string) => setToken(t), []);
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    const result = await post("/api/enquiries", {
+      fullName: form.get("Name"),
+      email: form.get("Email"),
+      phone: form.get("Phone") || undefined,
+      currentLocation: form.get("Location") || undefined,
+      destinationSlug: form.get("Destination") || undefined,
+      serviceSlug: form.get("Service") || undefined,
+      message: form.get("Message"),
+      officeCode: office,
+      company_website: form.get("company_website") || undefined,
+      turnstileToken: token,
+      ...context(),
+    });
+    setBusy(false);
+    if (result.ok) {
+      trackFormSubmit("enquiry", result.reference);
+      setSent(result.reference ?? "");
+    } else {
+      setError(result.error ?? text.error);
+    }
+  };
+
+  if (sent)
+    return (
+      <p className="t-body text-ink">
+        {text.enquiry.success}
+        {sent ? <> {text.reference} <strong>{sent}</strong>.</> : null}
+      </p>
+    );
+  return (
+    <form onSubmit={submit} onChange={(e) => check(e.currentTarget)} className="grid w-full gap-5 md:gap-[30px] lg:grid-cols-2">
+      <Intro lines={[text.enquiry.intro, text.note]} />
+      <Field label={text.field.name} name="Name" placeholder={text.field.nameHint} required />
+      <Field label={text.field.email} name="Email" type="email" placeholder={text.field.emailHint} required />
+      <Field label={text.field.phone} name="Phone" type="tel" placeholder={text.field.phoneHint} />
+      <Field label={text.field.location} name="Location" placeholder={text.field.locationHint} />
+      <Select label={text.field.destination} name="Destination">
+        <option value="">{text.field.destinationHint}</option>
+        {destinations.map((d) => <option key={d.slug} value={d.slug}>{d.name}</option>)}
+      </Select>
+      <Select label={text.field.service} name="Service">
+        <option value="">{text.field.serviceHint}</option>
+        {services.map((s) => <option key={s.slug} value={s.slug}>{s.title}</option>)}
+      </Select>
+      <Field label={text.field.message} name="Message" textarea placeholder={text.field.messageHint} className="lg:col-span-2" required />
+      <Honeypot />
+      <div className="lg:col-span-2 flex flex-col gap-4">
+        <Turnstile onToken={onToken} />
+        {error ? <p role="alert" className="t-base text-[#b42318]">{error}</p> : null}
+        <SubmitButton label={busy ? text.sending : text.enquiry.submit} ready={ready && !busy} />
+      </div>
+    </form>
+  );
+}
+
+export function BookingForm({ offices, services, text }: { offices: PublicOffice[]; services: PublicService[]; text: FormText }) {
+  const { office } = useOffice();
+  const { ready, check } = useReady(["Name", "Email", "Phone", "Date", "Time", "Service"]);
+  const [sent, setSent] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [token, setToken] = useState("");
+  const [officeCode, setOfficeCode] = useState(office);
+  const onToken = useCallback((t: string) => setToken(t), []);
+  const { min, max } = dateRange();
+  const chosen = offices.find((o) => o.id === officeCode);
+
+  const submit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    const result = await post("/api/consultations", {
+      fullName: form.get("Name"),
+      email: form.get("Email"),
+      phone: form.get("Phone"),
+      officeCode: form.get("Office"),
+      serviceSlug: form.get("Service"),
+      preferredDate: form.get("Date"),
+      preferredTime: form.get("Time"),
+      preferredContactMethod: form.get("Contact"),
+      notes: form.get("Notes") || undefined,
+      company_website: form.get("company_website") || undefined,
+      turnstileToken: token,
+      ...context(),
+    });
+    setBusy(false);
+    if (result.ok) {
+      trackFormSubmit("booking", result.reference);
+      setSent(result.reference ?? "");
+    } else {
+      setError(result.error ?? text.error);
+    }
+  };
+
+  if (sent)
+    return (
+      <p className="t-body text-ink">
+        {text.consultation.success}
+        {sent ? <> {text.reference} <strong>{sent}</strong>.</> : null}
+      </p>
+    );
+  return (
+    <form onSubmit={submit} onChange={(e) => check(e.currentTarget)} className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">
+      <Intro lines={[text.consultation.intro, text.note]} />
+      <Select label={text.field.office} name="Office" defaultValue={office} required onChange={(v) => setOfficeCode(v as typeof office)}>
+        {offices.map((o) => <option key={o.id} value={o.id}>{o.city}, {o.country}</option>)}
+      </Select>
+      <Select label={text.field.serviceRequired} name="Service" required>
+        <option value="">{text.field.serviceHint}</option>
+        {services.map((s) => <option key={s.slug} value={s.slug}>{s.title}</option>)}
+      </Select>
+      <Field label={text.field.date} name="Date" type="date" required min={min} max={max} />
+      <Field label={text.field.time} name="Time" type="time" required min="10:00" max="17:00" help={chosen?.hours} />
+      <Field label={text.field.name} name="Name" placeholder={text.field.nameHint} required />
+      <Field label={text.field.email} name="Email" type="email" placeholder={text.field.emailHint} required />
+      <Field label={text.field.phoneRequired} name="Phone" type="tel" placeholder={text.field.phoneHint} required />
+      <Select label={text.field.contactMethod} name="Contact" defaultValue="phone">
+        <option value="phone">{text.field.contactPhone}</option>
+        <option value="email">{text.field.contactEmail}</option>
+      </Select>
+      <Field label={text.field.notes} name="Notes" textarea placeholder={text.field.notesHint} className="md:col-span-2" />
+      <Honeypot />
+      <div className="md:col-span-2 flex flex-col gap-4">
+        <Turnstile onToken={onToken} />
+        {error ? <p role="alert" className="t-base text-[#b42318]">{error}</p> : null}
+        <SubmitButton label={busy ? text.sending : text.consultation.submit} ready={ready && !busy} />
+      </div>
+    </form>
+  );
+}

@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { slugify, uniqueSlug } from "@/lib/slug";
+import { slugify, uniqueSlug } from "@/lib/utils/slug";
 
 test("lowercases and joins words with hyphens", () => {
   expect(slugify("Skilled Independent Visa")).toBe("skilled-independent-visa");

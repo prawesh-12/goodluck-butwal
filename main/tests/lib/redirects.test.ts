@@ -19,7 +19,7 @@ vi.mock("@db/schema", () => ({
   redirects: { fromPath: "from_path", toPath: "to_path", statusCode: "status_code", isActive: "is_active" },
 }));
 
-const { lookupRedirect, resetRedirectCache } = await import("@/lib/redirects");
+const { lookupRedirect, resetRedirectCache } = await import("@/lib/seo/redirects");
 
 beforeEach(() => {
   resetRedirectCache();

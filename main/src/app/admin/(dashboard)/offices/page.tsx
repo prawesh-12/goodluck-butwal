@@ -1,8 +1,9 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { ContentFilters } from "@/components/admin/content-filters";
-import { listAdminOffices, PAGE_SIZE, type AdminFilters } from "@/server/queries/admin-people";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { ContentFilters } from "@/components/shared/admin/content-filters";
+import { listAdminOffices } from "@/features/offices/admin-queries";
+import { PAGE_SIZE, type AdminFilters } from "@/lib/utils/admin-query";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
   EditLink,
   EmptyState,
@@ -10,7 +11,7 @@ import {
   Pager,
   StatusBadge,
   ViewSiteLink,
-} from "@/components/admin/list-ui";
+} from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

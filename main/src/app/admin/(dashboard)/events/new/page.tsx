@@ -1,8 +1,8 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { EventForm, type EventValues } from "@/components/admin/event-form";
-import { officeZones } from "@/server/queries/admin-events";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { EventForm, type EventValues } from "@/features/events/components/event-form";
+import { officeZones } from "@/features/events/admin-queries";
 
 export const dynamic = "force-dynamic";
 

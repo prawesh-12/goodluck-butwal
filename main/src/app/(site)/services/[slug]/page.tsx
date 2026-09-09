@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
-import { getService, listServices } from "@/server/queries/services";
-import { listServiceFaqs } from "@/server/queries/destinations";
+import { getService, listServices } from "@/features/services/queries";
+import { listServiceFaqs } from "@/features/services/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Chip } from "@/components/ui/bits";
-import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
-import { Artwork, ServiceCard } from "@/components/home/services";
-import { Accordion, FaqCta } from "@/components/home/faqs";
-import { listTeam } from "@/server/queries/people";
-import { loadText } from "@/server/queries/text";
+import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
+import { Artwork, ServiceCard } from "@/features/services/components/services";
+import { Accordion, FaqCta } from "@/components/shared/faqs";
+import { listTeam } from "@/features/team/queries";
+import { loadText } from "@/features/site-text/queries";
 
 type Props = { params: Promise<{ slug: string }> };
 export const generateStaticParams = async () => (await listServices()).map((s) => ({ slug: s.slug }));

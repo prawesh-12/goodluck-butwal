@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
-import { img } from "@/lib/assets";
-import { company } from "@/lib/site";
-import { getAboutContent } from "@/server/queries/pages";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
+import { img } from "@/config/assets";
+import { company } from "@/config/site";
+import { getAboutContent } from "@/features/pages/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { SectionBg } from "@/components/ui/bits";
-import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
-import { loadText } from "@/server/queries/text";
+import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildEntityMetadata("page", "careers", { path: "/about/careers", title: "Careers" });

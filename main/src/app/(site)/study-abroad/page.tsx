@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { listServiceFaqs, listDestinations } from "@/server/queries/destinations";
+import { listServiceFaqs } from "@/features/services/queries";
+import { listDestinations } from "@/features/destinations/queries";
 import { Appear } from "@/components/ui/appear";
-import { InfoCard, InnerHero, SectionHead } from "@/components/inner";
-import { DestinationCard, destinationCards } from "@/components/home/destinations";
-import { Accordion, FaqCta } from "@/components/home/faqs";
-import { listTeam } from "@/server/queries/people";
-import { loadText } from "@/server/queries/text";
+import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
+import { DestinationCard, destinationCards } from "@/features/destinations/components/destinations";
+import { Accordion, FaqCta } from "@/components/shared/faqs";
+import { listTeam } from "@/features/team/queries";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({

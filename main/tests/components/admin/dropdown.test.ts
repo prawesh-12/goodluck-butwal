@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { matchTyped, nextEnabled, type DropdownOption } from "@/components/admin/dropdown";
+import { matchTyped, nextEnabled, type DropdownOption } from "@/components/shared/admin/dropdown";
 
 const options: DropdownOption[] = [
   { value: "draft", label: "Draft" },
@@ -40,10 +40,30 @@ function files(dir: string): string[] {
   });
 }
 
+// The admin screens live in src/app/admin, but the components they use now sit in their own
+// feature or in the shared admin kit. Walking the imports keeps the set complete without naming
+// every directory here.
+function adminFiles(): string[] {
+  const seen = new Set(files("src/app/admin"));
+  const queue = [...seen];
+  for (let path = queue.shift(); path; path = queue.shift()) {
+    for (const [, spec] of readFileSync(path, "utf8").matchAll(/["']@\/((?:features|components)\/[^"']+)["']/g)) {
+      for (const ext of [".tsx", ".ts"]) {
+        const candidate = join("src", spec + ext);
+        if (existsSync(candidate) && !seen.has(candidate)) {
+          seen.add(candidate);
+          queue.push(candidate);
+        }
+      }
+    }
+  }
+  return [...seen].filter((path) => /\.tsx$/.test(path));
+}
+
 // A native dropdown draws its open list with the operating system, which no stylesheet reaches.
 // A multiple select is a list box rendered in the page, so it stays.
 test("no admin form opens a native dropdown", () => {
-  const native = [...files("src/app/admin"), ...files("src/components/admin")].flatMap((path) =>
+  const native = adminFiles().flatMap((path) =>
     readFileSync(path, "utf8")
       .split("\n")
       .map((line, i) => ({ path, line, at: i + 1 }))

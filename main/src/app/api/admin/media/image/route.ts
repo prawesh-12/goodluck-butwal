@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
-import { requireActor } from "@/lib/session";
-import { ForbiddenError, requirePermission } from "@/lib/rbac";
-import { writeAudit } from "@/lib/audit";
-import { sniffImageType, uploadImage } from "@/lib/cloudinary";
+import { requireActor } from "@/lib/auth/session";
+import { ForbiddenError, requirePermission } from "@/lib/auth/rbac";
+import { writeAudit } from "@/lib/security/audit";
+import { sniffImageType, uploadImage } from "@/lib/integrations/cloudinary";
 
 export const dynamic = "force-dynamic";
 

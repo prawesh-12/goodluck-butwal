@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { reportError } from "@/lib/sentry";
+import { reportError } from "@/lib/integrations/sentry";
 
 // The last resort: the root layout itself failed, so this renders its own html and body and
 // cannot use any component from the app.

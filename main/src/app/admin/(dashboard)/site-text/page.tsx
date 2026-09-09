@@ -1,9 +1,9 @@
 import { asc } from "drizzle-orm";
 import { db } from "@db/client";
 import { uiStrings } from "@db/schema";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { SiteTextEditor, type SiteTextGroup } from "@/components/admin/site-text-editor";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { SiteTextEditor, type SiteTextGroup } from "@/features/site-text/components/site-text-editor";
 
 export const dynamic = "force-dynamic";
 

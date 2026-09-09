@@ -2,12 +2,13 @@ import { test, expect } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
-import { mediaUrl } from "@/server/queries/catalogue";
-import { listArticles } from "@/server/queries/editorial";
-import { listPartnerLogos, listTeam } from "@/server/queries/people";
-import { listServices } from "@/server/queries/services";
-import { listDestinations } from "@/server/queries/destinations";
-import { getAboutContent } from "@/server/queries/pages";
+import { mediaUrl } from "@/lib/utils/media-url";
+import { listArticles } from "@/features/posts/queries";
+import { listPartnerLogos } from "@/features/partners/queries";
+import { listTeam } from "@/features/team/queries";
+import { listServices } from "@/features/services/queries";
+import { listDestinations } from "@/features/destinations/queries";
+import { getAboutContent } from "@/features/pages/queries";
 
 const hasDb = Boolean(process.env.DATABASE_URL);
 

@@ -1,13 +1,10 @@
 import Link from "next/link";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { CourseEditor } from "@/components/admin/course-editor";
-import {
-  destinationOptions,
-  institutionOptions,
-  listCourseCategories,
-} from "@/server/queries/admin-catalogue";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { CourseEditor } from "@/features/courses/components/course-editor";
+import { destinationOptions, listCourseCategories } from "@/features/courses/admin-queries";
+import { institutionOptions } from "@/features/institutions/admin-queries";
 
 export const dynamic = "force-dynamic";
 

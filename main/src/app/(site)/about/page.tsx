@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import { buildEntityMetadata } from "@/lib/seo";
-import { gl, img } from "@/lib/assets";
-import { offices } from "@/lib/site";
-import { getAboutContent } from "@/server/queries/pages";
-import { listTeam, listPartnerLogos } from "@/server/queries/people";
-import { getGoogleRating } from "@/server/queries/editorial";
-import { loadText } from "@/server/queries/text";
+import { gl, img } from "@/config/assets";
+import { offices } from "@/config/site";
+import { getAboutContent } from "@/features/pages/queries";
+import { listTeam } from "@/features/team/queries";
+import { listPartnerLogos } from "@/features/partners/queries";
+import { getGoogleRating } from "@/features/settings/queries";
+import { loadText } from "@/features/site-text/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg } from "@/components/ui/bits";
 import { VideoDialog } from "@/components/ui/video-dialog";
-import { InnerHero, SectionHead, StatCard, TeamCard } from "@/components/inner";
-import { Partners } from "@/components/home/partners";
-import { TabShoulders } from "@/components/home/steps";
+import { InnerHero, SectionHead, StatCard, TeamCard } from "@/components/shared/inner";
+import { Partners } from "@/features/partners/components/partners";
+import { TabShoulders } from "@/components/shared/steps";
 
 export async function generateMetadata(): Promise<Metadata> {
   const about = await getAboutContent();

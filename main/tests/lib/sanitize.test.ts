@@ -1,5 +1,5 @@
 import { test, expect } from "vitest";
-import { sanitize } from "@/lib/sanitize";
+import { sanitize } from "@/lib/security/sanitize";
 
 test("keeps the markup the editor is allowed to produce", () => {
   const html = "<h2>Visas</h2><p>Read the <a href=\"https://example.com\">guide</a>.</p>";

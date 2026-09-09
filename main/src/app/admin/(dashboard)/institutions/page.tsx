@@ -1,16 +1,13 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { ContentFilters } from "@/components/admin/page-filters";
-import { InstitutionPartnerLink } from "@/components/admin/institution-partner-link";
-import { institutionPath } from "@/components/admin/course-meta";
-import {
-  coursesPerInstitution,
-  destinationOptions,
-  listAdminInstitutions,
-  PAGE_SIZE,
-} from "@/server/queries/admin-catalogue";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/admin/ui/table";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { ContentFilters } from "@/components/shared/admin/page-filters";
+import { InstitutionPartnerLink } from "@/features/institutions/components/institution-partner-link";
+import { institutionPath } from "@/config/course-meta";
+import { coursesPerInstitution, listAdminInstitutions } from "@/features/institutions/admin-queries";
+import { destinationOptions } from "@/features/courses/admin-queries";
+import { PAGE_SIZE } from "@/lib/utils/admin-query";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
   EditLink,
   EmptyState,
@@ -20,7 +17,7 @@ import {
   Pager,
   StatusBadge,
   ViewSiteLink,
-} from "@/components/admin/list-ui";
+} from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 

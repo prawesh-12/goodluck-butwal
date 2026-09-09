@@ -1,7 +1,7 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { ServiceEditor } from "@/components/admin/service-editor";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { ServiceEditor } from "@/features/services/components/service-editor";
 
 export const dynamic = "force-dynamic";
 

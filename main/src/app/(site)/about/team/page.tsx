@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import { JsonLd } from "@/components/seo/json-ld";
-import { breadcrumbs } from "@/components/seo/schema";
-import { InnerHero } from "@/components/inner";
-import { TeamGrid } from "@/components/team-grid";
-import { listTeam } from "@/server/queries/people";
-import { loadText } from "@/server/queries/text";
+import { JsonLd } from "@/components/shared/json-ld";
+import { breadcrumbs } from "@/lib/seo/schema";
+import { InnerHero } from "@/components/shared/inner";
+import { TeamGrid } from "@/features/team/components/team-grid";
+import { listTeam } from "@/features/team/queries";
+import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   const team = await listTeam();

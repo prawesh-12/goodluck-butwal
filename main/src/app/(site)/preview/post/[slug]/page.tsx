@@ -2,13 +2,13 @@ import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, postCategories, posts } from "@db/schema";
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { previewMetadata } from "@/lib/preview";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { previewMetadata } from "@/lib/security/preview";
 import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
-import { InnerHero } from "@/components/inner";
-import { formatDate } from "@/lib/datetime";
+import { InnerHero } from "@/components/shared/inner";
+import { formatDate } from "@/lib/utils/datetime";
 
 export const metadata = previewMetadata;
 export const dynamic = "force-dynamic";

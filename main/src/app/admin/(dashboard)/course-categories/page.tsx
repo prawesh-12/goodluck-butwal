@@ -1,8 +1,8 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { CourseCategoryManager } from "@/components/admin/course-category-manager";
-import { coursesPerCategory, listCourseCategories } from "@/server/queries/admin-catalogue";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { CourseCategoryManager } from "@/features/courses/components/course-category-manager";
+import { coursesPerCategory, listCourseCategories } from "@/features/courses/admin-queries";
 
 export const dynamic = "force-dynamic";
 

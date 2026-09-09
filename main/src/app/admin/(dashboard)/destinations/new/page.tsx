@@ -1,7 +1,7 @@
-import { requireActor } from "@/lib/session";
-import { allow } from "@/lib/guard";
-import { can } from "@/lib/rbac";
-import { DestinationEditor } from "@/components/admin/destination-editor";
+import { requireActor } from "@/lib/auth/session";
+import { allow } from "@/lib/auth/guard";
+import { can } from "@/lib/auth/rbac";
+import { DestinationEditor } from "@/features/destinations/components/destination-editor";
 
 export const dynamic = "force-dynamic";
 
