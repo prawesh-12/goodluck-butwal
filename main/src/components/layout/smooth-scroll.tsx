@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import Lenis from "lenis";
+import type Lenis from "lenis";
 
 // The reference runs Lenis. Its wheel curve fits a time-based lerp of about 0.08 (one 600px tick settles in ~1.4s).
 export function SmoothScroll() {
@@ -11,25 +11,41 @@ export function SmoothScroll() {
 
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const lenis = new Lenis({ lerp: 0.08, smoothWheel: true, wheelMultiplier: 1 });
-    lenisRef.current = lenis;
+    // Nothing here runs until after mount, so the library is fetched then rather than in the
+    // first load. Someone who scrolls in that gap gets native scrolling for a moment.
+    let cancelled = false;
     let raf = 0;
-    const loop = (t: number) => { lenis.raf(t); raf = requestAnimationFrame(loop); };
-    raf = requestAnimationFrame(loop);
-    // Hash links go through Lenis so anchors ease too.
-    const onClick = (e: MouseEvent) => {
-      const a = (e.target as HTMLElement).closest("a[href*='#']") as HTMLAnchorElement | null;
-      if (!a) return;
-      const url = new URL(a.href, location.href);
-      if (url.pathname !== location.pathname || !url.hash) return;
-      const el = document.querySelector(url.hash);
-      if (!el) return;
-      e.preventDefault();
-      lenis.scrollTo(el as HTMLElement, { offset: -100 });
-      history.pushState(null, "", url.hash);
+    let lenis: Lenis | null = null;
+    let onClick: ((e: MouseEvent) => void) | null = null;
+
+    void import("lenis").then(({ default: LenisClass }) => {
+      if (cancelled) return;
+      lenis = new LenisClass({ lerp: 0.08, smoothWheel: true, wheelMultiplier: 1 });
+      lenisRef.current = lenis;
+      const loop = (t: number) => { lenis?.raf(t); raf = requestAnimationFrame(loop); };
+      raf = requestAnimationFrame(loop);
+      // Hash links go through Lenis so anchors ease too.
+      onClick = (e: MouseEvent) => {
+        const a = (e.target as HTMLElement).closest("a[href*='#']") as HTMLAnchorElement | null;
+        if (!a) return;
+        const url = new URL(a.href, location.href);
+        if (url.pathname !== location.pathname || !url.hash) return;
+        const el = document.querySelector(url.hash);
+        if (!el) return;
+        e.preventDefault();
+        lenis?.scrollTo(el as HTMLElement, { offset: -100 });
+        history.pushState(null, "", url.hash);
+      };
+      document.addEventListener("click", onClick);
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      if (onClick) document.removeEventListener("click", onClick);
+      lenis?.destroy();
+      lenisRef.current = null;
     };
-    document.addEventListener("click", onClick);
-    return () => { cancelAnimationFrame(raf); document.removeEventListener("click", onClick); lenis.destroy(); lenisRef.current = null; };
   }, []);
 
   // Every page opens at the top, whatever was scrolled before. Without this, Lenis keeps easing from the old position (often the footer link you clicked).
