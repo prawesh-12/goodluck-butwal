@@ -66,13 +66,17 @@ test("sendEmailQuietly swallows a network error too", async () => {
   await expect(sendEmailQuietly({ to: "a@example.com", subject: "s", html: "<p>x</p>" })).resolves.toBe(false);
 });
 
-test("the logged failure carries the subject and never the message body", async () => {
+test("the logged failure names the reason and never the message body", async () => {
   const logged = vi.spyOn(console, "error").mockImplementation(() => {});
-  fetchMock.mockResolvedValue({ ok: false, status: 500, text: async () => "down" });
+  fetchMock.mockResolvedValue({ ok: false, status: 403, text: async () => "the domain is not verified" });
 
   await sendEmailQuietly({ to: "a@example.com", subject: "New enquiry ENQ-1", html: "<p>my private situation</p>" });
 
-  expect(logged).toHaveBeenCalledWith("email failed", { subject: "New enquiry ENQ-1" });
+  const [label, detail] = logged.mock.calls[0] as [string, { subject: string; reason: string }];
+  expect(label).toBe("email failed");
+  expect(detail.subject).toBe("New enquiry ENQ-1");
+  expect(detail.reason).toContain("403");
+  expect(detail.reason).toContain("not verified");
   expect(JSON.stringify(logged.mock.calls)).not.toContain("private");
 });
 

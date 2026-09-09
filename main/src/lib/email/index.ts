@@ -57,10 +57,11 @@ export async function sendEmailQuietly(message: Message) {
   try {
     await sendEmail(message);
     return true;
-  } catch {
-    // The row is already saved, so a failed send must not fail the request. It is logged
-    // instead, with the subject only: the body carries the enquirer's own words.
-    console.error("email failed", { subject: message.subject });
+  } catch (error) {
+    // The row is already saved, so a failed send must not fail the request. The subject and the
+    // reason are logged, never the body: that carries the enquirer's own words. Without the
+    // reason an unverified sending domain looks identical to a network outage.
+    console.error("email failed", { subject: message.subject, reason: (error as Error).message });
     return false;
   }
 }
