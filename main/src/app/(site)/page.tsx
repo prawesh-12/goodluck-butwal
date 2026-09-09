@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/seo/json-ld";
 import { organization, webSite } from "@/components/seo/schema";
-import { getHeroImage, getHeroVideo, getSocialLinks } from "@/server/queries/site";
+import { getHeroImage, getSocialLinks } from "@/server/queries/site";
 import { Hero } from "@/components/home/hero";
 import { Partners } from "@/components/home/partners";
 import { Services } from "@/components/home/services";
@@ -44,7 +44,6 @@ export default async function Home() {
   const upcomingEvents = await listUpcomingEvents();
   const socials = await getSocialLinks();
   const heroImage = await getHeroImage();
-  const heroVideo = await getHeroVideo();
   const t = await loadText();
 
   return (
@@ -53,13 +52,11 @@ export default async function Home() {
       <Hero
         googleRating={googleRating}
         sky={heroImage}
-        filmSrc={heroVideo}
         text={{
           titleBefore: t("home.hero.title_before", "Create your"),
           titleAfter: t("home.hero.title_after", "luck"),
           bookCta: t("home.hero.cta", "Book a consultation"),
           servicesCta: t("home.hero.services_cta", "Our services"),
-          videoTitle: t("home.hero.video_title", "Inside Goodluck Education and Migration"),
         }}
       />
       <Partners logos={logos} />
