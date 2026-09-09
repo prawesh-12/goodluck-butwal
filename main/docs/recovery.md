@@ -18,8 +18,8 @@ What to do when the database is gone, wrong, or somebody deleted something they 
 | Marker | `db/last_success`, rewritten on every successful run |
 | Watchdog | a weekly job fails, and opens an issue, if the marker is over 48 hours old |
 
-R2 is reached over the S3 API with the AWS CLI. There is no binding and no AWS SDK package, on
-purpose: the SDK is large and the worker has a hard size cap.
+R2 is reached over the S3 API with the AWS CLI. The site itself does not touch it, only the
+backup workflow does, so the bucket is independent of where the site is hosted.
 
 ## Who has access
 
@@ -28,7 +28,8 @@ need to know who to phone.
 
 | What | Who | Notes |
 |---|---|---|
-| Cloudflare account | | Owns R2, DNS and the worker |
+| Vercel account | | Owns the deployed site and its environment variables |
+| Cloudflare account | | Owns R2, DNS and Turnstile |
 | Neon account | | Owns the database and its branches |
 | GitHub repository | | Owns the workflows and the secrets |
 
@@ -75,9 +76,9 @@ outage.
    order by 1;
    ```
 
-6. **Point the site at the branch.** `wrangler secret put DATABASE_URL`, paste the branch string,
-   then redeploy. Check that the homepage, one article and the admin all load before you tell
-   anyone it is fixed.
+6. **Point the site at the branch.** Change `DATABASE_URL` in the Vercel project's environment
+   variables to the branch string, then redeploy. Check that the homepage, one article and the
+   admin all load before you tell anyone it is fixed.
 
 7. **Afterwards.** Once the restored branch has been live and correct for a day, promote it or
    copy it back to `main`, and delete the temporary branch so nobody restores into it by mistake.
@@ -94,7 +95,7 @@ Restoring Postgres does not bring these back:
 
 - **Uploaded images** live in Cloudinary and are not in the dump. They have their own retention.
 - **Files in `public/`** are in git, so a `git checkout` is the restore.
-- **Secrets** are in Wrangler and GitHub, not in the dump. Keep a copy somewhere safe and offline.
+- **Secrets** are in Vercel and GitHub, not in the dump. Keep a copy somewhere safe and offline.
 
 ## Measured results
 

@@ -17,8 +17,7 @@ goodluck/                     git repository root
 └── main/                     the application
     ├── db/                   schema, migrations, seeds
     ├── docs/                 this file and its neighbours
-    ├── public/               about 180 static assets, served by Cloudflare, not by the app
-    ├── scripts/              the worker size check
+    ├── public/               about 180 static assets, served from the CDN, not by the app
     ├── src/app/              routes: public pages, /admin, /api
     ├── src/components/       UI. The public components are approved and frozen.
     ├── src/lib/              auth, permissions, sanitising, dates, email, uploads
@@ -29,26 +28,25 @@ goodluck/                     git repository root
 
 | Layer | Choice | Why |
 |---|---|---|
-| Hosting | Cloudflare Workers via `@opennextjs/cloudflare` | Vercel's free plan is non-commercial, and the client requires free plans |
+| Hosting | Vercel | Runs a Next app as it is built, with no adapter in between |
 | Database | Neon Postgres over the HTTP driver | No connection pool, so the compute suspends when idle and the free budget lasts |
 | ORM | Drizzle | The schema is TypeScript, and migrations are generated from it |
 | Auth | Better Auth, email and password only | No social providers were asked for |
-| Uploads | Cloudinary over `fetch` | Its SDK is large and the worker has a hard size cap |
+| Uploads | Cloudinary over `fetch` | Its SDK is large and a signed request costs nothing |
 | Email | Resend over `fetch` | Same reason |
-| Bots | Cloudflare Turnstile | Free, and already in front of the DNS |
+| Bots | Cloudflare Turnstile | Free, and hosting has no bearing on it |
 | Errors | Sentry | Free tier |
 
-**No SDK packages for Cloudinary, Resend or AWS.** Each is a signed `fetch` call instead. That is
-not a stylistic preference: the compressed worker must stay under 3 MB or Cloudflare refuses the
-deploy, and those three packages alone would spend most of the budget.
+**No SDK packages for Cloudinary, Resend or AWS.** Each is a signed `fetch` call instead. The
+site was first built for a host with a hard 3 MB bundle cap, and those three packages alone would
+have spent most of it. The cap is gone with the move to Vercel, the `fetch` calls are staying:
+they work, and they are less code than the SDKs.
 
-## The size cap, which is the constraint that shapes everything
+## Bundle size
 
-`pnpm bundle:check` fails above **2.50 MB compressed**. Cloudflare refuses above 3 MB.
-
-It has been breached twice during the build and rescued both times without removing a feature.
-Both times the cause was the same shape of mistake: a heavy library imported by many route files,
-which the bundler then copies into each one.
+There is no hard cap any more, but two fixes made for the old one are worth keeping. Both times
+the cause was the same shape of mistake: a heavy library imported by many route files, which the
+bundler then copies into each one.
 
 - Reading the session used to import the whole auth server. Fifty-one route files did that.
   `src/lib/session.ts` now reads the session straight from the database instead, and only the
@@ -57,18 +55,16 @@ which the bundler then copies into each one.
   keeps `drizzle-orm`, `@neondatabase/serverless`, `sanitize-html` and `nanoid` out of the
   per-route chunks.
 
-**If the bundle goes over again, look for a library imported from many routes before you look
-anywhere else.** `find .open-next/server-functions -name "*.js" -size +200k` sorted by size will
-usually show you several chunks of nearly identical size, and that is your answer.
+**If a build ever gets heavy, look for a library imported from many routes before you look
+anywhere else.** Several route chunks of nearly identical size is the tell.
 
 ## Environment variables
 
 Names and where each one lives are in `main/.env.example`. In short:
 
-- **Public values** go in `wrangler.toml` under `[vars]`.
-- **Secrets** are set with `wrangler secret put NAME`. Never in a file, never in git.
-- Locally, both come from `main/.env.local`, which git ignores.
-- `main/.dev.vars` holds the local secrets that `wrangler dev` needs. Also ignored.
+- **Everything** is an environment variable on the Vercel project, public and secret alike.
+- Never in a file, never in git.
+- Locally they all come from `main/.env.local`, which git ignores.
 
 Anything an administrator might want to change is in the `settings` table, not here: notification
 addresses, social links and analytics ids.
@@ -117,9 +113,7 @@ that matters.
 | `pnpm typecheck` | Types only. Use this rather than a build while you work. |
 | `pnpm lint` | ESLint. Runs with a raised heap; the codebase outgrew Node's default. |
 | `pnpm test` | Vitest. The database tests stand aside when `DATABASE_URL` is unset. |
-| `pnpm build` | The Next build |
-| `pnpm build:worker` | The Next build plus the Cloudflare worker |
-| `pnpm bundle:check` | Fails above 2.50 MB compressed. Needs `build:worker` first. |
+| `pnpm build` | The Next build, the same one Vercel runs |
 | `pnpm db:seed` | Real content only |
 | `pnpm db:seed:dev` | Adds placeholder catalogue rows, marked `[PLACEHOLDER]`, as drafts |
 
@@ -127,13 +121,18 @@ pnpm only. Never `npm` or `yarn`, and never commit a second lockfile.
 
 ## Deploying
 
-Push to `main`. `.github/workflows/deploy.yml` runs migrations first and stops the release if one
-fails, then builds the worker and deploys it. Every job builds in `main/` and reads the pnpm
-version from its `package.json`.
+Push to `main`. Vercel builds and releases it from the push, and
+`.github/workflows/migrate.yml` runs the migrations from the same push. The two run alongside
+each other, so a migration that has to land before the code that needs it should go out on its
+own push first.
 
 The build needs a `DATABASE_URL` even though it never queries: Better Auth constructs its adapter
 when the module loads, and Next loads every route module during a build. CI passes a placeholder,
-deploy passes the real secret.
+Vercel passes the real one.
+
+The scheduled publish runs from `vercel.json`, a cron every 15 minutes against
+`/api/cron/publish-scheduled`. Vercel sends `CRON_SECRET` as a bearer token and the route refuses
+anything else.
 
 ## Permissions
 
@@ -163,12 +162,15 @@ See `recovery.md`. Read it before you need it.
 
 | Service | Free limit | What happens at the limit |
 |---|---|---|
-| Cloudflare Workers | 100k requests/day, 3 MB worker | Requests are refused. Paid is $5/month and lifts the worker to 10 MB. |
+| Vercel | Hobby is free but forbids commercial use. Pro is $20 per user per month. | See the note below. |
 | Neon | 100 CU-hours/month, 0.5 GB | The compute stops. This is why the driver has no pool: an idle site must suspend. |
 | Cloudinary | 25 credits/month | Uploads fail. Existing images keep serving. |
 | Resend | 3,000 emails/month, 100/day | Sends fail. A failure is logged and never fails the visitor's request. |
 | Sentry | 5,000 errors/month | Errors stop being recorded. |
 | R2 | 10 GB | Backups fail, and the weekly check opens an issue. |
 
-The client asked for free plans throughout. Nothing here upgrades itself, and nothing will start
-charging without someone choosing to.
+The client asked for free plans throughout. Everything above still is, with one exception:
+Vercel's free Hobby plan does not permit commercial use, and this is a commercial site. Moving to
+Vercel means Pro, at $20 per user per month. That was a deliberate choice, not an oversight.
+
+Nothing else here upgrades itself, and nothing will start charging without someone choosing to.

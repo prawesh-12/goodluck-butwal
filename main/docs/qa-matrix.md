@@ -25,7 +25,6 @@ Every row below was measured against a running server and a real Postgres, not a
 | A scheduled post publishes on the cron with no deploy | yes |
 | A testimonial without consent stays unpublished on that same run | yes |
 | CSV export opens in Excel with UTF-8 intact | yes, byte order mark present |
-| Worker bundle under its cap | 2.46 MB against 2.50 MB |
 | Automated tests | 309 passing |
 | Editable text: an admin's wording replaces the code's | verified |
 | App queries on the busiest dynamic page | 8, against a budget of 6 |
