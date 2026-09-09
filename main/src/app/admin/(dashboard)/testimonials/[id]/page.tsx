@@ -56,8 +56,6 @@ export default async function EditTestimonialPage({
           officeId: story.officeId ?? "",
           rating: story.rating,
           isFeatured: story.isFeatured,
-          consentGiven: story.consentGiven,
-          consentNote: story.consentNote ?? "",
           status: story.status,
           publishedAt: story.publishedAt ? story.publishedAt.toISOString().slice(0, 16) : "",
         }}

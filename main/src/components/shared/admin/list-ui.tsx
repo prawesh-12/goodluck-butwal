@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Check, ExternalLink, TriangleAlert, type LucideIcon } from "lucide-react";
+import { ExternalLink, type LucideIcon } from "lucide-react";
 import { Badge, type AdminBadgeProps } from "@/components/ui/admin/badge";
 import { Button } from "@/components/ui/admin/button";
 import { Card, CardContent } from "@/components/ui/admin/card";
@@ -36,18 +36,6 @@ export function StatusBadge({ status }: { status: string }) {
   return (
     <Badge variant={STATUS_VARIANT[status] ?? "secondary"} className="whitespace-nowrap">
       {status.replace(/_/g, " ")}
-    </Badge>
-  );
-}
-
-export function ConsentBadge({ given }: { given: boolean }) {
-  return given ? (
-    <Badge variant="success" className="whitespace-nowrap">
-      <Check /> Recorded
-    </Badge>
-  ) : (
-    <Badge variant="destructive" className="whitespace-nowrap">
-      <TriangleAlert /> Missing
     </Badge>
   );
 }

@@ -21,7 +21,6 @@ export type TestimonialType = (typeof testimonialTypes)[number];
 
 export const videoProviders = ["youtube", "vimeo", "local"] as const;
 
-export const CONSENT_REQUIRED = "Record consent before publishing.";
 
 export const pagePath = (parent: string, slug: string) =>
   slug === "about" ? "/about" : `/${parent}/${slug}`;

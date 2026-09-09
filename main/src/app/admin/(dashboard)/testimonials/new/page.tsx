@@ -24,8 +24,6 @@ const empty: TestimonialValues = {
   officeId: "",
   rating: null,
   isFeatured: false,
-  consentGiven: false,
-  consentNote: "",
   status: "draft",
   publishedAt: "",
 };

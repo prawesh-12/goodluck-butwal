@@ -42,7 +42,6 @@ export async function listAdminTestimonials(actor: Actor, f: EditorialFilters) {
         authorName: testimonials.authorName,
         isAnonymised: testimonials.isAnonymised,
         status: testimonials.status,
-        consentGiven: testimonials.consentGiven,
         isFeatured: testimonials.isFeatured,
         office: offices.name,
       })

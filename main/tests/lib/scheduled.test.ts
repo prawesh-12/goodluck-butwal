@@ -25,14 +25,3 @@ test("a draft is not due", () => {
   expect(isDueToPublish({ status: "draft", publishedAt: past }, now)).toBe(false);
 });
 
-test("a scheduled testimonial without consent is not due", () => {
-  expect(
-    isDueToPublish({ status: "scheduled", publishedAt: past, consentGiven: false }, now),
-  ).toBe(false);
-});
-
-test("a scheduled testimonial with consent is due", () => {
-  expect(
-    isDueToPublish({ status: "scheduled", publishedAt: past, consentGiven: true }, now),
-  ).toBe(true);
-});

@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  CONSENT_REQUIRED,
   requiredFieldsFor,
   testimonialTypes,
   videoProviders,
@@ -42,8 +41,6 @@ export type TestimonialValues = {
   officeId: string;
   rating: number | null;
   isFeatured: boolean;
-  consentGiven: boolean;
-  consentNote: string;
   status: string;
   publishedAt: string;
 };
@@ -68,7 +65,6 @@ export function TestimonialForm({
   const router = useRouter();
   const [type, setType] = useState<TestimonialType>(values.type);
   const [anonymised, setAnonymised] = useState(values.isAnonymised);
-  const [consent, setConsent] = useState(values.consentGiven);
   const [status, setStatus] = useState(values.status);
   const [quote, setQuote] = useState(values.quote);
   const [body, setBody] = useState(values.bodyHtml);
@@ -110,8 +106,6 @@ export function TestimonialForm({
           officeId: String(form.get("officeId") ?? ""),
           rating: rating ? Number(rating) : null,
           isFeatured: form.get("isFeatured") === "on",
-          consentGiven: consent,
-          consentNote: String(form.get("consentNote") ?? ""),
           status,
           publishedAt: String(form.get("publishedAt") ?? ""),
         };
@@ -300,29 +294,6 @@ export function TestimonialForm({
         <span className="t-small admin-help">Featured stories come first on the home page.</span>
       </label>
 
-      <h2 className="t-h5 admin-subhead">Consent</h2>
-
-      <label className="admin-field">
-        <span className="t-small">
-          <input
-            type="checkbox"
-            checked={consent}
-            onChange={(event) => setConsent(event.target.checked)}
-          />{" "}
-          This person agreed to their story being published
-        </span>
-        <span className="t-small admin-help">
-          {consent ? "Recorded. The story can go live." : CONSENT_REQUIRED}
-        </span>
-      </label>
-
-      <label className="admin-field">
-        <span className="t-small">How consent was given</span>
-        <textarea name="consentNote" defaultValue={values.consentNote} rows={2} />
-        <span className="t-small admin-help">
-          Staff only, never shown on the site. Note the date and whether it was by email or in person.
-        </span>
-      </label>
 
       <h2 className="t-h5 admin-subhead">Publishing</h2>
 

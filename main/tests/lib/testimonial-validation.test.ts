@@ -1,6 +1,5 @@
 import { test, expect } from "vitest";
 import {
-  CONSENT_REQUIRED,
   createTestimonialSchema,
   missingForType,
   publicIdentity,
@@ -27,8 +26,6 @@ const written: TestimonialInput = {
   officeId: "",
   rating: 5,
   isFeatured: false,
-  consentGiven: true,
-  consentNote: "Agreed by email on 3 March.",
   status: "published",
   publishedAt: "",
 };
@@ -68,21 +65,7 @@ test("a video with a link but no provider is refused", () => {
   expect(result.error?.issues[0].path).toEqual(["videoProvider"]);
 });
 
-test("a story without consent cannot be published", () => {
-  const problems = testimonialPublishProblems({ ...written, consentGiven: false }, {});
-  expect(problems).toContain(CONSENT_REQUIRED);
-});
-
-test("a draft without consent still saves", () => {
-  const result = createTestimonialSchema.safeParse({
-    ...written,
-    consentGiven: false,
-    status: "draft",
-  });
-  expect(result.success).toBe(true);
-});
-
-test("consent alone is enough to publish a written story", () => {
+test("a written story with a name and a quote can be published", () => {
   expect(testimonialPublishProblems(written, {})).toEqual([]);
 });
 
