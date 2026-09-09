@@ -35,26 +35,36 @@ export async function CourseFilters({ query, options }: { query: CourseQuery; op
       <form method="get" action="/courses" className="grid w-full gap-5 md:grid-cols-2 lg:grid-cols-3">
         {/* Field takes no default value, so the current keyword shows as a clearable chip instead. */}
         <Field label={t("courses.filter.keyword", "Keyword")} name="q" placeholder={t("courses.filter.keyword_hint", "Course, institution or country")} />
-        <Select label={t("courses.filter.destination", "Destination")} name="destination" defaultValue={query.destination ?? ""}>
-          <option value="">{t("courses.filter.destination_any", "All destinations")}</option>
-          {options.destinations.map((d) => <option key={d.slug} value={d.slug}>{d.name}</option>)}
-        </Select>
-        <Select label={t("courses.filter.level", "Qualification level")} name="level" defaultValue={query.level ?? ""}>
-          <option value="">{t("courses.filter.level_any", "All levels")}</option>
-          {LEVELS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
-        </Select>
-        <Select label={t("courses.filter.category", "Category")} name="category" defaultValue={query.category ?? ""}>
-          <option value="">{t("courses.filter.category_any", "All categories")}</option>
-          {options.categories.map((c) => <option key={c.slug} value={c.slug}>{c.name}</option>)}
-        </Select>
-        <Select label={t("courses.filter.institution", "Institution")} name="institution" defaultValue={query.institution ?? ""}>
-          <option value="">{t("courses.filter.institution_any", "All institutions")}</option>
-          {options.institutions.map((i) => <option key={i.slug} value={i.slug}>{i.name}</option>)}
-        </Select>
-        <Select label={t("courses.filter.intake", "Intake")} name="intake" defaultValue={query.intake ?? ""}>
-          <option value="">{t("courses.filter.intake_any", "Any intake")}</option>
-          {INTAKES.map((m) => <option key={m} value={m}>{m}</option>)}
-        </Select>
+        <Select
+          label={t("courses.filter.destination", "Destination")}
+          name="destination"
+          defaultValue={query.destination ?? ""}
+          options={[{ value: "", label: t("courses.filter.destination_any", "All destinations") }, ...options.destinations.map((d) => ({ value: d.slug, label: d.name }))]}
+        />
+        <Select
+          label={t("courses.filter.level", "Qualification level")}
+          name="level"
+          defaultValue={query.level ?? ""}
+          options={[{ value: "", label: t("courses.filter.level_any", "All levels") }, ...LEVELS.map((l) => ({ value: l.value, label: l.label }))]}
+        />
+        <Select
+          label={t("courses.filter.category", "Category")}
+          name="category"
+          defaultValue={query.category ?? ""}
+          options={[{ value: "", label: t("courses.filter.category_any", "All categories") }, ...options.categories.map((c) => ({ value: c.slug, label: c.name }))]}
+        />
+        <Select
+          label={t("courses.filter.institution", "Institution")}
+          name="institution"
+          defaultValue={query.institution ?? ""}
+          options={[{ value: "", label: t("courses.filter.institution_any", "All institutions") }, ...options.institutions.map((i) => ({ value: i.slug, label: i.name }))]}
+        />
+        <Select
+          label={t("courses.filter.intake", "Intake")}
+          name="intake"
+          defaultValue={query.intake ?? ""}
+          options={[{ value: "", label: t("courses.filter.intake_any", "Any intake") }, ...INTAKES.map((m) => ({ value: m, label: m }))]}
+        />
         <div className="flex items-end lg:col-span-3">
           <button type="submit" className="btn-black inline-flex h-[50px] items-center justify-center rounded-full px-[26px] text-[16px] font-semibold leading-[20.8px] text-white">
             {t("courses.filter.apply", "Apply filters")}

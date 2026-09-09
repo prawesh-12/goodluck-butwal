@@ -2,7 +2,7 @@
 
 import { useId, type ReactNode } from "react";
 import { ArrowDown, ArrowUp, Trash2 } from "lucide-react";
-import { Dropdown, type DropdownOption } from "@/components/shared/admin/dropdown";
+import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { Input } from "@/components/ui/admin/input";
 import { Textarea } from "@/components/ui/admin/textarea";
 import { Label } from "@/components/ui/admin/label";

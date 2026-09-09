@@ -7,6 +7,7 @@ import type { PublicOffice } from "@/features/offices/queries";
 import type { PublicDestination } from "@/features/destinations/queries";
 import type { PublicService } from "@/features/services/queries";
 import type { FormText } from "@/features/site-text/form-text";
+import { Dropdown, type DropdownOption } from "@/components/ui/dropdown";
 import { Turnstile } from "@/components/shared/turnstile";
 import { trackFormSubmit } from "@/lib/integrations/analytics";
 
@@ -19,19 +20,30 @@ function SubmitButton({ label, ready, className = "" }: { label: string; ready: 
   );
 }
 
-const selectClass = "h-[50px] w-full appearance-none rounded-[10px] bg-white px-5 text-[16px] font-medium text-ink outline-none ring-1 ring-inset ring-hairline focus:ring-ink/40";
+// The list is drawn in the page rather than by the operating system, so it matches the field it
+// drops out of on every platform.
+const TRIGGER = "flex h-[50px] w-full items-center justify-between gap-3 rounded-[10px] bg-white px-5 text-left text-[16px] font-medium text-ink outline-none ring-1 ring-inset ring-hairline focus-visible:ring-2 focus-visible:ring-ink/40";
+const LIST = "fixed z-[60] max-h-[280px] overflow-y-auto rounded-[10px] bg-white p-[6px] text-[16px] font-medium text-ink shadow-[0_18px_40px_-12px_rgba(29,29,29,0.28)] ring-1 ring-hairline";
+const OPTION = "cursor-pointer select-none rounded-[8px] px-4 py-[10px] leading-[22px] outline-none aria-selected:bg-surface aria-selected:text-ink data-[active]:bg-surface data-[active]:text-ink aria-disabled:pointer-events-none aria-disabled:opacity-50";
 
-export function Select({ label, name, children, defaultValue = "", required, onChange }: { label: string; name: string; children: React.ReactNode; defaultValue?: string; required?: boolean; onChange?: (value: string) => void }) {
+export function Select({ label, name, options, placeholder, defaultValue = "", required, onChange }: { label: string; name: string; options: DropdownOption[]; placeholder?: string; defaultValue?: string; required?: boolean; onChange?: (value: string) => void }) {
+  const id = `${name}-label`;
   return (
-    <label className="flex flex-col items-start gap-[10px]">
-      <span className="t-base text-muted">{label}</span>
-      <span className="relative w-full">
-        <select name={name} defaultValue={defaultValue} required={required} onChange={(e) => onChange?.(e.currentTarget.value)} className={selectClass}>
-          {children}
-        </select>
-        <span aria-hidden className="pointer-events-none absolute right-5 top-1/2 h-2 w-2 -translate-y-1/2 rotate-45 border-b-2 border-r-2 border-muted" />
-      </span>
-    </label>
+    <div className="flex flex-col items-start gap-[10px]">
+      <span id={id} className="t-base text-muted">{label}</span>
+      <Dropdown
+        name={name}
+        options={options}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        required={required}
+        onChange={onChange}
+        labelledBy={id}
+        triggerClassName={TRIGGER}
+        listClassName={LIST}
+        optionClassName={OPTION}
+      />
+    </div>
   );
 }
 
@@ -146,14 +158,18 @@ export function EnquiryForm({ destinations, services, text }: { destinations: Pu
       <Field label={text.field.email} name="Email" type="email" placeholder={text.field.emailHint} required />
       <Field label={text.field.phone} name="Phone" type="tel" placeholder={text.field.phoneHint} />
       <Field label={text.field.location} name="Location" placeholder={text.field.locationHint} />
-      <Select label={text.field.destination} name="Destination">
-        <option value="">{text.field.destinationHint}</option>
-        {destinations.map((d) => <option key={d.slug} value={d.slug}>{d.name}</option>)}
-      </Select>
-      <Select label={text.field.service} name="Service">
-        <option value="">{text.field.serviceHint}</option>
-        {services.map((s) => <option key={s.slug} value={s.slug}>{s.title}</option>)}
-      </Select>
+      <Select
+        label={text.field.destination}
+        name="Destination"
+        placeholder={text.field.destinationHint}
+        options={destinations.map((d) => ({ value: d.slug, label: d.name }))}
+      />
+      <Select
+        label={text.field.service}
+        name="Service"
+        placeholder={text.field.serviceHint}
+        options={services.map((service) => ({ value: service.slug, label: service.title }))}
+      />
       <Field label={text.field.message} name="Message" textarea placeholder={text.field.messageHint} className="lg:col-span-2" required />
       <Honeypot />
       <div className="lg:col-span-2 flex flex-col gap-4">
@@ -215,22 +231,35 @@ export function BookingForm({ offices, services, text }: { offices: PublicOffice
   return (
     <form onSubmit={submit} onChange={(e) => check(e.currentTarget)} className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px]">
       <Intro lines={[text.consultation.intro, text.note]} />
-      <Select label={text.field.office} name="Office" defaultValue={office} required onChange={(v) => setOfficeCode(v as typeof office)}>
-        {offices.map((o) => <option key={o.id} value={o.id}>{o.city}, {o.country}</option>)}
-      </Select>
-      <Select label={text.field.serviceRequired} name="Service" required>
-        <option value="">{text.field.serviceHint}</option>
-        {services.map((s) => <option key={s.slug} value={s.slug}>{s.title}</option>)}
-      </Select>
+      <Select
+        label={text.field.office}
+        name="Office"
+        defaultValue={office}
+        required
+        onChange={(v) => setOfficeCode(v as typeof office)}
+        options={offices.map((o) => ({ value: o.id, label: `${o.city}, ${o.country}` }))}
+      />
+      <Select
+        label={text.field.serviceRequired}
+        name="Service"
+        required
+        placeholder={text.field.serviceHint}
+        options={services.map((service) => ({ value: service.slug, label: service.title }))}
+      />
       <Field label={text.field.date} name="Date" type="date" required min={min} max={max} />
       <Field label={text.field.time} name="Time" type="time" required min="10:00" max="17:00" help={chosen?.hours} />
       <Field label={text.field.name} name="Name" placeholder={text.field.nameHint} required />
       <Field label={text.field.email} name="Email" type="email" placeholder={text.field.emailHint} required />
       <Field label={text.field.phoneRequired} name="Phone" type="tel" placeholder={text.field.phoneHint} required />
-      <Select label={text.field.contactMethod} name="Contact" defaultValue="phone">
-        <option value="phone">{text.field.contactPhone}</option>
-        <option value="email">{text.field.contactEmail}</option>
-      </Select>
+      <Select
+        label={text.field.contactMethod}
+        name="Contact"
+        defaultValue="phone"
+        options={[
+          { value: "phone", label: text.field.contactPhone },
+          { value: "email", label: text.field.contactEmail },
+        ]}
+      />
       <Field label={text.field.notes} name="Notes" textarea placeholder={text.field.notesHint} className="md:col-span-2" />
       <Honeypot />
       <div className="md:col-span-2 flex flex-col gap-4">

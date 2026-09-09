@@ -1,7 +1,7 @@
 import { test, expect } from "vitest";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import { matchTyped, nextEnabled, type DropdownOption } from "@/components/shared/admin/dropdown";
+import { matchTyped, nextEnabled, type DropdownOption } from "@/components/ui/dropdown";
 
 const options: DropdownOption[] = [
   { value: "draft", label: "Draft" },

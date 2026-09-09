@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { updateRegistration } from "@/features/test-prep/actions";
-import { Dropdown } from "@/components/shared/admin/dropdown";
+import { Dropdown } from "@/components/ui/dropdown";
 
 const STATUSES = ["registered", "attended", "cancelled"];
 

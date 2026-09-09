@@ -4,6 +4,13 @@ import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 export type DropdownOption = { value: string; label: string; disabled?: boolean };
 
+const ADMIN_TRIGGER =
+  "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1";
+const ADMIN_LIST =
+  "fixed z-50 max-h-64 min-w-32 overflow-y-auto rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md";
+const ADMIN_OPTION =
+  "relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[active]:bg-accent data-[active]:text-accent-foreground aria-disabled:pointer-events-none aria-disabled:opacity-50";
+
 // Walks past disabled options and stops at the ends rather than wrapping, the way a native
 // select does.
 export function nextEnabled(options: DropdownOption[], from: number, by: number): number {
@@ -29,6 +36,13 @@ type Props = {
   disabled?: boolean;
   labelledBy?: string;
   ariaLabel?: string;
+  required?: boolean;
+  placeholder?: string;
+  // The admin and the public forms look nothing alike, so the two skins pass their own classes
+  // rather than the component carrying a variant flag.
+  triggerClassName?: string;
+  listClassName?: string;
+  optionClassName?: string;
 };
 
 export function Dropdown({
@@ -40,6 +54,11 @@ export function Dropdown({
   disabled,
   labelledBy,
   ariaLabel,
+  required,
+  placeholder,
+  triggerClassName = ADMIN_TRIGGER,
+  listClassName = ADMIN_LIST,
+  optionClassName = ADMIN_OPTION,
 }: Props) {
   const controlled = value !== undefined;
   const [own, setOwn] = useState(defaultValue ?? "");
@@ -52,13 +71,14 @@ export function Dropdown({
   const [box, setBox] = useState({ top: 0, left: 0, width: 0 });
 
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const hiddenRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const typed = useRef({ text: "", at: 0 });
   const listId = useId();
   const optionId = (index: number) => `${listId}-${index}`;
 
   const selected = options.findIndex((option) => option.value === current);
-  const label = selected >= 0 ? options[selected].label : "";
+  const label = selected >= 0 ? options[selected].label : (placeholder ?? "");
 
   const place = () => {
     const rect = triggerRef.current?.getBoundingClientRect();
@@ -103,6 +123,13 @@ export function Dropdown({
     const option = options[index];
     if (!option || option.disabled) return;
     if (!controlled) setOwn(option.value);
+    // A hidden input set by React fires nothing, so a form watching onChange to enable its
+    // submit button would never hear about the pick.
+    const input = hiddenRef.current;
+    if (input) {
+      input.value = option.value;
+      input.dispatchEvent(new Event("change", { bubbles: true }));
+    }
     onChange?.(option.value);
     setOpen(false);
     triggerRef.current?.focus();
@@ -170,7 +197,7 @@ export function Dropdown({
 
   return (
     <>
-      {name ? <input type="hidden" name={name} value={current} /> : null}
+      {name ? <input ref={hiddenRef} type="hidden" name={name} value={current} readOnly /> : null}
       <button
         ref={triggerRef}
         type="button"
@@ -182,7 +209,8 @@ export function Dropdown({
         aria-labelledby={labelledBy}
         aria-label={ariaLabel}
         disabled={disabled}
-        className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1"
+        aria-required={required || undefined}
+        className={triggerClassName}
         onClick={() => (open ? setOpen(false) : show())}
         onKeyDown={onKeyDown}
       >
@@ -199,7 +227,7 @@ export function Dropdown({
           role="listbox"
           aria-labelledby={labelledBy}
           aria-label={ariaLabel}
-          className="fixed z-50 max-h-64 min-w-32 overflow-y-auto rounded-md border border-border bg-popover p-1 text-popover-foreground shadow-md"
+          className={listClassName}
           style={{ top: box.top, left: box.left, width: Math.max(box.width, 128) }}
         >
           {options.map((option, index) => (
@@ -210,7 +238,7 @@ export function Dropdown({
               aria-selected={index === selected}
               aria-disabled={option.disabled || undefined}
               data-active={index === active || undefined}
-              className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[active]:bg-accent data-[active]:text-accent-foreground aria-disabled:pointer-events-none aria-disabled:opacity-50"
+              className={optionClassName}
               onPointerEnter={() => !option.disabled && setActive(index)}
               onClick={() => commit(index)}
             >
