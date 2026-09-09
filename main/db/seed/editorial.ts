@@ -56,7 +56,6 @@ export async function seedPosts() {
 export async function seedTestimonials() {
   const media = await mediaIdByPath();
 
-  // Nothing is published until the client confirms each person consented to being quoted.
   const written = reviews.map((review, index) => ({
     type: "text" as const,
     authorName: review.name,
@@ -64,8 +63,8 @@ export async function seedTestimonials() {
     authorPhotoId: media.get(review.avatar) ?? null,
     quote: review.quote,
     rating: 5,
-    consentGiven: false,
-    status: "draft" as const,
+    status: "published" as const,
+    publishedAt: new Date(),
     sortOrder: index,
   }));
 
@@ -73,8 +72,8 @@ export async function seedTestimonials() {
     type: "image" as const,
     displayName: story.alt,
     imageId: media.get(story.image) ?? null,
-    consentGiven: false,
-    status: "draft" as const,
+    status: "published" as const,
+    publishedAt: new Date(),
     sortOrder: reviews.length + index,
   }));
 

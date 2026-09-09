@@ -6,7 +6,6 @@ import { mediaUrl } from "@/lib/utils/media-url";
 
 export type PublicReview = { name: string; avatar: string; date: string; quote: string };
 
-// Nothing is published until consent is recorded, which is why these can come back empty.
 export const listReviews = cache(async (): Promise<PublicReview[]> => {
   const rows = await db
     .select({
@@ -20,11 +19,7 @@ export const listReviews = cache(async (): Promise<PublicReview[]> => {
     .from(testimonials)
     .leftJoin(mediaAssets, eq(testimonials.authorPhotoId, mediaAssets.id))
     .where(
-      and(
-        eq(testimonials.status, "published"),
-        eq(testimonials.type, "text"),
-        eq(testimonials.consentGiven, true),
-      ),
+      and(eq(testimonials.status, "published"), eq(testimonials.type, "text")),
     )
     .orderBy(asc(testimonials.sortOrder));
 
@@ -47,11 +42,7 @@ export const listSuccessStories = cache(async (): Promise<{ image: string; alt: 
     .from(testimonials)
     .leftJoin(mediaAssets, eq(testimonials.imageId, mediaAssets.id))
     .where(
-      and(
-        eq(testimonials.status, "published"),
-        eq(testimonials.type, "image"),
-        eq(testimonials.consentGiven, true),
-      ),
+      and(eq(testimonials.status, "published"), eq(testimonials.type, "image")),
     )
     .orderBy(asc(testimonials.sortOrder));
 

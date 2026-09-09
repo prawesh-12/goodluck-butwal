@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { contentStatuses, httpsUrl, mediaId, text } from "@/lib/validators/fields";
 import {
-  CONSENT_REQUIRED,
   requiredFieldsFor,
   testimonialTypes,
   videoProviders,
@@ -10,7 +9,7 @@ import {
   type TestimonialType,
 } from "@/config/content-meta";
 
-export { CONSENT_REQUIRED, requiredFieldsFor, testimonialTypes, videoProviders };
+export { requiredFieldsFor, testimonialTypes, videoProviders };
 export type { RequiredField, Requirement, TestimonialType };
 
 const optionalId = z.union([z.literal(""), z.uuid("Choose one from the list.")]).default("");
@@ -40,8 +39,6 @@ const fields = {
   officeId: optionalId,
   rating: z.number().int().min(1, "A rating runs from 1 to 5.").max(5, "A rating runs from 1 to 5.").nullable().default(null),
   isFeatured: z.boolean().default(false),
-  consentGiven: z.boolean().default(false),
-  consentNote: text,
   status: z.enum(contentStatuses),
   publishedAt: goLiveAt,
 };
@@ -146,7 +143,6 @@ export function testimonialPublishProblems(
   alt: TestimonialAltText,
 ): string[] {
   const problems: string[] = [];
-  if (!data.consentGiven) problems.push(CONSENT_REQUIRED);
   for (const need of missingForType(data)) problems.push(need.message);
   if (!data.displayName && !data.authorName) {
     problems.push("Give the name the public should see.");

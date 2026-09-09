@@ -142,9 +142,6 @@ export const testimonials = pgTable(
     officeId: uuid("office_id").references(() => offices.id),
     rating: smallint("rating"),
     isFeatured: boolean("is_featured").notNull().default(false),
-    // Publishing is blocked while this is false.
-    consentGiven: boolean("consent_given").notNull().default(false),
-    consentNote: text("consent_note"),
   },
   (t) => [index("testimonials_status_featured_type_idx").on(t.status, t.isFeatured, t.type)],
 );

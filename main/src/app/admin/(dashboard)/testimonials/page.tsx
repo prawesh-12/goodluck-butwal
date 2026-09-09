@@ -10,7 +10,6 @@ import { listAdminTestimonials } from "@/features/testimonials/admin-queries";
 import { PAGE_SIZE } from "@/lib/utils/admin-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
-  ConsentBadge,
   EditLink,
   EmptyState,
   FlatBadge,
@@ -87,7 +86,6 @@ export default async function TestimonialsPage({
               <TableHead>Kind</TableHead>
               <TableHead>Office</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Consent</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -109,9 +107,6 @@ export default async function TestimonialsPage({
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={row.status} />
-                </TableCell>
-                <TableCell>
-                  <ConsentBadge given={row.consentGiven} />
                 </TableCell>
                 <TableCell>
                   <span className="flex items-center justify-end gap-1">

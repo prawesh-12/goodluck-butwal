@@ -27,7 +27,6 @@ type Publishable = PgTable & {
   status: PgColumn;
   publishedAt: PgColumn;
   slug?: PgColumn;
-  consentGiven?: PgColumn;
 };
 
 const ENTITIES: { name: string; table: Publishable; paths: (slug: string) => string[] }[] = [
@@ -72,18 +71,13 @@ export async function GET(request: Request) {
         status: table.status,
         publishedAt: table.publishedAt,
         slug: table.slug ?? sql<string | null>`null`,
-        consentGiven: table.consentGiven ?? sql<boolean | null>`null`,
       })
       .from(table)
       .where(and(eq(table.status, "scheduled"), lte(table.publishedAt, now)));
 
     const due = rows.filter((row) =>
       isDueToPublish(
-        {
-          status: row.status as ScheduledRow["status"],
-          publishedAt: row.publishedAt as Date | null,
-          consentGiven: (row.consentGiven as boolean | null) ?? undefined,
-        },
+        { status: row.status as ScheduledRow["status"], publishedAt: row.publishedAt as Date | null },
         now,
       ),
     );

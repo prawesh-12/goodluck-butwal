@@ -54,8 +54,6 @@ function columns(data: TestimonialInput, bodyHtml: string, existingDate: Date | 
     officeId: blank(data.officeId),
     rating: data.rating,
     isFeatured: data.isFeatured,
-    consentGiven: data.consentGiven,
-    consentNote: blank(data.consentNote),
     status: data.status,
     publishedAt: data.publishedAt
       ? new Date(data.publishedAt)
