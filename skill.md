@@ -152,7 +152,7 @@ what it fetches and what it renders. The fetching itself belongs in a feature.
 ### `src/features/`
 
 The bulk of the application, one folder per business area: `services`, `destinations`,
-`institutions`, `courses`, `test-prep`, `posts` (news), `events`, `testimonials`, `team`,
+`institutions`, `courses`, `test-prep`, `posts` (news), `events`, `team`,
 `partners`, `offices`, `pages`, `leads` (enquiries and consultations), `media`, `settings`,
 `site-text`, `search`, `users`.
 
@@ -285,8 +285,9 @@ Data: `events`, `event_registrations`
 **Success stories and testimonials**: client quotes and outcomes, on the homepage and their own
 page.
 Route: `src/app/(site)/success-stories/page.tsx`
-Feature: `src/features/testimonials/`
-Data: the `testimonials` table
+Feature: `src/features/testimonials/components/` for the two sections
+Data: `src/config/testimonials.ts`, checked in rather than a table, because the graphics and the
+Google quotes only change when a developer adds files to `public/`
 
 **Contact**: office cards, the general enquiry form, and FAQs.
 Route: `src/app/(site)/contact/page.tsx`
@@ -321,14 +322,15 @@ to read that kind of record.
 | Section | What you manage | Screens |
 | --- | --- | --- |
 | Enquiries | enquiries and consultation requests, their status, CSV export | `admin/enquiries`, `admin/consultations` |
-| Editorial | news posts, categories, tags, events and their registrations, testimonials | `admin/posts`, `admin/events`, `admin/testimonials` |
+| Editorial | news posts, categories, tags, events and their registrations | `admin/posts`, `admin/events` |
 | Study | destinations, institutions, courses, course categories, IELTS/PTE courses and batches | `admin/destinations`, `admin/institutions`, `admin/courses`, `admin/test-prep` |
 | Site | About-style pages, services, offices, team, partners, site text, media library | `admin/pages`, `admin/services`, `admin/offices`, `admin/team`, `admin/partners`, `admin/site-text`, `admin/media` |
 | Admin | settings, users, audit log, help | `admin/settings`, `admin/users`, `admin/audit-log`, `admin/help` |
 
 Homepage content is not one screen. It is assembled from the features it shows: change a service
-in Services, a partner logo in Partners, a story in Testimonials, the hero image and Google rating
-in Settings, and the headings in Site text.
+in Services, a partner logo in Partners, the hero image and Google rating in Settings, and the
+headings in Site text. Success stories and the client quotes are not in the admin at all: they
+live in `src/config/testimonials.ts`.
 
 ### What happens when you save
 
@@ -368,7 +370,7 @@ admin and others are not.
 **CMS-managed content** lives in the database. Staff change it and the site follows.
 
 Examples: office phone numbers and opening hours, staff bios and photos, service descriptions and
-their step lists, destination pages, courses and institutions, news articles, events, testimonials,
+their step lists, destination pages, courses and institutions, news articles, events,
 the hero image, the Google rating, footer links, and almost every visible heading and button label.
 
 **Application content** lives in the code and needs a developer and a deploy to change.
@@ -414,7 +416,7 @@ related tables:
 | `destinations.ts` | `destinations`, `destination_faqs`, `services`, `service_faqs` |
 | `institutions.ts` | `institutions`, `institution_images`, `courses`, `course_categories` |
 | `test-prep.ts` | `test_prep_courses`, `test_prep_batches`, `test_prep_registrations` |
-| `editorial.ts` | `posts`, `post_categories`, `tags`, `post_tags`, `events`, `event_registrations`, `testimonials` |
+| `editorial.ts` | `posts`, `post_categories`, `tags`, `post_tags`, `events`, `event_registrations` |
 | `leads.ts` | `enquiries`, `consultations` |
 | `system.ts` | `settings`, `redirects`, `audit_log` |
 | `enums.ts` | the fixed value lists: statuses, roles, categories, levels |
@@ -496,11 +498,11 @@ browser: forms, the FAQ accordion, the office context, the animation wrappers.
 
 ### Example: the homepage
 
-`src/app/(site)/page.tsx` starts fourteen queries at once inside a single `Promise.all`, because
+`src/app/(site)/page.tsx` starts twelve queries at once inside a single `Promise.all`, because
 none of them depends on another. Each is a feature query, for example `listServices()` from
-`src/features/services/queries.ts` and `listReviews()` from
-`src/features/testimonials/queries.ts`. Each returns rows already shaped for the components. The
-page then passes those objects straight into `<Hero>`, `<Services>`, `<Reviews>` and the rest.
+`src/features/services/queries.ts`. Each returns rows already shaped for the components. The page
+then passes those objects straight into `<Hero>`, `<Services>` and the rest. `<Reviews>` and
+`<Stories>` take no rows: they read `src/config/testimonials.ts` themselves.
 
 ### Example: a service page
 
@@ -709,7 +711,7 @@ roles:
 | `super_admin` | everything, including users, settings, redirects and all offices |
 | `au_admin` | full content control, scoped to the Australia office. No test-prep editing. |
 | `np_admin` | full content control, scoped to the Nepal office, including test prep |
-| `content_editor` | can create and edit posts, events and testimonials, but cannot publish them |
+| `content_editor` | can create and edit posts and events, but cannot publish them |
 
 The complete matrix of role × entity × action is in `src/lib/auth/rbac.ts`, and that file is the
 only place in the application that decides who may do what. Nothing else should carry its own

@@ -23,7 +23,6 @@ Every row below was measured against a running server and a real Postgres, not a
 | A fourth submission within an hour is refused politely | 429 |
 | The honeypot reports success, writes a spam row, sends no email | yes |
 | A scheduled post publishes on the cron with no deploy | yes |
-| A testimonial without consent stays unpublished on that same run | yes |
 | CSV export opens in Excel with UTF-8 intact | yes, byte order mark present |
 | Automated tests | 309 passing |
 | Editable text: an admin's wording replaces the code's | verified |

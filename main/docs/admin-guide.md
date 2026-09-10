@@ -35,8 +35,6 @@ super admin.
 | Schedule an article for later | Posts, set the status to Scheduled | Any admin |
 | Add an event and open registrations | Events | Your own office |
 | See who registered | Events, then Registrations | Your own office |
-| Add a success story or video testimonial | Testimonials | Australia or Nepal admin |
-| Hide a student's name | Testimonials, then Anonymise | Australia or Nepal admin |
 | See and respond to enquiries | Enquiries | Your own office |
 | Confirm a consultation | Consultations, then Confirm | Your own office |
 | Download enquiries as a spreadsheet | Enquiries, then Export | Your own office |
@@ -56,7 +54,7 @@ Give the smallest role that does the job.
 | Super admin | Everything, plus users, settings and redirects. Two people, no more. |
 | Australia admin | Australian content and Australian enquiries |
 | Nepal admin | Nepali content, Nepali enquiries, and IELTS and PTE |
-| Content editor | Writes posts, events and testimonials. **Cannot publish, and never sees enquiries.** |
+| Content editor | Writes posts and events. **Cannot publish, and never sees enquiries.** |
 
 Nobody can change their own role or switch off their own account, and the last remaining super
 admin cannot be removed. That is on purpose: it is what stops one mistake locking everyone out.
@@ -68,10 +66,6 @@ not a fault. Nothing needs a developer to push it live.
 
 **Every image needs alt text.** It is the sentence a blind visitor hears in place of the picture.
 The admin will not let you publish a page whose image has none, and it tells you which image.
-
-**A testimonial cannot be published without consent.** Tick the consent box only when you
-genuinely have the person's permission to show their words, name or face. This is the one rule
-that protects the business rather than the website.
 
 **Deleting mostly means archiving.** An archived record leaves the site but stays in the admin, so
 a mistake is a minute to undo. Only a super admin can truly delete something, and it asks you to
@@ -110,16 +104,11 @@ week, the times, 20 seats and the fee. Save. The batches page shows it as **Open
 **Filling fast** on its own when three seats or fewer remain, and **Full** at zero. You do not set
 those labels, they follow the seats.
 
-### 6. Add a video testimonial, tick consent, publish it
-Testimonials, then New. Set the kind to **Video**, paste the link and say where it is hosted.
-Tick **Consent given** only if you actually have permission. Publish. Without consent the site
-tells you "Record consent before publishing." and refuses.
-
-### 7. Find last week's enquiry, set it to Contacted, add an internal note
+### 6. Find last week's enquiry, set it to Contacted, add an internal note
 Enquiries. Search by name, email, phone or reference, or narrow by date. Open it. Change the
 status to Contacted, write the note, save. The note is internal and the enquirer never sees it.
 
-### 8. Create a content editor account, then deactivate it
+### 7. Create a content editor account, then deactivate it
 Users, then New. Name, email, a password of at least twelve characters, role Content editor.
 Save. To switch it off later, open it and untick **Active**. Deactivating is better than
 deleting: the person is locked out immediately, and the audit log still shows what they did.

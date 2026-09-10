@@ -69,7 +69,6 @@ outage.
    union all select 'services', count(*) from services
    union all select 'destinations', count(*) from destinations
    union all select 'posts', count(*) from posts
-   union all select 'testimonials', count(*) from testimonials
    union all select 'enquiries', count(*) from enquiries
    union all select 'consultations', count(*) from consultations
    union all select 'media_assets', count(*) from media_assets
