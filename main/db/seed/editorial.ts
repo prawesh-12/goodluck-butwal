@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, notInArray } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, postCategories, posts, settings, testimonials } from "@db/schema";
 import { slugify } from "@/lib/utils/slug";
@@ -90,6 +90,16 @@ export async function seedTestimonials() {
       await db.insert(testimonials).values(row);
     }
   }
+
+  // The source list is the whole set of success stories, so a graphic that is no longer in it has
+  // been withdrawn and its row goes with it.
+  await db.delete(testimonials).where(
+    and(
+      eq(testimonials.type, "image"),
+      notInArray(testimonials.displayName, graphics.map((row) => row.displayName)),
+    ),
+  );
+
   return written.length + graphics.length;
 }
 
