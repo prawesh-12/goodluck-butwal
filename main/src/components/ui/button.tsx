@@ -8,9 +8,9 @@ import { img } from "@/config/assets";
 
 const spring = { type: "spring", stiffness: 380, damping: 32 } as const;
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
-// Hoisted, because motion(Link) inside the body would be a new component type on every render
-// and React would remount the link instead of updating it.
-const MotionLink = motion(Link);
+// Hoisted, because motion.create(Link) inside the body would be a new component type on every
+// render and React would remount the link instead of updating it.
+const MotionLink = motion.create(Link);
 
 function ArrowChip({ side, lg, flip, variants }: { side: "left" | "right"; lg: boolean; flip: boolean; variants: Variants }) {
   return (
