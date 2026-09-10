@@ -26,7 +26,6 @@ export type Entity =
   | "batches"
   | "posts"
   | "events"
-  | "testimonials"
   | "postCategories"
   | "tags"
   | "enquiries"
@@ -60,7 +59,6 @@ const MATRIX: Record<Entity, Record<UserRole, Action[]>> = {
   batches: { super_admin: CRUDP, au_admin: ["read"], np_admin: CRUDP, content_editor: NONE },
   posts: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: CRU },
   events: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: CRU },
-  testimonials: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: CRU },
   postCategories: { super_admin: CRUD, au_admin: CRU, np_admin: CRU, content_editor: ["create", "read"] },
   tags: { super_admin: CRUD, au_admin: CRU, np_admin: CRU, content_editor: ["create", "read"] },
   enquiries: {

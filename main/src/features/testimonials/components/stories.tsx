@@ -1,4 +1,5 @@
 import { img } from "@/config/assets";
+import { successStories, type SuccessStory } from "@/config/testimonials";
 import type { GoogleRating } from "@/features/settings/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { loadText } from "@/features/site-text/queries";
 // The success-story graphics carry their own text, so each sits on a plain white plate and nothing else is added.
 
 
-function StoryCard({ s, tilt }: { s: { image: string; alt: string }; tilt: number }) {
+function StoryCard({ s, tilt }: { s: SuccessStory; tilt: number }) {
   return (
     <div
       style={{ rotate: `${tilt}deg` }}
@@ -21,7 +22,7 @@ function StoryCard({ s, tilt }: { s: { image: string; alt: string }; tilt: numbe
   );
 }
 
-export async function Stories({ successStories, googleRating }: { successStories: { image: string; alt: string }[]; googleRating: GoogleRating }) {
+export async function Stories({ googleRating }: { googleRating: GoogleRating }) {
   const t = await loadText();
   const rows = [successStories.slice(0, 6), successStories.slice(6)];
   return (

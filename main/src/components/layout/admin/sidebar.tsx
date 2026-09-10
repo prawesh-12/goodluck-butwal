@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   ArrowLeftRight,
-  BookOpen,
   Building2,
   CalendarDays,
   FileText,
@@ -32,7 +31,6 @@ const ICONS: Record<string, LucideIcon> = {
   "/admin/post-categories": FolderTree,
   "/admin/tags": Tags,
   "/admin/events": CalendarDays,
-  "/admin/testimonials": BookOpen,
   "/admin/destinations": Building2,
   "/admin/institutions": GraduationCap,
   "/admin/courses": FileText,

@@ -15,7 +15,6 @@ import { listAllFaqs } from "@/features/services/queries";
 import { listDestinations } from "@/features/destinations/queries";
 import { getGoogleRating } from "@/features/settings/queries";
 import { listArticles } from "@/features/posts/queries";
-import { listReviews, listSuccessStories } from "@/features/testimonials/queries";
 import { getAboutContent } from "@/features/pages/queries";
 import { loadText } from "@/features/site-text/queries";
 import { destinationCards } from "@/features/destinations/components/destinations";
@@ -31,9 +30,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  // Nothing here depends on anything else here, so the page waits once rather than fourteen times.
+  // Nothing here depends on anything else here, so the page waits once rather than twelve times.
   const [
-    logos, faces, services, allFaqs, cards, articles, reviews, successStories, googleRating, about,
+    logos, faces, services, allFaqs, cards, articles, googleRating, about,
     upcomingEvents, socials, heroImage, t,
   ] = await Promise.all([
     listPartnerLogos(),
@@ -42,8 +41,6 @@ export default async function Home() {
     listAllFaqs(),
     listDestinations().then((rows) => destinationCards(rows)),
     listArticles(),
-    listReviews(),
-    listSuccessStories(),
     getGoogleRating(),
     getAboutContent(),
     listUpcomingEvents(),
@@ -68,8 +65,8 @@ export default async function Home() {
       <Partners logos={logos} />
       <Destinations cards={cards} />
       <Services services={services} />
-      <Reviews reviews={reviews} googleRating={googleRating} values={about.values} />
-      <Stories successStories={successStories} googleRating={googleRating} />
+      <Reviews googleRating={googleRating} values={about.values} />
+      <Stories googleRating={googleRating} />
       <Offices logos={logos} />
       <News articles={articles} />
       <Events

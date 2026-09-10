@@ -2,7 +2,7 @@ import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
 import { team } from "./source/team";
-import { reviews, successStories } from "./source/stories";
+import { reviews, successStories } from "@/config/testimonials";
 import articles from "./source/articles.json";
 import { destinations } from "./source/destinations";
 import { services } from "./source/services";

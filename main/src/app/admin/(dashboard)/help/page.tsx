@@ -18,8 +18,6 @@ const WHERE: [string, string, string][] = [
   ["Schedule an article for later", "Posts, status Scheduled", "Any admin"],
   ["Add an event and open registrations", "Events", "Own office"],
   ["See who registered", "Events, then Registrations", "Own office"],
-  ["Add a success story or video testimonial", "Testimonials", "Australia or Nepal admin"],
-  ["Hide a student's name", "Testimonials, Anonymise", "Australia or Nepal admin"],
   ["See and respond to enquiries", "Enquiries", "Own office"],
   ["Confirm a consultation", "Consultations, then Confirm", "Own office"],
   ["Download enquiries as a spreadsheet", "Enquiries, then Export", "Own office"],

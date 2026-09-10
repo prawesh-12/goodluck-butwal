@@ -8,7 +8,6 @@ import {
   posts,
   services,
   teamMembers,
-  testimonials,
 } from "@db/schema";
 
 export const PAGE_SIZE = 48;
@@ -76,8 +75,6 @@ const REFERENCES = [
   { table: services, column: services.artworkId, label: services.name, kind: "Service artwork" },
   { table: services, column: services.reelId, label: services.name, kind: "Service reel" },
   { table: posts, column: posts.bannerImageId, label: posts.title, kind: "Post banner" },
-  { table: testimonials, column: testimonials.imageId, label: testimonials.displayName, kind: "Testimonial" },
-  { table: testimonials, column: testimonials.authorPhotoId, label: testimonials.displayName, kind: "Testimonial photo" },
 ] as const;
 
 export type Usage = { kind: string; label: string };

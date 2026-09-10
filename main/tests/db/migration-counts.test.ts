@@ -9,7 +9,6 @@ import {
   serviceFaqs,
   services,
   teamMembers,
-  testimonials,
 } from "@db/schema";
 
 // Needs a seeded database. CI has none, so it stands aside there rather than failing.
@@ -22,7 +21,6 @@ const EXPECTED = [
   ["destinations", destinations, 3],
   ["post_categories", postCategories, 7],
   ["posts", posts, 31],
-  ["testimonials", testimonials, 18],
   ["pages", pages, 5],
   ["service_faqs", serviceFaqs, 5],
 ] as const;

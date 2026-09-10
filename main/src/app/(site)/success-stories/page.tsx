@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { img } from "@/config/assets";
 import { getGoogleRating } from "@/features/settings/queries";
-import { listReviews, listSuccessStories } from "@/features/testimonials/queries";
+import { reviews, successStories } from "@/config/testimonials";
 import { loadText } from "@/features/site-text/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
@@ -19,12 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SuccessStoriesPage() {
-  const [successStories, reviews, googleRating, t] = await Promise.all([
-    listSuccessStories(),
-    listReviews(),
-    getGoogleRating(),
-    loadText(),
-  ]);
+  const [googleRating, t] = await Promise.all([getGoogleRating(), loadText()]);
 
   return (
     <>

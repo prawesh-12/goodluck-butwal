@@ -10,7 +10,6 @@ import {
   pages,
   services,
   testPrepCourses,
-  testimonials,
 } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
@@ -35,7 +34,6 @@ const KINDS: Record<
   course: { entity: "courses", table: courses, slug: courses.slug, title: courses.name, body: courses.descriptionHtml, status: courses.status },
   event: { entity: "events", table: events, slug: events.slug, title: events.title, body: events.descriptionHtml, status: events.status },
   "test-prep": { entity: "testPrep", table: testPrepCourses, slug: testPrepCourses.slug, title: testPrepCourses.name, body: testPrepCourses.descriptionHtml, status: testPrepCourses.status },
-  testimonial: { entity: "testimonials", table: testimonials, slug: testimonials.displayName, title: testimonials.displayName, body: testimonials.bodyHtml, status: testimonials.status },
 };
 
 export default async function Preview({

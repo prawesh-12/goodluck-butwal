@@ -19,7 +19,6 @@ export const NAV: NavGroup[] = [
       { href: "/admin/post-categories", label: "Categories", entity: "postCategories" },
       { href: "/admin/tags", label: "Tags", entity: "tags" },
       { href: "/admin/events", label: "Events", entity: "events" },
-      { href: "/admin/testimonials", label: "Testimonials", entity: "testimonials" },
     ],
   },
   {

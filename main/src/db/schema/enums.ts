@@ -60,9 +60,7 @@ export const eventType = pgEnum("event_type", [
 
 export const regStatus = pgEnum("reg_status", ["registered", "attended", "cancelled"]);
 
-export const testimonialType = pgEnum("testimonial_type", ["text", "image", "video"]);
 
-export const videoProvider = pgEnum("video_provider", ["youtube", "vimeo", "local"]);
 
 export const contactMethod = pgEnum("contact_method", ["email", "phone", "whatsapp"]);
 

@@ -1,6 +1,6 @@
 import { img } from "@/config/assets";
 import type { GoogleRating } from "@/features/settings/queries";
-import type { PublicReview } from "@/features/testimonials/queries";
+import { reviews, type Review } from "@/config/testimonials";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg } from "@/components/ui/bits";
@@ -13,7 +13,7 @@ const metaFor = (googleRating: GoogleRating, t: Text) => [
 ];
 
 // Reviewers have no photo on Google, so an initial stands in.
-export function ReviewCard({ r, className = "" }: { r: PublicReview; className?: string }) {
+export function ReviewCard({ r, className = "" }: { r: Review; className?: string }) {
   return (
     <div className={`flex flex-col items-start justify-between overflow-hidden rounded-[10px] bg-white p-5 md:rounded-[30px] md:p-10 ${className}`}>
       <div className="flex flex-col items-start gap-4 pb-10">
@@ -32,7 +32,7 @@ export function ReviewCard({ r, className = "" }: { r: PublicReview; className?:
 }
 
 // Magic UI's testimonial card: photo, name and source up top, stars where the bird icon sits, quote below.
-function ReviewTile({ r, source }: { r: PublicReview; source: string }) {
+function ReviewTile({ r, source }: { r: Review; source: string }) {
   return (
     <figure className="flex w-[300px] flex-col gap-4 rounded-2xl border border-hairline bg-white p-5 md:w-[400px]">
       <div className="flex flex-wrap items-center gap-3">
@@ -51,7 +51,7 @@ function ReviewTile({ r, source }: { r: PublicReview; source: string }) {
 // Two rows like the Magic UI marquee demo: top drifts right, bottom drifts left. Linear, since it never stops.
 
 
-export async function Reviews({ reviews, googleRating, values }: { reviews: PublicReview[]; googleRating: GoogleRating; values: string }) {
+export async function Reviews({ googleRating, values }: { googleRating: GoogleRating; values: string }) {
   const t = await loadText();
   const meta = metaFor(googleRating, t);
   const rows = [reviews.slice(0, 3), reviews.slice(3)];

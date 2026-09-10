@@ -15,7 +15,6 @@ import {
   services,
   teamMembers,
   testPrepCourses,
-  testimonials,
 } from "@db/schema";
 import { writeAudit } from "@/lib/security/audit";
 import { isDueToPublish, type ScheduledRow } from "@/lib/utils/scheduled";
@@ -49,7 +48,6 @@ const ENTITIES: { name: string; table: Publishable; paths: (slug: string) => str
   },
   { name: "posts", table: posts, paths: (s) => ["/news", `/news/${s}`] },
   { name: "events", table: events, paths: (s) => ["/events", `/events/${s}`] },
-  { name: "testimonials", table: testimonials, paths: () => ["/", "/success-stories"] },
 ];
 
 export async function GET(request: Request) {
