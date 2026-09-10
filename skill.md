@@ -458,8 +458,9 @@ the schema by Drizzle Kit and live in `db/migrations/`. Configuration: `drizzle.
 
 **Seeds**: scripts that fill an empty database with the starting content: offices, services,
 destinations, site text, the media rows for everything in `public/`. In `db/seed/`, entry point
-`db/seed/from-content.ts`, run with `pnpm db:seed`. Every step matches on a natural key and
-upserts, so running the seed twice changes nothing.
+`db/seed/from-content.ts`, run with `pnpm db:seed:dev` locally or `pnpm db:seed:prod` against
+production. Every step matches on a natural key and upserts, so running the seed twice changes
+nothing.
 
 **Local database**: `docker-compose.yml` runs PostgreSQL plus a small proxy that speaks Neon's
 HTTP protocol in front of it, on port 4444. This exists so local development and production run
@@ -1057,7 +1058,7 @@ the table, but there is no page under `src/app/admin/(dashboard)/redirects/`.
 Instead: rows go in by hand, or the page needs building.
 
 **The seed overwrites what it seeds**
-What can go wrong: running `pnpm db:seed` against a database an admin has been editing.
+What can go wrong: running `pnpm db:seed:prod` against a database an admin has been editing.
 Why: most steps upsert the seeded fields, so an admin's edit to a seeded row can be reverted.
 Instead: seed an empty or development database. Do not run it against production content.
 
@@ -1145,7 +1146,7 @@ pnpm typecheck   # check every type without building. The fastest useful check.
 pnpm lint        # check code style and catch common mistakes
 pnpm test        # run the test suite once (Vitest)
 pnpm build       # produce the production build, including prerendered pages
-pnpm db:seed     # fill the database with starting content
+pnpm db:seed:dev # fill the local database with starting content
 ```
 
 All of these run from `main/`.

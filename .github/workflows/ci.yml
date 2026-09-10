@@ -51,13 +51,9 @@ jobs:
       # drizzle-kit migrate speaks Neon's websocket protocol, which the local proxy does not
       # serve, so the generated SQL is applied straight to Postgres.
       - name: Apply migrations
-        run: |
-          for file in db/migrations/*.sql; do
-            echo "applying $file"
-            docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -q -U postgres -d goodluck < "$file"
-          done
+        run: pnpm db:migrate:dev
 
-      # db:seed reads .env.local, which does not exist here. --dev adds the placeholder
+      # db:seed:dev reads .env.local, which does not exist here. --dev adds the placeholder
       # catalogue the course and filter tests need.
       - name: Seed
         run: pnpm exec tsx db/seed/from-content.ts --dev

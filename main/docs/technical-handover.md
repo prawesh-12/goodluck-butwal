@@ -87,6 +87,7 @@ cd main
 pnpm install
 docker compose up -d          # Postgres, plus a proxy that speaks Neon's protocol
 cp .env.example .env.local    # then fill it in
+pnpm db:migrate:dev           # apply the migrations to the fresh database
 pnpm db:seed:dev              # content, plus placeholder catalogue rows
 pnpm dev
 ```
@@ -96,11 +97,9 @@ unreachable without it. With it, development and production run the same driver 
 client code, which means a query that works locally works deployed.
 
 `drizzle-kit migrate` is the one tool that cannot use the proxy, because it wants a WebSocket.
-Apply migrations locally with `psql` instead:
-
-```bash
-docker compose exec -T postgres psql -U postgres -d goodluck -v ON_ERROR_STOP=1 < db/migrations/0000_init.sql
-```
+That is why the two migrate commands do not match: `pnpm db:migrate:dev` pipes every file in
+`db/migrations/` through `psql` in the container, in order. It has no journal, so it applies the
+whole set every time and belongs to a fresh database, not one already migrated.
 
 Production migrations run through `drizzle-kit migrate` in the deploy workflow, which is the path
 that matters.
@@ -114,8 +113,10 @@ that matters.
 | `pnpm lint` | ESLint. Runs with a raised heap; the codebase outgrew Node's default. |
 | `pnpm test` | Vitest. The database tests stand aside when `DATABASE_URL` is unset. |
 | `pnpm build` | The Next build, the same one Vercel runs |
-| `pnpm db:seed` | Real content only |
-| `pnpm db:seed:dev` | Adds placeholder catalogue rows, marked `[PLACEHOLDER]`, as drafts |
+| `pnpm db:migrate:dev` | Applies every migration to the local database, for a fresh one |
+| `pnpm db:migrate:prod` | Applies pending migrations to production, the same step the deploy runs |
+| `pnpm db:seed:dev` | Seeds the local database, with placeholder catalogue rows marked `[PLACEHOLDER]` as drafts |
+| `pnpm db:seed:prod` | Seeds production with the real content only |
 
 pnpm only. Never `npm` or `yarn`, and never commit a second lockfile.
 
