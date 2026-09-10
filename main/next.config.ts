@@ -1,7 +1,17 @@
 import type { NextConfig } from "next";
 
-const immutableCache = [
-  { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+// Names under /images and /brand are stable and the files behind them get replaced in place, so
+// "immutable" pinned the old bytes in every browser that had already loaded one. Revalidation
+// keeps the bandwidth saving, because a 304 carries no body, and a replacement shows up within
+// the hour instead of the year.
+const assetCache = [
+  {
+    key: "Cache-Control",
+    value:
+      process.env.NODE_ENV === "production"
+        ? "public, max-age=3600, must-revalidate"
+        : "no-store",
+  },
 ];
 
 // React refresh compiles with eval in development. Production never needs it.
@@ -44,8 +54,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/images/:path*", headers: immutableCache },
-      { source: "/brand/:path*", headers: immutableCache },
+      { source: "/images/:path*", headers: assetCache },
+      { source: "/brand/:path*", headers: assetCache },
       {
         source: "/:path*",
         headers: [

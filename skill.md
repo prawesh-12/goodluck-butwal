@@ -623,7 +623,7 @@ redirect table is loaded once and held in memory for five minutes, with one refr
 time and the previous map kept if a refresh fails.
 `src/lib/seo/redirects.ts`
 
-**Static assets are served with a one-year immutable cache header** under `/images` and `/brand`.
+**Static assets under `/images` and `/brand` are cached for an hour and then revalidated.**
 `next.config.ts`
 
 ---
@@ -847,7 +847,7 @@ are referenced by URL rather than by id, so those are found by searching the HTM
 
 **Static assets that are not CMS-managed** are the page furniture: the hero sky and meadow,
 background textures, arrows, icons, flags, the brand logo. They are referenced from
-`src/config/assets.ts` and served from `public/`, with a one-year immutable cache header.
+`src/config/assets.ts` and served from `public/`, cached for an hour and then revalidated.
 
 **Before adding another image mechanism**, read `src/lib/utils/media-url.ts`, the `media_assets`
 part of `src/db/schema/core.ts`, and `src/lib/integrations/cloudinary.ts`. There is one path from
@@ -1117,8 +1117,10 @@ file in the repository. `main/.env.example` is the annotated list.
 | `BUILD_CPUS` | local builds only. See below. |
 
 **Caching in production.** Public pages are ISR at five minutes, plus immediate revalidation when
-an admin saves. Static files under `/images` and `/brand` carry a one-year immutable header. The
-admin, the form endpoints and the exports are never cached.
+an admin saves. Static files under `/images` and `/brand` are cached for an hour and then
+revalidated, because their names stay the same when the file behind one is replaced and an
+immutable header would hide the replacement for a year. The admin, the form endpoints and the
+exports are never cached.
 
 **Security headers** are set for every response in `next.config.ts`: a Content Security Policy,
 HSTS, `X-Content-Type-Options`, `X-Frame-Options`, a referrer policy and a permissions policy. The
