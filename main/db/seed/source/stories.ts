@@ -12,18 +12,17 @@ export const reviews = [
   { name: "Manish Dahal", avatar: "/images/reviewers/manish-dahal.webp", date: "Aug 2024", quote: "They guided me through every step of my visa process with great expertise and patience. Their team is friendly, professional, and always ready to help. Thanks to them, I got my visa without any stress." },
 ];
 
-// The 12 published success stories (goodluck_main/project). Each is a graphic with the story in the artwork.
+// The published success stories (goodluck_main/project). Each is a graphic with the story in the artwork.
 export const successStories = [
-  { image: "/images/success-stories/story-01.webp", alt: "Success story: Sajmin Chaudhary" },
-  { image: "/images/success-stories/story-02.webp", alt: "Success story: Sharmila Basnet, subclass 500" },
-  { image: "/images/success-stories/story-03.webp", alt: "Success story: Sijan Bhandari, subclass 408 visa grant" },
-  { image: "/images/success-stories/story-04.webp", alt: "Success story: Suraj Pokheral, PTE" },
-  { image: "/images/success-stories/story-05.webp", alt: "Success story: Mark" },
-  { image: "/images/success-stories/story-06.webp", alt: "Client review: Lotis Cueno" },
-  { image: "/images/success-stories/story-07.webp", alt: "Congratulations Swornim Maharjan, student dependent visa granted" },
-  { image: "/images/success-stories/story-08.webp", alt: "Congratulations Angelo John Villas, tourist to student visa grant" },
-  { image: "/images/success-stories/story-09.webp", alt: "Congratulations Bianda Cathleen Marco and Edmund Caeandang, tourist to student visa grant, dependent case" },
-  { image: "/images/success-stories/story-10.webp", alt: "Congratulations Robin Sunwar, 485 extension granted" },
-  { image: "/images/success-stories/story-11.webp", alt: "Congratulations Shila and Bipin, dependent visa granted within 10 days" },
-  { image: "/images/success-stories/story-12.webp", alt: "Client review: Ajoy Mahorjan" },
+  { image: "/images/success-stories/story-01.webp", alt: "Congratulations Swornim Maharjan, student dependent visa granted" },
+  { image: "/images/success-stories/story-02.webp", alt: "Congratulations Angelo John Villas, tourist to student visa grant" },
+  { image: "/images/success-stories/story-03.webp", alt: "Congratulations Bianda Cathleen Marco and Edmund Caeandang, tourist to student visa grant, dependent case" },
+  { image: "/images/success-stories/story-04.webp", alt: "Congratulations Robin Sunwar, 485 extension granted" },
+  { image: "/images/success-stories/story-05.webp", alt: "Congratulations Shila and Bipin, dependent visa granted within 10 days" },
+  { image: "/images/success-stories/story-06.webp", alt: "Client review: Ajoy Mahorjan" },
+  { image: "/images/success-stories/story-07.webp", alt: "Success story: Anil Maharjan, former Nepalese national player" },
+  { image: "/images/success-stories/story-08.webp", alt: "Success story: Asween Bhattarai, temporary activity visa approved and student visa secured" },
+  { image: "/images/success-stories/story-09.webp", alt: "Success story: Chandan Kumar Das, subclass 408 to student visa subclass 500" },
+  { image: "/images/success-stories/story-10.webp", alt: "Success story: Nirajan Maharjan, former Nepalese national soccer player" },
+  { image: "/images/success-stories/story-11.webp", alt: "Success story: Rumesh Bartaula, student visa granted" },
 ];

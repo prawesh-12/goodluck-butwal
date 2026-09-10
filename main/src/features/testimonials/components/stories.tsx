@@ -5,7 +5,7 @@ import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg, Ticker } from "@/components/ui/bits";
 import { loadText } from "@/features/site-text/queries";
 
-// The twelve success-story graphics carry their own text, so each sits on a plain white plate and nothing else is added.
+// The success-story graphics carry their own text, so each sits on a plain white plate and nothing else is added.
 
 
 function StoryCard({ s, tilt }: { s: { image: string; alt: string }; tilt: number }) {
