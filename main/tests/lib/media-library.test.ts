@@ -53,8 +53,8 @@ test("no route accepts an uploaded file body", () => {
 });
 
 test("the browser posts the file to cloudinary itself", () => {
-  const client = readFileSync("src/features/media/components/asset-library.tsx", "utf8");
-  expect(client).toContain("ticket.data.endpoint");
+  const client = readFileSync("src/features/media/components/upload-dialog.tsx", "utf8");
+  expect(client).toContain("ticket.endpoint");
   expect(client).toContain("recordUpload");
 });
 

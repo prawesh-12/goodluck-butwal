@@ -34,6 +34,8 @@
   --color-destructive-foreground: #fafafa;
   --color-success: #15803d;
   --color-success-foreground: #fafafa;
+  --color-warning: #b45309;
+  --color-warning-foreground: #fafafa;
   --color-border: #dde5ed;
   --color-input: #dde5ed;
   --color-ring: #3b82f6;
@@ -168,14 +170,18 @@
 }
 @media (min-width: 1200px) { .article h2 { font-size: 32px; } }
 
-/* Admin panel. Every rule is scoped under .admin so the public pages cannot be reached. */
-/* shadcn baseline for the admin tree only: plain divs read as foreground on
-   background, and every control inherits the app font. */
-.admin { background: var(--color-background); color: var(--color-foreground); font-family: var(--font-body); }
+/* Admin panel. Every rule is scoped under .admin so the public pages cannot be reached.
+   Everything else the admin draws is a shadcn component styled with Tailwind utilities. */
+.admin { min-height: 100vh; background: var(--color-background); color: var(--color-foreground); font-family: var(--font-body); }
 .admin * { border-color: var(--color-border); }
-/* The sidebar list is the only scrollable column in the admin shell. Thin,
-   quiet, overlay-free: the layout must not shift when it appears, and a
-   scroll in the nav must never move the page behind it. */
+
+/* Chrome draws its old stepper scrollbar otherwise. Both properties inherit, so the one rule
+   covers the page, the sidebar and every scrolling panel under it. */
+.admin-root { scrollbar-width: thin; scrollbar-color: var(--color-gray-text) transparent; }
+
+/* The sidebar list is the only scrollable column in the admin shell. Thin, quiet, overlay-free:
+   the layout must not shift when it appears, and a scroll in the nav must never move the page
+   behind it. */
 .admin-sidebar-nav {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
@@ -192,85 +198,3 @@
   background-clip: content-box;
 }
 .admin-sidebar-nav::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); border: 3px solid transparent; background-clip: content-box; }
-/* Chrome draws its old stepper scrollbar in the sidebar otherwise. Both properties inherit, so
-   the one rule covers the page, the sidebar and the media picker. */
-.admin-root { scrollbar-width: thin; scrollbar-color: var(--color-gray-text) transparent; }
-.admin { display: flex; min-height: 100vh; background: var(--color-surface); font-family: var(--font-body); }
-
-.admin-badge { padding: 3px 9px; border-radius: 999px; background: var(--color-surface); border: 1px solid var(--color-hairline); font-size: 12px; font-weight: 600; color: var(--color-muted); }
-
-.admin-tile { display: flex; flex-direction: column; gap: 4px; padding: 18px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; color: var(--color-muted); }
-.admin-tile:hover { border-color: var(--color-blue); }
-
-.admin-login { align-items: center; justify-content: center; }
-.admin-login-card { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 360px; padding: 28px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 12px; }
-.admin-field { display: flex; flex-direction: column; gap: 5px; color: var(--color-muted); }
-/* One box for every field. */
-.admin input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
-.admin select,
-.admin textarea { width: 100%; padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; color: var(--color-ink); background: #fff; }
-.admin textarea { min-height: 84px; resize: vertical; }
-/* The only select left is the multiple one on the post form, which is a list box in the page
-   rather than a dropdown the operating system draws. */
-.admin select { appearance: none; cursor: default; }
-
-/* The dropdown replacing the native select. The closed button copies the field box above so a
-   form reads as one set of controls. */
-/* Fixed, so a list opening from the last row of a table is not cut off by its clipped corners.
-   Above the media picker, which is the highest thing an admin can open under it. */
-.admin input:focus-visible,
-.admin select:focus-visible,
-.admin textarea:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
-.admin-error { color: #b42318; }
-.admin-empty { color: var(--color-muted); margin-top: 16px; }
-.admin-table { width: 100%; margin-top: 18px; border-collapse: collapse; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; overflow: hidden; font-size: 15px; }
-.admin-table th { text-align: left; padding: 10px 14px; background: var(--color-surface); font-weight: 600; color: var(--color-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-.admin-table td { padding: 10px 14px; border-top: 1px solid var(--color-hairline); color: var(--color-ink); }
-/* A link inherits its colour from the reset, so every one in a table read as plain text. The row
-   name is not a link at all now, it has an Edit button of its own. */
-.admin-table a:not(.admin-btn) { color: var(--color-blue-deep); text-decoration: underline; text-underline-offset: 2px; }
-.admin-table a:not(.admin-btn):hover { color: var(--color-blue); }
-/* Three short words, so they belong on one line. */
-.admin-table a[target="_blank"] { white-space: nowrap; }
-.admin-count { color: var(--color-muted); margin-bottom: 4px; }
-.admin-subhead { margin-top: 26px; }
-.admin-facts { display: grid; gap: 12px 24px; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); margin-top: 18px; }
-.admin-facts dt { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--color-gray-text); }
-.admin-facts dd { margin: 2px 0 0; color: var(--color-ink); }
-.admin-message { margin-top: 10px; padding: 16px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; white-space: pre-wrap; }
-.admin-editor { display: flex; flex-direction: column; gap: 12px; max-width: 620px; }
-.admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-
-/* The public pill, minus the arrow chip. btn-black-sm carries only a background and a shadow, so
-   admin buttons using it alone had no padding, no radius and black text on a black gradient.
-   Quiet is the default because most of these are toolbar and navigation buttons; the one action
-   that submits a form is the solid one. */
-.admin-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 36px; padding: 7px 18px; border: 1px solid var(--color-hairline); border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; line-height: 18.2px; white-space: nowrap; cursor: pointer; transition: background-color .2s, color .2s, border-color .2s; background: #fff; color: var(--color-ink); }
-.admin-btn:hover { background: var(--color-surface); }
-.admin-btn:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 2px; }
-.admin-btn:disabled { cursor: not-allowed; opacity: .45; }
-.admin-btn:disabled:hover { background: #fff; }
-
-.admin-btn-primary { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
-.admin-btn-primary:hover { background: #000; border-color: #000; }
-.admin-btn-primary:disabled:hover { background: var(--color-ink); }
-
-/* Delete looked exactly like Save. The only thing between an admin and a lost row was the
-   confirm dialog. */
-.admin-btn-danger { color: #b42318; border-color: #f0c2bd; }
-.admin-btn-danger:hover { background: #b42318; color: #fff; border-color: #b42318; }
-.admin-btn-danger:disabled:hover { background: #fff; color: #b42318; }
-
-.admin-clash { display: block; font-size: 12px; font-weight: 600; color: #b42318; }
-.admin-media-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--color-surface); border-radius: 6px; }
-.admin-help { color: var(--color-muted); }
-.admin-picker-current { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 8px; }
-.admin-picker-thumb { width: 76px; height: 58px; object-fit: contain; background: var(--color-surface); border-radius: 6px; }
-.admin-picker-dialog { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(29,29,29,0.45); }
-.admin-picker-panel { display: flex; flex-direction: column; gap: 14px; width: min(900px, 100%); max-height: 80vh; overflow: auto; padding: 20px; background: #fff; border-radius: 12px; }
-.admin-picker-head { display: flex; gap: 10px; }
-.admin-picker-head input { flex: 1; padding: 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; }
-.admin-picker-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
-.admin-picker-item { display: flex; flex-direction: column; gap: 4px; padding: 8px; text-align: left; background: #fff; border: 1px solid var(--color-hairline); border-radius: 8px; cursor: pointer; }
-.admin-picker-item:hover { border-color: var(--color-blue); }
-.admin-picker-item img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--color-surface); border-radius: 6px; }

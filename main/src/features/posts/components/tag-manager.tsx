@@ -2,136 +2,174 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Hash, Pencil, Trash2 } from "lucide-react";
 import { createTag, deleteTag, updateTag } from "@/features/posts/taxonomy-actions";
+import { Button } from "@/components/ui/admin/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/admin/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { TextField } from "@/components/shared/admin/fields";
+import { DataCard } from "@/components/shared/admin/list-ui";
+import { EmptyState } from "@/components/shared/admin/states";
+import { useAction } from "@/components/shared/admin/use-action";
 
 export type TagRow = { id: string; slug: string; name: string };
 
+type Draft = { id?: string; name: string; slug: string };
+
 export function TagManager({
   rows,
+  canCreate,
   canEdit,
   canDelete,
 }: {
   rows: TagRow[];
+  canCreate: boolean;
   canEdit: boolean;
   canDelete: boolean;
 }) {
+  const router = useRouter();
+  const { busy, errors, setErrors, run } = useAction();
+  const [draft, setDraft] = useState<Draft | null>(null);
+
+  const openDraft = (next: Draft) => {
+    setErrors({});
+    setDraft(next);
+  };
+
+  const set = (key: keyof Draft, value: string) =>
+    setDraft((current) => (current ? { ...current, [key]: value } : current));
+
+  const save = async () => {
+    if (!draft) return;
+    const payload = { name: draft.name, slug: draft.slug };
+    const saved = await run(() => (draft.id ? updateTag({ ...payload, id: draft.id }) : createTag(payload)), {
+      success: "Tag saved",
+      failure: "Couldn't save the tag.",
+    });
+    if (!saved) return;
+    setDraft(null);
+    router.refresh();
+  };
+
+  const remove = async (row: TagRow) => {
+    const done = await run(() => deleteTag({ id: row.id }), {
+      success: "Tag deleted",
+      failure: "Couldn't delete the tag.",
+    });
+    if (done) router.refresh();
+  };
+
+  const newTag = canCreate ? <Button onClick={() => openDraft({ name: "", slug: "" })}>New tag</Button> : null;
+
   return (
     <>
-      <NewTag />
-      {rows.map((row) => (
-        <TagEditor key={row.id} row={row} canEdit={canEdit} canDelete={canDelete} />
-      ))}
-    </>
-  );
-}
-
-function NewTag() {
-  const router = useRouter();
-  const [name, setName] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
-  return (
-    <form
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const result = await createTag({ name, slug: "" });
-        setBusy(false);
-        setMessage(result.ok ? "Added." : result.error);
-        if (!result.ok) return;
-        setName("");
-        router.refresh();
-      }}
-    >
-      <h2 className="t-h5 admin-subhead">Add a tag</h2>
-      <label className="admin-field">
-        <span className="t-small">Name</span>
-        <input value={name} onChange={(event) => setName(event.target.value)} />
-        <span className="t-small admin-help">
-          Tags sit at the foot of an article and gather related articles on one page.
-        </span>
-      </label>
-      <div className="admin-actions">
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy || !name}>
-          {busy ? "Adding" : "Add"}
-        </button>
-        {message ? <span className="t-small">{message}</span> : null}
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-sm text-muted-foreground">Tags sit at the foot of an article and gather related ones.</p>
+        {newTag}
       </div>
-    </form>
-  );
-}
 
-function TagEditor({
-  row,
-  canEdit,
-  canDelete,
-}: {
-  row: TagRow;
-  canEdit: boolean;
-  canDelete: boolean;
-}) {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+      {rows.length === 0 ? (
+        <EmptyState
+          icon={Hash}
+          title="No tags yet"
+          description="Add a tag to link articles on the same subject."
+          action={newTag}
+        />
+      ) : (
+        <DataCard>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="font-medium">{row.name}</TableCell>
+                  <TableCell>
+                    <span className="flex items-center justify-end gap-1">
+                      {canEdit ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openDraft({ id: row.id, name: row.name, slug: row.slug })}
+                        >
+                          <Pencil />
+                          Edit
+                        </Button>
+                      ) : null}
+                      {canDelete ? (
+                        <ConfirmDialog
+                          trigger={
+                            <Button variant="ghost" size="icon-sm" className="text-destructive">
+                              <Trash2 />
+                              <span className="sr-only">Delete {row.name}</span>
+                            </Button>
+                          }
+                          title={`Delete the ${row.name} tag?`}
+                          description="It comes off every article using it."
+                          confirmLabel="Delete tag"
+                          onConfirm={() => remove(row)}
+                        />
+                      ) : null}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataCard>
+      )}
 
-  return (
-    <form
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const form = new FormData(event.currentTarget);
-        const result = await updateTag({
-          id: row.id,
-          name: String(form.get("name") ?? ""),
-          slug: String(form.get("slug") ?? ""),
-        });
-        setBusy(false);
-        setMessage(result.ok ? "Saved." : result.error);
-        if (result.ok) router.refresh();
-      }}
-    >
-      <label className="admin-field">
-        <span className="t-small">Name</span>
-        <input name="name" defaultValue={row.name} readOnly={!canEdit} />
-        <span className="t-small admin-help">The word shown on the article.</span>
-      </label>
+      <Dialog open={draft !== null} onOpenChange={(open) => (open ? null : setDraft(null))}>
+        <DialogContent aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>{draft?.id ? "Edit tag" : "New tag"}</DialogTitle>
+          </DialogHeader>
 
-      <label className="admin-field">
-        <span className="t-small">Web address</span>
-        <input name="slug" defaultValue={row.slug} readOnly={!canEdit} />
-        <span className="t-small admin-help">The tag page lives at /news/tag/{row.slug}.</span>
-      </label>
-
-      <div className="admin-actions">
-        {canEdit ? (
-          <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-            {busy ? "Saving" : "Save"}
-          </button>
-        ) : null}
-
-        {canDelete ? (
-          <button
-            type="button"
-            className="admin-btn admin-btn-danger"
-            disabled={busy}
-            onClick={async () => {
-              if (!window.confirm(`Delete the ${row.name} tag? It comes off every article using it.`)) return;
-              setBusy(true);
-              const result = await deleteTag({ id: row.id });
-              setBusy(false);
-              setMessage(result.ok ? "Deleted." : result.error);
-              if (result.ok) router.refresh();
+          <form
+            className="space-y-5"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void save();
             }}
           >
-            Delete
-          </button>
-        ) : null}
+            <TextField
+              name="name"
+              label="Name"
+              value={draft?.name ?? ""}
+              onChange={(value) => set("name", value)}
+              error={errors.name?.[0]}
+            />
+            <TextField
+              name="slug"
+              label="URL slug"
+              value={draft?.slug ?? ""}
+              help="Used in the page address."
+              onChange={(value) => set("slug", value)}
+              error={errors.slug?.[0]}
+            />
 
-        {message ? <span className="t-small">{message}</span> : null}
-      </div>
-    </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDraft(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={busy}>
+                {busy ? "Saving..." : "Save"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

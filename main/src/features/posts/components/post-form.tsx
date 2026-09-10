@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { company } from "@/config/site";
-import { slugify } from "@/lib/utils/slug";
+import { ExternalLink } from "lucide-react";
 import { EXCERPT_MAX } from "@/config/content-meta";
+import { slugify } from "@/lib/utils/slug";
 import { archivePost, createPost, updatePost } from "@/features/posts/actions";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
 import type { EditorialOptions } from "@/features/posts/admin-queries";
+import { Button } from "@/components/ui/admin/button";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { MultiSelectField, SelectField, TextAreaField, TextField } from "@/components/shared/admin/fields";
+import { ErrorState } from "@/components/shared/admin/states";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
-import { Select } from "@/components/shared/admin/repeater";
+import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
 
 // Tiptap is a large dependency and belongs only in the browser, so the Worker never bundles it.
 const RichText = dynamic(() => import("@/components/shared/admin/editor-rich-text"), { ssr: false });
@@ -31,7 +35,11 @@ export type PostValues = {
   status: string;
 };
 
-type FieldErrors = Record<string, string[] | undefined>;
+const publishableStatuses = [
+  { value: "draft", label: "Draft" },
+  { value: "published", label: "Published" },
+  { value: "archived", label: "Archived" },
+];
 
 export function PostForm({
   values,
@@ -47,203 +55,253 @@ export function PostForm({
   canDelete: boolean;
 }) {
   const router = useRouter();
-  const [title, setTitle] = useState(values.title);
-  const [slug, setSlug] = useState(values.slug);
+  const { busy, errors, run } = useAction();
+  const [form, setForm] = useState(values);
+  const [dirty, setDirty] = useState(false);
   const [slugTouched, setSlugTouched] = useState(Boolean(values.id));
-  const [excerpt, setExcerpt] = useState(values.excerpt);
-  const [body, setBody] = useState(values.bodyHtml);
-  const [status, setStatus] = useState(values.status);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [live, setLive] = useState(values.status === "published");
+  const askToPublish = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    focusFirstError(errors);
+  }, [errors]);
+
+  const set = <K extends keyof PostValues>(key: K, value: PostValues[K]) => {
+    setForm((current) => ({ ...current, [key]: value }));
+    setDirty(true);
+  };
+
+  const setTitle = (title: string) => {
+    setForm((current) => ({ ...current, title, slug: slugTouched ? current.slug : slugify(title) }));
+    setDirty(true);
+  };
+
+  const goingLive = form.status === "published" && !live;
+
+  const persist = async () => {
+    const payload = {
+      title: form.title,
+      slug: form.slug,
+      excerpt: form.excerpt,
+      bodyHtml: form.bodyHtml,
+      bannerImageId: form.bannerImageId,
+      categoryId: form.categoryId,
+      officeId: form.officeId,
+      destinationId: form.destinationId,
+      tagIds: form.tagIds,
+      authorDisplayName: form.authorDisplayName,
+      status: form.status,
+    };
+
+    const id = values.id;
+    const saved = await run(
+      () => (id ? updatePost({ ...payload, id }) : createPost(payload)),
+      goingLive
+        ? { success: "Article published", failure: "Couldn't publish the article." }
+        : id
+          ? { success: "Article saved", failure: "Couldn't save the article." }
+          : { success: "Article created", failure: "Couldn't create the article." },
+    );
+    if (!saved) return;
+
+    setDirty(false);
+    setLive(payload.status === "published");
+    if (id) router.refresh();
+    else router.push(`/admin/posts/${saved.id}`);
+  };
+
+  const archive = async () => {
+    const id = values.id;
+    if (!id) return;
+    const done = await run(() => archivePost({ id }), {
+      success: "Article archived",
+      failure: "Couldn't archive the article.",
+    });
+    if (!done) return;
+    setForm((current) => ({ ...current, status: "archived" }));
+    setLive(false);
+    router.refresh();
+  };
 
   const statuses = canPublish
-    ? ["draft", "published", "archived"]
-    : ["draft", "archived"];
+    ? publishableStatuses
+    : publishableStatuses.filter((status) => status.value !== "published");
 
   return (
-    <form id="admin-post-form"
-      className="admin-editor"
-      onSubmit={async (event) => {
+    <form
+      className="space-y-6"
+      onSubmit={(event) => {
         event.preventDefault();
-        setBusy(true);
-        const form = new FormData(event.currentTarget);
-        const payload = {
-          ...(values.id ? { id: values.id } : {}),
-          title,
-          slug,
-          excerpt,
-          bodyHtml: body,
-          bannerImageId: String(form.get("bannerImageId") ?? ""),
-          categoryId: String(form.get("categoryId") ?? ""),
-          officeId: String(form.get("officeId") ?? ""),
-          destinationId: String(form.get("destinationId") ?? ""),
-          tagIds: form.getAll("tagIds").map(String),
-          authorDisplayName: String(form.get("authorDisplayName") ?? ""),
-          status,
-        };
-
-        const result = values.id ? await updatePost(payload) : await createPost(payload);
-        setBusy(false);
-        setErrors(result.ok ? {} : (result.fieldErrors ?? {}));
-        setMessage(result.ok ? "Saved." : result.error);
-        if (!result.ok) return;
-        if (values.id) router.refresh();
-        else router.push(`/admin/posts/${result.data.id}`);
+        // The dialog belongs to the save, not to the dropdown, so nobody is interrupted while
+        // they are still deciding.
+        if (goingLive) askToPublish.current?.click();
+        else void persist();
       }}
     >
-      <UnsavedGuard formId="admin-post-form" />
-      <label className="admin-field">
-        <span className="t-small">Title</span>
-        <input
-          value={title}
-          onChange={(event) => {
-            setTitle(event.target.value);
-            if (!slugTouched) setSlug(slugify(event.target.value));
-          }}
-        />
-        <span className="t-small admin-help">The headline on the article and in the news list.</span>
-        {errors.title ? <span className="t-small admin-error">{errors.title[0]}</span> : null}
-      </label>
+      <UnsavedGuard dirty={dirty} />
 
-      <label className="admin-field">
-        <span className="t-small">Web address</span>
-        <input
-          value={slug}
-          onChange={(event) => {
-            setSlugTouched(true);
-            setSlug(event.target.value);
-          }}
-        />
-        <span className="t-small admin-help">
-          The article lives at {company.url}/news/{slug || "..."}. Changing it on a published post
-          leaves a redirect behind, so old links keep working.
-        </span>
-        {errors.slug ? <span className="t-small admin-error">{errors.slug[0]}</span> : null}
-      </label>
+      <EditorLayout
+        aside={
+          <SectionCard title="Publishing">
+            <SelectField
+              name="status"
+              label="Status"
+              value={form.status}
+              onChange={(value) => set("status", value)}
+              options={statuses}
+              error={errors.status?.[0]}
+              help={canPublish ? undefined : "You can save drafts. An admin puts the article on the website."}
+            />
 
-      <label className="admin-field">
-        <span className="t-small">Excerpt</span>
-        <textarea value={excerpt} onChange={(event) => setExcerpt(event.target.value)} rows={3} />
-        <span className="t-small admin-help">
-          The summary under the title on the news list and in search results. {excerpt.length} of{" "}
-          {EXCERPT_MAX} characters.
-        </span>
-        {errors.excerpt ? <span className="t-small admin-error">{errors.excerpt[0]}</span> : null}
-      </label>
+            {errors.publish?.length ? (
+              <ErrorState title="This cannot go live yet" description={errors.publish.join(" ")} />
+            ) : null}
 
-      <RichText
-        label="Body"
-        help="Everything on the article page under the banner."
-        value={values.bodyHtml}
-        onChange={setBody}
-      />
-
-      <MediaPicker
-        label="Banner image"
-        name="bannerImageId"
-        value={banner}
-        help="The wide picture at the top of the article and on its news card."
-      />
-
-      <Select
-        label="Category"
-        name="categoryId"
-        defaultValue={values.categoryId}
-        help="The label on the news card and the filter it sits under."
-        options={[
-          { value: "", label: "Not set" },
-          ...options.categories.map((category) => ({ value: category.id, label: category.name })),
-        ]}
-      />
-
-      <label className="admin-field">
-        <span className="t-small">Tags</span>
-        <select name="tagIds" multiple defaultValue={values.tagIds} size={6}>
-          {options.tags.map((tag) => (
-            <option key={tag.id} value={tag.id}>
-              {tag.name}
-            </option>
-          ))}
-        </select>
-        <span className="t-small admin-help">
-          Shown at the foot of the article. Hold Ctrl, or Command on a Mac, to pick more than one.
-        </span>
-      </label>
-
-      <Select
-        label="Office"
-        name="officeId"
-        defaultValue={values.officeId}
-        help="Leave it on both unless the article is only about one office."
-        options={[
-          { value: "", label: "Both offices" },
-          ...options.offices.map((office) => ({ value: office.id, label: office.name })),
-        ]}
-      />
-
-      <Select
-        label="Destination"
-        name="destinationId"
-        defaultValue={values.destinationId}
-        help="Links the article to that study destination page."
-        options={[
-          { value: "", label: "Not about one country" },
-          ...options.destinations.map((d) => ({ value: d.id, label: d.name })),
-        ]}
-      />
-
-      <label className="admin-field">
-        <span className="t-small">Author shown</span>
-        <input name="authorDisplayName" defaultValue={values.authorDisplayName} />
-        <span className="t-small admin-help">The by-line on the article. Leave it empty for no by-line.</span>
-      </label>
-
-      <h2 className="t-h5 admin-subhead">Publishing</h2>
-
-      <Select
-        label="Status"
-        value={status}
-        onChange={setStatus}
-        help={
-          canPublish
-            ? "Draft is invisible. Published puts it on the site. Archived comes off it."
-            : "You can save drafts. An admin puts the article live."
+            {values.id && live ? (
+              <Button variant="outline" size="sm" asChild className="w-full">
+                <a href={`/news/${form.slug}`} target="_blank" rel="noreferrer">
+                  <ExternalLink />
+                  View on site
+                </a>
+              </Button>
+            ) : null}
+          </SectionCard>
         }
-        options={statuses.map((option) => ({ value: option, label: option }))}
+      >
+        <SectionCard title="Article">
+          <TextField
+            name="title"
+            label="Title"
+            value={form.title}
+            onChange={setTitle}
+            error={errors.title?.[0]}
+          />
+
+          <TextField
+            name="slug"
+            label="URL slug"
+            value={form.slug}
+            help="Used in the page address."
+            error={errors.slug?.[0]}
+            onChange={(value) => {
+              setSlugTouched(true);
+              set("slug", value);
+            }}
+          />
+
+          <TextAreaField
+            name="excerpt"
+            label="Excerpt"
+            rows={3}
+            value={form.excerpt}
+            hint={`${form.excerpt.length} / ${EXCERPT_MAX}`}
+            error={errors.excerpt?.[0]}
+            onChange={(value) => set("excerpt", value)}
+          />
+
+          <RichText label="Body" value={values.bodyHtml} onChange={(value) => set("bodyHtml", value)} />
+        </SectionCard>
+
+        <SectionCard title="Media">
+          <MediaPicker
+            label="Banner image"
+            name="bannerImageId"
+            value={banner}
+            help="The wide picture at the top of the article."
+            onChange={(id) => set("bannerImageId", id ?? "")}
+          />
+        </SectionCard>
+
+        <SectionCard title="Classification">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <SelectField
+              name="categoryId"
+              label="Category"
+              value={form.categoryId}
+              onChange={(value) => set("categoryId", value)}
+              emptyLabel="Not set"
+              error={errors.categoryId?.[0]}
+              options={options.categories.map((category) => ({ value: category.id, label: category.name }))}
+            />
+
+            <SelectField
+              name="officeId"
+              label="Office"
+              value={form.officeId}
+              onChange={(value) => set("officeId", value)}
+              emptyLabel="Both offices"
+              error={errors.officeId?.[0]}
+              options={options.offices.map((office) => ({ value: office.id, label: office.name }))}
+            />
+
+            <SelectField
+              name="destinationId"
+              label="Destination"
+              value={form.destinationId}
+              onChange={(value) => set("destinationId", value)}
+              emptyLabel="Not about one country"
+              error={errors.destinationId?.[0]}
+              options={options.destinations.map((destination) => ({
+                value: destination.id,
+                label: destination.name,
+              }))}
+            />
+
+            <TextField
+              name="authorDisplayName"
+              label="Author"
+              value={form.authorDisplayName}
+              help="Leave it empty for no by-line."
+              error={errors.authorDisplayName?.[0]}
+              onChange={(value) => set("authorDisplayName", value)}
+            />
+          </div>
+
+          <MultiSelectField
+            name="tagIds"
+            label="Tags"
+            selected={form.tagIds}
+            onChange={(value) => set("tagIds", value)}
+            placeholder="Choose tags"
+            searchPlaceholder="Search tags"
+            emptyMessage="No tags yet."
+            error={errors.tagIds?.[0]}
+            options={options.tags.map((tag) => ({ value: tag.id, label: tag.name }))}
+          />
+        </SectionCard>
+      </EditorLayout>
+
+      <EditorActionBar
+        dirty={dirty}
+        busy={busy}
+        saveLabel={goingLive ? "Publish" : "Save"}
+        savingLabel={goingLive ? "Publishing..." : "Saving..."}
+        destructive={
+          values.id && canDelete && form.status !== "archived" ? (
+            <ConfirmDialog
+              trigger={
+                <Button type="button" variant="ghost" size="sm" className="text-destructive">
+                  Archive
+                </Button>
+              }
+              title="Take this article off the website?"
+              description="It stays here as an archived article and you can put it back."
+              confirmLabel="Archive"
+              onConfirm={archive}
+            />
+          ) : null
+        }
       />
 
-      <div className="admin-actions">
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-          {busy ? "Saving" : "Save"}
-        </button>
-
-        {values.id ? (
-          <Link className="admin-btn" href={`/news/${values.slug}`} target="_blank">
-            View on site
-          </Link>
-        ) : null}
-
-        {values.id && canDelete ? (
-          <button
-            type="button"
-            className="admin-btn"
-            disabled={busy}
-            onClick={async () => {
-              if (!window.confirm("Take this article off the site? It stays here as archived.")) return;
-              setBusy(true);
-              const result = await archivePost({ id: values.id });
-              setBusy(false);
-              setMessage(result.ok ? "Archived." : result.error);
-              if (result.ok) router.refresh();
-            }}
-          >
-            Archive
-          </button>
-        ) : null}
-
-        {message ? <span className="t-small">{message}</span> : null}
-      </div>
+      {/* The confirmation is opened by the save, so its trigger stays out of the layout. */}
+      <ConfirmDialog
+        trigger={<button ref={askToPublish} type="button" hidden tabIndex={-1} aria-hidden />}
+        title="Publish this article?"
+        description="It will become visible on the public website."
+        confirmLabel="Publish"
+        destructive={false}
+        onConfirm={persist}
+      />
     </form>
   );
 }

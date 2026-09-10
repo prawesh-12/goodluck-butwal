@@ -2,44 +2,47 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { linkPartnersToInstitutions } from "@/features/institutions/actions";
+import { Link2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/admin/button";
+import { Card, CardContent } from "@/components/ui/admin/card";
+import { useAction } from "@/components/shared/admin/use-action";
+import { linkPartnersToInstitutions } from "@/features/institutions/actions";
 
 // Joins partner rows to institutions whose names already match, so both read one source.
 export function InstitutionPartnerLink() {
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const { busy, run } = useAction();
+  const [outcome, setOutcome] = useState<string | null>(null);
+
+  const match = async () => {
+    const result = await run(() => linkPartnersToInstitutions(), {
+      success: "Partner logos matched",
+      failure: "Couldn't match the partner logos.",
+    });
+    if (!result) return;
+    setOutcome(
+      result.linked === 0
+        ? "No partner logo has a name matching an institution, so nothing changed."
+        : `Linked ${result.linked} partner ${result.linked === 1 ? "logo" : "logos"}.`,
+    );
+    router.refresh();
+  };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        disabled={busy}
-        onClick={async () => {
-          setBusy(true);
-          const result = await linkPartnersToInstitutions();
-          setBusy(false);
-          if (!result.ok) {
-            setMessage(result.error);
-            return;
-          }
-          setMessage(
-            result.data.linked === 0
-              ? "No partner logo has a name matching an institution, so nothing changed."
-              : `Linked ${result.data.linked} partner ${result.data.linked === 1 ? "logo" : "logos"}.`,
-          );
-          router.refresh();
-        }}
-      >
-        {busy ? "Matching" : "Match partner logos"}
-      </Button>
-      <span className="text-xs text-muted-foreground">
-        Links a partner logo to the institution with the same name. Nothing is renamed or guessed.
-      </span>
-      {message ? <span className="text-sm text-muted-foreground">{message}</span> : null}
-    </div>
+    <Card className="shadow-none">
+      <CardContent className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0 space-y-1">
+          <p className="text-sm font-medium text-foreground">Match partner logos</p>
+          <p className="text-xs text-muted-foreground">
+            Links a partner logo to the institution with the same name. Nothing is renamed or guessed.
+          </p>
+          {outcome ? <p className="text-xs text-muted-foreground">{outcome}</p> : null}
+        </div>
+        <Button type="button" variant="outline" size="sm" disabled={busy} onClick={match}>
+          {busy ? <Loader2 className="animate-spin" /> : <Link2 />}
+          {busy ? "Matching..." : "Match logos"}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

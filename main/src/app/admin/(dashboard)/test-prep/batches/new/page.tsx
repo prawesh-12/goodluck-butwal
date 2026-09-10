@@ -1,6 +1,10 @@
+import { GraduationCap } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader } from "@/components/shared/admin/page-header";
+import { NewButton } from "@/components/shared/admin/list-ui";
+import { EmptyState } from "@/components/shared/admin/states";
 import { BatchEditor } from "@/features/test-prep/components/batch-editor";
 import { courseOptions, trainerOptions } from "@/features/test-prep/admin-queries";
 
@@ -17,10 +21,20 @@ export default async function NewBatchPage({
   const [courses, trainers, params] = await Promise.all([courseOptions(), trainerOptions("np"), searchParams]);
 
   return (
-    <>
-      <h1 className="t-h4">New batch</h1>
+    <div className="space-y-6">
+      <EditorHeader backHref="/admin/test-prep/batches" backLabel="Batches" title="New batch" />
+
       {courses.length === 0 ? (
-        <p className="t-body admin-empty">There is no course to attach a batch to yet. Add a course first.</p>
+        <EmptyState
+          icon={GraduationCap}
+          title="There is no course to attach a batch to"
+          description="A batch is one run of a course, so the course has to exist first."
+          action={
+            can(actor, "testPrep", "create") ? (
+              <NewButton href="/admin/test-prep/new">New course</NewButton>
+            ) : null
+          }
+        />
       ) : (
         <BatchEditor
           canDelete={can(actor, "batches", "delete")}
@@ -44,6 +58,6 @@ export default async function NewBatchPage({
           }}
         />
       )}
-    </>
+    </div>
   );
 }

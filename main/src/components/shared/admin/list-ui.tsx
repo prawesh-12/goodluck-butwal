@@ -1,26 +1,32 @@
 import Link from "next/link";
-import { ExternalLink, type LucideIcon } from "lucide-react";
+import { ExternalLink, MoreHorizontal, Pencil } from "lucide-react";
 import { Badge, type AdminBadgeProps } from "@/components/ui/admin/badge";
 import { Button } from "@/components/ui/admin/button";
-import { Card, CardContent } from "@/components/ui/admin/card";
-import { Input } from "@/components/ui/admin/input";
-import { Label } from "@/components/ui/admin/label";
+import { Card } from "@/components/ui/admin/card";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/admin/pagination";
 import { cn } from "@/components/ui/admin/cn";
 
 type BadgeVariant = AdminBadgeProps["variant"];
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   published: "success",
-  draft: "outline",
+  draft: "secondary",
   archived: "outline",
   new: "default",
-  pending: "default",
+  pending: "warning",
   open: "success",
-  filling_fast: "secondary",
+  filling_fast: "warning",
   full: "outline",
   closed: "outline",
   completed: "outline",
-  in_progress: "secondary",
+  in_progress: "warning",
   contacted: "secondary",
   converted: "success",
   confirmed: "success",
@@ -31,15 +37,31 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
   spam: "destructive",
 };
 
-export function StatusBadge({ status }: { status: string }) {
+const STATUS_LABEL: Record<string, string> = {
+  filling_fast: "Filling fast",
+  in_progress: "In progress",
+  no_show: "No show",
+};
+
+export function statusLabel(status: string) {
+  return STATUS_LABEL[status] ?? status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, " ");
+}
+
+export function StatusBadge({ status, className }: { status: string; className?: string }) {
   return (
-    <Badge variant={STATUS_VARIANT[status] ?? "secondary"} className="whitespace-nowrap">
-      {status.replace(/_/g, " ")}
+    <Badge variant={STATUS_VARIANT[status] ?? "secondary"} className={cn("whitespace-nowrap", className)}>
+      {statusLabel(status)}
     </Badge>
   );
 }
 
-export function FlatBadge({ children, variant = "secondary" }: { children: React.ReactNode; variant?: BadgeVariant }) {
+export function FlatBadge({
+  children,
+  variant = "secondary",
+}: {
+  children: React.ReactNode;
+  variant?: BadgeVariant;
+}) {
   return (
     <Badge variant={variant} className="whitespace-nowrap">
       {children}
@@ -47,13 +69,18 @@ export function FlatBadge({ children, variant = "secondary" }: { children: React
   );
 }
 
-export function RowAvatar({ name }: { name: string }) {
+export function RowAvatar({ name, src }: { name: string; src?: string | null }) {
   const initials = name
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("");
+
+  if (src) {
+    return <img src={src} alt="" className="size-8 shrink-0 rounded-full object-cover" />;
+  }
+
   return (
     <span
       aria-hidden
@@ -64,30 +91,8 @@ export function RowAvatar({ name }: { name: string }) {
   );
 }
 
-export function ListHeader({
-  title,
-  count,
-  countNoun = "matching",
-  actions,
-}: {
-  title: string;
-  count?: number;
-  countNoun?: string;
-  actions?: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-wrap items-end justify-between gap-3">
-      <div className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {count !== undefined ? (
-          <p className="text-sm text-muted-foreground">
-            {count} {countNoun}
-          </p>
-        ) : null}
-      </div>
-      {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
-    </div>
-  );
+export function Muted({ children }: { children: React.ReactNode }) {
+  return <span className="text-muted-foreground">{children}</span>;
 }
 
 export function NewButton({ href, children }: { href: string; children: React.ReactNode }) {
@@ -98,21 +103,47 @@ export function NewButton({ href, children }: { href: string; children: React.Re
   );
 }
 
-export function ViewSiteLink({ href }: { href: string }) {
+export function ViewSiteLink({ href, label = "View" }: { href: string; label?: string }) {
   return (
-    <Button variant="ghost" size="sm" asChild className={cn("whitespace-nowrap")}>
+    <Button variant="ghost" size="icon-sm" asChild title={`${label} on the website`}>
       <a href={href} target="_blank" rel="noreferrer">
-        <ExternalLink /> View
+        <ExternalLink />
+        <span className="sr-only">{label} on the website</span>
       </a>
     </Button>
   );
 }
 
-export function EditLink({ href }: { href: string }) {
+export function EditLink({ href, label = "Edit" }: { href: string; label?: string }) {
   return (
     <Button variant="outline" size="sm" asChild>
-      <Link href={href}>Edit</Link>
+      <Link href={href}>
+        <Pencil />
+        {label}
+      </Link>
     </Button>
+  );
+}
+
+export function RowActionsTrigger({ label = "More actions" }: { label?: string }) {
+  return (
+    <Button variant="ghost" size="icon-sm">
+      <MoreHorizontal />
+      <span className="sr-only">{label}</span>
+    </Button>
+  );
+}
+
+export function DataCard({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <Card className={cn("overflow-hidden py-0 shadow-none", className)}>{children}</Card>;
+}
+
+export function ResultCount({ shown, total, noun }: { shown: number; total: number; noun: string }) {
+  if (total === 0) return null;
+  return (
+    <p className="text-sm text-muted-foreground">
+      Showing {shown} of {total} {noun}
+    </p>
   );
 }
 
@@ -126,67 +157,38 @@ export function Pager({
   params: Record<string, string | undefined>;
 }) {
   if (pages <= 1) return null;
-  return (
-    <nav className="flex items-center gap-3" aria-label="Pages">
-      {page > 1 ? (
-        <Button variant="outline" size="sm" asChild>
-          <Link href={`?${new URLSearchParams({ ...params, page: String(page - 1) })}`}>Previous</Link>
-        </Button>
-      ) : null}
-      <span className="text-sm text-muted-foreground">
-        Page {page} of {pages}
-      </span>
-      {page < pages ? (
-        <Button variant="outline" size="sm" asChild>
-          <Link href={`?${new URLSearchParams({ ...params, page: String(page + 1) })}`}>Next</Link>
-        </Button>
-      ) : null}
-    </nav>
-  );
-}
 
-export function EmptyState({
-  icon: Icon,
-  children,
-}: {
-  icon?: LucideIcon;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border px-6 py-12 text-center">
-      {Icon ? <Icon className="size-6 text-muted-foreground" /> : null}
-      <p className="max-w-md text-sm text-muted-foreground">{children}</p>
-    </div>
-  );
-}
+  const at = (target: number) => {
+    const next = new URLSearchParams(
+      Object.entries(params).filter(([, value]) => value !== undefined) as [string, string][],
+    );
+    next.set("page", String(target));
+    return `?${next}`;
+  };
 
-export function FilterCard({ children }: { children: React.ReactNode }) {
-  return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-4">{children}</div>
-      </CardContent>
-    </Card>
-  );
-}
+  const window = [page - 1, page, page + 1].filter((n) => n >= 1 && n <= pages);
 
-export function SearchField({
-  id,
-  value,
-  defaultValue,
-  placeholder,
-  onChange,
-}: {
-  id: string;
-  value?: string;
-  defaultValue?: string;
-  placeholder?: string;
-  onChange: (value: string) => void;
-}) {
   return (
-    <div className="space-y-1.5">
-      <Label htmlFor={id}>Search</Label>
-      <Input id={id} value={value} defaultValue={defaultValue} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
-    </div>
+    <Pagination>
+      <PaginationContent>
+        {page > 1 ? (
+          <PaginationItem>
+            <PaginationPrevious href={at(page - 1)} />
+          </PaginationItem>
+        ) : null}
+        {window.map((n) => (
+          <PaginationItem key={n}>
+            <PaginationLink href={at(n)} isActive={n === page}>
+              {n}
+            </PaginationLink>
+          </PaginationItem>
+        ))}
+        {page < pages ? (
+          <PaginationItem>
+            <PaginationNext href={at(page + 1)} />
+          </PaginationItem>
+        ) : null}
+      </PaginationContent>
+    </Pagination>
   );
 }

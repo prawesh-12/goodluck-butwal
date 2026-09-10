@@ -1,11 +1,16 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CalendarDays } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader } from "@/components/shared/admin/page-header";
+import { FlatBadge, StatusBadge, ViewSiteLink } from "@/components/shared/admin/list-ui";
 import { TestPrepCourseEditor } from "@/features/test-prep/components/course-editor";
+import { TEST_LABEL } from "@/features/test-prep/schedule";
 import { pickedMedia } from "@/features/media/admin-queries";
 import { getAdminCourse } from "@/features/test-prep/admin-queries";
+import { Button } from "@/components/ui/admin/button";
 
 export const dynamic = "force-dynamic";
 
@@ -18,19 +23,31 @@ export default async function EditTestPrepCoursePage({ params }: { params: Promi
   allowOwn(actor, row);
 
   const media = await pickedMedia([row.heroImageId]);
-  const path = `/test-preparation/${row.slug}`;
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">{row.name}</h1>
-        <Link className="admin-btn" href={`/admin/test-prep/batches?course=${row.id}`}>
-          Batches
-        </Link>
-        <a className="admin-btn" href={path} target="_blank" rel="noreferrer">
-          View on site
-        </a>
-      </div>
+    <div className="space-y-6">
+      <EditorHeader
+        backHref="/admin/test-prep"
+        backLabel="Test preparation"
+        title={row.name}
+        meta={
+          <>
+            <StatusBadge status={row.status} />
+            <FlatBadge variant="outline">{TEST_LABEL[row.testType]}</FlatBadge>
+          </>
+        }
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              <Link href={`/admin/test-prep/batches?course=${row.id}`}>
+                <CalendarDays />
+                Batches
+              </Link>
+            </Button>
+            <ViewSiteLink href={`/test-preparation/${row.slug}`} />
+          </>
+        }
+      />
 
       <TestPrepCourseEditor
         canDelete={can(actor, "testPrep", "delete")}
@@ -51,6 +68,6 @@ export default async function EditTestPrepCoursePage({ params }: { params: Promi
           sortOrder: row.sortOrder,
         }}
       />
-    </>
+    </div>
   );
 }

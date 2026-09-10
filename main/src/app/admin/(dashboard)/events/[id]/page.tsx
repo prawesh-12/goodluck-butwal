@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Users } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
@@ -7,6 +9,10 @@ import { EventForm } from "@/features/events/components/event-form";
 import { pickedMedia } from "@/features/media/admin-queries";
 import { getAdminEvent, officeZones } from "@/features/events/admin-queries";
 import { seatsTaken } from "@/features/events/queries";
+import { EditorHeader } from "@/components/shared/admin/page-header";
+import { FlatBadge, StatusBadge, ViewSiteLink } from "@/components/shared/admin/list-ui";
+import { eventTypeLabels } from "@/config/content-meta";
+import { Button } from "@/components/ui/admin/button";
 
 export const dynamic = "force-dynamic";
 
@@ -30,13 +36,29 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   const local = (value: Date | null) => (value ? utcToZonedInput(value, zone) : "");
 
   return (
-    <>
-      <h1 className="t-h4">{event.title}</h1>
-      <p className="t-small admin-help">
-        <a href={`/events/${event.slug}`} target="_blank" rel="noreferrer">
-          View on site
-        </a>
-      </p>
+    <div className="space-y-6">
+      <EditorHeader
+        backHref="/admin/events"
+        backLabel="Events"
+        title={event.title}
+        meta={
+          <>
+            <StatusBadge status={event.status} />
+            <FlatBadge variant="outline">{eventTypeLabels[event.eventType]}</FlatBadge>
+          </>
+        }
+        actions={
+          <>
+            <Button variant="outline" asChild>
+              <Link href={`/admin/events/${event.id}/registrations`}>
+                <Users />
+                Registrations
+              </Link>
+            </Button>
+            <ViewSiteLink href={`/events/${event.slug}`} />
+          </>
+        }
+      />
 
       <EventForm
         values={{
@@ -66,6 +88,6 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
         canPublish={can(actor, "events", "publish")}
         canDelete={can(actor, "events", "delete")}
       />
-    </>
+    </div>
   );
 }

@@ -1,9 +1,12 @@
+import { Users } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
-import { ContentFilters } from "@/components/shared/admin/content-filters";
+import { PageHeader } from "@/components/shared/admin/page-header";
+import { FilterBar } from "@/components/shared/admin/filter-bar";
+import { NewButton, Pager, ResultCount } from "@/components/shared/admin/list-ui";
+import { EmptyState } from "@/components/shared/admin/states";
 import { TeamList } from "@/features/team/components/team-list";
-import { EmptyState, ListHeader, NewButton, Pager } from "@/components/shared/admin/list-ui";
 import { listAdminTeam } from "@/features/team/admin-queries";
 import { officeOptions } from "@/features/offices/queries";
 import { PAGE_SIZE, type AdminFilters } from "@/lib/utils/admin-query";
@@ -25,31 +28,71 @@ export default async function TeamPage({
     officeOptions(),
   ]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const narrowed = Boolean(params.q || params.status || params.office);
+  const canCreate = can(actor, "team", "create");
 
   return (
-    <div className="space-y-4">
-      <ListHeader
+    <>
+      <PageHeader
         title="Team"
-        count={total}
-        actions={<NewButton href="/admin/team/new">Add a team member</NewButton>}
+        description="The people shown on the website."
+        actions={canCreate ? <NewButton href="/admin/team/new">Add team member</NewButton> : null}
       />
 
-      <ContentFilters
-        placeholder="Name or position"
-        offices={actor.role === "super_admin" ? offices : undefined}
+      <FilterBar
+        searchPlaceholder="Search by name or position"
+        filters={[
+          {
+            name: "status",
+            label: "Status",
+            anyLabel: "All statuses",
+            options: [
+              { value: "draft", label: "Draft" },
+              { value: "published", label: "Published" },
+              { value: "archived", label: "Archived" },
+            ],
+          },
+          ...(actor.role === "super_admin"
+            ? [
+                {
+                  name: "office",
+                  label: "Office",
+                  anyLabel: "All offices",
+                  options: offices.map((office) => ({ value: office.id, label: office.name })),
+                },
+              ]
+            : []),
+        ]}
       />
 
       {rows.length === 0 ? (
-        <EmptyState>Nobody matches those filters. Clear the search, or add a team member.</EmptyState>
+        narrowed ? (
+          <EmptyState
+            icon={Users}
+            title="No team members match those filters"
+            description="Clear the search or the filters to see everyone again."
+          />
+        ) : (
+          <EmptyState
+            icon={Users}
+            title="No team members yet"
+            description="Add the first person to show them on the team page."
+            action={canCreate ? <NewButton href="/admin/team/new">Add team member</NewButton> : null}
+          />
+        )
       ) : (
         <TeamList
           key={rows.map((row) => row.id).join("-")}
           rows={rows}
+          offset={(page - 1) * PAGE_SIZE}
           canReorder={can(actor, "team", "update")}
         />
       )}
 
-      <Pager page={page} pages={pages} params={params} />
-    </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <ResultCount shown={rows.length} total={total} noun="team members" />
+        <Pager page={page} pages={pages} params={params} />
+      </div>
+    </>
   );
 }

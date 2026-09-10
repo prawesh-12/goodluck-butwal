@@ -1,32 +1,74 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { deleteAsset, describeImage, recordUpload } from "@/features/media/actions";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { AlertCircle, ExternalLink, ImageIcon, Play, Settings2, Trash2, Upload, Video } from "lucide-react";
+import { deleteAsset, describeImage } from "@/features/media/actions";
 import type { LibraryAsset } from "@/features/media/queries";
-import { Alert, AlertDescription } from "@/components/ui/admin/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/admin/alert";
 import { Button } from "@/components/ui/admin/button";
-import { Card, CardContent } from "@/components/ui/admin/card";
-import { Input } from "@/components/ui/admin/input";
-import { Label } from "@/components/ui/admin/label";
-import { EmptyState, FilterCard, FlatBadge, SearchField } from "@/components/shared/admin/list-ui";
+import { Card } from "@/components/ui/admin/card";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/admin/dialog";
+import { Progress } from "@/components/ui/admin/progress";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/admin/sheet";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { TextField } from "@/components/shared/admin/fields";
+import { FlatBadge, ResultCount } from "@/components/shared/admin/list-ui";
+import { EmptyState } from "@/components/shared/admin/states";
+import { useAction } from "@/components/shared/admin/use-action";
+import {
+  deleteBlock,
+  fileSize,
+  folderName,
+  plainError,
+  type DeleteBlock,
+  type ResourceType,
+} from "@/features/media/components/asset-utils";
+import { ACCEPT, UploadDialog, uploadAsset } from "@/features/media/components/upload-dialog";
 
 type Props = {
-  resourceType: "image" | "video";
+  resourceType: ResourceType;
   assets: LibraryAsset[];
+  total: number;
   cursor: string | null;
+  q: string;
+  onFirstPage: boolean;
   canUpload: boolean;
   canUpdate: boolean;
   canDelete: boolean;
 };
 
-function size(bytes: number) {
-  return bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`;
+const WORDS = {
+  image: { one: "image", many: "images", One: "Image" },
+  video: { one: "video", many: "videos", One: "Video" },
+} as const;
+
+function meta(asset: LibraryAsset) {
+  return [asset.width ? `${asset.width} × ${asset.height}` : null, fileSize(asset.bytes), asset.format.toUpperCase()]
+    .filter(Boolean)
+    .join(" · ");
 }
 
-// Safari plays HLS natively, everyone else needs the library, so it is fetched only once a
-// preview is opened.
-function Player({ stream, fallback }: { stream: string; fallback: string }) {
+function uploadedOn(iso: string) {
+  if (!iso) return "Unknown";
+  const date = new Date(iso);
+  return Number.isNaN(date.getTime())
+    ? "Unknown"
+    : date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+// Safari plays the adaptive stream natively, everyone else needs the library, so it is fetched
+// only once a video is actually opened.
+function Player({ stream, fallback, title }: { stream: string; fallback: string; title: string }) {
   const ref = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -38,7 +80,7 @@ function Player({ stream, fallback }: { stream: string; fallback: string }) {
     }
 
     let cancelled = false;
-    let hls: { destroy: () => void } | undefined;
+    let player: { destroy: () => void } | undefined;
     void import("hls.js").then(({ default: Hls }) => {
       if (cancelled) return;
       if (!Hls.isSupported()) {
@@ -46,304 +88,395 @@ function Player({ stream, fallback }: { stream: string; fallback: string }) {
         return;
       }
       const instance = new Hls();
-      hls = instance;
+      player = instance;
       instance.loadSource(stream);
       instance.attachMedia(video);
     });
 
     return () => {
       cancelled = true;
-      hls?.destroy();
+      player?.destroy();
     };
   }, [stream, fallback]);
 
-  return <video ref={ref} controls playsInline className="w-full rounded-md bg-black" />;
+  return <video ref={ref} title={title} controls autoPlay playsInline className="w-full rounded-md bg-black" />;
 }
 
-export function AssetLibrary({ resourceType, assets, cursor, canUpload, canUpdate, canDelete }: Props) {
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-b border-border py-2 last:border-0">
+      <dt className="shrink-0 text-xs text-muted-foreground">{label}</dt>
+      <dd className="truncate text-sm">{value}</dd>
+    </div>
+  );
+}
+
+function Blocked({ block, noun }: { block: DeleteBlock; noun: string }) {
+  return (
+    <Alert variant="destructive">
+      <AlertCircle />
+      <AlertTitle>This {noun} can&apos;t be deleted yet.</AlertTitle>
+      <AlertDescription>
+        <p>{block.message}</p>
+        {block.items.length > 0 ? (
+          <ul className="space-y-0.5">
+            {block.items.map((item) => (
+              <li key={`${item.kind}-${item.label}`}>
+                {item.kind}: {item.label}
+              </li>
+            ))}
+            {block.more > 0 ? <li>and {block.more} more</li> : null}
+          </ul>
+        ) : null}
+      </AlertDescription>
+    </Alert>
+  );
+}
+
+function ManageSheet({
+  asset,
+  resourceType,
+  canUpdate,
+  canDelete,
+  onClose,
+  onPlay,
+}: {
+  asset: LibraryAsset;
+  resourceType: ResourceType;
+  canUpdate: boolean;
+  canDelete: boolean;
+  onClose: () => void;
+  onPlay: () => void;
+}) {
   const router = useRouter();
-  const params = useSearchParams();
-  const typing = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const [open, setOpen] = useState<string | null>(null);
-  const [playing, setPlaying] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const { busy, run } = useAction();
+  const picker = useRef<HTMLInputElement>(null);
+  const [description, setDescription] = useState(asset.reference?.altText ?? "");
+  const [caption, setCaption] = useState(asset.reference?.caption ?? "");
+  const [replacing, setReplacing] = useState<number | null>(null);
+  const [block, setBlock] = useState<DeleteBlock | null>(null);
 
   const video = resourceType === "video";
+  const { one, One } = WORDS[resourceType];
 
-  const set = (key: string, value: string) => {
-    const next = new URLSearchParams(params);
-    if (value) next.set(key, value);
-    else next.delete(key);
-    if (key !== "cursor") next.delete("cursor");
-    router.replace(`/admin/${video ? "videos" : "images"}?${next}`);
+  const describe = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const saved = await run(
+      async () => {
+        const result = await describeImage({
+          publicId: asset.publicId,
+          filename: asset.filename,
+          altText: description,
+          caption,
+        });
+        return result.ok
+          ? { ok: true as const, data: true }
+          : { ok: false as const, error: plainError(result.error, resourceType) };
+      },
+      { success: "Description saved", failure: "Couldn't save the description." },
+    );
+    if (saved) router.refresh();
   };
 
-  // Every search is a Cloudinary Admin API call, which is rate limited, so it waits for a pause
-  // in the typing rather than firing per keystroke.
-  const search = (value: string) => {
-    clearTimeout(typing.current);
-    typing.current = setTimeout(() => set("q", value), 400);
-  };
-
-  // The file goes from here straight to Cloudinary. Our server only signs the request and then
-  // records what landed, so a large video never passes through a Next route.
-  const send = async (file: File, opts: { folder?: string; publicId?: string; altText?: string }) => {
-    setBusy(true);
-    setMessage(null);
-    try {
-      const signed = await fetch("/api/admin/media/sign", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ resourceType, folder: opts.folder, publicId: opts.publicId }),
-      });
-      const ticket = (await signed.json()) as {
-        ok: boolean;
-        error?: string;
-        data?: { endpoint: string; apiKey: string; params: Record<string, string> };
-      };
-      if (!ticket.ok || !ticket.data) {
-        setMessage(ticket.error ?? "The upload could not be started.");
-        return;
-      }
-
-      const body = new FormData();
-      body.append("file", file);
-      body.append("api_key", ticket.data.apiKey);
-      for (const [key, value] of Object.entries(ticket.data.params)) body.append(key, value);
-
-      const uploaded = await fetch(ticket.data.endpoint, { method: "POST", body });
-      if (!uploaded.ok) {
-        const detail = (await uploaded.json().catch(() => null)) as { error?: { message?: string } } | null;
-        setMessage(detail?.error?.message ?? "Cloudinary refused that file.");
-        return;
-      }
-      const { public_id: publicId } = (await uploaded.json()) as { public_id: string };
-
-      const result = await recordUpload({ publicId, resourceType, altText: opts.altText });
-      setMessage(result.ok ? "Uploaded." : result.error);
-      if (result.ok) router.refresh();
-    } catch {
-      setMessage("The upload did not go through. Try again.");
-    } finally {
-      setBusy(false);
+  const replace = async (file: File) => {
+    setReplacing(0);
+    const result = await uploadAsset(file, { resourceType, publicId: asset.publicId }, setReplacing);
+    setReplacing(null);
+    if (!result.ok) {
+      toast.error(`Couldn't replace this ${one}.`, { description: result.error });
+      return;
     }
+    toast.success(`${One} replaced`);
+    onClose();
+    router.refresh();
+  };
+
+  const remove = async () => {
+    const deleted = await run(
+      async () => {
+        const result = await deleteAsset({ publicId: asset.publicId, resourceType });
+        if (result.ok) return { ok: true as const, data: true };
+        const reason = deleteBlock(result.error, resourceType);
+        setBlock(reason);
+        return {
+          ok: false as const,
+          error: reason.items.length > 0 ? `It is used by ${reason.items.map((item) => item.label).join(", ")}.` : reason.message,
+        };
+      },
+      { success: `${One} deleted`, failure: `Couldn't delete this ${one}.` },
+    );
+    if (!deleted) return;
+    onClose();
+    router.refresh();
   };
 
   return (
-    <>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <FilterCard>
-          <SearchField
-            id="asset-search"
-            defaultValue={params.get("q") ?? ""}
-            placeholder="Part of the file name"
-            onChange={search}
-          />
-        </FilterCard>
-      </form>
+    <Sheet
+      open
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
+    >
+      <SheetContent className="w-full gap-0 overflow-y-auto sm:max-w-md">
+        <SheetHeader>
+          <SheetTitle className="pr-8 wrap-break-word">{asset.filename}</SheetTitle>
+          <SheetDescription>Uploaded {uploadedOn(asset.createdAt)}</SheetDescription>
+        </SheetHeader>
 
-      {canUpload ? (
-        <Card>
-          <CardContent className="pt-6">
-            <form
-              className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-4"
-              onSubmit={async (event) => {
-                event.preventDefault();
-                const form = event.currentTarget;
-                const data = new FormData(form);
-                const file = data.get("file");
-                if (!(file instanceof File) || file.size === 0) return;
-                await send(file, {
-                  folder: String(data.get("folder") ?? "general"),
-                  altText: String(data.get("altText") ?? ""),
-                });
-                form.reset();
-              }}
-            >
-              <div className="space-y-1.5">
-                <Label htmlFor="asset-file">{video ? "Video file" : "Image file"}</Label>
-                <Input id="asset-file" name="file" type="file" required accept={video ? "video/mp4,video/webm" : "image/*"} />
+        <div className="space-y-5 px-4 pb-6">
+          <img
+            src={video ? asset.thumbUrl : asset.viewUrl}
+            alt={asset.reference?.altText ?? ""}
+            className="max-h-64 w-full rounded-md bg-secondary object-contain"
+          />
+
+          <dl>
+            <Detail label="Dimensions" value={asset.width ? `${asset.width} × ${asset.height}` : "Unknown"} />
+            <Detail label="Format" value={asset.format.toUpperCase() || "Unknown"} />
+            <Detail label="Size" value={fileSize(asset.bytes)} />
+            <Detail label="Folder" value={folderName(asset.publicId)} />
+          </dl>
+
+          {!video && canUpdate ? (
+            <form onSubmit={describe} className="space-y-4">
+              <TextField
+                name="altText"
+                label="Description"
+                value={description}
+                onChange={setDescription}
+                placeholder="What the picture shows"
+                help="Read aloud to visitors who cannot see the picture."
+              />
+              <TextField name="caption" label="Caption" value={caption} onChange={setCaption} />
+              <Button type="submit" size="sm" disabled={busy}>
+                {busy ? "Saving..." : "Save"}
+              </Button>
+            </form>
+          ) : null}
+
+          {replacing !== null ? <Progress value={replacing} aria-label={`Replacing this ${one}`} /> : null}
+          {block ? <Blocked block={block} noun={one} /> : null}
+        </div>
+
+        <SheetFooter className="flex-row flex-wrap gap-2 border-t border-border">
+          {video ? (
+            <Button type="button" variant="outline" size="sm" onClick={onPlay}>
+              <Play />
+              Play
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" asChild>
+              <a href={asset.viewUrl} target="_blank" rel="noreferrer">
+                <ExternalLink />
+                Open
+              </a>
+            </Button>
+          )}
+
+          {canUpdate ? (
+            <>
+              <input
+                ref={picker}
+                type="file"
+                hidden
+                accept={ACCEPT[resourceType]}
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  event.target.value = "";
+                  if (file) void replace(file);
+                }}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={replacing !== null}
+                onClick={() => picker.current?.click()}
+              >
+                <Upload />
+                {replacing !== null ? "Replacing..." : `Replace ${one}`}
+              </Button>
+            </>
+          ) : null}
+
+          {canDelete ? (
+            <ConfirmDialog
+              trigger={
+                <Button type="button" variant="destructive" size="sm" disabled={busy} className="ml-auto">
+                  <Trash2 />
+                  Delete
+                </Button>
+              }
+              title={`Delete this ${one}?`}
+              description="This cannot be undone."
+              confirmLabel={`Delete ${one}`}
+              onConfirm={remove}
+            />
+          ) : null}
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+export function AssetGrid({
+  resourceType,
+  assets,
+  total,
+  cursor,
+  q,
+  onFirstPage,
+  canUpload,
+  canUpdate,
+  canDelete,
+}: Props) {
+  const [manage, setManage] = useState<LibraryAsset | null>(null);
+  const [playing, setPlaying] = useState<LibraryAsset | null>(null);
+
+  const video = resourceType === "video";
+  const { one, many } = WORDS[resourceType];
+  const path = `/admin/${many}`;
+  const Icon = video ? Video : ImageIcon;
+
+  if (assets.length === 0) {
+    return q ? (
+      <EmptyState
+        icon={Icon}
+        title={`No ${many} match your search`}
+        description="Try a different word, or clear the search to see everything."
+        action={
+          <Button variant="outline" asChild>
+            <Link href={path}>Clear the search</Link>
+          </Button>
+        }
+      />
+    ) : (
+      <EmptyState
+        icon={Icon}
+        title={`No ${many} yet`}
+        description={`Upload a ${one} to use it across the website.`}
+        action={
+          canUpload ? (
+            <UploadDialog
+              resourceType={resourceType}
+              trigger={
+                <Button>
+                  <Upload />
+                  Upload {many}
+                </Button>
+              }
+            />
+          ) : undefined
+        }
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {assets.map((asset) => (
+          <Card key={asset.publicId} className="flex flex-col gap-0 overflow-hidden py-0 shadow-none">
+            <div className="relative">
+              <img
+                src={asset.thumbUrl}
+                alt={asset.reference?.altText ?? ""}
+                loading="lazy"
+                className="aspect-4/3 w-full bg-secondary object-contain"
+              />
+              {video ? (
+                <span
+                  aria-hidden
+                  className="absolute inset-0 flex items-center justify-center text-white drop-shadow"
+                >
+                  <Play className="size-8 fill-white/80" />
+                </span>
+              ) : null}
+            </div>
+
+            <div className="flex flex-1 flex-col gap-2 p-3">
+              <p className="truncate text-sm font-medium" title={asset.filename}>
+                {asset.filename}
+              </p>
+              <p className="text-xs text-muted-foreground">{meta(asset)}</p>
+
+              <div className="flex flex-wrap gap-1.5">
+                <FlatBadge variant="outline">{folderName(asset.publicId)}</FlatBadge>
+                {!video && asset.reference && asset.reference.altText === null ? (
+                  <FlatBadge variant="destructive">Needs description</FlatBadge>
+                ) : null}
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="asset-folder">Folder</Label>
-                <Input id="asset-folder" name="folder" defaultValue="general" pattern="[a-z0-9]+(-[a-z0-9]+)*" />
-              </div>
-              {video ? null : (
-                <div className="space-y-1.5">
-                  <Label htmlFor="asset-alt">Alt text</Label>
-                  <Input id="asset-alt" name="altText" placeholder="What the image shows" />
-                </div>
-              )}
-              <div>
-                <Button type="submit" disabled={busy}>
-                  {busy ? "Uploading" : "Upload"}
+
+              <div className="mt-auto flex items-center gap-2 pt-2">
+                {video ? (
+                  <Button type="button" variant="outline" size="sm" onClick={() => setPlaying(asset)}>
+                    <Play />
+                    Play
+                  </Button>
+                ) : (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={asset.viewUrl} target="_blank" rel="noreferrer">
+                      <ExternalLink />
+                      Open
+                    </a>
+                  </Button>
+                )}
+                <Button type="button" variant="ghost" size="sm" onClick={() => setManage(asset)}>
+                  <Settings2 />
+                  Manage
                 </Button>
               </div>
-            </form>
-            {video ? (
-              <p className="pt-3 text-sm text-muted-foreground">
-                Streaming versions are built after the upload, so a new video can take a minute before it plays.
-              </p>
-            ) : null}
-          </CardContent>
-        </Card>
-      ) : (
-        <p className="text-sm text-muted-foreground">Your role cannot upload.</p>
-      )}
+            </div>
+          </Card>
+        ))}
+      </div>
 
-      {message ? (
-        <Alert>
-          <AlertDescription>{message}</AlertDescription>
-        </Alert>
-      ) : null}
-
-      {assets.length === 0 ? (
-        <EmptyState>Nothing matches. Clear the search, or upload a file.</EmptyState>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {assets.map((asset) => (
-            <Card key={asset.publicId} className="overflow-hidden">
-              {playing === asset.publicId ? (
-                <Player stream={asset.viewUrl} fallback={asset.secureUrl} />
-              ) : (
-                <img
-                  src={asset.thumbUrl}
-                  alt={asset.reference?.altText ?? ""}
-                  className="aspect-4/3 w-full bg-secondary object-contain"
-                  loading="lazy"
-                />
-              )}
-
-              <CardContent className="space-y-2 pt-4">
-                <p className="truncate text-sm" title={asset.publicId}>
-                  {asset.filename}
-                </p>
-                <p className="text-xs break-all text-muted-foreground">
-                  {asset.publicId}
-                  <br />
-                  {[asset.format.toUpperCase(), asset.width ? `${asset.width}x${asset.height}` : null, size(asset.bytes), asset.createdAt.slice(0, 10)]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
-                {/* Only assets a CMS section can point at need alt text. The rest of the library
-                    is art the pages resolve straight from Cloudinary. */}
-                {!video && asset.reference && asset.reference.altText === null ? (
-                  <FlatBadge variant="destructive">Needs alt text</FlatBadge>
-                ) : null}
-
-                <div className="flex flex-wrap items-center gap-2">
-                  {video ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPlaying(playing === asset.publicId ? null : asset.publicId)}
-                    >
-                      {playing === asset.publicId ? "Stop" : "Play"}
-                    </Button>
-                  ) : (
-                    <Button variant="outline" size="sm" asChild>
-                      <a href={asset.viewUrl} target="_blank" rel="noreferrer">
-                        Open
-                      </a>
-                    </Button>
-                  )}
-                  {canUpdate || canDelete ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setOpen(open === asset.publicId ? null : asset.publicId)}
-                    >
-                      {open === asset.publicId ? "Close" : "Manage"}
-                    </Button>
-                  ) : null}
-                </div>
-
-                {open === asset.publicId ? (
-                  <div className="space-y-3">
-                    {!video && canUpdate ? (
-                      <form
-                        className="space-y-3"
-                        onSubmit={async (event) => {
-                          event.preventDefault();
-                          const form = new FormData(event.currentTarget);
-                          const result = await describeImage({
-                            publicId: asset.publicId,
-                            filename: asset.filename,
-                            altText: form.get("altText"),
-                            caption: form.get("caption"),
-                          });
-                          setMessage(result.ok ? "Saved." : result.error);
-                          if (result.ok) router.refresh();
-                        }}
-                      >
-                        <div className="space-y-1.5">
-                          <Label htmlFor={`alt-${asset.publicId}`}>Alt text</Label>
-                          <Input
-                            id={`alt-${asset.publicId}`}
-                            name="altText"
-                            defaultValue={asset.reference?.altText ?? ""}
-                            placeholder="What the image shows"
-                          />
-                        </div>
-                        <div className="space-y-1.5">
-                          <Label htmlFor={`caption-${asset.publicId}`}>Caption</Label>
-                          <Input id={`caption-${asset.publicId}`} name="caption" defaultValue={asset.reference?.caption ?? ""} />
-                        </div>
-                        <Button type="submit" size="sm">
-                          Save
-                        </Button>
-                      </form>
-                    ) : null}
-
-                    {canUpdate ? (
-                      <div className="space-y-1.5">
-                        <Label htmlFor={`replace-${asset.publicId}`}>Replace the file</Label>
-                        <Input
-                          id={`replace-${asset.publicId}`}
-                          type="file"
-                          accept={video ? "video/mp4,video/webm" : "image/*"}
-                          disabled={busy}
-                          onChange={async (event) => {
-                            const file = event.target.files?.[0];
-                            if (!file) return;
-                            await send(file, { publicId: asset.publicId });
-                            event.target.value = "";
-                          }}
-                        />
-                      </div>
-                    ) : null}
-
-                    {canDelete ? (
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={async () => {
-                          if (!window.confirm(`Delete ${asset.publicId}?`)) return;
-                          const result = await deleteAsset({ publicId: asset.publicId, resourceType });
-                          setMessage(result.ok ? "Deleted." : result.error);
-                          if (result.ok) router.refresh();
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    ) : null}
-                  </div>
-                ) : null}
-              </CardContent>
-            </Card>
-          ))}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {onFirstPage ? <ResultCount shown={assets.length} total={total} noun={many} /> : <span />}
+        <div className="flex items-center gap-2">
+          {onFirstPage ? null : (
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={q ? `${path}?q=${encodeURIComponent(q)}` : path}>Back to the newest</Link>
+            </Button>
+          )}
+          {cursor ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`${path}?${q ? `q=${encodeURIComponent(q)}&` : ""}page=${encodeURIComponent(cursor)}`}>
+                Next page
+              </Link>
+            </Button>
+          ) : null}
         </div>
-      )}
+      </div>
 
-      {cursor ? (
-        <Button type="button" variant="outline" size="sm" onClick={() => set("cursor", cursor)}>
-          Next page
-        </Button>
+      {manage ? (
+        <ManageSheet
+          key={manage.publicId}
+          asset={manage}
+          resourceType={resourceType}
+          canUpdate={canUpdate}
+          canDelete={canDelete}
+          onClose={() => setManage(null)}
+          onPlay={() => {
+            setPlaying(manage);
+            setManage(null);
+          }}
+        />
       ) : null}
-    </>
+
+      {playing ? (
+        <Dialog
+          open
+          onOpenChange={(next) => {
+            if (!next) setPlaying(null);
+          }}
+        >
+          <DialogContent aria-describedby={undefined} className="sm:max-w-3xl">
+            <DialogTitle className="truncate pr-8">{playing.filename}</DialogTitle>
+            <Player stream={playing.viewUrl} fallback={playing.secureUrl} title={playing.filename} />
+          </DialogContent>
+        </Dialog>
+      ) : null}
+    </div>
   );
 }

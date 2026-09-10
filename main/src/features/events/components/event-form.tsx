@@ -1,17 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { company } from "@/config/site";
+import { Archive, ExternalLink, Users } from "lucide-react";
 import { slugify } from "@/lib/utils/slug";
 import { eventTypeLabels, eventTypes, type EventType } from "@/config/content-meta";
 import { archiveEvent, createEvent, updateEvent } from "@/features/events/actions";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
 import type { OfficeZone } from "@/features/events/admin-queries";
+import {
+  SelectField,
+  SwitchField,
+  TextAreaField,
+  TextField,
+} from "@/components/shared/admin/fields";
+import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
-import { Select } from "@/components/shared/admin/repeater";
+import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
+import { Button } from "@/components/ui/admin/button";
 
 const RichText = dynamic(() => import("@/components/shared/admin/editor-rich-text"), { ssr: false });
 
@@ -37,7 +46,8 @@ export type EventValues = {
   status: string;
 };
 
-type FieldErrors = Record<string, string[] | undefined>;
+// Capacity is typed, so it lives in the form as text and turns back into a number on save.
+type FormState = Omit<EventValues, "capacity"> & { capacity: string };
 
 export function EventForm({
   values,
@@ -55,297 +65,343 @@ export function EventForm({
   canDelete: boolean;
 }) {
   const router = useRouter();
-  const [title, setTitle] = useState(values.title);
-  const [slug, setSlug] = useState(values.slug);
+  const { busy, errors, run } = useAction();
+  const [form, setForm] = useState<FormState>({
+    ...values,
+    capacity: values.capacity === null ? "" : String(values.capacity),
+  });
+  const [dirty, setDirty] = useState(false);
   const [slugTouched, setSlugTouched] = useState(Boolean(values.id));
-  const [summary, setSummary] = useState(values.summary);
-  const [body, setBody] = useState(values.descriptionHtml);
-  const [officeId, setOfficeId] = useState(values.officeId);
-  const [isOnline, setIsOnline] = useState(values.isOnline);
-  const [embed, setEmbed] = useState(values.mapsEmbedUrl);
-  const [capacity, setCapacity] = useState(values.capacity === null ? "" : String(values.capacity));
-  const [status, setStatus] = useState(values.status);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [errors, setErrors] = useState<FieldErrors>({});
+  const [confirmingPublish, setConfirmingPublish] = useState(false);
 
-  const statuses = canPublish ? ["draft", "published", "archived"] : ["draft", "archived"];
-  const zone = offices.find((office) => office.id === officeId)?.timezone;
-  const clock = zone ? `Times are the clock on the wall in ${zone}.` : "Choose the office first. Until then times are read as UTC.";
-  const seatsLeft = capacity ? Number(capacity) - seatsTaken : null;
+  useEffect(() => {
+    focusFirstError(errors);
+  }, [errors]);
+
+  const set = (patch: Partial<FormState>) => {
+    setForm((current) => ({ ...current, ...patch }));
+    setDirty(true);
+  };
+
+  const id = values.id;
+  const zone = offices.find((office) => office.id === form.officeId)?.timezone;
+  const clock = zone
+    ? `Times are the clock on the wall in ${zone}.`
+    : "Choose the office first. Until then times are read as UTC.";
+  const seatsLeft = form.capacity ? Math.max(0, Number(form.capacity) - seatsTaken) : null;
+  const goingLive = form.status === "published" && values.status !== "published";
+
+  const save = async () => {
+    const payload = {
+      ...(id ? { id } : {}),
+      title: form.title,
+      slug: form.slug,
+      eventType: form.eventType,
+      officeId: form.officeId,
+      summary: form.summary,
+      descriptionHtml: form.descriptionHtml,
+      coverImageId: form.coverImageId,
+      startsAt: form.startsAt,
+      endsAt: form.endsAt,
+      isOnline: form.isOnline,
+      // The hidden half of the pair is cleared rather than kept out of sight.
+      onlineUrl: form.isOnline ? form.onlineUrl : "",
+      venueName: form.isOnline ? "" : form.venueName,
+      venueAddress: form.isOnline ? "" : form.venueAddress,
+      mapsEmbedUrl: form.isOnline ? "" : form.mapsEmbedUrl,
+      capacity: form.capacity ? Number(form.capacity) : null,
+      registrationEnabled: form.registrationEnabled,
+      registrationDeadline: form.registrationDeadline,
+      status: form.status,
+    };
+
+    const saved = await run(() => (id ? updateEvent(payload) : createEvent(payload)), {
+      success: id ? "Event saved" : "Event created",
+      failure: id ? "Couldn't save the event." : "Couldn't create the event.",
+    });
+    if (!saved) return;
+    setDirty(false);
+    if (id) router.refresh();
+    else router.push(`/admin/events/${saved.id}`);
+  };
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (goingLive) {
+      setConfirmingPublish(true);
+      return;
+    }
+    void save();
+  };
 
   return (
-    <form id="admin-event-form"
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const form = new FormData(event.currentTarget);
-        const payload = {
-          ...(values.id ? { id: values.id } : {}),
-          title,
-          slug,
-          eventType: String(form.get("eventType") ?? "seminar"),
-          officeId,
-          summary,
-          descriptionHtml: body,
-          coverImageId: String(form.get("coverImageId") ?? ""),
-          startsAt: String(form.get("startsAt") ?? ""),
-          endsAt: String(form.get("endsAt") ?? ""),
-          isOnline,
-          // The hidden half of the pair is cleared rather than kept out of sight.
-          onlineUrl: isOnline ? String(form.get("onlineUrl") ?? "") : "",
-          venueName: isOnline ? "" : String(form.get("venueName") ?? ""),
-          venueAddress: isOnline ? "" : String(form.get("venueAddress") ?? ""),
-          mapsEmbedUrl: isOnline ? "" : embed,
-          capacity: capacity ? Number(capacity) : null,
-          registrationEnabled: form.get("registrationEnabled") === "on",
-          registrationDeadline: String(form.get("registrationDeadline") ?? ""),
-          status,
-        };
+    <form onSubmit={submit} className="space-y-6">
+      <UnsavedGuard dirty={dirty} />
 
-        const result = values.id ? await updateEvent(payload) : await createEvent(payload);
-        setBusy(false);
-        setErrors(result.ok ? {} : (result.fieldErrors ?? {}));
-        setMessage(result.ok ? "Saved." : result.error);
-        if (!result.ok) return;
-        if (values.id) router.refresh();
-        else router.push(`/admin/events/${result.data.id}`);
-      }}
-    >
-      <UnsavedGuard formId="admin-event-form" />
-      <label className="admin-field">
-        <span className="t-small">Title</span>
-        <input
-          value={title}
-          onChange={(event) => {
-            setTitle(event.target.value);
-            if (!slugTouched) setSlug(slugify(event.target.value));
-          }}
-        />
-        <span className="t-small admin-help">The name on the events list and at the top of the event page.</span>
-        {errors.title ? <span className="t-small admin-error">{errors.title[0]}</span> : null}
-      </label>
+      <EditorLayout
+        aside={
+          <SectionCard title="Publishing">
+            <SelectField
+              name="status"
+              label="Status"
+              value={form.status}
+              onChange={(status) => set({ status })}
+              options={[
+                { value: "draft", label: "Draft" },
+                { value: "published", label: "Published", disabled: !canPublish },
+                { value: "archived", label: "Archived" },
+              ]}
+              help={canPublish ? undefined : "You can save drafts. An admin puts the event live."}
+            />
 
-      <label className="admin-field">
-        <span className="t-small">Web address</span>
-        <input
-          value={slug}
-          onChange={(event) => {
-            setSlugTouched(true);
-            setSlug(event.target.value);
-          }}
-        />
-        <span className="t-small admin-help">
-          The event lives at {company.url}/events/{slug || "..."}. Changing it on a published event
-          leaves a redirect behind, so old links keep working.
-        </span>
-        {errors.slug ? <span className="t-small admin-error">{errors.slug[0]}</span> : null}
-      </label>
-
-      <Select
-        label="Kind of event"
-        name="eventType"
-        defaultValue={values.eventType}
-        help="The label on the event card and the filter it sits under."
-        options={eventTypes.map((type) => ({ value: type, label: eventTypeLabels[type] }))}
-      />
-
-      <Select
-        label="Office"
-        value={officeId}
-        onChange={setOfficeId}
-        help="Whose event it is. Every time below is read and shown in that office's time zone, and the event only appears on the home page for visitors seeing that office."
-        options={[
-          { value: "", label: "Not set" },
-          ...offices.map((office) => ({ value: office.id, label: office.name })),
-        ]}
-      />
-
-      <label className="admin-field">
-        <span className="t-small">Summary</span>
-        <textarea value={summary} onChange={(event) => setSummary(event.target.value)} rows={3} />
-        <span className="t-small admin-help">The sentence under the title on the events list.</span>
-        {errors.summary ? <span className="t-small admin-error">{errors.summary[0]}</span> : null}
-      </label>
-
-      <RichText
-        label="Description"
-        help="Everything on the event page under the cover picture."
-        value={values.descriptionHtml}
-        onChange={setBody}
-      />
-
-      <MediaPicker
-        label="Cover image"
-        name="coverImageId"
-        value={cover}
-        help="The wide picture at the top of the event page and on its card."
-      />
-
-      <h2 className="t-h5 admin-subhead">When</h2>
-
-      <label className="admin-field">
-        <span className="t-small">Starts</span>
-        <input type="datetime-local" name="startsAt" defaultValue={values.startsAt} />
-        <span className="t-small admin-help">{clock}</span>
-        {errors.startsAt ? <span className="t-small admin-error">{errors.startsAt[0]}</span> : null}
-      </label>
-
-      <label className="admin-field">
-        <span className="t-small">Ends</span>
-        <input type="datetime-local" name="endsAt" defaultValue={values.endsAt} />
-        <span className="t-small admin-help">Leave it empty if there is no finish time. {clock}</span>
-        {errors.endsAt ? <span className="t-small admin-error">{errors.endsAt[0]}</span> : null}
-      </label>
-
-      <h2 className="t-h5 admin-subhead">Where</h2>
-
-      <label className="admin-field">
-        <span className="t-small">
-          <input type="checkbox" checked={isOnline} onChange={(event) => setIsOnline(event.target.checked)} /> This
-          event is online
-        </span>
-        <span className="t-small admin-help">
-          An online event shows the joining link instead of an address. A venue event shows the
-          address and the map.
-        </span>
-      </label>
-
-      {isOnline ? (
-        <label className="admin-field">
-          <span className="t-small">Joining link</span>
-          <input name="onlineUrl" defaultValue={values.onlineUrl} />
-          <span className="t-small admin-help">
-            Where people join, starting with https://. It is shown on the page and sent in the
-            confirmation email.
-          </span>
-          {errors.onlineUrl ? <span className="t-small admin-error">{errors.onlineUrl[0]}</span> : null}
-        </label>
-      ) : (
-        <>
-          <label className="admin-field">
-            <span className="t-small">Venue</span>
-            <input name="venueName" defaultValue={values.venueName} />
-            <span className="t-small admin-help">The name shown in the Where block on the event page.</span>
-            {errors.venueName ? <span className="t-small admin-error">{errors.venueName[0]}</span> : null}
-          </label>
-
-          <label className="admin-field">
-            <span className="t-small">Address</span>
-            <textarea name="venueAddress" defaultValue={values.venueAddress} rows={2} />
-            <span className="t-small admin-help">The street address under the venue name.</span>
-          </label>
-
-          <label className="admin-field">
-            <span className="t-small">Map to show on the page</span>
-            <input name="mapsEmbedUrl" value={embed} onChange={(event) => setEmbed(event.target.value)} />
-            <span className="t-small admin-help">
-              In Google Maps choose Share, then Embed a map, then copy the address inside src=&quot;...&quot;.
-              The map below is what visitors will see.
-              Without this there is no map on the page.
-            </span>
-            {errors.mapsEmbedUrl ? <span className="t-small admin-error">{errors.mapsEmbedUrl[0]}</span> : null}
-          </label>
-
-          {embed.startsWith("https://") ? (
-            <iframe title="Map preview" src={embed} width="100%" height="260" loading="lazy" />
-          ) : (
-            <p className="t-small admin-empty">No map yet. Paste an address above to see it here.</p>
-          )}
-        </>
-      )}
-
-      <h2 className="t-h5 admin-subhead">Registration</h2>
-
-      <label className="admin-field">
-        <span className="t-small">
-          <input type="checkbox" name="registrationEnabled" defaultChecked={values.registrationEnabled} /> Take
-          registrations
-        </span>
-        <span className="t-small admin-help">
-          Off hides the form on the event page and turns away anything still posted to it.
-        </span>
-      </label>
-
-      <label className="admin-field">
-        <span className="t-small">Seats</span>
-        <input
-          type="number"
-          min={1}
-          value={capacity}
-          onChange={(event) => setCapacity(event.target.value)}
-        />
-        <span className="t-small admin-help">
-          {seatsTaken} registered so far. {seatsLeft === null
-            ? "Leave it empty for no limit."
-            : `${Math.max(0, seatsLeft)} of ${capacity} left. The form closes itself when they run out.`}
-        </span>
-        {errors.capacity ? <span className="t-small admin-error">{errors.capacity[0]}</span> : null}
-      </label>
-
-      <label className="admin-field">
-        <span className="t-small">Registration closes</span>
-        <input type="datetime-local" name="registrationDeadline" defaultValue={values.registrationDeadline} />
-        <span className="t-small admin-help">
-          Left empty, registration closes when the event starts. {clock}
-        </span>
-        {errors.registrationDeadline ? (
-          <span className="t-small admin-error">{errors.registrationDeadline[0]}</span>
-        ) : null}
-      </label>
-
-      {values.id ? (
-        <p className="t-small admin-help">
-          <Link href={`/admin/events/${values.id}/registrations`}>See who has registered</Link>
-        </p>
-      ) : null}
-
-      <h2 className="t-h5 admin-subhead">Publishing</h2>
-
-      <Select
-        label="Status"
-        value={status}
-        onChange={setStatus}
-        help={
-          canPublish
-            ? "Draft is invisible. Published puts it on the site. Archived comes off it."
-            : "You can save drafts. An admin puts the event live."
+            {id ? (
+              <Button variant="outline" size="sm" asChild className="w-full">
+                <a href={`/events/${values.slug}`} target="_blank" rel="noreferrer">
+                  <ExternalLink />
+                  View on site
+                </a>
+              </Button>
+            ) : null}
+          </SectionCard>
         }
-        options={statuses.map((option) => ({ value: option, label: option }))}
+      >
+        <SectionCard title="Event details">
+          <TextField
+            name="title"
+            label="Title"
+            value={form.title}
+            error={errors.title?.[0]}
+            onChange={(title) => set(slugTouched ? { title } : { title, slug: slugify(title) })}
+          />
+
+          <TextField
+            name="slug"
+            label="URL slug"
+            help="Used in the page address."
+            value={form.slug}
+            error={errors.slug?.[0]}
+            onChange={(slug) => {
+              setSlugTouched(true);
+              set({ slug });
+            }}
+          />
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <SelectField
+              name="eventType"
+              label="Kind of event"
+              value={form.eventType}
+              onChange={(eventType) => set({ eventType: eventType as EventType })}
+              options={eventTypes.map((type) => ({ value: type, label: eventTypeLabels[type] }))}
+            />
+
+            <SelectField
+              name="officeId"
+              label="Office"
+              value={form.officeId}
+              emptyLabel="Not set"
+              help="Whose event it is. Every time below is read in that office's time zone."
+              onChange={(officeId) => set({ officeId })}
+              options={offices.map((office) => ({ value: office.id, label: office.name }))}
+            />
+          </div>
+
+          <TextAreaField
+            name="summary"
+            label="Summary"
+            rows={3}
+            value={form.summary}
+            error={errors.summary?.[0]}
+            onChange={(summary) => set({ summary })}
+          />
+
+          <RichText
+            label="Description"
+            value={values.descriptionHtml}
+            onChange={(descriptionHtml) => set({ descriptionHtml })}
+          />
+        </SectionCard>
+
+        <SectionCard title="When and where" description={clock}>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField
+              name="startsAt"
+              label="Starts"
+              type="datetime-local"
+              value={form.startsAt}
+              error={errors.startsAt?.[0]}
+              onChange={(startsAt) => set({ startsAt })}
+            />
+            <TextField
+              name="endsAt"
+              label="Ends"
+              type="datetime-local"
+              help="Leave it empty if there is no finish time."
+              value={form.endsAt}
+              error={errors.endsAt?.[0]}
+              onChange={(endsAt) => set({ endsAt })}
+            />
+          </div>
+
+          <SwitchField
+            label="This event is online"
+            help="An online event shows the joining link instead of an address and a map."
+            checked={form.isOnline}
+            onChange={(isOnline) => set({ isOnline })}
+          />
+
+          {form.isOnline ? (
+            <TextField
+              name="onlineUrl"
+              label="Joining link"
+              help="Shown on the page and sent in the confirmation email."
+              value={form.onlineUrl}
+              error={errors.onlineUrl?.[0]}
+              onChange={(onlineUrl) => set({ onlineUrl })}
+            />
+          ) : (
+            <>
+              <TextField
+                name="venueName"
+                label="Venue"
+                value={form.venueName}
+                error={errors.venueName?.[0]}
+                onChange={(venueName) => set({ venueName })}
+              />
+
+              <TextAreaField
+                name="venueAddress"
+                label="Address"
+                rows={2}
+                value={form.venueAddress}
+                error={errors.venueAddress?.[0]}
+                onChange={(venueAddress) => set({ venueAddress })}
+              />
+
+              <TextField
+                name="mapsEmbedUrl"
+                label="Map"
+                help="In Google Maps choose Share, then Embed a map, then copy the address inside src."
+                value={form.mapsEmbedUrl}
+                error={errors.mapsEmbedUrl?.[0]}
+                onChange={(mapsEmbedUrl) => set({ mapsEmbedUrl })}
+              />
+
+              {form.mapsEmbedUrl.startsWith("https://") ? (
+                <iframe
+                  title="Map preview"
+                  src={form.mapsEmbedUrl}
+                  loading="lazy"
+                  className="h-64 w-full rounded-lg border border-border"
+                />
+              ) : (
+                <p className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-sm text-muted-foreground">
+                  No map yet. Paste an address above to see it here.
+                </p>
+              )}
+            </>
+          )}
+        </SectionCard>
+
+        <SectionCard title="Media">
+          <MediaPicker
+            label="Event image"
+            name="coverImageId"
+            value={cover}
+            onChange={(coverImageId) => set({ coverImageId: coverImageId ?? "" })}
+          />
+        </SectionCard>
+
+        <SectionCard title="Registration">
+          <SwitchField
+            label="Take registrations"
+            help="Off hides the form on the event page."
+            checked={form.registrationEnabled}
+            onChange={(registrationEnabled) => set({ registrationEnabled })}
+          />
+
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField
+              name="capacity"
+              label="Seats"
+              type="number"
+              value={form.capacity}
+              error={errors.capacity?.[0]}
+              onChange={(capacity) => set({ capacity })}
+              help={
+                seatsLeft === null
+                  ? `${seatsTaken} registered so far. Leave it empty for no limit.`
+                  : `${seatsTaken} registered so far, ${seatsLeft} of ${form.capacity} left.`
+              }
+            />
+
+            <TextField
+              name="registrationDeadline"
+              label="Registration closes"
+              type="datetime-local"
+              help="Left empty, registration closes when the event starts."
+              value={form.registrationDeadline}
+              error={errors.registrationDeadline?.[0]}
+              onChange={(registrationDeadline) => set({ registrationDeadline })}
+            />
+          </div>
+
+          {id ? (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/admin/events/${id}/registrations`}>
+                <Users />
+                See who has registered
+              </Link>
+            </Button>
+          ) : null}
+        </SectionCard>
+      </EditorLayout>
+
+      <EditorActionBar
+        dirty={dirty}
+        busy={busy}
+        saveLabel={goingLive ? "Publish" : "Save"}
+        destructive={
+          canDelete && id ? (
+            <ConfirmDialog
+              trigger={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Archive />
+                  Archive
+                </Button>
+              }
+              title="Take this event off the site?"
+              description="It comes off the public website and stays here as archived."
+              confirmLabel="Archive event"
+              onConfirm={async () => {
+                const archived = await run(() => archiveEvent({ id }), {
+                  success: "Event archived",
+                  failure: "Couldn't archive the event.",
+                });
+                if (archived) {
+                  setForm((current) => ({ ...current, status: "archived" }));
+                  router.refresh();
+                }
+              }}
+            />
+          ) : null
+        }
       />
 
-      <div className="admin-actions">
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-          {busy ? "Saving" : "Save"}
-        </button>
-
-        {values.id ? (
-          <Link className="admin-btn" href={`/events/${values.slug}`} target="_blank">
-            View on site
-          </Link>
-        ) : null}
-
-        {values.id && canDelete ? (
-          <button
-            type="button"
-            className="admin-btn"
-            disabled={busy}
-            onClick={async () => {
-              if (!window.confirm("Take this event off the site? It stays here as archived.")) return;
-              setBusy(true);
-              const result = await archiveEvent({ id: values.id });
-              setBusy(false);
-              setMessage(result.ok ? "Archived." : result.error);
-              if (result.ok) router.refresh();
-            }}
-          >
-            Archive
-          </button>
-        ) : null}
-
-        {message ? <span className="t-small">{message}</span> : null}
-      </div>
+      <ConfirmDialog
+        open={confirmingPublish}
+        onOpenChange={setConfirmingPublish}
+        title="Publish this event?"
+        description="It will become visible on the public website and start taking registrations."
+        confirmLabel="Publish"
+        destructive={false}
+        onConfirm={save}
+      />
     </form>
   );
 }

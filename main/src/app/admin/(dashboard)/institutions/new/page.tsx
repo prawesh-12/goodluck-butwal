@@ -1,6 +1,7 @@
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader } from "@/components/shared/admin/page-header";
 import { InstitutionEditor } from "@/features/institutions/components/institution-editor";
 import { destinationOptions } from "@/features/courses/admin-queries";
 
@@ -11,11 +12,8 @@ export default async function NewInstitutionPage() {
   allow(actor, "institutions", "create");
 
   return (
-    <>
-      <h1 className="t-h4">New institution</h1>
-      <p className="t-small admin-help">
-        Save it first, then the gallery opens on the edit screen.
-      </p>
+    <div className="space-y-6">
+      <EditorHeader backHref="/admin/institutions" backLabel="Institutions" title="New institution" />
       <InstitutionEditor
         canDelete={false}
         canPublish={can(actor, "institutions", "publish")}
@@ -36,6 +34,6 @@ export default async function NewInstitutionPage() {
           sortOrder: 0,
         }}
       />
-    </>
+    </div>
   );
 }

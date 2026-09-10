@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader } from "@/components/shared/admin/page-header";
+import { StatusBadge } from "@/components/shared/admin/list-ui";
 import { PostForm } from "@/features/posts/components/post-form";
 import { pickedMedia } from "@/features/media/admin-queries";
-import { editorialOptions } from "@/features/posts/admin-queries";
-import { getAdminPost } from "@/features/posts/admin-queries";
+import { editorialOptions, getAdminPost } from "@/features/posts/admin-queries";
 
 export const dynamic = "force-dynamic";
 
@@ -25,12 +26,12 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
 
   return (
     <>
-      <h1 className="t-h4">{post.title}</h1>
-      <p className="t-small admin-help">
-        <a href={`/news/${post.slug}`} target="_blank" rel="noreferrer">
-          View on site
-        </a>
-      </p>
+      <EditorHeader
+        backHref="/admin/posts"
+        backLabel="News"
+        title={post.title}
+        meta={<StatusBadge status={post.status} />}
+      />
 
       <PostForm
         values={{

@@ -2,11 +2,26 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Pencil, Tags, Trash2 } from "lucide-react";
 import {
   createPostCategory,
   deletePostCategory,
   updatePostCategory,
 } from "@/features/posts/taxonomy-actions";
+import { Button } from "@/components/ui/admin/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/admin/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { TextField } from "@/components/shared/admin/fields";
+import { DataCard, Muted } from "@/components/shared/admin/list-ui";
+import { EmptyState } from "@/components/shared/admin/states";
+import { useAction } from "@/components/shared/admin/use-action";
 
 export type CategoryRow = {
   id: string;
@@ -17,152 +32,197 @@ export type CategoryRow = {
   posts: number;
 };
 
+type Draft = { id?: string; name: string; slug: string; description: string; sortOrder: string };
+
+const blank: Draft = { name: "", slug: "", description: "", sortOrder: "0" };
+
 export function PostCategoryManager({
   rows,
+  canCreate,
   canEdit,
   canDelete,
 }: {
   rows: CategoryRow[];
+  canCreate: boolean;
   canEdit: boolean;
   canDelete: boolean;
 }) {
+  const router = useRouter();
+  const { busy, errors, setErrors, run } = useAction();
+  const [draft, setDraft] = useState<Draft | null>(null);
+
+  const openDraft = (next: Draft) => {
+    setErrors({});
+    setDraft(next);
+  };
+
+  const set = (key: keyof Draft, value: string) =>
+    setDraft((current) => (current ? { ...current, [key]: value } : current));
+
+  const save = async () => {
+    if (!draft) return;
+    const payload = {
+      name: draft.name,
+      slug: draft.slug,
+      description: draft.description,
+      sortOrder: Number(draft.sortOrder) || 0,
+    };
+    const saved = await run(
+      () => (draft.id ? updatePostCategory({ ...payload, id: draft.id }) : createPostCategory(payload)),
+      { success: "Category saved", failure: "Couldn't save the category." },
+    );
+    if (!saved) return;
+    setDraft(null);
+    router.refresh();
+  };
+
+  const remove = async (row: CategoryRow) => {
+    const done = await run(() => deletePostCategory({ id: row.id }), {
+      success: "Category deleted",
+      failure: "Couldn't delete the category.",
+    });
+    if (done) router.refresh();
+  };
+
+  const newCategory = canCreate ? (
+    <Button onClick={() => openDraft({ ...blank })}>New category</Button>
+  ) : null;
+
   return (
     <>
-      <NewCategory />
-      {rows.map((row) => (
-        <CategoryEditor key={row.id} row={row} canEdit={canEdit} canDelete={canDelete} />
-      ))}
-    </>
-  );
-}
-
-function NewCategory() {
-  const router = useRouter();
-  const [name, setName] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-
-  return (
-    <form
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const result = await createPostCategory({ name, slug: "", description: "", sortOrder: 0 });
-        setBusy(false);
-        setMessage(result.ok ? "Added." : result.error);
-        if (!result.ok) return;
-        setName("");
-        router.refresh();
-      }}
-    >
-      <h2 className="t-h5 admin-subhead">Add a category</h2>
-      <label className="admin-field">
-        <span className="t-small">Name</span>
-        <input value={name} onChange={(event) => setName(event.target.value)} />
-        <span className="t-small admin-help">
-          The label on a news card and the heading on its own news page. The web address is made
-          from the name.
-        </span>
-      </label>
-      <div className="admin-actions">
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy || !name}>
-          {busy ? "Adding" : "Add"}
-        </button>
-        {message ? <span className="t-small">{message}</span> : null}
+      <div className="flex items-center justify-between gap-4">
+        <p className="text-sm text-muted-foreground">Categories group articles on the news page.</p>
+        {newCategory}
       </div>
-    </form>
-  );
-}
 
-function CategoryEditor({
-  row,
-  canEdit,
-  canDelete,
-}: {
-  row: CategoryRow;
-  canEdit: boolean;
-  canDelete: boolean;
-}) {
-  const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+      {rows.length === 0 ? (
+        <EmptyState
+          icon={Tags}
+          title="No categories yet"
+          description="Add a category so readers can browse articles by subject."
+          action={newCategory}
+        />
+      ) : (
+        <DataCard>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead className="hidden sm:table-cell">Articles</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="font-medium">
+                    {row.name}
+                    {row.description ? (
+                      <span className="block text-xs font-medium text-muted-foreground">{row.description}</span>
+                    ) : null}
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    {row.posts > 0 ? row.posts : <Muted>None</Muted>}
+                  </TableCell>
+                  <TableCell>
+                    <span className="flex items-center justify-end gap-1">
+                      {canEdit ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            openDraft({
+                              id: row.id,
+                              name: row.name,
+                              slug: row.slug,
+                              description: row.description ?? "",
+                              sortOrder: String(row.sortOrder),
+                            })
+                          }
+                        >
+                          <Pencil />
+                          Edit
+                        </Button>
+                      ) : null}
+                      {canDelete ? (
+                        <ConfirmDialog
+                          trigger={
+                            <Button variant="ghost" size="icon-sm" className="text-destructive">
+                              <Trash2 />
+                              <span className="sr-only">Delete {row.name}</span>
+                            </Button>
+                          }
+                          title={`Delete the ${row.name} category?`}
+                          description="Articles keep their text, but they lose this label on the website."
+                          confirmLabel="Delete category"
+                          onConfirm={() => remove(row)}
+                        />
+                      ) : null}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataCard>
+      )}
 
-  return (
-    <form
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const form = new FormData(event.currentTarget);
-        const result = await updatePostCategory({
-          id: row.id,
-          name: String(form.get("name") ?? ""),
-          slug: String(form.get("slug") ?? ""),
-          description: String(form.get("description") ?? ""),
-          sortOrder: Number(form.get("sortOrder") ?? 0),
-        });
-        setBusy(false);
-        setMessage(result.ok ? "Saved." : result.error);
-        if (result.ok) router.refresh();
-      }}
-    >
-      <h2 className="t-h5 admin-subhead">{row.name}</h2>
-      <p className="t-small admin-help">
-        {row.posts} {row.posts === 1 ? "post" : "posts"} use this category.
-      </p>
+      <Dialog open={draft !== null} onOpenChange={(open) => (open ? null : setDraft(null))}>
+        <DialogContent aria-describedby={undefined}>
+          <DialogHeader>
+            <DialogTitle>{draft?.id ? "Edit category" : "New category"}</DialogTitle>
+          </DialogHeader>
 
-      <label className="admin-field">
-        <span className="t-small">Name</span>
-        <input name="name" defaultValue={row.name} readOnly={!canEdit} />
-        <span className="t-small admin-help">The label on the news card.</span>
-      </label>
-
-      <label className="admin-field">
-        <span className="t-small">Web address</span>
-        <input name="slug" defaultValue={row.slug} readOnly={!canEdit} />
-        <span className="t-small admin-help">The category page lives at /news/category/{row.slug}.</span>
-      </label>
-
-      <label className="admin-field">
-        <span className="t-small">Description</span>
-        <input name="description" defaultValue={row.description ?? ""} readOnly={!canEdit} />
-        <span className="t-small admin-help">The sentence under the heading on the category page.</span>
-      </label>
-
-      <label className="admin-field">
-        <span className="t-small">Order</span>
-        <input name="sortOrder" type="number" min={0} defaultValue={row.sortOrder} readOnly={!canEdit} />
-        <span className="t-small admin-help">Lower numbers come first in the news filter.</span>
-      </label>
-
-      <div className="admin-actions">
-        {canEdit ? (
-          <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-            {busy ? "Saving" : "Save"}
-          </button>
-        ) : null}
-
-        {canDelete ? (
-          <button
-            type="button"
-            className="admin-btn admin-btn-danger"
-            disabled={busy}
-            onClick={async () => {
-              if (!window.confirm(`Delete the ${row.name} category?`)) return;
-              setBusy(true);
-              const result = await deletePostCategory({ id: row.id });
-              setBusy(false);
-              setMessage(result.ok ? "Deleted." : result.error);
-              if (result.ok) router.refresh();
+          <form
+            className="space-y-5"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void save();
             }}
           >
-            Delete
-          </button>
-        ) : null}
+            <TextField
+              name="name"
+              label="Name"
+              value={draft?.name ?? ""}
+              onChange={(value) => set("name", value)}
+              error={errors.name?.[0]}
+            />
+            <TextField
+              name="slug"
+              label="URL slug"
+              value={draft?.slug ?? ""}
+              help="Used in the page address."
+              onChange={(value) => set("slug", value)}
+              error={errors.slug?.[0]}
+            />
+            <TextField
+              name="description"
+              label="Description"
+              value={draft?.description ?? ""}
+              onChange={(value) => set("description", value)}
+              error={errors.description?.[0]}
+            />
+            <TextField
+              name="sortOrder"
+              label="Display order"
+              type="number"
+              value={draft?.sortOrder ?? "0"}
+              help="Lower numbers appear first."
+              onChange={(value) => set("sortOrder", value)}
+              error={errors.sortOrder?.[0]}
+            />
 
-        {message ? <span className="t-small">{message}</span> : null}
-      </div>
-    </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDraft(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={busy}>
+                {busy ? "Saving..." : "Save"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

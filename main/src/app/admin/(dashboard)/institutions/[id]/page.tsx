@@ -2,9 +2,10 @@ import { notFound } from "next/navigation";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader } from "@/components/shared/admin/page-header";
+import { StatusBadge } from "@/components/shared/admin/list-ui";
 import { InstitutionEditor } from "@/features/institutions/components/institution-editor";
 import { InstitutionGallery } from "@/features/institutions/components/institution-gallery";
-import { institutionPath } from "@/config/course-meta";
 import { pickedMedia } from "@/features/media/admin-queries";
 import { courseCountFor, getAdminInstitution, institutionGallery } from "@/features/institutions/admin-queries";
 import { destinationOptions } from "@/features/courses/admin-queries";
@@ -24,26 +25,22 @@ export default async function EditInstitutionPage({ params }: { params: Promise<
     institutionGallery(row.id),
     courseCountFor(row.id),
   ]);
-  const path = institutionPath(row.slug);
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">{row.name}</h1>
-        <a className="admin-btn" href={path} target="_blank" rel="noreferrer">
-          View on site
-        </a>
-      </div>
-      <p className="t-small admin-count">
-        {courses} {courses === 1 ? "course" : "courses"} at this institution.
-        {courses > 0 ? " They have to be moved before it can be deleted." : ""}
-      </p>
+    <div className="space-y-6">
+      <EditorHeader
+        backHref="/admin/institutions"
+        backLabel="Institutions"
+        title={row.name}
+        meta={<StatusBadge status={row.status} />}
+      />
 
       <InstitutionEditor
         canDelete={can(actor, "institutions", "delete")}
         canPublish={can(actor, "institutions", "publish")}
         media={media}
         destinations={destinations}
+        courses={courses}
         value={{
           id: row.id,
           slug: row.slug,
@@ -71,6 +68,6 @@ export default async function EditInstitutionPage({ params }: { params: Promise<
           media: item.media,
         }))}
       />
-    </>
+    </div>
   );
 }

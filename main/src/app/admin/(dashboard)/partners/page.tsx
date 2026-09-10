@@ -1,9 +1,12 @@
+import { Handshake } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
-import { ContentFilters } from "@/components/shared/admin/content-filters";
+import { PageHeader } from "@/components/shared/admin/page-header";
+import { FilterBar } from "@/components/shared/admin/filter-bar";
+import { NewButton, Pager, ResultCount } from "@/components/shared/admin/list-ui";
+import { EmptyState } from "@/components/shared/admin/states";
 import { PartnerList } from "@/features/partners/components/partner-list";
-import { EmptyState, ListHeader, NewButton, Pager } from "@/components/shared/admin/list-ui";
 import { listAdminPartners } from "@/features/partners/admin-queries";
 import { PAGE_SIZE, type AdminFilters } from "@/lib/utils/admin-query";
 
@@ -21,19 +24,48 @@ export default async function PartnersPage({
   const filters: AdminFilters = { ...params, page: Number(params.page ?? 1) };
   const { rows, total, page } = await listAdminPartners(filters);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const narrowed = Boolean(params.q || params.status);
+  const canCreate = can(actor, "partners", "create");
 
   return (
-    <div className="space-y-4">
-      <ListHeader
+    <>
+      <PageHeader
         title="Partners"
-        count={total}
-        actions={<NewButton href="/admin/partners/new">Add a partner</NewButton>}
+        description="The logos shown on the website."
+        actions={canCreate ? <NewButton href="/admin/partners/new">Add partner</NewButton> : null}
       />
 
-      <ContentFilters placeholder="Partner name" />
+      <FilterBar
+        searchPlaceholder="Search partners"
+        filters={[
+          {
+            name: "status",
+            label: "Status",
+            anyLabel: "All statuses",
+            options: [
+              { value: "draft", label: "Draft" },
+              { value: "published", label: "Published" },
+              { value: "archived", label: "Archived" },
+            ],
+          },
+        ]}
+      />
 
       {rows.length === 0 ? (
-        <EmptyState>No partners match those filters. Clear the search, or add a partner.</EmptyState>
+        narrowed ? (
+          <EmptyState
+            icon={Handshake}
+            title="No partners match those filters"
+            description="Clear the search or the filters to see them all again."
+          />
+        ) : (
+          <EmptyState
+            icon={Handshake}
+            title="No partners yet"
+            description="Add the first partner to show its logo on the home page."
+            action={canCreate ? <NewButton href="/admin/partners/new">Add partner</NewButton> : null}
+          />
+        )
       ) : (
         <PartnerList
           key={rows.map((row) => row.id).join("-")}
@@ -42,7 +74,10 @@ export default async function PartnersPage({
         />
       )}
 
-      <Pager page={page} pages={pages} params={params} />
-    </div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <ResultCount shown={rows.length} total={total} noun="partners" />
+        <Pager page={page} pages={pages} params={params} />
+      </div>
+    </>
   );
 }

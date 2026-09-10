@@ -1,14 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
+import { slugify } from "@/lib/utils/slug";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
-import { Field, Repeater, SaveBar, Select, TextArea } from "@/components/shared/admin/repeater";
+import { Repeater } from "@/components/shared/admin/repeater";
+import { SelectField, TextAreaField, TextField } from "@/components/shared/admin/fields";
+import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
+import { ErrorState } from "@/components/shared/admin/states";
+import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
+import { Button } from "@/components/ui/admin/button";
 import {
   createTestPrepCourse,
   deleteTestPrepCourse,
   updateTestPrepCourse,
 } from "@/features/test-prep/actions";
+
+const RichText = dynamic(() => import("@/components/shared/admin/editor-rich-text"), { ssr: false });
 
 type SyllabusItem = { title: string; body: string };
 
@@ -27,10 +39,6 @@ export type CourseValue = {
   sortOrder: number;
 };
 
-// Inlined rather than imported: a client component pulling in a validator drags zod into the
-// browser bundle.
-const coursePath = (slug: string) => `/test-preparation/${slug}`;
-
 export function TestPrepCourseEditor({
   value,
   media,
@@ -43,152 +51,222 @@ export function TestPrepCourseEditor({
   canPublish: boolean;
 }) {
   const router = useRouter();
+  const { busy, errors, run } = useAction();
   const [row, setRow] = useState<CourseValue>(value);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string[] | undefined>>({});
+  const [dirty, setDirty] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(Boolean(value.id));
+  const [confirmingPublish, setConfirmingPublish] = useState(false);
 
-  const set = (patch: Partial<CourseValue>) => setRow((current) => ({ ...current, ...patch }));
-  const pick = (id: string | null) => (id ? (media[id] ?? null) : null);
-  const path = coursePath(row.slug);
+  useEffect(() => {
+    focusFirstError(errors);
+  }, [errors]);
+
+  const set = (patch: Partial<CourseValue>) => {
+    setRow((current) => ({ ...current, ...patch }));
+    setDirty(true);
+  };
+
+  const id = row.id;
+  const goingLive = row.status === "published" && value.status !== "published";
+
+  const save = async () => {
+    const saved = await run(
+      () => (id ? updateTestPrepCourse(row) : createTestPrepCourse(row)),
+      {
+        success: id ? "Course saved" : "Course created",
+        failure: id ? "Couldn't save the course." : "Couldn't create the course.",
+      },
+    );
+    if (!saved) return;
+    setDirty(false);
+    if (id) router.refresh();
+    else router.push(`/admin/test-prep/${saved.id}`);
+  };
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (goingLive) {
+      setConfirmingPublish(true);
+      return;
+    }
+    void save();
+  };
 
   return (
-    <form
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const result = row.id ? await updateTestPrepCourse(row) : await createTestPrepCourse(row);
-        setBusy(false);
-        setErrors(result.ok ? {} : (result.fieldErrors ?? {}));
-        setMessage(result.ok ? "Saved." : result.error);
-        if (result.ok && !row.id) router.push(`/admin/test-prep/${result.data.id}`);
-        else if (result.ok) router.refresh();
-      }}
-    >
-      <Field
-        label="Course name"
-        help="The name at the top of the course page and in the batch list."
-        value={row.name}
-        onChange={(name) => set({ name })}
-        error={errors.name?.[0]}
-      />
+    <form onSubmit={submit} className="space-y-6">
+      <UnsavedGuard dirty={dirty} />
 
-      <Field
-        label="Web address"
-        help={`This course will live at ${path}. Changing it leaves a redirect behind so old links still work.`}
-        value={row.slug}
-        onChange={(slug) => set({ slug })}
-        error={errors.slug?.[0]}
-      />
+      <EditorLayout
+        aside={
+          <SectionCard title="Publishing">
+            <SelectField
+              name="status"
+              label="Status"
+              value={row.status}
+              onChange={(status) => set({ status })}
+              options={[
+                { value: "draft", label: "Draft" },
+                { value: "published", label: "Published", disabled: !canPublish },
+                { value: "archived", label: "Archived" },
+              ]}
+              help={canPublish ? undefined : "You can save drafts. An admin puts a course live."}
+            />
 
-      <Select
-        label="Test"
-        help="Which test this course prepares people for. Visitors filter the batch table by it."
-        value={row.testType}
-        onChange={(testType) => set({ testType })}
-        options={[
-          { value: "ielts", label: "IELTS" },
-          { value: "pte", label: "PTE" },
-        ]}
-        error={errors.testType?.[0]}
-      />
+            <TextField
+              name="sortOrder"
+              label="Display order"
+              type="number"
+              help="Lower numbers appear first."
+              value={String(row.sortOrder)}
+              onChange={(sortOrder) => set({ sortOrder: Number(sortOrder) || 0 })}
+            />
 
-      <Field
-        label="Summary"
-        help="The one line under the name, on the test preparation page and in lists."
-        value={row.summary}
-        onChange={(summary) => set({ summary })}
-      />
-
-      <TextArea
-        label="Description"
-        help="The main text on the course page."
-        rows={8}
-        value={row.descriptionHtml}
-        onChange={(descriptionHtml) => set({ descriptionHtml })}
-      />
-
-      <Repeater<SyllabusItem>
-        label="Syllabus"
-        help="What the course covers. Each line becomes a bullet on the course page."
-        items={row.syllabus}
-        blank={() => ({ title: "", body: "" })}
-        onChange={(syllabus) => set({ syllabus })}
-        addLabel="Add a syllabus section"
-        emptyLabel="No syllabus yet. A course cannot go live without one."
-      >
-        {(item, update) => (
-          <>
-            <Field label="Heading" value={item.title} onChange={(title) => update({ title })} />
-            <TextArea label="What it covers" rows={3} value={item.body} onChange={(body) => update({ body })} />
-          </>
-        )}
-      </Repeater>
-
-      <MediaPicker
-        label="Course picture"
-        name="heroImageId"
-        value={pick(row.heroImageId)}
-        help="Shown at the top of the course page."
-        onChange={(heroImageId) => set({ heroImageId })}
-      />
-
-      <Field
-        label="Fee"
-        help="The usual price of the course. A batch can charge something else. Leave empty to show no price."
-        value={row.defaultFee}
-        onChange={(defaultFee) => set({ defaultFee })}
-        error={errors.defaultFee?.[0]}
-      />
-
-      <Field
-        label="Currency"
-        help="Three letters, like NPR."
-        value={row.feeCurrency}
-        onChange={(feeCurrency) => set({ feeCurrency })}
-        error={errors.feeCurrency?.[0]}
-      />
-
-      <h2 className="t-h5 admin-subhead">Publishing</h2>
-
-      <Field
-        label="Order"
-        type="number"
-        help="Lower numbers come first on the test preparation page."
-        value={String(row.sortOrder)}
-        onChange={(sortOrder) => set({ sortOrder: Number(sortOrder) || 0 })}
-      />
-
-      <Select
-        label="Status"
-        help="Only published courses are on the site. Their batches are hidden with them."
-        value={row.status}
-        onChange={(status) => set({ status })}
-        options={[
-          { value: "draft", label: "Draft" },
-          { value: "published", label: "Published", disabled: !canPublish },
-          { value: "archived", label: "Archived" },
-        ]}
-      />
-
-      <SaveBar
-        busy={busy}
-        message={message}
-        problems={errors.publish}
-        viewHref={path}
-        onDelete={
-          canDelete && row.id
-            ? async () => {
-                if (!confirm(`Delete ${row.name}? This cannot be undone.`)) return;
-                setBusy(true);
-                const result = await deleteTestPrepCourse({ id: row.id });
-                setBusy(false);
-                if (result.ok) router.push("/admin/test-prep");
-                else setMessage(result.error);
-              }
-            : undefined
+            {errors.publish?.length ? (
+              <ErrorState title="This cannot go live yet" description={errors.publish.join(" ")} />
+            ) : null}
+          </SectionCard>
         }
+      >
+        <SectionCard title="Course details">
+          <TextField
+            name="name"
+            label="Course name"
+            value={row.name}
+            error={errors.name?.[0]}
+            onChange={(name) => {
+              set(slugTouched ? { name } : { name, slug: slugify(name) });
+            }}
+          />
+
+          <TextField
+            name="slug"
+            label="URL slug"
+            help="Used in the page address."
+            value={row.slug}
+            error={errors.slug?.[0]}
+            onChange={(slug) => {
+              setSlugTouched(true);
+              set({ slug });
+            }}
+          />
+
+          <SelectField
+            name="testType"
+            label="Test"
+            value={row.testType}
+            error={errors.testType?.[0]}
+            onChange={(testType) => set({ testType })}
+            options={[
+              { value: "ielts", label: "IELTS" },
+              { value: "pte", label: "PTE" },
+            ]}
+          />
+
+          <TextAreaField
+            name="summary"
+            label="Summary"
+            rows={3}
+            value={row.summary}
+            error={errors.summary?.[0]}
+            onChange={(summary) => set({ summary })}
+          />
+        </SectionCard>
+
+        <SectionCard title="Course content">
+          <RichText label="Description" value={value.descriptionHtml} onChange={(descriptionHtml) => set({ descriptionHtml })} />
+
+          <Repeater<SyllabusItem>
+            label="Syllabus"
+            help="What the course covers, section by section."
+            items={row.syllabus}
+            blank={() => ({ title: "", body: "" })}
+            onChange={(syllabus) => set({ syllabus })}
+            addLabel="Add a section"
+            emptyLabel="No syllabus yet. A course needs one before it can go live."
+          >
+            {(item, update) => (
+              <>
+                <TextField label="Heading" value={item.title} onChange={(title) => update({ title })} />
+                <TextAreaField
+                  label="What it covers"
+                  rows={3}
+                  value={item.body}
+                  onChange={(body) => update({ body })}
+                />
+              </>
+            )}
+          </Repeater>
+        </SectionCard>
+
+        <SectionCard title="Media">
+          <MediaPicker
+            label="Course picture"
+            name="heroImageId"
+            value={row.heroImageId ? (media[row.heroImageId] ?? null) : null}
+            onChange={(heroImageId) => set({ heroImageId })}
+          />
+        </SectionCard>
+
+        <SectionCard title="Fee" description="What a batch charges unless it sets its own fee.">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField
+              name="defaultFee"
+              label="Fee"
+              value={row.defaultFee}
+              error={errors.defaultFee?.[0]}
+              onChange={(defaultFee) => set({ defaultFee })}
+            />
+            <TextField
+              name="feeCurrency"
+              label="Currency"
+              help="Three letters, like NPR."
+              value={row.feeCurrency}
+              error={errors.feeCurrency?.[0]}
+              onChange={(feeCurrency) => set({ feeCurrency })}
+            />
+          </div>
+        </SectionCard>
+      </EditorLayout>
+
+      <EditorActionBar
+        dirty={dirty}
+        busy={busy}
+        saveLabel={goingLive ? "Publish" : "Save"}
+        destructive={
+          canDelete && id ? (
+            <ConfirmDialog
+              trigger={
+                <Button type="button" variant="ghost" size="sm" className="text-destructive hover:bg-destructive/10 hover:text-destructive">
+                  <Trash2 />
+                  Delete
+                </Button>
+              }
+              title={`Delete ${row.name || "this course"}?`}
+              description="This cannot be undone. A course with batches has to have those deleted first."
+              confirmLabel="Delete course"
+              onConfirm={async () => {
+                const deleted = await run(() => deleteTestPrepCourse({ id }), {
+                  success: "Course deleted",
+                  failure: "Couldn't delete the course.",
+                });
+                if (deleted) {
+                  setDirty(false);
+                  router.push("/admin/test-prep");
+                }
+              }}
+            />
+          ) : null
+        }
+      />
+
+      <ConfirmDialog
+        open={confirmingPublish}
+        onOpenChange={setConfirmingPublish}
+        title="Publish this course?"
+        description="It will become visible on the public website, along with its batches."
+        confirmLabel="Publish"
+        destructive={false}
+        onConfirm={save}
       />
     </form>
   );

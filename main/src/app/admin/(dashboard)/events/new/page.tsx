@@ -1,4 +1,5 @@
 import { requireActor } from "@/lib/auth/session";
+import { EditorHeader } from "@/components/shared/admin/page-header";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { EventForm, type EventValues } from "@/features/events/components/event-form";
@@ -34,8 +35,9 @@ export default async function NewEventPage() {
   const offices = await officeZones();
 
   return (
-    <>
-      <h1 className="t-h4">Add an event</h1>
+    <div className="space-y-6">
+      <EditorHeader backHref="/admin/events" backLabel="Events" title="New event" />
+
       <EventForm
         values={empty}
         offices={offices}
@@ -44,6 +46,6 @@ export default async function NewEventPage() {
         canPublish={can(actor, "events", "publish")}
         canDelete={false}
       />
-    </>
+    </div>
   );
 }

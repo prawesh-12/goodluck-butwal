@@ -1,42 +1,31 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Download } from "lucide-react";
-import { Select } from "@/components/shared/admin/repeater";
+import { X } from "lucide-react";
+import { FilterBar, type Filter } from "@/components/shared/admin/filter-bar";
+import { Button } from "@/components/ui/admin/button";
 import { Input } from "@/components/ui/admin/input";
 import { Label } from "@/components/ui/admin/label";
-import { Button } from "@/components/ui/admin/button";
-import { Card, CardContent } from "@/components/ui/admin/card";
 
-// Search waits for a pause in typing, so a long name is one query rather than twelve.
+// FilterBar only carries a search box and dropdowns. Both lead lists also filter on a date
+// range, so the two date inputs are added here rather than in the shared bar.
 export function LeadFilters({
-  statuses,
-  services = [],
-  exportPath,
+  searchPlaceholder,
+  filters,
+  fromLabel,
+  toLabel,
 }: {
-  statuses: string[];
-  services?: { slug: string; name: string }[];
-  exportPath: string;
+  searchPlaceholder: string;
+  filters: Filter[];
+  fromLabel: string;
+  toLabel: string;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const [q, setQ] = useState(params.get("q") ?? "");
 
-  useEffect(() => {
-    const current = params.get("q") ?? "";
-    if (q === current) return;
-
-    const timer = setTimeout(() => {
-      const next = new URLSearchParams(params);
-      if (q) next.set("q", q);
-      else next.delete("q");
-      next.delete("page");
-      router.replace(`${pathname}?${next}`);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [q, params, pathname, router]);
+  const from = params.get("from") ?? "";
+  const to = params.get("to") ?? "";
 
   const set = (key: string, value: string) => {
     const next = new URLSearchParams(params);
@@ -46,61 +35,52 @@ export function LeadFilters({
     router.replace(`${pathname}?${next}`);
   };
 
+  const clearDates = () => {
+    const next = new URLSearchParams(params);
+    next.delete("from");
+    next.delete("to");
+    next.delete("page");
+    router.replace(`${pathname}?${next}`);
+  };
+
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <form className="grid items-end gap-4 sm:grid-cols-2 lg:grid-cols-5" onSubmit={(e) => e.preventDefault()}>
-          <div className="space-y-1.5">
-            <Label htmlFor="lead-search">Search</Label>
-            <Input
-              id="lead-search"
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Name, email, phone or reference"
-            />
-          </div>
+    <div className="space-y-3">
+      <FilterBar searchPlaceholder={searchPlaceholder} filters={filters} />
 
-          <Select
-            label="Status"
-            defaultValue={params.get("status") ?? ""}
-            onChange={(value) => set("status", value)}
-            options={[
-              { value: "", label: "Any" },
-              ...statuses.map((s) => ({ value: s, label: s.replace(/_/g, " ") })),
-            ]}
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="space-y-1.5">
+          <Label htmlFor="lead-from" className="text-xs text-muted-foreground">
+            {fromLabel}
+          </Label>
+          <Input
+            id="lead-from"
+            type="date"
+            className="w-44"
+            value={from}
+            onChange={(event) => set("from", event.target.value)}
           />
+        </div>
 
-          {services.length > 0 ? (
-            <Select
-              label="Service"
-              defaultValue={params.get("service") ?? ""}
-              onChange={(value) => set("service", value)}
-              options={[
-                { value: "", label: "Any" },
-                ...services.map((s) => ({ value: s.slug, label: s.name })),
-              ]}
-            />
-          ) : null}
+        <div className="space-y-1.5">
+          <Label htmlFor="lead-to" className="text-xs text-muted-foreground">
+            {toLabel}
+          </Label>
+          <Input
+            id="lead-to"
+            type="date"
+            className="w-44"
+            value={to}
+            onChange={(event) => set("to", event.target.value)}
+          />
+        </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="lead-from">From</Label>
-            <Input id="lead-from" type="date" defaultValue={params.get("from") ?? ""} onChange={(e) => set("from", e.target.value)} />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="lead-to">To</Label>
-            <Input id="lead-to" type="date" defaultValue={params.get("to") ?? ""} onChange={(e) => set("to", e.target.value)} />
-          </div>
-
-          <div className="sm:col-span-2 lg:col-span-5">
-            <Button type="button" variant="outline" size="sm" asChild>
-              <a href={`${exportPath}?${params}`}>
-                <Download /> Export CSV
-              </a>
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        {from || to ? (
+          <Button variant="ghost" size="sm" onClick={clearDates}>
+            <X />
+            Clear dates
+          </Button>
+        ) : null}
+      </div>
+    </div>
   );
 }
