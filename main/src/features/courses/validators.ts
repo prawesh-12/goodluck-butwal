@@ -93,4 +93,3 @@ const categoryFields = {
 
 export const createCourseCategorySchema = z.object(categoryFields);
 export const updateCourseCategorySchema = z.object({ id: z.uuid(), ...categoryFields });
-export const reorderSchema = z.object({ ids: z.array(z.uuid()).min(1) });

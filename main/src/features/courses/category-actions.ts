@@ -11,7 +11,6 @@ import { requirePermission } from "@/lib/auth/rbac";
 import { uniqueSlug } from "@/lib/utils/slug";
 import {
   createCourseCategorySchema,
-  reorderSchema,
   updateCourseCategorySchema,
 } from "@/features/courses/validators";
 import { courseCategorySlugs } from "@/features/courses/admin-queries";
@@ -103,26 +102,4 @@ export async function deleteCourseCategory(input: unknown): Promise<Result> {
 
   refresh();
   return { ok: true, data: { id: parsed.data.id } };
-}
-
-export async function reorderCourseCategories(input: unknown): Promise<Result<{ moved: number }>> {
-  const actor = await requireActor();
-  requirePermission(actor, "courseCategories", "update");
-
-  const parsed = reorderSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "That order could not be read." };
-  const { ids } = parsed.data;
-
-  const known = await courseCategorySlugs();
-  if (ids.length !== known.length) return { ok: false, error: "The list changed. Reload and try again." };
-
-  for (const [index, id] of ids.entries()) {
-    await db
-      .update(courseCategories)
-      .set({ sortOrder: index, updatedBy: actor.id, updatedAt: new Date() })
-      .where(eq(courseCategories.id, id));
-  }
-
-  refresh();
-  return { ok: true, data: { moved: ids.length } };
 }

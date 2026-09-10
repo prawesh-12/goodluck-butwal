@@ -60,14 +60,6 @@ export async function institutionOptions() {
     .orderBy(asc(institutions.name));
 }
 
-export async function coursesPerInstitution() {
-  const rows = await db
-    .select({ institutionId: courses.institutionId, n: count() })
-    .from(courses)
-    .groupBy(courses.institutionId);
-  return new Map(rows.map((row) => [row.institutionId, row.n]));
-}
-
 export async function courseCountFor(institutionId: string) {
   const [row] = await db
     .select({ n: count() })
