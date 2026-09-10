@@ -1,11 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { lookupRedirect } from "@/lib/seo/redirects";
 
-// Cookie presence only, so the edge pulls in no auth library. The admin layout reads the real
+// Cookie presence only, so no auth library is pulled in here. The admin layout reads the real
 // session and turns away anyone expired or deactivated.
 const COOKIE = "better-auth.session_token";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // A renamed slug leaves a 301 behind, and this is what serves it.

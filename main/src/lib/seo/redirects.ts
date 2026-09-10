@@ -4,7 +4,7 @@ import { redirects } from "@db/schema";
 
 type Rule = { to: string; status: number };
 
-// Cached in the isolate: middleware runs on every request, so reading the table each time
+// Cached in the isolate: the proxy runs on every request, so reading the table each time
 // would put a query in front of the whole site.
 const TTL = 5 * 60 * 1000;
 
