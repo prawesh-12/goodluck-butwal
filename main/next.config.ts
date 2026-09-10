@@ -33,8 +33,9 @@ const csp = [
 
 const nextConfig: NextConfig = {
   // These run only on the server and are imported from many routes. Left to Next, each route
-  // chunk gets its own copy of them.
-  serverExternalPackages: ["drizzle-orm", "@neondatabase/serverless", "sanitize-html", "nanoid", "zod"],
+  // chunk gets its own copy of them. sanitize-html is not in the list: it is CommonJS and requires
+  // htmlparser2 12, which is ESM only, so an external require of it throws on the deploy runtime.
+  serverExternalPackages: ["drizzle-orm", "@neondatabase/serverless", "nanoid", "zod"],
   experimental: {
     // Turns on forbidden(), the only way a page can answer with a real 403 status.
     authInterrupts: true,
