@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createTeamMember, deleteTeamMember, updateTeamMember } from "@/features/team/actions";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
-import { Field, SeoSection } from "@/components/shared/admin/seo-section";
+import { Field } from "@/components/shared/admin/field";
 import { Select } from "@/components/shared/admin/repeater";
 import type { OfficeOption } from "@/components/shared/admin/content-filters";
 
@@ -23,23 +23,17 @@ export type TeamValues = {
   isCoFounder: boolean;
   isFeatured: boolean;
   status: string;
-  seoTitle: string;
-  seoDescription: string;
-  seoNoindex: boolean;
-  canonicalUrl: string;
 };
 
 export function TeamEditor({
   values,
   photo,
-  shareImage,
   offices,
   canPublish,
   canDelete,
 }: {
   values: TeamValues;
   photo: PickedMedia | null;
-  shareImage: PickedMedia | null;
   offices: OfficeOption[];
   canPublish: boolean;
   canDelete: boolean;
@@ -75,11 +69,6 @@ export function TeamEditor({
           isCoFounder: form.get("isCoFounder") === "on",
           isFeatured: form.get("isFeatured") === "on",
           status: canPublish ? text("status") : values.status || "draft",
-          seoTitle: text("seoTitle"),
-          seoDescription: text("seoDescription"),
-          seoOgImageId: text("seoOgImageId"),
-          seoNoindex: form.get("seoNoindex") === "on",
-          canonicalUrl: text("canonicalUrl"),
         };
 
         const result = isNew
@@ -184,18 +173,6 @@ export function TeamEditor({
         </span>
         <span className="t-small admin-help">Featured people are shown first on the team page.</span>
       </label>
-
-      <SeoSection
-        values={{
-          seoTitle: values.seoTitle,
-          seoDescription: values.seoDescription,
-          seoNoindex: values.seoNoindex,
-          canonicalUrl: values.canonicalUrl,
-        }}
-        path={`/team/${values.slug || "new-person"}`}
-        fallbackTitle={values.fullName || "New team member"}
-        shareImage={shareImage}
-      />
 
       <div className="admin-actions">
         <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>

@@ -3,6 +3,7 @@ import { gl } from "@/config/assets";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/bits";
+import { Img } from "@/components/ui/img";
 
 export function ErrorBlock({
   badge = "Something went wrong",
@@ -34,7 +35,7 @@ export function ErrorBlock({
             </Appear>
             {action ?? <PillButton href="/" iconSide="left">{cta}</PillButton>}
           </div>
-          <img aria-hidden src={gl.campus} alt="" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-[-40px] z-[1] w-[calc(100%+20px)] max-w-none object-contain object-top md:bottom-[-80px]" loading="lazy" decoding="async" />
+          <Img aria-hidden src={gl.campus} alt="" sizes="100vw" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-[-40px] z-[1] w-[calc(100%+20px)] max-w-none object-contain object-top md:bottom-[-80px]" loading="lazy" decoding="async" />
         </Appear>
       </div>
     </section>

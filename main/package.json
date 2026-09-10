@@ -9,11 +9,12 @@
     "start": "next start",
     "lint": "NODE_OPTIONS=--max-old-space-size=8192 eslint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "node --env-file-if-exists=.env.local node_modules/vitest/vitest.mjs run",
     "db:migrate:dev": "for f in db/migrations/*.sql; do docker compose exec -T postgres psql -U postgres -d goodluck -v ON_ERROR_STOP=1 -q < \"$f\" || exit 1; done",
     "db:migrate:prod": "node --env-file=.env.production node_modules/drizzle-kit/bin.cjs migrate",
     "db:seed:dev": "tsx --env-file=.env.local db/seed/from-content.ts --dev",
-    "db:seed:prod": "tsx --env-file=.env.production db/seed/from-content.ts"
+    "db:seed:prod": "tsx --env-file=.env.production db/seed/from-content.ts",
+    "assets:upload": "tsx --env-file=.env.local scripts/upload-assets.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
@@ -27,6 +28,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
+    "hls.js": "^1.7.2",
     "lenis": "1.3.26",
     "lucide-react": "1.41.0",
     "motion": "13.2.0",

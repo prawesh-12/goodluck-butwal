@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUser, updateUser } from "@/features/users/actions";
 import { THIRD_SUPER_ADMIN_PHRASE } from "@/lib/auth/user-rules";
-import { Field } from "@/components/shared/admin/seo-section";
+import { Field } from "@/components/shared/admin/field";
 import { Select } from "@/components/shared/admin/repeater";
 
 export type UserValues = {

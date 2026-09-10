@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { FilterCard, SearchField } from "@/components/shared/admin/list-ui";
 import { Select } from "@/components/shared/admin/repeater";
 
-const STATUSES = ["draft", "scheduled", "published", "archived"];
+const STATUSES = ["draft", "published", "archived"];
 
 export type OfficeOption = { id: string; name: string };
 

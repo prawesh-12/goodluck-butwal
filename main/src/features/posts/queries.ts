@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { TAGS, cached } from "@/lib/cache";
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, postCategories, postTags, posts, tags } from "@db/schema";
@@ -18,7 +19,7 @@ export type PublicArticle = {
 
 export type FullArticle = PublicArticle & { html: string };
 
-export const listArticles = cache(async (): Promise<PublicArticle[]> => {
+const listArticlesUncached = cached(async (): Promise<PublicArticle[]> => {
   const rows = await db
     .select({
       slug: posts.slug,
@@ -52,7 +53,9 @@ export const listArticles = cache(async (): Promise<PublicArticle[]> => {
     width: row.width ?? undefined,
     height: row.height ?? undefined,
   }));
-});
+}, ["articles"], [TAGS.posts]);
+
+export const listArticles = cache(listArticlesUncached);
 
 // One row at a time: the body is only rendered here, not on the pages that show cards.
 export const getArticle = cache(async (slug: string): Promise<FullArticle | undefined> => {
@@ -95,13 +98,15 @@ export const listArticlesByCategory = cache(async (slug: string) => {
   return all.filter((article) => slugify(article.category) === slug);
 });
 
-export const listCategories = cache(async () => {
+const listCategoriesUncached = cached(async () => {
   const rows = await db
     .select({ slug: postCategories.slug, name: postCategories.name })
     .from(postCategories)
     .orderBy(asc(postCategories.sortOrder));
   return rows;
-});
+}, ["post-categories"], [TAGS.posts]);
+
+export const listCategories = cache(listCategoriesUncached);
 
 export const listArticlesByTag = cache(async (slug: string): Promise<PublicArticle[]> => {
   const ids = await db

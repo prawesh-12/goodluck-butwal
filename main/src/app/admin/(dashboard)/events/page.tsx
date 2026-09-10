@@ -6,7 +6,7 @@ import { contentStatuses } from "@/lib/validators/fields";
 import { eventTypeLabels, eventTypes } from "@/config/content-meta";
 import { formatInOfficeTz } from "@/lib/utils/datetime";
 import { EditorialFilters } from "@/components/shared/admin/editor-filters";
-import { officeOptions } from "@/features/offices/admin-queries";
+import { officeOptions } from "@/features/offices/queries";
 import { listAdminEvents, PAGE_SIZE, type EventFilters } from "@/features/events/admin-queries";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {

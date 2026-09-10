@@ -9,6 +9,7 @@ import { PillButton } from "@/components/ui/button";
 import { SectionBg } from "@/components/ui/bits";
 import { InnerHero } from "@/components/shared/inner";
 import { ReviewCard } from "@/features/testimonials/components/reviews";
+import { CARD_SIZES, Img } from "@/components/ui/img";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
@@ -27,7 +28,7 @@ export default async function SuccessStoriesPage() {
         <div className="grid w-full grid-cols-2 gap-[10px] md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
           {successStories.map((s, i) => (
             <Appear key={s.image} delay={0.05 * (i % 4)} className="aspect-square overflow-clip rounded-[10px] bg-surface ring-1 ring-hairline md:rounded-[20px]">
-              <img src={s.image} alt={s.alt} className="size-full object-cover" loading="lazy" decoding="async" />
+              <Img src={s.image} alt={s.alt} sizes={CARD_SIZES} className="size-full object-cover" loading="lazy" decoding="async" />
             </Appear>
           ))}
         </div>
@@ -41,7 +42,7 @@ export default async function SuccessStoriesPage() {
                 <h2 className="t-h2 max-w-[719px]">{t("stories.reviews.title", "What our clients say")}</h2>
                 <div className="flex flex-wrap items-center gap-[10px] md:gap-5">
                   <div className="flex items-start gap-[6px]">
-                    <span className="flex h-[22px] items-center"><img src={img.star} alt="" style={{ width: 19, height: 18 }} loading="lazy" decoding="async" /></span>
+                    <span className="flex h-[22px] items-center"><Img src={img.star} alt="" w={40} style={{ width: 19, height: 18 }} loading="lazy" decoding="async" /></span>
                     <p className="t-base text-muted">{t("stories.reviews.rating", "{score} Google rating").replace("{score}", googleRating.score)}</p>
                   </div>
                   <span aria-hidden className="h-[22px] w-px bg-ink opacity-30" />

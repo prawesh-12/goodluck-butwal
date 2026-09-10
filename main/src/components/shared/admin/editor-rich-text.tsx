@@ -4,7 +4,8 @@ import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { TableKit } from "@tiptap/extension-table";
-import { MediaPicker, mediaSrc } from "@/features/media/components/media-picker";
+import { MediaPicker } from "@/features/media/components/media-picker";
+import { mediaUrl } from "@/lib/utils/media-url";
 import { findBodyImage } from "@/features/posts/actions";
 
 export default function RichText({
@@ -63,7 +64,7 @@ export default function RichText({
     editor
       .chain()
       .focus()
-      .setImage({ src: mediaSrc(found.data, 960), alt: found.data.altText ?? "" })
+      .setImage({ src: mediaUrl(found.data, 960), alt: found.data.altText ?? "" })
       .run();
   };
 

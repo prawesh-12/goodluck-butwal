@@ -9,7 +9,6 @@ import { slugify } from "@/lib/utils/slug";
 import { EXCERPT_MAX } from "@/config/content-meta";
 import { archivePost, createPost, updatePost } from "@/features/posts/actions";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
-import { SeoFields, type SeoValue } from "@/components/shared/admin/page-seo-fields";
 import type { EditorialOptions } from "@/features/posts/admin-queries";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { Select } from "@/components/shared/admin/repeater";
@@ -30,12 +29,6 @@ export type PostValues = {
   tagIds: string[];
   authorDisplayName: string;
   status: string;
-  publishedAt: string;
-  seoTitle: string;
-  seoDescription: string;
-  seoOgImageId: string;
-  seoNoindex: boolean;
-  canonicalUrl: string;
 };
 
 type FieldErrors = Record<string, string[] | undefined>;
@@ -44,14 +37,12 @@ export function PostForm({
   values,
   options,
   banner,
-  shareImage,
   canPublish,
   canDelete,
 }: {
   values: PostValues;
   options: EditorialOptions;
   banner: PickedMedia | null;
-  shareImage: PickedMedia | null;
   canPublish: boolean;
   canDelete: boolean;
 }) {
@@ -62,19 +53,12 @@ export function PostForm({
   const [excerpt, setExcerpt] = useState(values.excerpt);
   const [body, setBody] = useState(values.bodyHtml);
   const [status, setStatus] = useState(values.status);
-  const [seo, setSeo] = useState<SeoValue>({
-    seoTitle: values.seoTitle,
-    seoDescription: values.seoDescription,
-    seoOgImageId: values.seoOgImageId || null,
-    seoNoindex: values.seoNoindex,
-    canonicalUrl: values.canonicalUrl,
-  });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
 
   const statuses = canPublish
-    ? ["draft", "scheduled", "published", "archived"]
+    ? ["draft", "published", "archived"]
     : ["draft", "archived"];
 
   return (
@@ -97,12 +81,6 @@ export function PostForm({
           tagIds: form.getAll("tagIds").map(String),
           authorDisplayName: String(form.get("authorDisplayName") ?? ""),
           status,
-          publishedAt: String(form.get("publishedAt") ?? ""),
-          seoTitle: seo.seoTitle,
-          seoDescription: seo.seoDescription,
-          seoOgImageId: seo.seoOgImageId ?? "",
-          seoNoindex: seo.seoNoindex,
-          canonicalUrl: seo.canonicalUrl,
         };
 
         const result = values.id ? await updatePost(payload) : await createPost(payload);
@@ -221,16 +199,6 @@ export function PostForm({
         <span className="t-small admin-help">The by-line on the article. Leave it empty for no by-line.</span>
       </label>
 
-      <SeoFields
-        value={seo}
-        onChange={(patch) => setSeo((current) => ({ ...current, ...patch }))}
-        path={`/news/${slug || "..."}`}
-        fallbackTitle={title}
-        fallbackDescription={excerpt}
-        ogImage={shareImage}
-        errors={errors}
-      />
-
       <h2 className="t-h5 admin-subhead">Publishing</h2>
 
       <Select
@@ -239,21 +207,11 @@ export function PostForm({
         onChange={setStatus}
         help={
           canPublish
-            ? "Draft is invisible. Scheduled goes live on its own. Archived comes off the site."
+            ? "Draft is invisible. Published puts it on the site. Archived comes off it."
             : "You can save drafts. An admin puts the article live."
         }
         options={statuses.map((option) => ({ value: option, label: option }))}
       />
-
-      <label className="admin-field">
-        <span className="t-small">Go live at</span>
-        <input type="datetime-local" name="publishedAt" defaultValue={values.publishedAt} />
-        <span className="t-small admin-help">
-          The date shown on the article. A scheduled article needs a time in the future, in UTC, and
-          goes live within fifteen minutes of it.
-        </span>
-        {errors.publishedAt ? <span className="t-small admin-error">{errors.publishedAt[0]}</span> : null}
-      </label>
 
       <div className="admin-actions">
         <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>

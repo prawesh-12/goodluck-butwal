@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const contentStatuses = ["draft", "scheduled", "published", "archived"] as const;
+export const contentStatuses = ["draft", "published", "archived"] as const;
 
 export const text = z.string().trim().default("");
 

@@ -1,7 +1,12 @@
 # Running the site
 
-Everything on this site is edited in the admin, at `/admin`. You never need a developer to change
-wording, a phone number, a photo, a price or a page.
+Seven parts of this site are edited in the admin, at `/admin`: Team, Partners, News, Events,
+Institutions, Courses and Test preparation. Enquiries and Consultations are there too, so you can
+see and answer what comes in.
+
+Everything else on the site, page wording, service descriptions, destination pages, office
+details, is set by a developer. That is deliberate. It is the part of the site that is not meant
+to change week to week, and keeping it out of the admin is what stops it being broken by accident.
 
 > Screenshots are added once the site is on its real address. Every step below is written so it
 > can be followed without them.
@@ -21,29 +26,25 @@ super admin.
 
 | I want to change... | Go to | Who can |
 |---|---|---|
-| A heading or button label anywhere | Site text | Any admin |
-| A phone number, address, hours or map | Offices | Your own office |
 | Add a staff member, change a bio or photo | Team | Your own office |
-| Text on a destination page | Destinations | Australia or Nepal admin |
-| Add an FAQ question | Destinations or Services, then FAQs | Australia or Nepal admin |
-| A service description or its steps | Services | Australia or Nepal admin |
 | Add a partner logo to the ticker | Partners | Australia or Nepal admin |
-| Add an institution or its gallery | Institutions | Australia or Nepal admin |
-| Add courses, or many at once | Courses, or Courses then Import | Australia or Nepal admin |
-| Add an IELTS or PTE batch, change fees or seats | Test prep, then Batches | Nepal admin |
-| Publish a news article | Posts. Editors can write but not publish. | Any admin |
-| Schedule an article for later | Posts, set the status to Scheduled | Any admin |
+| Publish a news article | News. Editors can write but not publish. | Any admin |
+| Sort articles into categories or tags | News, at the foot of the list | Any admin |
 | Add an event and open registrations | Events | Your own office |
 | See who registered | Events, then Registrations | Your own office |
+| Add an institution or its gallery | Institutions | Australia or Nepal admin |
+| Add courses, or many at once | Courses, or Courses then Import | Australia or Nepal admin |
+| Group courses by subject area | Courses, at the foot of the list | Super admin |
+| Add an IELTS or PTE batch, change fees or seats | Test preparation, then Batches | Nepal admin |
+| Upload, replace or delete a picture | Images | Any admin |
+| Upload, replace or delete a video | Videos | Any admin |
 | See and respond to enquiries | Enquiries | Your own office |
 | Confirm a consultation | Consultations, then Confirm | Your own office |
 | Download enquiries as a spreadsheet | Enquiries, then Export | Your own office |
-| The page title Google shows | That record's SEO section | Whoever owns the record |
-| Which address gets enquiry notifications | Settings, Notifications | Super admin |
-| The announcement bar, social links, Google rating | Settings | Super admin |
 | Add a staff login or change a role | Users | Super admin |
-| Send an old address to a new page | Redirects | Super admin |
-| See who changed what | Audit log | Any admin |
+
+Anything not in that table, page wording, services, destinations, office details, the announcement
+bar, is a developer change. Ask, and it goes out with the next release.
 
 ## Who gets which role
 
@@ -51,10 +52,10 @@ Give the smallest role that does the job.
 
 | Role | Sees |
 |---|---|
-| Super admin | Everything, plus users, settings and redirects. Two people, no more. |
+| Super admin | Everything, plus users. Two people, no more. |
 | Australia admin | Australian content and Australian enquiries |
 | Nepal admin | Nepali content, Nepali enquiries, and IELTS and PTE |
-| Content editor | Writes posts and events. **Cannot publish, and never sees enquiries.** |
+| Content editor | Writes news and events. **Cannot publish, and never sees enquiries.** |
 
 Nobody can change their own role or switch off their own account, and the last remaining super
 admin cannot be removed. That is on purpose: it is what stops one mistake locking everyone out.
@@ -64,45 +65,53 @@ admin cannot be removed. That is on purpose: it is what stops one mistake lockin
 **Publishing is not instant everywhere.** A change appears within five minutes. That is normal,
 not a fault. Nothing needs a developer to push it live.
 
+**A record is either Draft, Published or Archived.** There is no way to schedule something for
+later. When you want it live, publish it.
+
 **Every image needs alt text.** It is the sentence a blind visitor hears in place of the picture.
-The admin will not let you publish a page whose image has none, and it tells you which image.
+The admin will not let you publish a record whose image has none, and it tells you which image.
 
 **Deleting mostly means archiving.** An archived record leaves the site but stays in the admin, so
 a mistake is a minute to undo. Only a super admin can truly delete something, and it asks you to
 type a confirmation first.
 
-**Renaming a page keeps the old address working.** The site sends the old link to the new page
+**A picture in use cannot be deleted.** Images and Videos refuse a delete while something on the
+site still shows the file, and the message names what is using it. Take it off that record first.
+
+**Renaming a record keeps the old address working.** The site sends the old link to the new page
 automatically, so a shared link or a Google result does not break.
 
-## The eight things you should be able to do unaided
+**Google titles look after themselves.** The title and description Google shows are built from the
+record's own title and summary. Write those well and the search result reads well.
+
+## The seven things you should be able to do unaided
 
 These are the handover test. If you cannot finish one of them, that is a fault in the admin to be
 fixed, not something you failed.
 
-### 1. Change the Nepal office phone number
-Offices, then Nepal Office. Change **Phone as written** (the version visitors see) and **Phone**
-(the version the call button dials, starting with `+`). Save. Open the site: the header, the
-footer and the contact cards all show the new number within five minutes.
+### 1. Add a team member with a photo and publish them
+Team, then New. Name and position. For the photo, press **Choose** and pick from the library, or
+upload it in Images first. **Give the photo alt text**, otherwise publishing is refused. Set the
+office, set the status to Published, save.
 
-### 2. Change the heading above the destinations section on the homepage
-Site text. Search for the wording you can see on the homepage. Change the value, save.
-Only the wording changes; you cannot break the layout from here.
+### 2. Write a news article, save it as a draft, publish it
+News, then New. The address is filled in from the title; leave it alone unless you have a reason.
+Write the body, pick a category, add tags. Save with the status Draft. When you are happy, change
+the status to Published and save.
 
-### 3. Add a team member with a photo and publish them
-Team, then New. Name and position. For the photo, press **Choose** and pick from the media
-library, or upload it there first. **Give the photo alt text**, otherwise publishing is refused.
-Set the office, set the status to Published, save.
+### 3. Add a news category and put an article in it
+News. At the foot of the article list, open **Categories**, add the name, save. Then open the
+article and pick the new category. Tags work the same way, in the panel beside it.
 
-### 4. Write a news article, save it as a draft, preview it, publish it
-Posts, then New. The address is filled in from the title; leave it alone unless you have a
-reason. Write the body. Save with the status Draft, then use Preview to see it as a visitor
-would. When you are happy, change the status to Published and save.
+### 4. Replace a picture that is already on the site
+Images. Search for it, press **Replace**, choose the new file. Everything showing that picture
+picks up the new one, because the address does not change.
 
 ### 5. Add an IELTS batch starting next month with 20 seats and a fee
-Test prep, then Batches, then New. Pick the IELTS course. Set the start date, the days of the
-week, the times, 20 seats and the fee. Save. The batches page shows it as **Open**; it changes to
-**Filling fast** on its own when three seats or fewer remain, and **Full** at zero. You do not set
-those labels, they follow the seats.
+Test preparation, then Batches, then New. Pick the IELTS course. Set the start date, the days of
+the week, the times, 20 seats and the fee. Save. The batches page shows it as **Open**; it changes
+to **Filling fast** on its own when three seats or fewer remain, and **Full** at zero. You do not
+set those labels, they follow the seats.
 
 ### 6. Find last week's enquiry, set it to Contacted, add an internal note
 Enquiries. Search by name, email, phone or reference, or narrow by date. Open it. Change the
@@ -110,8 +119,8 @@ status to Contacted, write the note, save. The note is internal and the enquirer
 
 ### 7. Create a content editor account, then deactivate it
 Users, then New. Name, email, a password of at least twelve characters, role Content editor.
-Save. To switch it off later, open it and untick **Active**. Deactivating is better than
-deleting: the person is locked out immediately, and the audit log still shows what they did.
+Save. To switch it off later, open it and untick **Active**. Deactivating is better than deleting:
+the person is locked out immediately and their work keeps its author.
 
 ## When something looks wrong
 
@@ -120,6 +129,8 @@ deleting: the person is locked out immediately, and the audit log still shows wh
 - **You cannot see a menu item.** Your role does not cover it. That is the design, not a fault.
 - **It refuses to publish.** Read the message: it names exactly what is missing, usually alt text
   on an image or an empty required field.
+- **It refuses to delete a picture.** Something on the site is still using it. The message says
+  what. Change that record first.
 - **You cannot open somebody else's office record.** You are not meant to. Ask a super admin.
-- **Something genuinely broken.** The audit log shows who changed what and when, which is usually
-  the fastest way to find out what happened.
+- **The wording you want to change is not in the admin.** It is developer-controlled. Ask, and it
+  goes out with the next release.

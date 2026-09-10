@@ -4,8 +4,10 @@ import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { contentStatuses } from "@/lib/validators/fields";
 import { EditorialFilters } from "@/components/shared/admin/editor-filters";
-import { officeOptions } from "@/features/offices/admin-queries";
-import { listAdminPosts, listPostCategories } from "@/features/posts/admin-queries";
+import { officeOptions } from "@/features/offices/queries";
+import { listAdminPosts, listPostCategories, listTags, postsPerCategory } from "@/features/posts/admin-queries";
+import { PostCategoryManager } from "@/features/posts/components/post-category-manager";
+import { TagManager } from "@/features/posts/components/tag-manager";
 import { PAGE_SIZE } from "@/lib/utils/admin-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
 import {
@@ -31,9 +33,11 @@ export default async function PostsPage({
 
   const params = await searchParams;
   const filters: Filters = { ...params, page: Number(params.page ?? 1) };
-  const [{ rows, total, page }, categories, offices] = await Promise.all([
+  const [{ rows, total, page }, categories, counts, tags, offices] = await Promise.all([
     listAdminPosts(actor, filters),
     listPostCategories(),
+    postsPerCategory(),
+    listTags(),
     actor.role === "super_admin" ? officeOptions() : Promise.resolve([]),
   ]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
@@ -41,7 +45,7 @@ export default async function PostsPage({
   return (
     <div className="space-y-4">
       <ListHeader
-        title="Posts"
+        title="News"
         count={total}
         actions={
           can(actor, "posts", "create") ? (
@@ -120,6 +124,28 @@ export default async function PostsPage({
       )}
 
       <Pager page={page} pages={pages} params={params} />
+
+      {can(actor, "postCategories", "read") ? (
+        <details>
+          <summary className="t-h5 admin-subhead">Categories ({categories.length})</summary>
+          <PostCategoryManager
+            rows={categories.map((category) => ({ ...category, posts: counts.get(category.id) ?? 0 }))}
+            canEdit={can(actor, "postCategories", "update")}
+            canDelete={can(actor, "postCategories", "delete")}
+          />
+        </details>
+      ) : null}
+
+      {can(actor, "tags", "read") ? (
+        <details>
+          <summary className="t-h5 admin-subhead">Tags ({tags.length})</summary>
+          <TagManager
+            rows={tags}
+            canEdit={can(actor, "tags", "update")}
+            canDelete={can(actor, "tags", "delete")}
+          />
+        </details>
+      ) : null}
     </div>
   );
 }

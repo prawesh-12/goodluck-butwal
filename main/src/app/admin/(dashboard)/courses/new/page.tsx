@@ -39,7 +39,6 @@ export default async function NewCoursePage() {
         institutions={institutions}
         categories={categories}
         destinations={destinations}
-        shareImage={null}
         value={{
           slug: "",
           name: "",
@@ -58,11 +57,6 @@ export default async function NewCoursePage() {
           entryRequirementsHtml: "",
           status: "draft",
           sortOrder: 0,
-          seoTitle: "",
-          seoDescription: "",
-          seoOgImageId: null,
-          seoNoindex: false,
-          canonicalUrl: "",
         }}
       />
     </>

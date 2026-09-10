@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { organization, webSite } from "@/lib/seo/schema";
-import { getHeroImage, getSocialLinks } from "@/features/settings/queries";
+import { getSocialLinks } from "@/features/settings/queries";
 import { Hero } from "@/components/shared/hero";
 import { Partners } from "@/features/partners/components/partners";
 import { Services } from "@/features/services/components/services";
@@ -33,7 +33,7 @@ export default async function Home() {
   // Nothing here depends on anything else here, so the page waits once rather than twelve times.
   const [
     logos, faces, services, allFaqs, cards, articles, googleRating, about,
-    upcomingEvents, socials, heroImage, t,
+    upcomingEvents, socials, t,
   ] = await Promise.all([
     listPartnerLogos(),
     listTeam().then((rows) => rows.slice(0, 3)),
@@ -45,7 +45,6 @@ export default async function Home() {
     getAboutContent(),
     listUpcomingEvents(),
     getSocialLinks(),
-    getHeroImage(),
     loadText(),
   ]);
 
@@ -54,7 +53,6 @@ export default async function Home() {
       <JsonLd data={[organization(socials.map((s) => s.href)), webSite()]} />
       <Hero
         googleRating={googleRating}
-        sky={heroImage}
         text={{
           titleBefore: t("home.hero.title_before", "Create your"),
           titleAfter: t("home.hero.title_after", "luck"),

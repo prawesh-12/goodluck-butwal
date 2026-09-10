@@ -5,14 +5,13 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
 import { Field, SaveBar, Select, Toggle } from "@/components/shared/admin/repeater";
-import { SeoFields, type SeoValue } from "@/components/shared/admin/page-seo-fields";
 import { institutionPath } from "@/config/course-meta";
 import { createInstitution, deleteInstitution, updateInstitution } from "@/features/institutions/actions";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 
 const RichText = dynamic(() => import("@/components/shared/admin/editor-rich-text"), { ssr: false });
 
-export type InstitutionValue = SeoValue & {
+export type InstitutionValue = {
   id?: string;
   slug: string;
   name: string;
@@ -158,20 +157,9 @@ export function InstitutionEditor({
         onChange={(status) => set({ status })}
         options={[
           { value: "draft", label: "Draft" },
-          { value: "scheduled", label: "Scheduled", disabled: !canPublish },
           { value: "published", label: "Published", disabled: !canPublish },
           { value: "archived", label: "Archived" },
         ]}
-      />
-
-      <SeoFields
-        value={row}
-        onChange={set}
-        path={path}
-        fallbackTitle={row.name}
-        fallbackDescription={row.city ? `${row.city}, ${row.country}` : row.country}
-        ogImage={pick(row.seoOgImageId)}
-        errors={errors}
       />
 
       <SaveBar

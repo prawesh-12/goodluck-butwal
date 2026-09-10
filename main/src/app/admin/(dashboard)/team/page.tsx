@@ -5,7 +5,7 @@ import { ContentFilters } from "@/components/shared/admin/content-filters";
 import { TeamList } from "@/features/team/components/team-list";
 import { EmptyState, ListHeader, NewButton, Pager } from "@/components/shared/admin/list-ui";
 import { listAdminTeam } from "@/features/team/admin-queries";
-import { officeOptions } from "@/features/offices/admin-queries";
+import { officeOptions } from "@/features/offices/queries";
 import { PAGE_SIZE, type AdminFilters } from "@/lib/utils/admin-query";
 
 export const dynamic = "force-dynamic";

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { mediaUrl } from "@/lib/utils/media-url";
 
 export type PickedMedia = {
   id: string;
@@ -10,12 +11,6 @@ export type PickedMedia = {
   filename: string | null;
   altText: string | null;
 };
-
-export function mediaSrc(item: Pick<PickedMedia, "kind" | "staticPath" | "cloudinaryPublicId">, width = 320) {
-  if (item.kind === "static") return item.staticPath ?? "";
-  const cloud = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-  return `https://res.cloudinary.com/${cloud}/image/upload/f_auto,q_auto,w_${width}/${item.cloudinaryPublicId}`;
-}
 
 // The only way to choose an image in the admin. No form has a file input, so every image is a
 // media_assets row with alt text attached.
@@ -77,9 +72,9 @@ export function MediaPicker({
         {picked ? (
           <>
             {type === "video" ? (
-              <video src={mediaSrc(picked)} className="admin-picker-thumb" muted />
+              <video src={mediaUrl(picked, 320)} className="admin-picker-thumb" muted />
             ) : (
-              <img src={mediaSrc(picked)} alt={picked.altText ?? ""} className="admin-picker-thumb" />
+              <img src={mediaUrl(picked, 320)} alt={picked.altText ?? ""} className="admin-picker-thumb" />
             )}
             <div>
               <p className="t-small">{picked.filename}</p>
@@ -124,15 +119,17 @@ export function MediaPicker({
             {loading ? (
               <p className="t-small admin-empty">Looking.</p>
             ) : items.length === 0 ? (
-              <p className="t-small admin-empty">Nothing matches. Upload it in Media first.</p>
+              <p className="t-small admin-empty">
+                Nothing matches. Upload it in {type === "video" ? "Videos" : "Images"} first.
+              </p>
             ) : (
               <div className="admin-picker-grid">
                 {items.map((item) => (
                   <button key={item.id} type="button" className="admin-picker-item" onClick={() => choose(item)}>
                     {type === "video" ? (
-                      <video src={mediaSrc(item)} className="admin-media-thumb" muted />
+                      <video src={mediaUrl(item, 320)} className="admin-media-thumb" muted />
                     ) : (
-                      <img src={mediaSrc(item)} alt={item.altText ?? ""} />
+                      <img src={mediaUrl(item, 320)} alt={item.altText ?? ""} />
                     )}
                     <span className="t-small">{item.filename}</span>
                     {type === "video" || item.altText ? null : (

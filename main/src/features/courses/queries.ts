@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { TAGS, cached } from "@/lib/cache";
 import { and, asc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import { unionAll } from "drizzle-orm/pg-core";
 import { db } from "@db/client";
@@ -145,7 +146,7 @@ export async function listCourses(query: CourseQuery) {
   return { rows: rows.map(toCourse), total: rows[0]?.total ?? 0 };
 }
 
-export const getCourse = cache(async (slug: string): Promise<PublicCourse | undefined> => {
+const getCourseUncached = cached(async (slug: string): Promise<PublicCourse | undefined> => {
   const rows = await db
     .select(courseColumns)
     .from(courses)
@@ -163,11 +164,13 @@ export const getCourse = cache(async (slug: string): Promise<PublicCourse | unde
     .limit(1);
 
   return rows[0] ? toCourse(rows[0]) : undefined;
-});
+}, ["course"], [TAGS.courses]);
+
+export const getCourse = cache(getCourseUncached);
 
 export type FilterOption = { slug: string; name: string };
 
-export const listCourseFilterOptions = cache(async () => {
+const listCourseFilterOptionsUncached = cached(async () => {
   // Three lists in one round trip. Institutions have no order column, so the name decides.
   const rows = await unionAll(
     db
@@ -206,4 +209,6 @@ export const listCourseFilterOptions = cache(async () => {
     categories: pick("category"),
     institutions: pick("institution"),
   };
-});
+}, ["course-filters"], [TAGS.courses]);
+
+export const listCourseFilterOptions = cache(listCourseFilterOptionsUncached);

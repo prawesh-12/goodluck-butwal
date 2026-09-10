@@ -6,6 +6,13 @@ vi.mock("@db/client", () => ({
   db: { select: () => ({ from: async () => rows.current }) },
 }));
 vi.mock("@db/schema", () => ({ uiStrings: { key: "key", value: "value" } }));
+// These tests are about which wording wins, not about caching. unstable_cache needs a Next
+// request context that a unit test has no reason to build, so it passes straight through.
+vi.mock("next/cache", () => ({
+  unstable_cache: (fn: (...args: unknown[]) => unknown) => fn,
+  revalidateTag: () => undefined,
+  revalidatePath: () => undefined,
+}));
 
 const { loadText } = await import("@/features/site-text/queries");
 

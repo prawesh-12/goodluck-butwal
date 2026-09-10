@@ -4,8 +4,6 @@ import { useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Field, SaveBar, Select } from "@/components/shared/admin/repeater";
-import { SeoFields, type SeoValue } from "@/components/shared/admin/page-seo-fields";
-import type { PickedMedia } from "@/features/media/components/media-picker";
 import {
   INTAKE_MONTHS,
   QUALIFICATION_LABEL,
@@ -17,7 +15,7 @@ import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 
 const RichText = dynamic(() => import("@/components/shared/admin/editor-rich-text"), { ssr: false });
 
-export type CourseValue = SeoValue & {
+export type CourseValue = {
   id?: string;
   slug: string;
   name: string;
@@ -45,7 +43,6 @@ export function CourseEditor({
   institutions,
   categories,
   destinations,
-  shareImage,
   canDelete,
   canPublish,
 }: {
@@ -53,7 +50,6 @@ export function CourseEditor({
   institutions: Option[];
   categories: Option[];
   destinations: Option[];
-  shareImage: PickedMedia | null;
   canDelete: boolean;
   canPublish: boolean;
 }) {
@@ -258,20 +254,9 @@ export function CourseEditor({
         onChange={(status) => set({ status })}
         options={[
           { value: "draft", label: "Draft" },
-          { value: "scheduled", label: "Scheduled", disabled: !canPublish },
           { value: "published", label: "Published", disabled: !canPublish },
           { value: "archived", label: "Archived" },
         ]}
-      />
-
-      <SeoFields
-        value={row}
-        onChange={set}
-        path={path}
-        fallbackTitle={row.name}
-        fallbackDescription={institutionName}
-        ogImage={row.seoOgImageId ? shareImage : null}
-        errors={errors}
       />
 
       <SaveBar

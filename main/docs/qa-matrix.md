@@ -13,6 +13,8 @@ Every row below was measured against a running server and a real Postgres, not a
 | Check | Result |
 |---|---|
 | All 17 original public routes return 200 | yes |
+| Every admin section loads for a super admin | 13 of 13 |
+| The removed admin editors are gone from the build, not just hidden | yes |
 | All 31 article URLs resolve at their original slugs | 31 of 31 |
 | A `redirects` row produces a real 301 | yes |
 | Signed out, `/admin` redirects to the login page | 307 |
@@ -22,11 +24,16 @@ Every row below was measured against a running server and a real Postgres, not a
 | No Turnstile token writes nothing and returns 400 | yes |
 | A fourth submission within an hour is refused politely | 429 |
 | The honeypot reports success, writes a spam row, sends no email | yes |
-| A scheduled post publishes on the cron with no deploy | yes |
+| Publishing a post reaches the site with no deploy | yes |
 | CSV export opens in Excel with UTF-8 intact | yes, byte order mark present |
-| Automated tests | 309 passing |
-| Editable text: an admin's wording replaces the code's | verified |
-| App queries on the busiest dynamic page | 8, against a budget of 6 |
+| Automated tests | 433 passing |
+| Unpublishing removes an article from the site and the sitemap, no deploy | 200 to 404, sitemap entry gone |
+| Publishing puts one back | 404 to 200, sitemap entry back |
+| An unmapped destination renders instead of crashing | 200 |
+| The media library lists and searches Cloudinary itself | 23 team assets found live |
+| An uploaded video is delivered over adaptive HLS | `sp_auto/....m3u8` |
+| App queries on a repeat cached public request | 0 across 8 routes |
+| App queries on the busiest dynamic page | 2, against a budget of 6 |
 
 ## Browsers
 

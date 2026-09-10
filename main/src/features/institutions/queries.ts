@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { TAGS, cached } from "@/lib/cache";
 import { and, asc, desc, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { destinations, institutionImages, institutions, mediaAssets } from "@db/schema";
@@ -17,7 +18,7 @@ export type PublicInstitution = {
   descriptionHtml: string;
 };
 
-export const listInstitutions = cache(async (): Promise<PublicInstitution[]> => {
+const listInstitutionsUncached = cached(async (): Promise<PublicInstitution[]> => {
   const rows = await db
     .select({
       slug: institutions.slug,
@@ -51,7 +52,9 @@ export const listInstitutions = cache(async (): Promise<PublicInstitution[]> => 
     isPartner: row.isPartner,
     descriptionHtml: row.descriptionHtml ?? "",
   }));
-});
+}, ["institutions"], [TAGS.institutions]);
+
+export const listInstitutions = cache(listInstitutionsUncached);
 
 export const getInstitution = cache(async (slug: string) =>
   (await listInstitutions()).find((i) => i.slug === slug),
@@ -59,7 +62,7 @@ export const getInstitution = cache(async (slug: string) =>
 
 export type GalleryImage = { src: string; caption: string };
 
-export const listInstitutionImages = cache(async (slug: string): Promise<GalleryImage[]> => {
+const listInstitutionImagesUncached = cached(async (slug: string): Promise<GalleryImage[]> => {
   const rows = await db
     .select({
       caption: institutionImages.caption,
@@ -74,4 +77,6 @@ export const listInstitutionImages = cache(async (slug: string): Promise<Gallery
     .orderBy(asc(institutionImages.sortOrder));
 
   return rows.map((row) => ({ src: mediaUrl(row, 640), caption: row.caption ?? "" }));
-});
+}, ["institution-images"], [TAGS.institutions]);
+
+export const listInstitutionImages = cache(listInstitutionImagesUncached);

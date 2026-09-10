@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { institutionPath } from "@/config/course-meta";
-import { mediaId, missingAltProblems, seoFields, slugField, type AttachedImage } from "@/lib/validators/content-fields";
+import { mediaId, missingAltProblems, slugField, type AttachedImage } from "@/lib/validators/content-fields";
 import { contentStatuses } from "@/lib/validators/fields";
 
 const httpsUrl = z
@@ -21,7 +21,6 @@ const fields = {
   isFeatured: z.boolean().default(false),
   status: z.enum(contentStatuses),
   sortOrder: z.coerce.number().int().min(0).default(0),
-  ...seoFields,
 };
 
 export const createInstitutionSchema = z.object(fields);

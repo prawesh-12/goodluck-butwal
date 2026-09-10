@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { TAGS, cached } from "@/lib/cache";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, offices, teamMembers } from "@db/schema";
@@ -13,7 +14,7 @@ export type PublicMember = {
   photo: string;
 };
 
-export const listTeam = cache(async (): Promise<PublicMember[]> => {
+const listTeamUncached = cached(async (): Promise<PublicMember[]> => {
   const rows = await db
     .select({
       slug: teamMembers.slug,
@@ -37,4 +38,6 @@ export const listTeam = cache(async (): Promise<PublicMember[]> => {
     office: (row.office as OfficeId | null) ?? null,
     photo: mediaUrl(row, 640),
   }));
-});
+}, ["team"], [TAGS.team]);
+
+export const listTeam = cache(listTeamUncached);

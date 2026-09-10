@@ -4,6 +4,7 @@ import { img } from "@/config/assets";
 import { formatDate } from "@/lib/utils/datetime";
 import { Appear } from "@/components/ui/appear";
 import { Badge, Chip } from "@/components/ui/bits";
+import { CARD_SIZES, Img } from "@/components/ui/img";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
@@ -44,12 +45,12 @@ export function InnerHero({
     <section className={cx("relative flex w-full flex-col items-center overflow-clip pt-32 md:pt-[158px] lg:pt-[194px]", pb, className)}>
       <div aria-hidden className="absolute inset-0 z-0 overflow-clip">
         <div className="absolute inset-0 z-[1]" style={{ backgroundImage: overlay }} />
-        <img src={bg === "sky" ? img.heroSky : img.fieldSky} alt="" className="absolute inset-0 size-full object-cover" style={{ objectPosition: "50% 0%" }} loading="lazy" decoding="async" />
+        <Img src={bg === "sky" ? img.heroSky : img.fieldSky} alt="" sizes="100vw" w={1280} className="absolute inset-0 size-full object-cover" style={{ objectPosition: "50% 0%" }} fetchPriority="high" decoding="async" />
       </div>
       {clouds && (
         <>
-          <img aria-hidden src={img.cloud1} alt="" className="pointer-events-none absolute z-[1] hidden w-[602px] max-w-none opacity-80 lg:block" style={{ top: 50, left: -50 }} loading="lazy" decoding="async" />
-          <img aria-hidden src={img.cloud3} alt="" className="pointer-events-none absolute z-[1] hidden w-[584px] max-w-none opacity-80 lg:block" style={{ top: -150, right: 30 }} loading="lazy" decoding="async" />
+          <Img aria-hidden src={img.cloud1} alt="" w={640} className="pointer-events-none absolute z-[1] hidden w-[602px] max-w-none opacity-80 lg:block" style={{ top: 50, left: -50 }} loading="lazy" decoding="async" />
+          <Img aria-hidden src={img.cloud3} alt="" w={640} className="pointer-events-none absolute z-[1] hidden w-[584px] max-w-none opacity-80 lg:block" style={{ top: -150, right: 30 }} loading="lazy" decoding="async" />
         </>
       )}
       <div className={cx("relative z-[2] w-full", width === 860 ? "px-4 md:max-w-[860px] md:px-5 lg:px-[30px]" : "container-x")}>
@@ -74,7 +75,7 @@ export function NewsCard({ article, delay = 0, className, href }: { article: Art
     <Appear delay={delay} className={cx("p-1", className)}>
       <Link href={href ?? `/news/${article.slug}`} aria-label={article.title} className="group flex flex-col gap-[10px] overflow-clip rounded-[10px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:rounded-[20px]">
         <div className="aspect-[1533/458] w-full overflow-clip rounded-[6px] lg:rounded-[10px]">
-          <img src={article.image} alt={article.title} className="size-full scale-[1.01] object-cover transition-transform duration-500 group-hover:scale-[1.06]" loading="lazy" decoding="async" />
+          <Img src={article.image} alt={article.title} sizes={CARD_SIZES} className="size-full scale-[1.01] object-cover transition-transform duration-500 group-hover:scale-[1.06]" loading="lazy" decoding="async" />
         </div>
         <div className="flex flex-wrap items-center gap-[10px] p-4 lg:p-[10px]">
           <span className="inline-flex h-7 items-center rounded-full bg-surface px-[14px] pb-[6px] pt-1 text-[14px] font-medium leading-[18.2px] text-black">{article.category}</span>
@@ -89,7 +90,7 @@ export function TeamCard({ name, role, photo, office, delay = 0, href }: { name:
   const body = (
     <>
       <div className="aspect-[345/400] w-full overflow-clip rounded-[10px] bg-surface md:rounded-[20px]">
-        <img src={photo} alt={name} className="size-full object-cover object-top transition-transform duration-500 hover:scale-[1.03]" loading="lazy" decoding="async" />
+        <Img src={photo} alt={name} sizes={CARD_SIZES} className="size-full object-cover object-top transition-transform duration-500 hover:scale-[1.03]" loading="lazy" decoding="async" />
       </div>
       <div className="flex flex-col items-center gap-[2px]">
         <h3 className="t-h5 text-center">{name}</h3>
@@ -167,7 +168,7 @@ export function StatCard({ label, value, text, icon, tone = "white", className }
       <div className="flex items-start gap-[10px] pb-[30px]">
         <p className={cx("t-base w-[154px] md:w-[105px]", t.label)}>{label}</p>
         <span className={cx("ml-auto flex size-10 shrink-0 items-center justify-center overflow-clip rounded-full", t.icon)}>
-          <img src={icon} alt="" className="size-5 object-contain" loading="lazy" decoding="async" />
+          <Img src={icon} alt="" w={40} className="size-5 object-contain" loading="lazy" decoding="async" />
         </span>
       </div>
       <div className="flex flex-col gap-[6px]">

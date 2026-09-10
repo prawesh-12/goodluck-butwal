@@ -29,14 +29,6 @@ export const publishing = {
   sortOrder: integer("sort_order").notNull().default(0),
 };
 
-export const seo = {
-  seoTitle: text("seo_title"),
-  seoDescription: text("seo_description"),
-  seoOgImageId: uuid("seo_og_image_id").references((): AnyPgColumn => mediaAssets.id),
-  seoNoindex: boolean("seo_noindex").notNull().default(false),
-  canonicalUrl: text("canonical_url"),
-};
-
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -95,7 +87,6 @@ type OpeningHours = { day: number; open: string; close: string; closed: boolean 
 export const offices = pgTable("offices", {
   ...base,
   ...publishing,
-  ...seo,
   slug: text("slug").notNull().unique(),
   code: varchar("code", { length: 2 }).notNull().unique(),
   name: text("name").notNull(),
@@ -115,7 +106,6 @@ export const offices = pgTable("offices", {
   openingHours: jsonb("opening_hours").$type<OpeningHours>(),
   profileHtml: text("profile_html"),
   credentialsHtml: text("credentials_html"),
-  heroImageId: uuid("hero_image_id").references((): AnyPgColumn => mediaAssets.id),
   isActive: boolean("is_active").notNull().default(true),
 });
 

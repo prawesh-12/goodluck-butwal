@@ -13,36 +13,6 @@ export const DAY_NAMES = [
   "Saturday",
 ];
 
-export const tones = ["blue", "dark", "surface", "white"] as const;
-export type Tone = (typeof tones)[number];
-
-export const pagePath = (parent: string, slug: string) =>
-  slug === "about" ? "/about" : `/${parent}/${slug}`;
-
-export const destinationPath = (slug: string) => `/study-abroad/${slug}`;
-
-export const servicePath = (slug: string) => `/services/${slug}`;
-
-export type SocialLink = { label: string; href: string; icon?: string };
-
-export type SettingsValues = {
-  site_name: string;
-  hero_image_id: string;
-  hero_video_id: string;
-  default_seo_title: string;
-  default_seo_description: string;
-  default_og_image_id: string;
-  social_links: SocialLink[];
-  notify_email_au: string;
-  notify_email_np: string;
-  ga4_id: string;
-  gtm_id: string;
-  google_site_verification: string;
-  announcement_bar: string;
-  google_rating: string;
-  google_review_count: number;
-};
-
 export const eventTypes = [
   "seminar",
   "education_fair",

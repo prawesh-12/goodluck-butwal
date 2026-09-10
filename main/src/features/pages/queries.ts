@@ -1,8 +1,8 @@
 import { cache } from "react";
 import { inArray } from "drizzle-orm";
 import { db } from "@db/client";
-import { mediaAssets, pages } from "@db/schema";
-import { mediaUrl } from "@/lib/utils/media-url";
+import { pages } from "@db/schema";
+import { csrArt } from "@/config/assets";
 
 // Same field names the About routes already render, so a page only swaps its import.
 export type AboutContent = {
@@ -30,7 +30,7 @@ type AboutBlocks = {
   quote: { text: string; author: string };
 };
 type FoundersBlocks = { message_html: string; summary: string };
-type CsrBlocks = { partners: { name: string; logo_id: string | null; photo_id: string | null; line: string }[] };
+type CsrBlocks = { partners: { name: string; line: string }[] };
 type CareersBlocks = {
   values: { title: string; body: string }[];
   voices: { quote: string; name: string; role: string }[];
@@ -45,24 +45,6 @@ export const getAboutContent = cache(async (): Promise<AboutContent> => {
     .where(inArray(pages.slug, SLUGS));
 
   const bySlug = new Map(rows.map((row) => [row.slug, row]));
-
-  // Only the CSR partners carry images, so the media read is limited to the ids they name.
-  const csrBlocks = bySlug.get("corporate-social-responsibility")?.blocks as CsrBlocks | undefined;
-  const wanted = [...new Set(
-    (csrBlocks?.partners ?? []).flatMap((p) => [p.logo_id, p.photo_id]).filter((id): id is string => Boolean(id)),
-  )];
-  const media = wanted.length
-    ? await db
-        .select({
-          id: mediaAssets.id,
-          kind: mediaAssets.kind,
-          staticPath: mediaAssets.staticPath,
-          cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
-        })
-        .from(mediaAssets)
-        .where(inArray(mediaAssets.id, wanted))
-    : [];
-  const path = new Map(media.map((m) => [m.id, mediaUrl(m, 640)]));
 
   const about = bySlug.get("about")?.blocks as AboutBlocks;
   const founders = bySlug.get("message-from-co-founders")?.blocks as FoundersBlocks;
@@ -84,12 +66,7 @@ export const getAboutContent = cache(async (): Promise<AboutContent> => {
       .filter(Boolean),
     coFounderSummary: [founders.summary],
     csrIntro: bySlug.get("corporate-social-responsibility")?.intro ?? "",
-    csr: csr.partners.map((p) => ({
-      name: p.name,
-      line: p.line,
-      logo: p.logo_id ? (path.get(p.logo_id) ?? "") : "",
-      photo: p.photo_id ? (path.get(p.photo_id) ?? undefined) : undefined,
-    })),
+    csr: csr.partners.map((p) => ({ name: p.name, line: p.line, logo: csrArt[p.name]?.logo ?? "", photo: csrArt[p.name]?.photo })),
     careersValues: careers.values.map((v) => ({ title: v.title, line: v.body })),
     staffVoices: careers.voices,
   };

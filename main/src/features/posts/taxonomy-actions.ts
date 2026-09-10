@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { TAGS, invalidate } from "@/lib/cache";
 import { count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
-import { postCategories, postTags, posts, tags } from "@db/schema";
+import { postCategories, posts, tags } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
 import { requirePermission } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
 import { uniqueSlug } from "@/lib/utils/slug";
 import {
   createPostCategorySchema,
@@ -20,6 +20,15 @@ import { categorySlugs, tagSlugs } from "@/features/posts/admin-queries";
 type Result =
   | { ok: true; data: { id: string } }
   | { ok: false; error: string; fieldErrors?: Record<string, string[]> };
+
+// The row alone does not say which category or tag page changed, so the whole set is retagged.
+function refreshTaxonomy(kind: "category" | "tag") {
+  invalidate(TAGS.posts);
+  revalidatePath("/admin/posts");
+  revalidatePath(`/news/${kind}/[slug]`, "page");
+  revalidatePath("/news");
+  revalidatePath("/");
+}
 
 export async function createPostCategory(input: unknown): Promise<Result> {
   const actor = await requireActor();
@@ -44,15 +53,7 @@ export async function createPostCategory(input: unknown): Promise<Result> {
     })
     .returning({ id: postCategories.id });
 
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "post_categories",
-    entityId: created.id,
-    summary: `added the ${data.name} category`,
-  });
-
-  revalidatePath("/admin/post-categories");
+  refreshTaxonomy("category");
   return { ok: true, data: created };
 }
 
@@ -88,17 +89,7 @@ export async function updatePostCategory(input: unknown): Promise<Result> {
     })
     .where(eq(postCategories.id, data.id));
 
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "post_categories",
-    entityId: data.id,
-    summary: `renamed a category to ${data.name}`,
-  });
-
-  revalidatePath("/admin/post-categories");
-  revalidatePath("/news");
-  revalidatePath("/");
+  refreshTaxonomy("category");
   return { ok: true, data: { id: data.id } };
 }
 
@@ -127,15 +118,8 @@ export async function deletePostCategory(input: unknown): Promise<Result> {
   }
 
   await db.delete(postCategories).where(eq(postCategories.id, parsed.data.id));
-  await writeAudit({
-    userId: actor.id,
-    action: "delete",
-    entityType: "post_categories",
-    entityId: parsed.data.id,
-    summary: `deleted the ${existing.name} category`,
-  });
 
-  revalidatePath("/admin/post-categories");
+  refreshTaxonomy("category");
   return { ok: true, data: { id: parsed.data.id } };
 }
 
@@ -155,15 +139,7 @@ export async function createTag(input: unknown): Promise<Result> {
     .values({ slug, name: data.name, createdBy: actor.id, updatedBy: actor.id })
     .returning({ id: tags.id });
 
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "tags",
-    entityId: created.id,
-    summary: `added the ${data.name} tag`,
-  });
-
-  revalidatePath("/admin/tags");
+  refreshTaxonomy("tag");
   return { ok: true, data: created };
 }
 
@@ -189,17 +165,7 @@ export async function updateTag(input: unknown): Promise<Result> {
     .set({ slug, name: data.name, updatedBy: actor.id, updatedAt: new Date() })
     .where(eq(tags.id, data.id));
 
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "tags",
-    entityId: data.id,
-    summary: `renamed a tag to ${data.name}`,
-  });
-
-  revalidatePath("/admin/tags");
-  revalidatePath("/news");
-  revalidatePath("/");
+  refreshTaxonomy("tag");
   return { ok: true, data: { id: data.id } };
 }
 
@@ -213,22 +179,8 @@ export async function deleteTag(input: unknown): Promise<Result> {
   const [existing] = await db.select({ name: tags.name }).from(tags).where(eq(tags.id, parsed.data.id));
   if (!existing) return { ok: false, error: "That tag no longer exists." };
 
-  const [used] = await db
-    .select({ n: count() })
-    .from(postTags)
-    .where(eq(postTags.tagId, parsed.data.id));
-
   await db.delete(tags).where(eq(tags.id, parsed.data.id));
-  await writeAudit({
-    userId: actor.id,
-    action: "delete",
-    entityType: "tags",
-    entityId: parsed.data.id,
-    summary: `deleted the ${existing.name} tag, removed from ${used.n} ${used.n === 1 ? "post" : "posts"}`,
-  });
 
-  revalidatePath("/admin/tags");
-  revalidatePath("/news");
-  revalidatePath("/");
+  refreshTaxonomy("tag");
   return { ok: true, data: { id: parsed.data.id } };
 }

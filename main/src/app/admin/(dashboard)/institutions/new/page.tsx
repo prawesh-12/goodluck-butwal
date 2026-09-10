@@ -34,11 +34,6 @@ export default async function NewInstitutionPage() {
           isFeatured: false,
           status: "draft",
           sortOrder: 0,
-          seoTitle: "",
-          seoDescription: "",
-          seoOgImageId: null,
-          seoNoindex: false,
-          canonicalUrl: "",
         }}
       />
     </>

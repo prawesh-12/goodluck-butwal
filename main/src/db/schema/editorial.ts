@@ -10,7 +10,7 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { base, mediaAssets, offices, publishing, seo, users } from "./core";
+import { base, mediaAssets, offices, publishing, users } from "./core";
 import { eventType, regStatus } from "./enums";
 import { destinations } from "./destinations";
 
@@ -49,7 +49,6 @@ export const posts = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     slug: text("slug").notNull().unique(),
     title: text("title").notNull(),
     excerpt: text("excerpt"),
@@ -74,7 +73,6 @@ export const events = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     slug: text("slug").notNull().unique(),
     title: text("title").notNull(),
     eventType: eventType("event_type").notNull(),

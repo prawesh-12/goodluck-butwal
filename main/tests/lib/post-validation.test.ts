@@ -4,7 +4,6 @@ import {
   createPostSchema,
   postPublishProblems,
   readingMinutes,
-  redirectForRename,
   type PostInput,
 } from "@/features/posts/validators";
 
@@ -20,12 +19,6 @@ const ready: PostInput = {
   tagIds: [],
   authorDisplayName: "",
   status: "published",
-  publishedAt: "",
-  seoTitle: "",
-  seoDescription: "",
-  seoOgImageId: "",
-  seoNoindex: false,
-  canonicalUrl: "",
 };
 
 test("reading time rounds a word count to whole minutes", () => {
@@ -68,37 +61,13 @@ test("an image in the body with alt text passes", () => {
   expect(bodyImagesMissingAlt('<img src="/a/b.jpg" alt="A queue at the fair">')).toEqual([]);
 });
 
-test("renaming a published slug produces a 301 to the new address", () => {
-  expect(redirectForRename("old-title", "new-title", true)).toEqual({
-    fromPath: "/news/old-title",
-    toPath: "/news/new-title",
-    statusCode: 301,
-    note: "The post moved from old-title.",
-  });
+test("a post cannot be saved as scheduled", () => {
+  expect(createPostSchema.safeParse({ ...ready, status: "scheduled" }).success).toBe(false);
 });
 
-test("a draft that was never live leaves no redirect behind", () => {
-  expect(redirectForRename("old-title", "new-title", false)).toBe(null);
-});
-
-test("saving a published post without renaming it writes no redirect", () => {
-  expect(redirectForRename("same-title", "same-title", true)).toBe(null);
-});
-
-test("a scheduled post needs a time in the future", () => {
-  const result = createPostSchema.safeParse({
-    ...ready,
-    status: "scheduled",
-    publishedAt: "2020-01-01T09:00",
-  });
-  expect(result.success).toBe(false);
-  expect(result.error?.issues[0].message).toContain("future");
-});
-
-test("a scheduled post with no date is refused", () => {
-  const result = createPostSchema.safeParse({ ...ready, status: "scheduled", publishedAt: "" });
-  expect(result.success).toBe(false);
-  expect(result.error?.issues[0].path).toEqual(["publishedAt"]);
+test("a go-live date cannot be submitted any more", () => {
+  const parsed = createPostSchema.parse({ ...ready, publishedAt: "2030-01-01T09:00" });
+  expect(Object.keys(parsed)).not.toContain("publishedAt");
 });
 
 test("a draft needs no date at all", () => {

@@ -12,9 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # The same string local development uses. src/db/client.ts only points at the HTTP proxy
-      # when the connection string says localtest.me.
+      # src/db/client.ts only routes through the HTTP proxy when the host says localtest.me.
       DATABASE_URL: postgres://postgres:postgres@db.localtest.me:5432/goodluck
+      # Next inlines this at build time and no .env file reaches CI. The cloud name is public,
+      # it sits in every delivery URL; the API key and secret stay out of CI entirely.
+      NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ytkhxohl
 
     steps:
       - uses: actions/checkout@v4
@@ -31,45 +33,21 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # localtest.me is a public wildcard pointing at 127.0.0.1. Resolving it here keeps the run
-      # from depending on outside DNS.
-      - name: Point db.localtest.me at the runner
-        run: echo "127.0.0.1 db.localtest.me" | sudo tee -a /etc/hosts
+      # localtest.me is a public wildcard for 127.0.0.1. Resolving it here keeps CI off outside DNS.
+      - run: echo "127.0.0.1 db.localtest.me" | sudo tee -a /etc/hosts
 
-      - name: Start Postgres and the Neon HTTP proxy
-        run: docker compose up -d --wait
+      - run: docker compose up -d --wait
 
-      - name: Wait for the proxy to accept connections
-        run: |
-          for _ in $(seq 1 30); do
-            (echo > /dev/tcp/127.0.0.1/4444) 2>/dev/null && exit 0
-            sleep 1
-          done
-          echo "the proxy on 4444 never came up" >&2
-          exit 1
+      # The proxy has no healthcheck, so --wait returns before it is listening.
+      - run: timeout 60 bash -c 'until (echo > /dev/tcp/127.0.0.1/4444) 2>/dev/null; do sleep 1; done'
 
-      # drizzle-kit migrate speaks Neon's websocket protocol, which the local proxy does not
-      # serve, so the generated SQL is applied straight to Postgres.
-      - name: Apply migrations
-        run: pnpm db:migrate:dev
+      # drizzle-kit migrate speaks Neon's websocket protocol, which the local proxy does not serve.
+      - run: pnpm db:migrate:dev
 
-      # db:seed:dev reads .env.local, which does not exist here. --dev adds the placeholder
-      # catalogue the course and filter tests need.
-      - name: Seed
-        run: pnpm exec tsx db/seed/from-content.ts --dev
-
-      # The placeholder catalogue is seeded as drafts so it can never reach a real site. The
-      # filter tests need published rows, and this database is discarded with the run.
-      - name: Publish the placeholder catalogue
-        run: |
-          docker compose exec -T postgres psql -v ON_ERROR_STOP=1 -q -U postgres -d goodluck \
-            -c "update institutions set status='published', published_at=now() where status='draft';" \
-            -c "update courses set status='published', published_at=now() where status='draft';"
+      # db:seed:dev reads .env.local, which CI has none of.
+      - run: pnpm exec tsx db/seed/from-content.ts --dev
 
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
-
-      # Pages prerender from the database, so this needs the seeded one. The fan-out is what
-      # max_connections in docker-compose.yml is raised for.
       - run: pnpm build

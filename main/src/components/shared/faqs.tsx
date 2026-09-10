@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { PublicMember } from "@/features/team/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
+import { Img } from "@/components/ui/img";
 
 export type FaqItem = { q: string; a: string };
 export type FaqCtaText = { title: string; line: string; cta: string; you: string };
@@ -56,7 +57,7 @@ export function FaqCta({ faces, className = "", text = ctaText }: { faces: Publi
         <div className="flex items-center pr-[10px]">
           {faces.map((m) => (
             <span key={m.slug} className="block w-[30px]">
-              <img src={m.photo} alt="" className="size-10 max-w-none rounded-full object-cover object-top" loading="lazy" decoding="async" />
+              <Img src={m.photo} alt="" w={80} className="size-10 max-w-none rounded-full object-cover object-top" loading="lazy" decoding="async" />
             </span>
           ))}
         </div>

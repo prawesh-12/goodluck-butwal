@@ -1,15 +1,10 @@
 import { eq } from "drizzle-orm";
 import { db } from "@db/client";
-import { destinationFaqs, destinations, mediaAssets, serviceFaqs, services, uiStrings } from "@db/schema";
+import { destinationFaqs, destinations, serviceFaqs, services, uiStrings } from "@db/schema";
 import { destinations as source } from "./source/destinations";
 import { faqs } from "./source/faqs";
 
 const COUNTRY_CODE: Record<string, string> = { australia: "AU", "united-kingdom": "GB", "new-zealand": "NZ" };
-
-async function mediaIdByPath() {
-  const rows = await db.select({ id: mediaAssets.id, path: mediaAssets.staticPath }).from(mediaAssets);
-  return new Map(rows.map((row) => [row.path, row.id]));
-}
 
 // Section headings are rendered but have no column, so they live as interface text.
 async function putString(key: string, value: string, label: string, help: string) {
@@ -20,16 +15,11 @@ async function putString(key: string, value: string, label: string, help: string
 }
 
 export async function seedDestinations() {
-  const media = await mediaIdByPath();
-
   for (const [index, d] of source.entries()) {
     const row = {
       slug: d.slug,
       name: d.name,
       countryCode: COUNTRY_CODE[d.slug] ?? null,
-      heroImageId: media.get(d.hero) ?? null,
-      flagImageId: media.get(d.flag) ?? null,
-      cardImageId: media.get(d.card) ?? null,
       overviewHtml: d.overview,
       academicHtml: d.academic,
       workHtml: d.work,
@@ -53,10 +43,6 @@ export async function seedDestinations() {
       .values(row)
       .onConflictDoUpdate({ target: destinations.slug, set: { ...row, updatedAt: new Date() } });
 
-    if (media.get(d.hero)) {
-      await db.update(mediaAssets).set({ altText: d.heroAlt }).where(eq(mediaAssets.id, media.get(d.hero)!));
-    }
-
     await putString(`destination.${d.slug}.migrationTitle`, d.migrationTitle, `${d.name} migration heading`, "Heading above the migration blocks.");
     await putString(`destination.${d.slug}.whyTitle`, d.whyTitle, `${d.name} reasons heading`, "Heading above the reasons list.");
     if (d.checklistTitle) {
@@ -69,7 +55,6 @@ export async function seedDestinations() {
     slug: "new-zealand",
     name: "New Zealand",
     countryCode: "NZ",
-    flagImageId: media.get("/images/flags/new-zealand.svg") ?? null,
     hasPage: false,
     status: "published" as const,
     publishedAt: new Date(),

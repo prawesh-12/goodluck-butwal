@@ -1,7 +1,7 @@
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
-import { officeOptions } from "@/features/offices/admin-queries";
+import { officeOptions } from "@/features/offices/queries";
 import { TeamEditor } from "@/features/team/components/team-editor";
 
 export const dynamic = "force-dynamic";
@@ -32,13 +32,8 @@ export default async function NewTeamMemberPage() {
           isCoFounder: false,
           isFeatured: false,
           status: "draft",
-          seoTitle: "",
-          seoDescription: "",
-          seoNoindex: false,
-          canonicalUrl: "",
         }}
         photo={null}
-        shareImage={null}
         offices={offices}
         canPublish={can(actor, "team", "publish")}
         canDelete={false}

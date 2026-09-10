@@ -14,8 +14,8 @@ const hero = readFileSync("src/components/shared/hero.tsx", "utf8");
 // The meadow only shows from lg up. As a plain <img> the preload scanner fetched it on every
 // viewport, which cost a phone 258 KB for a picture it never renders.
 test("the hero meadow is requested through a media source, not a bare img", () => {
-  expect(hero).toMatch(/<source\s+media="\(min-width: 1200px\)"\s+srcSet=\{gl\.heroMeadow\}/);
-  expect(hero).not.toMatch(/<img[^>]+src=\{gl\.heroMeadow\}/);
+  expect(hero).toMatch(/<source\s+media="\(min-width: 1200px\)"\s+srcSet=\{assetSrcSet\(gl\.heroMeadow\)\}/);
+  expect(hero).not.toMatch(/<Img[^>]+src=\{gl\.heroMeadow\}/);
 });
 
 // Whichever image is the largest paint on a viewport has to be discoverable early.

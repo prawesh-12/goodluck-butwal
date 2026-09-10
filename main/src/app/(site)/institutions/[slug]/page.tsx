@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
@@ -14,6 +14,7 @@ import { CourseRow } from "@/features/courses/components/course-row";
 import { Pager } from "@/components/shared/pager";
 import { Empty } from "@/components/shared/empty";
 import { loadText } from "@/features/site-text/queries";
+import { Img } from "@/components/ui/img";
 
 type Props = { params: Promise<{ slug: string }>; searchParams: Promise<SearchParams> };
 
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const institution = await getInstitution(slug);
   if (!institution) return buildMetadata({ path: "/institutions", title: "Institution", noindex: true });
-  return buildEntityMetadata("institution", slug, {
+  return buildMetadata({
     path: `/institutions/${slug}`,
     title: institution.name,
     description: [institution.city, institution.country].filter(Boolean).join(", "),
@@ -58,7 +59,7 @@ export default async function InstitutionPage({ params, searchParams }: Props) {
           institution.logo ? (
             <Appear delay={0.1} className="w-full">
               <div className="mx-auto flex aspect-[16/6] w-full max-w-[560px] items-center justify-center overflow-clip rounded-[10px] bg-white p-8 ring-1 ring-hairline md:rounded-[30px]">
-                <img src={institution.logo} alt={institution.name} className="max-h-full w-auto max-w-[70%] object-contain" loading="lazy" decoding="async" />
+                <Img src={institution.logo} alt={institution.name} w={320} className="max-h-full w-auto max-w-[70%] object-contain" loading="lazy" decoding="async" />
               </div>
             </Appear>
           ) : undefined
@@ -85,7 +86,7 @@ export default async function InstitutionPage({ params, searchParams }: Props) {
           <div className="w-full px-4 md:px-[30px]">
             <Ticker gap={30} speed={120} className="w-full [--gap-override:20px] md:[--gap-override:30px]">
               {gallery.map((image) => (
-                <img key={image.src} src={image.src} alt={image.caption || institution.name} className="h-[180px] w-auto shrink-0 rounded-[10px] object-cover md:h-[260px] md:rounded-[20px]" loading="lazy" decoding="async" />
+                <Img key={image.src} src={image.src} alt={image.caption || institution.name} w={640} className="h-[180px] w-auto shrink-0 rounded-[10px] object-cover md:h-[260px] md:rounded-[20px]" loading="lazy" decoding="async" />
               ))}
             </Ticker>
           </div>

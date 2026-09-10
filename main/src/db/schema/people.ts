@@ -1,5 +1,5 @@
 import { boolean, index, pgTable, text, uuid } from "drizzle-orm/pg-core";
-import { base, mediaAssets, offices, publishing, seo } from "./core";
+import { base, mediaAssets, offices, publishing } from "./core";
 import { institutions } from "./institutions";
 
 export const teamMembers = pgTable(
@@ -7,7 +7,6 @@ export const teamMembers = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     officeId: uuid("office_id").references(() => offices.id),
     slug: text("slug").notNull().unique(),
     fullName: text("full_name").notNull(),

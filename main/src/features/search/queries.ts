@@ -13,7 +13,8 @@ import {
 } from "@db/schema";
 import { LEVELS } from "@/features/courses/filters";
 import { eventTypeLabels } from "@/config/content-meta";
-import { mediaUrl } from "@/lib/utils/media-url";
+import { destinationArt, serviceArt } from "@/config/assets";
+import { assetUrl, mediaUrl } from "@/lib/utils/media-url";
 import { groupHits, searchTerm, type SearchGroup, type SearchKind } from "@/features/search/query";
 
 const PER_GROUP = 12;
@@ -24,6 +25,13 @@ const media = {
   kind: mediaAssets.kind,
   staticPath: mediaAssets.staticPath,
   cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
+};
+
+// Every arm of a UNION has to name the same columns, so these stand in for the media join.
+const noMedia = {
+  kind: sql<"static" | "cloudinary" | null>`null::media_kind`.as("kind"),
+  staticPath: sql<string | null>`null::text`.as("static_path"),
+  cloudinaryPublicId: sql<string | null>`null::text`.as("cloudinary_public_id"),
 };
 
 // to_char at UTC, so the date matches what toISOString() would have given.
@@ -72,6 +80,12 @@ const categoryLabel: Record<SearchKind, (raw: string | null) => string> = {
 
 // News cards on the search page are wider than the rest, so their artwork is asked for larger.
 const imageWidth = (kind: SearchKind) => (kind === "posts" ? 960 : 640);
+
+function hitImage(kind: SearchKind, slug: string, row: Row) {
+  if (kind === "destinations") return assetUrl(destinationArt[slug]?.card ?? "", 640);
+  if (kind === "services") return assetUrl(serviceArt[slug]?.image ?? "", 640);
+  return mediaUrl(row, imageWidth(kind));
+}
 
 // Plain ILIKE across the six things a visitor can land on, run as one query.
 export async function search(raw: string | string[] | undefined): Promise<SearchGroup[]> {
@@ -159,11 +173,10 @@ export async function search(raw: string | string[] | undefined): Promise<Search
         excerpt: sql<string | null>`${destinations.tagline}`.as("excerpt"),
         category: sql<string | null>`${destinations.name}`.as("category"),
         on: day(sql`coalesce(${destinations.publishedAt}, ${destinations.createdAt})`),
-        ...media,
+        ...noMedia,
         rank: sql<number>`row_number() over (order by ${destinations.sortOrder} asc, ${destinations.slug} asc)`.mapWith(Number).as("rank"),
       })
       .from(destinations)
-      .leftJoin(mediaAssets, eq(destinations.cardImageId, mediaAssets.id))
       .where(
         and(
           eq(destinations.status, "published"),
@@ -183,11 +196,10 @@ export async function search(raw: string | string[] | undefined): Promise<Search
         excerpt: sql<string | null>`${services.summary}`.as("excerpt"),
         category: sql<string | null>`${services.category}::text`.as("category"),
         on: day(sql`coalesce(${services.publishedAt}, ${services.createdAt})`),
-        ...media,
+        ...noMedia,
         rank: sql<number>`row_number() over (order by ${services.sortOrder} asc, ${services.slug} asc)`.mapWith(Number).as("rank"),
       })
       .from(services)
-      .leftJoin(mediaAssets, eq(services.artworkId, mediaAssets.id))
       .where(
         and(
           eq(services.status, "published"),
@@ -233,7 +245,7 @@ export async function search(raw: string | string[] | undefined): Promise<Search
             title: row.title,
             date: row.on,
             category: categoryLabel[kind](row.category),
-            image: mediaUrl(row, imageWidth(kind)),
+            image: hitImage(kind, row.slug, row),
             excerpt: row.excerpt ?? "",
           },
         };

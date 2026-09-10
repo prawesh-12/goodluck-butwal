@@ -7,7 +7,6 @@ import { db } from "@db/client";
 import { consultations, enquiries, offices, services } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
 import { requireOwnership, requirePermission } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
 import { sendEmailQuietly } from "@/lib/email";
 import { consultationConfirmed } from "@/lib/email/templates";
 import { formatInOfficeTz, officeSlot } from "@/lib/utils/datetime";
@@ -29,7 +28,7 @@ export async function updateEnquiry(input: unknown): Promise<Result> {
   const data = parsed.data;
 
   const [existing] = await db
-    .select({ officeId: enquiries.officeId, reference: enquiries.referenceCode })
+    .select({ officeId: enquiries.officeId })
     .from(enquiries)
     .where(eq(enquiries.id, data.id));
   if (!existing) return { ok: false, error: "That enquiry no longer exists." };
@@ -41,14 +40,6 @@ export async function updateEnquiry(input: unknown): Promise<Result> {
     .update(enquiries)
     .set({ status: data.status, internalNotes: data.internalNotes ?? null, updatedBy: actor.id, updatedAt: new Date() })
     .where(eq(enquiries.id, data.id));
-
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "enquiries",
-    entityId: data.id,
-    summary: `${existing.reference} is now ${data.status}`,
-  });
 
   revalidatePath("/admin/enquiries");
   return { ok: true };
@@ -102,14 +93,6 @@ export async function confirmConsultation(input: unknown): Promise<Result> {
       { name: row.officeName ?? "", addressLine1: row.address, phoneDisplay: row.officePhone },
     ),
     to: row.email,
-  });
-
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "consultations",
-    entityId: row.id,
-    summary: `${row.reference} confirmed for ${when}`,
   });
 
   revalidatePath("/admin/consultations");

@@ -13,44 +13,26 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
-    heading: "Editorial",
+    heading: "Content",
     items: [
-      { href: "/admin/posts", label: "Posts", entity: "posts" },
-      { href: "/admin/post-categories", label: "Categories", entity: "postCategories" },
-      { href: "/admin/tags", label: "Tags", entity: "tags" },
+      { href: "/admin/team", label: "Team", entity: "team" },
+      { href: "/admin/partners", label: "Partners", entity: "partners" },
+      { href: "/admin/posts", label: "News", entity: "posts" },
       { href: "/admin/events", label: "Events", entity: "events" },
-    ],
-  },
-  {
-    heading: "Study",
-    items: [
-      { href: "/admin/destinations", label: "Destinations", entity: "destinations" },
       { href: "/admin/institutions", label: "Institutions", entity: "institutions" },
       { href: "/admin/courses", label: "Courses", entity: "courses" },
-      { href: "/admin/course-categories", label: "Course categories", entity: "courseCategories" },
       { href: "/admin/test-prep", label: "Test preparation", entity: "testPrep" },
     ],
   },
   {
-    heading: "Site",
+    heading: "Media",
     items: [
-      { href: "/admin/pages", label: "Pages", entity: "pages" },
-      { href: "/admin/services", label: "Services", entity: "services" },
-      { href: "/admin/offices", label: "Offices", entity: "offices" },
-      { href: "/admin/team", label: "Team", entity: "team" },
-      { href: "/admin/partners", label: "Partners", entity: "partners" },
-      { href: "/admin/site-text", label: "Site text", entity: "uiStrings" },
-      { href: "/admin/media", label: "Media", entity: "media" },
+      { href: "/admin/images", label: "Images", entity: "media" },
+      { href: "/admin/videos", label: "Videos", entity: "media" },
     ],
   },
   {
     heading: "Admin",
-    items: [
-      { href: "/admin/settings", label: "Settings", entity: "settings" },
-      { href: "/admin/redirects", label: "Redirects", entity: "redirects" },
-      { href: "/admin/users", label: "Users", entity: "users" },
-      { href: "/admin/audit-log", label: "Audit log", entity: "auditLog" },
-      { href: "/admin/help", label: "Help", entity: "auditLog" },
-    ],
+    items: [{ href: "/admin/users", label: "Users", entity: "users" }],
   },
 ];

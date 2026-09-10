@@ -11,7 +11,6 @@ type BadgeVariant = AdminBadgeProps["variant"];
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   published: "success",
-  scheduled: "secondary",
   draft: "outline",
   archived: "outline",
   new: "default",

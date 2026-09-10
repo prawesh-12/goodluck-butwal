@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { TAGS, cached } from "@/lib/cache";
 import { and, asc, eq, gte } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, offices, teamMembers, testPrepBatches, testPrepCourses } from "@db/schema";
@@ -43,7 +44,7 @@ export type PublicBatch = {
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export const listTestPrepCourses = cache(async (): Promise<PublicCourse[]> => {
+const listTestPrepCoursesUncached = cached(async (): Promise<PublicCourse[]> => {
   const rows = await db
     .select({
       id: testPrepCourses.id,
@@ -82,7 +83,9 @@ export const listTestPrepCourses = cache(async (): Promise<PublicCourse[]> => {
     // Batch times are office-local, so a course with no office falls back to the Nepal zone.
     timezone: row.timezone ?? "Asia/Kathmandu",
   }));
-});
+}, ["test-prep-courses"], [TAGS.testPrep]);
+
+export const listTestPrepCourses = cache(listTestPrepCoursesUncached);
 
 export const getTestPrepCourse = cache(async (slug: string) =>
   (await listTestPrepCourses()).find((course) => course.slug === slug),

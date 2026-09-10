@@ -18,12 +18,6 @@ const empty: PostValues = {
   tagIds: [],
   authorDisplayName: "",
   status: "draft",
-  publishedAt: "",
-  seoTitle: "",
-  seoDescription: "",
-  seoOgImageId: "",
-  seoNoindex: false,
-  canonicalUrl: "",
 };
 
 export default async function NewPostPage() {
@@ -39,7 +33,6 @@ export default async function NewPostPage() {
         values={empty}
         options={options}
         banner={null}
-        shareImage={null}
         canPublish={can(actor, "posts", "publish")}
         canDelete={false}
       />

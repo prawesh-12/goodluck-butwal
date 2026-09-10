@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { INTAKE_MONTHS, coursePath, qualificationLevels } from "@/config/course-meta";
-import { missingAltProblems, seoFields, slugField, type AttachedImage } from "@/lib/validators/content-fields";
+import { slugField } from "@/lib/validators/content-fields";
 import { contentStatuses } from "@/lib/validators/fields";
 
 const money = z
@@ -39,7 +39,6 @@ const fields = {
   entryRequirementsHtml: z.string().default(""),
   status: z.enum(contentStatuses),
   sortOrder: z.coerce.number().int().min(0).default(0),
-  ...seoFields,
 };
 
 function checkFees(data: { tuitionFeeMin: string; tuitionFeeMax: string }, ctx: z.RefinementCtx) {
@@ -69,7 +68,7 @@ export type CoursePublishFields = {
   tuitionCurrency: string;
 };
 
-export function coursePublishProblems(data: CoursePublishFields, images: AttachedImage[] = []): string[] {
+export function coursePublishProblems(data: CoursePublishFields): string[] {
   const problems: string[] = [];
   if (!data.name.trim()) problems.push("Name is empty.");
   if (!data.institutionId) problems.push("No institution is chosen.");
@@ -80,7 +79,7 @@ export function coursePublishProblems(data: CoursePublishFields, images: Attache
   if ((data.tuitionFeeMin || data.tuitionFeeMax) && !data.tuitionCurrency) {
     problems.push("A fee is set but no currency is chosen.");
   }
-  return [...problems, ...missingAltProblems(images)];
+  return problems;
 }
 
 export { coursePath };

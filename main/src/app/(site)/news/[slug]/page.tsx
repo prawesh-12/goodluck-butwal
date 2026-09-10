@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { article, breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
@@ -11,6 +11,7 @@ import { formatDate } from "@/lib/utils/datetime";
 import { FaqCta } from "@/components/shared/faqs";
 import { listTeam } from "@/features/team/queries";
 import { loadText } from "@/features/site-text/queries";
+import { CARD_SIZES, Img } from "@/components/ui/img";
 
 type Props = { params: Promise<{ slug: string }> };
 export const generateStaticParams = async () => (await listArticles()).map((a) => ({ slug: a.slug }));
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const a = await getArticle(slug);
   if (!a) return buildMetadata({ path: "/news", title: "News", noindex: true });
-  return buildEntityMetadata("post", slug, {
+  return buildMetadata({
     path: `/news/${slug}`,
     title: a.title,
     description: a.excerpt,
@@ -54,7 +55,7 @@ export default async function ArticlePage({ params }: Props) {
         <div className="container-x">
           <div className="flex flex-col items-center gap-[50px]">
             <Appear y={10} duration={0.6} className="aspect-[1533/458] w-full overflow-clip rounded-[10px] md:rounded-[20px]">
-              <img src={a.image} alt={a.title} className="size-full object-cover" loading="lazy" decoding="async" />
+              <Img src={a.image} alt={a.title} sizes={CARD_SIZES} className="size-full object-cover" loading="lazy" decoding="async" />
             </Appear>
             <div className="article article-scroll w-full max-w-[800px]" dangerouslySetInnerHTML={{ __html: a.html }} />
             <div className="w-full max-w-[800px]"><FaqCta faces={faces} /></div>

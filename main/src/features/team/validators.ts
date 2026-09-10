@@ -21,11 +21,6 @@ const fields = {
   isCoFounder: z.boolean().default(false),
   isFeatured: z.boolean().default(false),
   status: z.enum(contentStatuses),
-  seoTitle: text,
-  seoDescription: text,
-  seoOgImageId: mediaId,
-  seoNoindex: z.boolean().default(false),
-  canonicalUrl: httpsUrl,
 };
 
 export const createTeamMemberSchema = z.object(fields);
@@ -35,7 +30,7 @@ export const reorderTeamSchema = z.object({ ids: z.array(z.uuid()).min(1) });
 
 export type TeamMemberInput = z.infer<typeof createTeamMemberSchema>;
 
-export type TeamAltText = { photo?: string | null; shareImage?: string | null };
+export type TeamAltText = { photo?: string | null };
 
 export function teamPublishProblems(data: TeamMemberInput, alt: TeamAltText): string[] {
   const missing: string[] = [];
@@ -43,6 +38,5 @@ export function teamPublishProblems(data: TeamMemberInput, alt: TeamAltText): st
   if (!data.officeId) missing.push("Office");
   if (!data.photoId) missing.push("Photo");
   if (data.photoId && !alt.photo) missing.push("Alt text on the photo");
-  if (data.seoOgImageId && !alt.shareImage) missing.push("Alt text on the share image");
   return missing;
 }

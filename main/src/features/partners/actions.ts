@@ -1,12 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { TAGS, invalidate } from "@/lib/cache";
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@db/client";
 import { partners } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
 import { can, requirePermission } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
 import {
   createPartnerSchema,
   partnerPublishProblems,
@@ -14,7 +14,7 @@ import {
   updatePartnerSchema,
   type PartnerInput,
 } from "@/features/partners/validators";
-import { altTextByIds } from "@/features/offices/admin-queries";
+import { mediaAlt } from "@/features/media/admin-queries";
 
 type Result<T = { id: string }> =
   | { ok: true; data: T }
@@ -24,7 +24,7 @@ const blank = (value: string) => (value === "" ? null : value);
 
 async function publishRefusal(data: PartnerInput) {
   if (data.status !== "published") return null;
-  const alt = await altTextByIds([data.logoId]);
+  const alt = await mediaAlt([data.logoId]);
   const problems = partnerPublishProblems(data, alt.get(data.logoId));
   return problems.length > 0 ? `Not ready to publish. Add: ${problems.join(", ")}.` : null;
 }
@@ -37,6 +37,14 @@ function columns(data: PartnerInput) {
     isFeatured: data.isFeatured,
     status: data.status,
   };
+}
+
+function refresh() {
+  invalidate(TAGS.partners);
+  revalidatePath("/admin/partners");
+  revalidatePath("/");
+  revalidatePath("/about");
+  revalidatePath("/contact/book-consultation");
 }
 
 export async function createPartner(input: unknown): Promise<Result> {
@@ -65,16 +73,7 @@ export async function createPartner(input: unknown): Promise<Result> {
     })
     .returning({ id: partners.id });
 
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "partners",
-    entityId: created.id,
-    summary: `added ${data.name}`,
-  });
-
-  revalidatePath("/admin/partners");
-  revalidatePath("/");
+  refresh();
   return { ok: true, data: { id: created.id } };
 }
 
@@ -89,7 +88,7 @@ export async function updatePartner(input: unknown): Promise<Result> {
   const data = parsed.data;
 
   const [existing] = await db
-    .select({ id: partners.id, name: partners.name, status: partners.status, publishedAt: partners.publishedAt })
+    .select({ id: partners.id, status: partners.status, publishedAt: partners.publishedAt })
     .from(partners)
     .where(eq(partners.id, data.id));
   if (!existing) return { ok: false, error: "That partner no longer exists." };
@@ -110,17 +109,7 @@ export async function updatePartner(input: unknown): Promise<Result> {
     })
     .where(eq(partners.id, data.id));
 
-  await writeAudit({
-    userId: actor.id,
-    action:
-      data.status === existing.status ? "update" : data.status === "published" ? "publish" : "unpublish",
-    entityType: "partners",
-    entityId: data.id,
-    summary: `${data.name} updated`,
-  });
-
-  revalidatePath("/admin/partners");
-  revalidatePath("/");
+  refresh();
   return { ok: true, data: { id: data.id } };
 }
 
@@ -132,23 +121,14 @@ export async function deletePartner(input: unknown): Promise<Result> {
   if (!parsed.success) return { ok: false, error: "That partner could not be found." };
 
   const [existing] = await db
-    .select({ id: partners.id, name: partners.name })
+    .select({ id: partners.id })
     .from(partners)
     .where(eq(partners.id, parsed.data.id));
   if (!existing) return { ok: false, error: "That partner no longer exists." };
 
   await db.delete(partners).where(eq(partners.id, existing.id));
 
-  await writeAudit({
-    userId: actor.id,
-    action: "delete",
-    entityType: "partners",
-    entityId: existing.id,
-    summary: `removed ${existing.name}`,
-  });
-
-  revalidatePath("/admin/partners");
-  revalidatePath("/");
+  refresh();
   return { ok: true, data: { id: existing.id } };
 }
 
@@ -170,14 +150,6 @@ export async function reorderPartners(input: unknown): Promise<Result<{ moved: n
       .where(eq(partners.id, id));
   }
 
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "partners",
-    summary: `reordered ${ids.length} partners`,
-  });
-
-  revalidatePath("/admin/partners");
-  revalidatePath("/");
+  refresh();
   return { ok: true, data: { moved: ids.length } };
 }

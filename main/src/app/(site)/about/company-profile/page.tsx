@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cache } from "react";
 import { and, eq } from "drizzle-orm";
-import { buildEntityMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { breadcrumbs } from "@/lib/seo/schema";
 import { db } from "@db/client";
@@ -11,6 +11,7 @@ import { listOffices } from "@/features/offices/queries";
 import { loadText } from "@/features/site-text/queries";
 import { Appear } from "@/components/ui/appear";
 import { InnerHero, SectionHead } from "@/components/shared/inner";
+import { Img } from "@/components/ui/img";
 
 // Registered particulars are not in this repo, so the body is admin-editable. Everything else
 // comes from the office table and the company record.
@@ -23,7 +24,7 @@ const getProfileBody = cache(async () => {
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildEntityMetadata("page", "company-profile", {
+  return buildMetadata({
     path: "/about/company-profile",
     title: "Company profile",
   });
@@ -72,7 +73,7 @@ export default async function CompanyProfilePage() {
               {offices.map((office, i) => (
                 <Appear key={office.id} delay={0.05 * i} className="flex flex-col gap-[10px] rounded-[20px] bg-surface p-5 md:rounded-[24px] md:p-6">
                   <span className="flex items-center gap-2">
-                    <img src={office.flag} alt="" className="size-[22px] rounded-full ring-2 ring-white" loading="lazy" decoding="async" />
+                    <Img src={office.flag} alt="" w={48} className="size-[22px] rounded-full ring-2 ring-white" loading="lazy" decoding="async" />
                     <span className="t-body font-semibold text-ink">{office.label}</span>
                   </span>
                   <address className="t-base not-italic text-muted">{office.address}</address>

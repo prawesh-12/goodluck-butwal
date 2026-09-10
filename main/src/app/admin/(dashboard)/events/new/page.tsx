@@ -25,12 +25,6 @@ const empty: EventValues = {
   registrationEnabled: true,
   registrationDeadline: "",
   status: "draft",
-  publishedAt: "",
-  seoTitle: "",
-  seoDescription: "",
-  seoOgImageId: "",
-  seoNoindex: false,
-  canonicalUrl: "",
 };
 
 export default async function NewEventPage() {
@@ -46,7 +40,6 @@ export default async function NewEventPage() {
         values={empty}
         offices={offices}
         cover={null}
-        shareImage={null}
         seatsTaken={0}
         canPublish={can(actor, "events", "publish")}
         canDelete={false}

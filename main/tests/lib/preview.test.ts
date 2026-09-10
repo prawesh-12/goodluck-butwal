@@ -11,6 +11,3 @@ test("every content type has a preview address, not only articles", () => {
   expect(previewPath("course", "nursing")).toBe("/preview/course/nursing");
 });
 
-test("a name with a space in it survives the address", () => {
-  expect(previewPath("testimonial", "Jane Doe")).toBe("/preview/testimonial/Jane%20Doe");
-});

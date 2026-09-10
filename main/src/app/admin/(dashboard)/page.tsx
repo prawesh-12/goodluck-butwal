@@ -1,4 +1,4 @@
-import { and, count, eq, gte, inArray } from "drizzle-orm";
+import { and, count, eq, gte } from "drizzle-orm";
 import { db } from "@db/client";
 import { consultations, enquiries, events, posts, testPrepBatches } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
@@ -35,7 +35,7 @@ async function tiles(actor: Actor) {
     const [row] = await db
       .select({ n: count() })
       .from(posts)
-      .where(and(inArray(posts.status, ["draft", "scheduled"]), scopedWhere(posts, actor)));
+      .where(and(eq(posts.status, "draft"), scopedWhere(posts, actor)));
     out.push({ label: "Drafts", value: row.n, href: "/admin/posts", hint: "Not yet published" });
   }
 

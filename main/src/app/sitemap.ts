@@ -56,21 +56,22 @@ const sources = [
   { table: teamMembers, prefix: "/team", frequency: "monthly" as Frequency, extra: undefined },
 ];
 
+// Without this a metadata route is generated once and frozen until the next deployment.
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [records, categories, tagRows] = await Promise.all([
     Promise.all(
       sources.map(async ({ table, prefix, frequency, extra }) => {
         const rows = await db
-          .select({ slug: table.slug, updatedAt: table.updatedAt, noindex: table.seoNoindex })
+          .select({ slug: table.slug, updatedAt: table.updatedAt })
           .from(table)
           .where(and(eq(table.status, "published"), extra));
-        return rows
-          .filter((row) => !row.noindex)
-          .map((row) => ({
-            url: url(`${prefix}/${row.slug}`),
-            lastModified: row.updatedAt,
-            changeFrequency: frequency,
-          }));
+        return rows.map((row) => ({
+          url: url(`${prefix}/${row.slug}`),
+          lastModified: row.updatedAt,
+          changeFrequency: frequency,
+        }));
       }),
     ),
     db

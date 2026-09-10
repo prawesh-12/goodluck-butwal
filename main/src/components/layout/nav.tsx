@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { gl } from "@/config/assets";
 import { nav } from "@/config/site";
 import { PillButton } from "@/components/ui/button";
+import { Img } from "@/components/ui/img";
 
 function BlurTop() {
   const layers = [0.078125, 0.15625, 0.3125, 0.625, 1.25, 2.5, 5, 10];
@@ -41,7 +42,7 @@ export function Nav({ text }: { text: NavText }) {
         <div className="w-full px-4 md:w-auto md:max-w-[860px] md:px-5 lg:max-w-[1280px] lg:px-6">
           <div className="flex h-[52px] items-center gap-4 overflow-hidden rounded-full bg-white p-[10px] shadow-[0_0_0_2px_rgba(221,229,237,0.7)] md:h-[54px] md:shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:h-[58px] lg:gap-5">
             <Link href="/" aria-label="Goodluck Education and Migration, home" className="block h-7 shrink-0 md:h-8">
-              <img src={gl.logo} alt="Goodluck Education and Migration" className="h-full w-auto object-contain" />
+              <Img src={gl.logo} alt="Goodluck Education and Migration" w={320} className="h-full w-auto object-contain" />
             </Link>
             <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
               {nav.map((l) => {

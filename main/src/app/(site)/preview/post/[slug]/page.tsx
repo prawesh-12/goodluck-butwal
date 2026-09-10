@@ -9,6 +9,7 @@ import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
 import { InnerHero } from "@/components/shared/inner";
 import { formatDate } from "@/lib/utils/datetime";
+import { Img } from "@/components/ui/img";
 
 export const metadata = previewMetadata;
 export const dynamic = "force-dynamic";
@@ -70,9 +71,10 @@ export default async function PostPreview({ params }: { params: Promise<{ slug: 
                 duration={0.6}
                 className="aspect-[1533/458] w-full overflow-clip rounded-[10px] md:rounded-[20px]"
               >
-                <img
+                <Img
                   src={post.image}
                   alt={post.title}
+                  sizes="(min-width: 810px) 800px, 100vw"
                   className="size-full object-cover"
                   loading="lazy"
                   decoding="async"

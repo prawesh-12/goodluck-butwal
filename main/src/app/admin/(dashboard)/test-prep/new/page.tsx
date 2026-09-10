@@ -28,11 +28,6 @@ export default async function NewTestPrepCoursePage() {
           feeCurrency: "NPR",
           status: "draft",
           sortOrder: 0,
-          seoTitle: "",
-          seoDescription: "",
-          seoOgImageId: null,
-          seoNoindex: false,
-          canonicalUrl: "",
         }}
       />
     </>

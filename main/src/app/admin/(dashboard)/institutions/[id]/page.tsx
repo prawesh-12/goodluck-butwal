@@ -19,7 +19,7 @@ export default async function EditInstitutionPage({ params }: { params: Promise<
   if (!row) notFound();
 
   const [media, destinations, gallery, courses] = await Promise.all([
-    pickedMedia([row.logoId, row.seoOgImageId]),
+    pickedMedia([row.logoId]),
     destinationOptions(),
     institutionGallery(row.id),
     courseCountFor(row.id),
@@ -58,11 +58,6 @@ export default async function EditInstitutionPage({ params }: { params: Promise<
           isFeatured: row.isFeatured,
           status: row.status,
           sortOrder: row.sortOrder,
-          seoTitle: row.seoTitle ?? "",
-          seoDescription: row.seoDescription ?? "",
-          seoOgImageId: row.seoOgImageId,
-          seoNoindex: row.seoNoindex,
-          canonicalUrl: row.canonicalUrl ?? "",
         }}
       />
 

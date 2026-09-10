@@ -3,7 +3,7 @@ import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { getAdminPartner } from "@/features/partners/admin-queries";
-import { pickedMedia } from "@/features/media/picked-media-map";
+import { pickedMedia } from "@/features/media/admin-queries";
 import { PartnerEditor } from "@/features/partners/components/partner-editor";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +34,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ id: st
           isFeatured: row.isFeatured,
           status: row.status,
         }}
-        logo={media.get(row.logoId ?? "") ?? null}
+        logo={media[row.logoId ?? ""] ?? null}
         canPublish={can(actor, "partners", "publish")}
         canDelete={can(actor, "partners", "delete")}
       />

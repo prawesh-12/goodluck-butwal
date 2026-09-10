@@ -1,16 +1,14 @@
-import { boolean, index, jsonb, pgTable, text, timestamp, uuid, varchar } from "drizzle-orm/pg-core";
-import { base, mediaAssets, publishing, seo, users } from "./core";
+import { boolean, index, jsonb, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { base, publishing, users } from "./core";
 
 export const pages = pgTable("pages", {
   ...base,
   ...publishing,
-  ...seo,
   slug: text("slug").notNull().unique(),
   parent: varchar("parent", { length: 20 }).notNull().default("about"),
   title: text("title").notNull(),
   intro: text("intro"),
   bodyHtml: text("body_html"),
-  heroImageId: uuid("hero_image_id").references(() => mediaAssets.id),
   blocks: jsonb("blocks"),
   showInNav: boolean("show_in_nav").notNull().default(false),
 });

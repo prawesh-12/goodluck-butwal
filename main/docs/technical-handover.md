@@ -21,7 +21,7 @@ goodluck/                     git repository root
     ├── src/app/              routes: public pages, /admin, /api
     ├── src/components/       UI. The public components are approved and frozen.
     ├── src/lib/              auth, permissions, sanitising, dates, email, uploads
-    └── src/server/           queries and server actions. Server only, never imported by a page.
+    └── src/features/         per area: public queries, admin queries, server actions, components.
 ```
 
 ## The stack, and why each piece
@@ -66,8 +66,8 @@ Names and where each one lives are in `main/.env.example`. In short:
 - Never in a file, never in git.
 - Locally they all come from `main/.env.local`, which git ignores.
 
-Anything an administrator might want to change is in the `settings` table, not here: notification
-addresses, social links and analytics ids.
+Notification addresses, social links and analytics ids live in the `settings` table, not here.
+Nothing in the admin edits them: a developer changes a row when the client asks.
 
 **`NEXT_PUBLIC_SENTRY_DSN`** is on the Sentry project under Settings, Client Keys. A DSN is
 write-only and meant to be public, which is why it carries the public prefix: the two error screens
@@ -75,8 +75,8 @@ run in the browser and cannot read any other name. Do not run Sentry's setup wiz
 the SDK, which costs 0.62 MB compressed and breaks the size cap. `src/lib/sentry.ts` posts the same
 envelope over `fetch`.
 
-**There is no Google Maps key.** A map is whatever an admin pasted into the office or event, taken
-from Share, then Embed a map, in Google Maps. The Maps Embed API is free but Google will not issue
+**There is no Google Maps key.** A map is whatever was pasted into the office row or the event,
+taken from Share, then Embed a map, in Google Maps. The Maps Embed API is free but Google will not issue
 a key without a card on file, and the client's plans are free ones. The Get directions links are
 ordinary Google Maps addresses and never needed a key either.
 
@@ -131,17 +131,42 @@ The build needs a `DATABASE_URL` even though it never queries: Better Auth const
 when the module loads, and Next loads every route module during a build. CI passes a placeholder,
 Vercel passes the real one.
 
-The scheduled publish runs from `vercel.json`, a cron every 15 minutes against
-`/api/cron/publish-scheduled`. Vercel sends `CRON_SECRET` as a bearer token and the route refuses
-anything else.
+Publishing is an explicit admin action: a piece is Draft, Published or Archived, and saving it
+revalidates the pages that show it. There is no scheduled publishing, nothing runs on a timer, and
+the app has no cron.
+
+## What the admin manages, and what it does not
+
+Ten sections, and no more:
+
+```
+ENQUIRIES   Enquiries, Consultations
+CONTENT     Team, Partners, News, Events, Institutions, Courses, Test preparation
+MEDIA       Images, Videos
+ADMIN       Users
+```
+
+Those seven content areas are the only editable website content. Page wording, services,
+destinations, office details, `ui_strings` and `settings` still back the public site and still sit
+in Postgres, but they are developer-controlled: change the row, or the seed, and deploy. Keeping
+them out of the admin is the point, not an omission.
+
+Media splits in two. The seven content areas attach a picture through the picker, which stores a
+`media_assets` row holding the reference and its alt text. Everything else, backgrounds, flags,
+destination and service art, the brand video, is named in `src/config/assets.ts` and resolved
+straight to a Cloudinary URL by `src/lib/utils/media-url.ts`, with no database lookup at all.
+
+Images and Videos under MEDIA browse Cloudinary itself, not the database. A delete is refused
+while any of the seven areas still references the asset, and an uploaded video is given the
+`sp_auto` eager ladder so it is served as adaptive HLS rather than as an origin MP4.
 
 ## Permissions
 
-One matrix, held as data in `src/lib/rbac.ts`. Nothing else in the app decides who may do what.
+One matrix, held as data in `src/lib/auth/rbac.ts`. Nothing else in the app decides who may do what.
 
 - `can(user, entity, action)` answers the question.
 - `requirePermission` throws, for server actions.
-- `allow` and `allowOwn` in `src/lib/guard.ts` answer a real 403, for pages.
+- `allow` and `allowOwn` in `src/lib/auth/guard.ts` answer a real 403, for pages.
 - `scopedWhere(table, user)` pins a query to the user's office. **Never compare `office_id`
   anywhere else.**
 - Ownership is always re-checked on the row that came back from the database, never on the id

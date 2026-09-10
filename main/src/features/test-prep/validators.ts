@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { mediaId, seoFields, slugField } from "@/lib/validators/content-fields";
+import { mediaId, slugField } from "@/lib/validators/content-fields";
 import { contentStatuses } from "@/lib/validators/fields";
 
 const testTypes = ["ielts", "pte"] as const;
@@ -30,7 +30,6 @@ const courseFields = {
   feeCurrency: z.string().trim().length(3, "Three letters, like NPR.").default("NPR"),
   status: z.enum(contentStatuses),
   sortOrder: z.coerce.number().int().min(0).default(0),
-  ...seoFields,
 };
 
 export const createTestPrepCourseSchema = z.object(courseFields);

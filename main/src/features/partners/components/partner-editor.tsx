@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPartner, deletePartner, updatePartner } from "@/features/partners/actions";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
-import { Field } from "@/components/shared/admin/seo-section";
+import { Field } from "@/components/shared/admin/field";
 import { Select } from "@/components/shared/admin/repeater";
 
 export type PartnerValues = {

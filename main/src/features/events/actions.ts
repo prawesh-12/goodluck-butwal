@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidateSitemap } from "@/lib/cache";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
 import { events, redirects } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
 import { can, requireOwnership, requirePermission } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
 import { sanitize } from "@/lib/security/sanitize";
 import { uniqueSlug } from "@/lib/utils/slug";
 import {
@@ -17,7 +17,7 @@ import {
   zonedToUtc,
   type EventInput,
 } from "@/features/events/validators";
-import { altTextByIds } from "@/features/offices/admin-queries";
+import { mediaAlt } from "@/features/media/admin-queries";
 import { eventSlugs, officeTimezone } from "@/features/events/admin-queries";
 
 type Result =
@@ -26,20 +26,15 @@ type Result =
 
 const blank = (value: string) => (value === "" ? null : value);
 
-const goesLive = (status: string) => status === "published" || status === "scheduled";
+const goesLive = (status: string) => status === "published";
 
 async function publishProblems(data: EventInput) {
-  const alt = await altTextByIds([data.coverImageId, data.seoOgImageId]);
-  return eventPublishProblems(data, {
-    cover: alt.get(data.coverImageId),
-    shareImage: alt.get(data.seoOgImageId),
-  });
+  const alt = await mediaAlt([data.coverImageId]);
+  return eventPublishProblems(data, { cover: alt.get(data.coverImageId) });
 }
 
-function goLiveAt(data: EventInput, existing: Date | null) {
-  if (data.publishedAt) return new Date(data.publishedAt);
-  if (data.status === "published") return existing ?? new Date();
-  return existing;
+function publishedDate(data: EventInput, existing: Date | null) {
+  return data.status === "published" ? (existing ?? new Date()) : existing;
 }
 
 // The three times are typed as the office's wall clock and stored as instants.
@@ -63,16 +58,12 @@ function columns(data: EventInput, slug: string, html: string, timeZone: string,
     registrationEnabled: data.registrationEnabled,
     registrationDeadline: data.registrationDeadline ? zonedToUtc(data.registrationDeadline, timeZone) : null,
     status: data.status,
-    publishedAt: goLiveAt(data, existingDate),
-    seoTitle: blank(data.seoTitle),
-    seoDescription: blank(data.seoDescription),
-    seoOgImageId: blank(data.seoOgImageId),
-    seoNoindex: data.seoNoindex,
-    canonicalUrl: blank(data.canonicalUrl),
+    publishedAt: publishedDate(data, existingDate),
   };
 }
 
 function refresh(slugs: string[]) {
+  revalidateSitemap();
   revalidatePath("/admin/events");
   revalidatePath("/events");
   revalidatePath("/");
@@ -109,14 +100,6 @@ export async function createEvent(input: unknown): Promise<Result> {
     .insert(events)
     .values({ ...columns(data, slug, html, timeZone, null), createdBy: actor.id, updatedBy: actor.id })
     .returning({ id: events.id, slug: events.slug });
-
-  await writeAudit({
-    userId: actor.id,
-    action: data.status === "published" ? "publish" : "create",
-    entityType: "events",
-    entityId: created.id,
-    summary: `created ${created.slug}`,
-  });
 
   refresh([created.slug]);
   return { ok: true, data: created };
@@ -188,14 +171,6 @@ export async function updateEvent(input: unknown): Promise<Result> {
       });
   }
 
-  await writeAudit({
-    userId: actor.id,
-    action: data.status === "published" && existing.status !== "published" ? "publish" : "update",
-    entityType: "events",
-    entityId: data.id,
-    summary: slug === existing.slug ? `updated ${slug}` : `${existing.slug} is now ${slug}, 301 written`,
-  });
-
   refresh([slug, existing.slug]);
   return { ok: true, data: { id: data.id, slug } };
 }
@@ -218,14 +193,6 @@ export async function archiveEvent(input: unknown): Promise<Result> {
     .update(events)
     .set({ status: "archived", updatedBy: actor.id, updatedAt: new Date() })
     .where(eq(events.id, parsed.data.id));
-
-  await writeAudit({
-    userId: actor.id,
-    action: "unpublish",
-    entityType: "events",
-    entityId: parsed.data.id,
-    summary: `archived ${existing.slug}`,
-  });
 
   refresh([existing.slug]);
   return { ok: true, data: { id: parsed.data.id, slug: existing.slug } };

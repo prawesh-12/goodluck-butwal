@@ -9,7 +9,6 @@ import { slugify } from "@/lib/utils/slug";
 import { eventTypeLabels, eventTypes, type EventType } from "@/config/content-meta";
 import { archiveEvent, createEvent, updateEvent } from "@/features/events/actions";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
-import { SeoFields, type SeoValue } from "@/components/shared/admin/page-seo-fields";
 import type { OfficeZone } from "@/features/events/admin-queries";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { Select } from "@/components/shared/admin/repeater";
@@ -36,12 +35,6 @@ export type EventValues = {
   registrationEnabled: boolean;
   registrationDeadline: string;
   status: string;
-  publishedAt: string;
-  seoTitle: string;
-  seoDescription: string;
-  seoOgImageId: string;
-  seoNoindex: boolean;
-  canonicalUrl: string;
 };
 
 type FieldErrors = Record<string, string[] | undefined>;
@@ -50,7 +43,6 @@ export function EventForm({
   values,
   offices,
   cover,
-  shareImage,
   seatsTaken,
   canPublish,
   canDelete,
@@ -58,7 +50,6 @@ export function EventForm({
   values: EventValues;
   offices: OfficeZone[];
   cover: PickedMedia | null;
-  shareImage: PickedMedia | null;
   seatsTaken: number;
   canPublish: boolean;
   canDelete: boolean;
@@ -74,18 +65,11 @@ export function EventForm({
   const [embed, setEmbed] = useState(values.mapsEmbedUrl);
   const [capacity, setCapacity] = useState(values.capacity === null ? "" : String(values.capacity));
   const [status, setStatus] = useState(values.status);
-  const [seo, setSeo] = useState<SeoValue>({
-    seoTitle: values.seoTitle,
-    seoDescription: values.seoDescription,
-    seoOgImageId: values.seoOgImageId || null,
-    seoNoindex: values.seoNoindex,
-    canonicalUrl: values.canonicalUrl,
-  });
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
 
-  const statuses = canPublish ? ["draft", "scheduled", "published", "archived"] : ["draft", "archived"];
+  const statuses = canPublish ? ["draft", "published", "archived"] : ["draft", "archived"];
   const zone = offices.find((office) => office.id === officeId)?.timezone;
   const clock = zone ? `Times are the clock on the wall in ${zone}.` : "Choose the office first. Until then times are read as UTC.";
   const seatsLeft = capacity ? Number(capacity) - seatsTaken : null;
@@ -118,12 +102,6 @@ export function EventForm({
           registrationEnabled: form.get("registrationEnabled") === "on",
           registrationDeadline: String(form.get("registrationDeadline") ?? ""),
           status,
-          publishedAt: String(form.get("publishedAt") ?? ""),
-          seoTitle: seo.seoTitle,
-          seoDescription: seo.seoDescription,
-          seoOgImageId: seo.seoOgImageId ?? "",
-          seoNoindex: seo.seoNoindex,
-          canonicalUrl: seo.canonicalUrl,
         };
 
         const result = values.id ? await updateEvent(payload) : await createEvent(payload);
@@ -323,16 +301,6 @@ export function EventForm({
         </p>
       ) : null}
 
-      <SeoFields
-        value={seo}
-        onChange={(patch) => setSeo((current) => ({ ...current, ...patch }))}
-        path={`/events/${slug || "..."}`}
-        fallbackTitle={title}
-        fallbackDescription={summary}
-        ogImage={shareImage}
-        errors={errors}
-      />
-
       <h2 className="t-h5 admin-subhead">Publishing</h2>
 
       <Select
@@ -341,20 +309,11 @@ export function EventForm({
         onChange={setStatus}
         help={
           canPublish
-            ? "Draft is invisible. Scheduled goes live on its own. Archived comes off the site."
+            ? "Draft is invisible. Published puts it on the site. Archived comes off it."
             : "You can save drafts. An admin puts the event live."
         }
         options={statuses.map((option) => ({ value: option, label: option }))}
       />
-
-      <label className="admin-field">
-        <span className="t-small">Go live at</span>
-        <input type="datetime-local" name="publishedAt" defaultValue={values.publishedAt} />
-        <span className="t-small admin-help">
-          When the event page appears on the site, in UTC. This is not the time of the event itself.
-        </span>
-        {errors.publishedAt ? <span className="t-small admin-error">{errors.publishedAt[0]}</span> : null}
-      </label>
 
       <div className="admin-actions">
         <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>

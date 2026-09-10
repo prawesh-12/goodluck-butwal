@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
 import { Field, Repeater, SaveBar, Select, TextArea } from "@/components/shared/admin/repeater";
-import { SeoFields, type SeoValue } from "@/components/shared/admin/page-seo-fields";
 import {
   createTestPrepCourse,
   deleteTestPrepCourse,
@@ -13,7 +12,7 @@ import {
 
 type SyllabusItem = { title: string; body: string };
 
-export type CourseValue = SeoValue & {
+export type CourseValue = {
   id?: string;
   slug: string;
   testType: string;
@@ -168,20 +167,9 @@ export function TestPrepCourseEditor({
         onChange={(status) => set({ status })}
         options={[
           { value: "draft", label: "Draft" },
-          { value: "scheduled", label: "Scheduled", disabled: !canPublish },
           { value: "published", label: "Published", disabled: !canPublish },
           { value: "archived", label: "Archived" },
         ]}
-      />
-
-      <SeoFields
-        value={row}
-        onChange={set}
-        path={path}
-        fallbackTitle={row.name}
-        fallbackDescription={row.summary}
-        ogImage={pick(row.seoOgImageId)}
-        errors={errors}
       />
 
       <SaveBar

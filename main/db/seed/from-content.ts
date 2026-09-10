@@ -1,4 +1,3 @@
-import { join } from "node:path";
 import { runAll, step } from "./runner";
 import { seedMedia } from "./media";
 import { seedOffices } from "./offices";
@@ -13,10 +12,7 @@ import { seedEvents } from "./events";
 import { seedTestPrep } from "./test-prep";
 import { seedCourseCategories, seedPlaceholderCatalogue } from "./catalogue";
 
-// Run from the app root, so public/ is one level down from here.
-const ROOT = process.cwd();
-
-step("media_assets", () => seedMedia(join(ROOT, "public")));
+step("media_assets", seedMedia);
 step("offices", seedOffices);
 step("ui_strings", seedUiStrings);
 step("settings", seedSettings);

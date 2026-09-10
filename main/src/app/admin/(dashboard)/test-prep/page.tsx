@@ -22,7 +22,6 @@ export const dynamic = "force-dynamic";
 
 const STATUSES = [
   { value: "draft", label: "Draft" },
-  { value: "scheduled", label: "Scheduled" },
   { value: "published", label: "Published" },
   { value: "archived", label: "Archived" },
 ];

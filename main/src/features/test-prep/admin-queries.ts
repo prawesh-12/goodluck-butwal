@@ -243,8 +243,6 @@ export async function registrationOwner(id: string) {
     .select({
       id: testPrepRegistrations.id,
       officeId: testPrepCourses.officeId,
-      fullName: testPrepRegistrations.fullName,
-      batchId: testPrepRegistrations.batchId,
     })
     .from(testPrepRegistrations)
     .innerJoin(testPrepBatches, eq(testPrepRegistrations.batchId, testPrepBatches.id))
@@ -261,6 +259,7 @@ export async function batchSeats(id: string) {
       seatsTaken: testPrepBatches.seatsTaken,
       status: testPrepBatches.status,
       officeId: testPrepCourses.officeId,
+      courseSlug: testPrepCourses.slug,
     })
     .from(testPrepBatches)
     .innerJoin(testPrepCourses, eq(testPrepBatches.courseId, testPrepCourses.id))

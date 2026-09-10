@@ -17,7 +17,7 @@ export default async function EditTestPrepCoursePage({ params }: { params: Promi
   if (!row) notFound();
   allowOwn(actor, row);
 
-  const media = await pickedMedia([row.heroImageId, row.seoOgImageId]);
+  const media = await pickedMedia([row.heroImageId]);
   const path = `/test-preparation/${row.slug}`;
 
   return (
@@ -49,11 +49,6 @@ export default async function EditTestPrepCoursePage({ params }: { params: Promi
           feeCurrency: row.feeCurrency,
           status: row.status,
           sortOrder: row.sortOrder,
-          seoTitle: row.seoTitle ?? "",
-          seoDescription: row.seoDescription ?? "",
-          seoOgImageId: row.seoOgImageId,
-          seoNoindex: row.seoNoindex,
-          canonicalUrl: row.canonicalUrl ?? "",
         }}
       />
     </>

@@ -11,6 +11,9 @@ export function SmoothScroll() {
 
   useEffect(() => {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Only wheel input is smoothed, so a touch device pays the bytes and the frame loop for
+    // scrolling that stays native either way.
+    if (!matchMedia("(pointer: fine)").matches) return;
     // Fetched after mount so it stays out of the initial bundle.
     let cancelled = false;
     let raf = 0;

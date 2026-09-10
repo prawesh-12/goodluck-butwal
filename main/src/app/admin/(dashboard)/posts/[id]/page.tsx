@@ -3,7 +3,7 @@ import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { PostForm } from "@/features/posts/components/post-form";
-import { pickedMedia } from "@/features/media/picked-media-map";
+import { pickedMedia } from "@/features/media/admin-queries";
 import { editorialOptions } from "@/features/posts/admin-queries";
 import { getAdminPost } from "@/features/posts/admin-queries";
 
@@ -20,7 +20,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
 
   const [options, media] = await Promise.all([
     editorialOptions(),
-    pickedMedia([post.bannerImageId, post.seoOgImageId]),
+    pickedMedia([post.bannerImageId]),
   ]);
 
   return (
@@ -46,16 +46,9 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
           tagIds: post.tagIds,
           authorDisplayName: post.authorDisplayName ?? "",
           status: post.status,
-          publishedAt: post.publishedAt ? post.publishedAt.toISOString().slice(0, 16) : "",
-          seoTitle: post.seoTitle ?? "",
-          seoDescription: post.seoDescription ?? "",
-          seoOgImageId: post.seoOgImageId ?? "",
-          seoNoindex: post.seoNoindex,
-          canonicalUrl: post.canonicalUrl ?? "",
         }}
         options={options}
-        banner={media.get(post.bannerImageId ?? "") ?? null}
-        shareImage={media.get(post.seoOgImageId ?? "") ?? null}
+        banner={media[post.bannerImageId ?? ""] ?? null}
         canPublish={can(actor, "posts", "publish")}
         canDelete={can(actor, "posts", "delete")}
       />

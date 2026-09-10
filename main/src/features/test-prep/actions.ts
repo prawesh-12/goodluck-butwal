@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { TAGS, invalidate, revalidateSitemap } from "@/lib/cache";
 import { count, eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
 import { offices, redirects, testPrepBatches, testPrepCourses, testPrepRegistrations } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
-import { requireOwnership, requirePermission } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
+import { can, requireOwnership, requirePermission } from "@/lib/auth/rbac";
 import { sanitize } from "@/lib/security/sanitize";
 import { uniqueSlug } from "@/lib/utils/slug";
 import { mediaAlt } from "@/features/media/admin-queries";
@@ -23,12 +23,10 @@ import {
   type BatchInput,
   type TestPrepCourseInput,
 } from "@/features/test-prep/validators";
-import { missingAltProblems } from "@/lib/validators/content-fields";
-import { publishRefusal, seoValues, slugRedirect } from "@/features/pages/validators";
+import { missingAltProblems, publishRefusal, slugRedirect } from "@/lib/validators/content-fields";
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string; fieldErrors?: Record<string, string[]> };
 
-const GOING_LIVE = new Set(["published", "scheduled"]);
 const blank = (value: string) => (value === "" ? null : value);
 
 // Every test prep course is filed to the Nepal office, so the ownership check has something
@@ -39,12 +37,11 @@ async function nepalOfficeId() {
 }
 
 async function courseProblems(data: TestPrepCourseInput) {
-  const alt = await mediaAlt([data.heroImageId, data.seoOgImageId]);
+  const alt = await mediaAlt([data.heroImageId]);
   return [
     ...testPrepPublishProblems(data),
     ...missingAltProblems([
       { label: "The course picture", id: data.heroImageId, altText: alt.get(data.heroImageId ?? "") ?? null },
-      { label: "The share image", id: data.seoOgImageId, altText: alt.get(data.seoOgImageId ?? "") ?? null },
     ]),
   ];
 }
@@ -61,13 +58,18 @@ function courseValues(data: TestPrepCourseInput, slug: string, descriptionHtml: 
     defaultFee: blank(data.defaultFee),
     feeCurrency: data.feeCurrency.toUpperCase(),
     status: data.status,
-    publishedAt: data.status === "published" ? new Date() : null,
+    publishedAt: publishedDate(data, null),
     sortOrder: data.sortOrder,
-    ...seoValues(data),
   };
 }
 
+function publishedDate(data: { status: string }, existing: Date | null) {
+  return data.status === "published" ? (existing ?? new Date()) : existing;
+}
+
 function refreshCourse(slugs: string[]) {
+  invalidate(TAGS.testPrep);
+  revalidateSitemap();
   revalidatePath("/admin/test-prep");
   revalidatePath("/test-preparation");
   revalidatePath("/test-preparation/batches");
@@ -87,7 +89,11 @@ export async function createTestPrepCourse(input: unknown): Promise<Result<{ id:
   const officeId = await nepalOfficeId();
   requireOwnership(actor, { officeId });
 
-  if (GOING_LIVE.has(data.status)) {
+  if (data.status === "published" && !can(actor, "testPrep", "publish")) {
+    return { ok: false, error: "You cannot publish. Save it as a draft and ask an admin." };
+  }
+
+  if (data.status === "published") {
     const problems = await courseProblems(data);
     if (problems.length > 0) return publishRefusal(problems);
   }
@@ -102,14 +108,6 @@ export async function createTestPrepCourse(input: unknown): Promise<Result<{ id:
       updatedBy: actor.id,
     })
     .returning({ id: testPrepCourses.id, slug: testPrepCourses.slug });
-
-  await writeAudit({
-    userId: actor.id,
-    action: data.status === "published" ? "publish" : "create",
-    entityType: "test_prep_courses",
-    entityId: created.id,
-    summary: `created the course ${created.slug}`,
-  });
 
   refreshCourse([created.slug]);
   return { ok: true, data: created };
@@ -140,7 +138,11 @@ export async function updateTestPrepCourse(input: unknown): Promise<Result<{ id:
   // Checked on the loaded row, never on the id that came from the form.
   requireOwnership(actor, existing);
 
-  if (GOING_LIVE.has(data.status)) {
+  if (data.status !== existing.status && !can(actor, "testPrep", "publish")) {
+    return { ok: false, error: "You cannot change whether a course is live. Ask an admin." };
+  }
+
+  if (data.status === "published") {
     const problems = await courseProblems(data);
     if (problems.length > 0) return publishRefusal(problems);
   }
@@ -153,7 +155,7 @@ export async function updateTestPrepCourse(input: unknown): Promise<Result<{ id:
     .update(testPrepCourses)
     .set({
       ...courseValues(data, slug, sanitize(data.descriptionHtml)),
-      publishedAt: data.status === "published" ? (existing.publishedAt ?? new Date()) : existing.publishedAt,
+      publishedAt: publishedDate(data, existing.publishedAt),
       updatedBy: actor.id,
       updatedAt: new Date(),
     })
@@ -169,14 +171,6 @@ export async function updateTestPrepCourse(input: unknown): Promise<Result<{ id:
         set: { toPath: moved.toPath, isActive: true, updatedBy: actor.id, updatedAt: new Date() },
       });
   }
-
-  await writeAudit({
-    userId: actor.id,
-    action: data.status === "published" && existing.status !== "published" ? "publish" : "update",
-    entityType: "test_prep_courses",
-    entityId: data.id,
-    summary: moved ? `${existing.slug} is now ${slug}, 301 written` : `updated the course ${slug}`,
-  });
 
   refreshCourse([slug, existing.slug]);
   return { ok: true, data: { id: data.id, slug } };
@@ -203,13 +197,6 @@ export async function deleteTestPrepCourse(input: unknown): Promise<Result<{ id:
   }
 
   await db.delete(testPrepCourses).where(eq(testPrepCourses.id, existing.id));
-  await writeAudit({
-    userId: actor.id,
-    action: "delete",
-    entityType: "test_prep_courses",
-    entityId: existing.id,
-    summary: `deleted the course ${existing.name}`,
-  });
 
   refreshCourse([existing.slug]);
   return { ok: true, data: { id: existing.id } };
@@ -235,6 +222,7 @@ function batchValues(data: BatchInput) {
 }
 
 function refreshBatches(courseSlug?: string) {
+  invalidate(TAGS.testPrep);
   revalidatePath("/admin/test-prep/batches");
   revalidatePath("/test-preparation/batches");
   if (courseSlug) revalidatePath(testPrepPath(courseSlug));
@@ -259,14 +247,6 @@ export async function createBatch(input: unknown): Promise<Result<{ id: string }
     .insert(testPrepBatches)
     .values({ ...batchValues(data), createdBy: actor.id, updatedBy: actor.id })
     .returning({ id: testPrepBatches.id });
-
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "test_prep_batches",
-    entityId: created.id,
-    summary: `created the batch ${data.batchName} on ${course.name}`,
-  });
 
   refreshBatches(course.slug);
   return { ok: true, data: created };
@@ -295,14 +275,6 @@ export async function updateBatch(input: unknown): Promise<Result<{ id: string }
     .set({ ...batchValues(data), updatedBy: actor.id, updatedAt: new Date() })
     .where(eq(testPrepBatches.id, data.id));
 
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "test_prep_batches",
-    entityId: data.id,
-    summary: `updated the batch ${data.batchName}`,
-  });
-
   refreshBatches(course.slug);
   return { ok: true, data: { id: data.id } };
 }
@@ -328,15 +300,8 @@ export async function deleteBatch(input: unknown): Promise<Result<{ id: string }
   }
 
   await db.delete(testPrepBatches).where(eq(testPrepBatches.id, existing.id));
-  await writeAudit({
-    userId: actor.id,
-    action: "delete",
-    entityType: "test_prep_batches",
-    entityId: existing.id,
-    summary: "deleted a batch",
-  });
 
-  refreshBatches();
+  refreshBatches(existing.courseSlug);
   return { ok: true, data: { id: existing.id } };
 }
 
@@ -362,14 +327,6 @@ export async function updateRegistration(input: unknown): Promise<Result<{ id: s
       updatedAt: new Date(),
     })
     .where(eq(testPrepRegistrations.id, data.id));
-
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "test_prep_registrations",
-    entityId: data.id,
-    summary: `${existing.fullName} is now ${data.status}`,
-  });
 
   revalidatePath("/admin/test-prep/registrations");
   return { ok: true, data: { id: data.id } };

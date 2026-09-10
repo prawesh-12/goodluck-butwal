@@ -196,23 +196,9 @@
    the one rule covers the page, the sidebar and the media picker. */
 .admin-root { scrollbar-width: thin; scrollbar-color: var(--color-gray-text) transparent; }
 .admin { display: flex; min-height: 100vh; background: var(--color-surface); font-family: var(--font-body); }
-.admin-sidebar { position: sticky; top: 0; align-self: flex-start; width: 240px; height: 100vh; flex-shrink: 0; background: #fff; border-right: 1px solid var(--color-hairline); padding: 20px 0; overflow-y: auto; }
-.admin-brand { display: block; padding: 0 20px 20px; font-family: var(--font-display); font-weight: 600; font-size: 20px; color: var(--color-ink); }
-.admin-nav-group { padding: 12px 0; }
-.admin-nav-heading { padding: 0 20px 6px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--color-gray-text); }
-.admin-nav-link { display: block; padding: 7px 20px; font-size: 15px; font-weight: 500; color: var(--color-muted); }
-.admin-nav-link:hover { background: var(--color-surface); color: var(--color-ink); }
-.admin-nav-link[aria-current="page"] { color: var(--color-blue-deep); background: var(--color-surface); box-shadow: inset 3px 0 0 var(--color-blue-deep); }
 
-.admin-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-/* The bar spans the width so its rule does, but its contents line up with the column below. */
-.admin-topbar { position: sticky; top: 0; z-index: 4; padding: 14px 28px; background: #fff; border-bottom: 1px solid var(--color-hairline); }
-.admin-topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; max-width: 1344px; margin: 0 auto; }
-.admin-identity { display: flex; align-items: center; gap: 10px; }
 .admin-badge { padding: 3px 9px; border-radius: 999px; background: var(--color-surface); border: 1px solid var(--color-hairline); font-size: 12px; font-weight: 600; color: var(--color-muted); }
-.admin-content { width: 100%; max-width: 1400px; margin: 0 auto; padding: 28px; flex: 1; }
 
-.admin-tiles { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); margin-top: 18px; }
 .admin-tile { display: flex; flex-direction: column; gap: 4px; padding: 18px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; color: var(--color-muted); }
 .admin-tile:hover { border-color: var(--color-blue); }
 
@@ -230,31 +216,20 @@
 
 /* The dropdown replacing the native select. The closed button copies the field box above so a
    form reads as one set of controls. */
-.admin-dropdown { display: flex; align-items: center; width: 100%; min-height: 38px; padding: 9px 34px 9px 11px; border: 1px solid var(--color-hairline); border-radius: 8px; font: inherit; font-size: 15px; text-align: left; color: var(--color-ink); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%234d585f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center; cursor: pointer; }
-.admin-dropdown:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
-.admin-dropdown:disabled { cursor: not-allowed; opacity: .55; }
-.admin-dropdown-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Fixed, so a list opening from the last row of a table is not cut off by its clipped corners.
    Above the media picker, which is the highest thing an admin can open under it. */
-.admin-dropdown-list { position: fixed; z-index: 60; max-height: 264px; margin: 0; padding: 4px; overflow-y: auto; list-style: none; background: #fff; border: 1px solid var(--color-hairline); border-radius: 8px; box-shadow: 0 10px 30px rgba(29,29,29,.14); }
-.admin-dropdown-option { padding: 8px 10px; border-radius: 6px; font-size: 15px; color: var(--color-ink); cursor: pointer; }
-.admin-dropdown-option[data-active] { background: var(--color-surface); }
-.admin-dropdown-option[aria-selected="true"] { font-weight: 600; color: var(--color-blue-deep); }
-.admin-dropdown-option[aria-disabled] { color: var(--color-gray-text); cursor: not-allowed; }
 .admin input:focus-visible,
 .admin select:focus-visible,
 .admin textarea:focus-visible { outline: 2px solid var(--color-blue); outline-offset: 1px; }
 .admin-error { color: #b42318; }
 .admin-empty { color: var(--color-muted); margin-top: 16px; }
-.admin-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin: 18px 0; }
-.admin-filters .admin-field { flex: 1 1 180px; min-width: 160px; }
 .admin-table { width: 100%; margin-top: 18px; border-collapse: collapse; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; overflow: hidden; font-size: 15px; }
 .admin-table th { text-align: left; padding: 10px 14px; background: var(--color-surface); font-weight: 600; color: var(--color-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
 .admin-table td { padding: 10px 14px; border-top: 1px solid var(--color-hairline); color: var(--color-ink); }
 /* A link inherits its colour from the reset, so every one in a table read as plain text. The row
    name is not a link at all now, it has an Edit button of its own. */
-.admin-table a:not(.admin-btn), .admin-pager a { color: var(--color-blue-deep); text-decoration: underline; text-underline-offset: 2px; }
-.admin-table a:not(.admin-btn):hover, .admin-pager a:hover { color: var(--color-blue); }
+.admin-table a:not(.admin-btn) { color: var(--color-blue-deep); text-decoration: underline; text-underline-offset: 2px; }
+.admin-table a:not(.admin-btn):hover { color: var(--color-blue); }
 /* Three short words, so they belong on one line. */
 .admin-table a[target="_blank"] { white-space: nowrap; }
 .admin-count { color: var(--color-muted); margin-bottom: 4px; }
@@ -286,13 +261,8 @@
 .admin-btn-danger:hover { background: #b42318; color: #fff; border-color: #b42318; }
 .admin-btn-danger:disabled:hover { background: #fff; color: #b42318; }
 
-.admin-pager { display: flex; align-items: center; gap: 14px; margin-top: 16px; }
 .admin-clash { display: block; font-size: 12px; font-weight: 600; color: #b42318; }
-.admin-media-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); margin-top: 18px; }
-.admin-media-tile { margin: 0; padding: 10px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 10px; }
 .admin-media-thumb { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: var(--color-surface); border-radius: 6px; }
-.admin-media-name { margin: 8px 0 6px; word-break: break-all; color: var(--color-muted); }
-.admin-media-form { margin-top: 10px; max-width: none; }
 .admin-help { color: var(--color-muted); }
 .admin-picker-current { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px; background: #fff; border: 1px solid var(--color-hairline); border-radius: 8px; }
 .admin-picker-thumb { width: 76px; height: 58px; object-fit: contain; background: var(--color-surface); border-radius: 6px; }

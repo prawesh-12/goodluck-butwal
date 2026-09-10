@@ -3,7 +3,13 @@ import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { ContentFilters } from "@/components/shared/admin/page-filters";
 import { QUALIFICATION_LABEL, coursePath, qualificationLevels } from "@/config/course-meta";
-import { destinationOptions, listAdminCourses, listCourseCategories } from "@/features/courses/admin-queries";
+import { CourseCategoryManager } from "@/features/courses/components/course-category-manager";
+import {
+  coursesPerCategory,
+  destinationOptions,
+  listAdminCourses,
+  listCourseCategories,
+} from "@/features/courses/admin-queries";
 import { institutionOptions } from "@/features/institutions/admin-queries";
 import { PAGE_SIZE } from "@/lib/utils/admin-query";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
@@ -22,7 +28,6 @@ export const dynamic = "force-dynamic";
 
 const STATUSES = [
   { value: "draft", label: "Draft" },
-  { value: "scheduled", label: "Scheduled" },
   { value: "published", label: "Published" },
   { value: "archived", label: "Archived" },
 ];
@@ -36,11 +41,12 @@ export default async function CoursesPage({
   allow(actor, "courses", "read");
 
   const params = await searchParams;
-  const [{ rows, total, page }, institutions, categories, destinations] = await Promise.all([
+  const [{ rows, total, page }, institutions, categories, destinations, categoryCounts] = await Promise.all([
     listAdminCourses({ ...params, page: Number(params.page ?? 1) }),
     institutionOptions(),
     listCourseCategories(),
     destinationOptions(),
+    coursesPerCategory(),
   ]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
@@ -137,6 +143,22 @@ export default async function CoursesPage({
       )}
 
       <Pager page={page} pages={pages} params={params} />
+
+      {can(actor, "courseCategories", "read") ? (
+        <section className="space-y-4">
+          <h2 className="t-h5 admin-subhead">Subject areas</h2>
+          <p className="t-small admin-count">{categories.length} subject areas</p>
+          <CourseCategoryManager
+            rows={categories.map((category) => ({
+              ...category,
+              courses: categoryCounts.get(category.id) ?? 0,
+            }))}
+            canCreate={can(actor, "courseCategories", "create")}
+            canEdit={can(actor, "courseCategories", "update")}
+            canDelete={can(actor, "courseCategories", "delete")}
+          />
+        </section>
+      ) : null}
     </div>
   );
 }
