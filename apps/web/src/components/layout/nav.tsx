@@ -10,10 +10,13 @@ import { PillButton } from "@/components/ui/button";
 import { Img } from "@/components/ui/img";
 
 function BlurTop() {
-  const layers = [0.078125, 0.15625, 0.3125, 0.625, 1.25, 2.5, 5, 10];
+  // The two lightest layers, 0.078 px and 0.156 px, blurred less than a fifth of a device pixel and
+  // changed nothing visible (max 2/255), so the stack starts at 0.3125 px and keeps each band where it was.
+  const layers = [0.3125, 0.625, 1.25, 2.5, 5, 10];
   return (
     <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-[8] h-[60px] overflow-hidden md:h-[100px]">
-      {layers.map((b, i) => {
+      {layers.map((b, n) => {
+        const i = n + 2;
         const s = i * 12.5;
         const mask = i === 7 ? `linear-gradient(to top, rgba(0,0,0,0) ${s}%, #000 ${s + 12.5}%, #000 100%)` : `linear-gradient(to top, rgba(0,0,0,0) ${s - 12.5}%, #000 ${s}%, #000 ${s + 12.5}%, rgba(0,0,0,0) ${s + 25}%)`;
         return <div key={b} className="absolute inset-0" style={{ zIndex: i + 1, backdropFilter: `blur(${b}px)`, WebkitBackdropFilter: `blur(${b}px)`, maskImage: mask, WebkitMaskImage: mask }} />;

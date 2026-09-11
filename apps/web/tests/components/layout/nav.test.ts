@@ -26,3 +26,14 @@ test("the nav logo does not prefetch the home page while on it", () => {
 test("the nav logo keeps the default prefetch on inner pages", () => {
   expect(logo("/services")).toBe("undefined");
 });
+
+// Dropping the two lightest layers must not move the remaining bands: the first kept layer still
+// starts its mask at 12.5% and the stack still ends with the 10 px layer at the top of the strip.
+test("the blur stack keeps six layers with their original mask bands", () => {
+  pathname.mockReturnValue("/services");
+  const html = renderToStaticMarkup(createElement(Nav, { text }));
+  const blurs = [...html.matchAll(/;backdrop-filter:blur\(([\d.]+)px\)/g)].map((m) => Number(m[1]));
+  expect(blurs).toEqual([0.3125, 0.625, 1.25, 2.5, 5, 10]);
+  expect(html).toContain("rgba(0,0,0,0) 12.5%, #000 25%, #000 37.5%, rgba(0,0,0,0) 50%");
+  expect(html).toContain("rgba(0,0,0,0) 87.5%, #000 100%, #000 100%");
+});
