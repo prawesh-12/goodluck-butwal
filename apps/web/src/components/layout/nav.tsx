@@ -19,7 +19,13 @@ function BlurTop() {
         const i = n + 2;
         const s = i * 12.5;
         const mask = i === 7 ? `linear-gradient(to top, rgba(0,0,0,0) ${s}%, #000 ${s + 12.5}%, #000 100%)` : `linear-gradient(to top, rgba(0,0,0,0) ${s - 12.5}%, #000 ${s}%, #000 ${s + 12.5}%, rgba(0,0,0,0) ${s + 25}%)`;
-        return <div key={b} className="absolute inset-0" style={{ zIndex: i + 1, backdropFilter: `blur(${b}px)`, WebkitBackdropFilter: `blur(${b}px)`, maskImage: mask, WebkitMaskImage: mask }} />;
+        // The mask only shows a band of each layer, so the backdrop is clipped to that band plus the
+        // blur's reach (4 sigma). The compositor then blurs the band instead of the whole strip.
+        const lo = i === 7 ? 87.5 : Math.max(0, s - 12.5);
+        const hi = i === 7 ? 100 : Math.min(100, s + 25);
+        const reach = 4 * b;
+        const clip = `inset(${hi === 100 ? 0 : `calc(${100 - hi}% - ${reach}px)`} 0 ${lo === 0 ? 0 : `calc(${lo}% - ${reach}px)`} 0)`;
+        return <div key={b} className="absolute inset-0" style={{ zIndex: i + 1, backdropFilter: `blur(${b}px)`, WebkitBackdropFilter: `blur(${b}px)`, maskImage: mask, WebkitMaskImage: mask, clipPath: clip }} />;
       })}
     </div>
   );
