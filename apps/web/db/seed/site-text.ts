@@ -301,7 +301,6 @@ const chromeRows: StringRow[] = [
   { key: "footer.tagline", value: "Ready to create your luck?", group: "footer", label: "Footer heading", help: "The line under the logo at the foot of every page." },
   { key: "footer.offices.title", value: "Offices", group: "footer", label: "Footer offices heading", help: "The heading above the office addresses in the footer." },
   { key: "footer.copyright", value: "\u00a9 {year} {name}. All rights reserved.", group: "footer", label: "Copyright line", help: "The last line of the footer. Write {year} for the current year and {name} for the company name." },
-  { key: "footer.staff_login", value: "Staff login", group: "footer", label: "Staff login link", help: "The quiet link in the last line of the footer that opens the admin sign in page." },
 
   { key: "cta.consultation", value: "Book a free consultation", group: "cta", label: "Consultation button", help: "Used at the foot of the team, institution and empty-list pages." },
   { key: "cta.appointment", value: "Book an appointment", group: "cta", label: "Appointment button", help: "Used at the foot of the test preparation batches page." },

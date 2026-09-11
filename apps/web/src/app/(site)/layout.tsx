@@ -55,7 +55,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               tagline: t("footer.tagline", "Ready to create your luck?"),
               officesHeading: t("footer.offices.title", "Offices"),
               copyright: t("footer.copyright", "© {year} {name}. All rights reserved."),
-              staffLogin: t("footer.staff_login", "Staff login"),
             }}
           />
         </OfficeProvider>
