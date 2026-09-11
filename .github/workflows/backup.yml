@@ -7,10 +7,6 @@ on:
     - cron: "0 19 * * 1"
   workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: main
-
 permissions:
   contents: read
   issues: write

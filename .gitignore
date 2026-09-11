@@ -1,3 +1,4 @@
 extras/
 designs/
 node_modules
+*.tsbuildinfo

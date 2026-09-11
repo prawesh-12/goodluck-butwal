@@ -3,16 +3,12 @@ name: CI
 on:
   pull_request:
 
-defaults:
-  run:
-    working-directory: main
-
 jobs:
   check:
     runs-on: ubuntu-latest
 
     env:
-      # src/db/client.ts only routes through the HTTP proxy when the host says localtest.me.
+      # packages/db/src/client.ts only routes through the HTTP proxy when the host says localtest.me.
       DATABASE_URL: postgres://postgres:postgres@db.localtest.me:5432/goodluck
       # Next inlines this at build time and no .env file reaches CI. The cloud name is public,
       # it sits in every delivery URL; the API key and secret stay out of CI entirely.
@@ -22,14 +18,11 @@ jobs:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with:
-          package_json_file: main/package.json
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: main/pnpm-lock.yaml
 
       - run: pnpm install --frozen-lockfile
 
@@ -37,6 +30,7 @@ jobs:
       - run: echo "127.0.0.1 db.localtest.me" | sudo tee -a /etc/hosts
 
       - run: docker compose up -d --wait
+        working-directory: packages/db
 
       # The proxy has no healthcheck, so --wait returns before it is listening.
       - run: timeout 60 bash -c 'until (echo > /dev/tcp/127.0.0.1/4444) 2>/dev/null; do sleep 1; done'
@@ -45,7 +39,7 @@ jobs:
       - run: pnpm db:migrate:dev
 
       # db:seed:dev reads .env.local, which CI has none of.
-      - run: pnpm exec tsx db/seed/from-content.ts --dev
+      - run: pnpm --filter web exec tsx db/seed/from-content.ts --dev
 
       - run: pnpm typecheck
       - run: pnpm lint

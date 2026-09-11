@@ -1,5 +1,20 @@
 {
+  "name": "goodluck",
+  "private": true,
   "packageManager": "pnpm@11.17.0",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "start": "pnpm --filter web start",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "db:migrate:dev": "pnpm --filter @goodluck/db migrate:dev",
+    "db:migrate:prod": "pnpm --filter @goodluck/db migrate:prod",
+    "db:seed:dev": "pnpm --filter web db:seed:dev",
+    "db:seed:prod": "pnpm --filter web db:seed:prod",
+    "assets:upload": "pnpm --filter web assets:upload"
+  },
   "devDependencies": {
     "shadcn": "^4.21.0"
   }

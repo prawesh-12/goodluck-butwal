@@ -1,0 +1,8 @@
+packages:
+  - apps/*
+  - packages/*
+
+allowBuilds:
+  '@sentry/cli': false
+  esbuild: true
+  unrs-resolver: false
