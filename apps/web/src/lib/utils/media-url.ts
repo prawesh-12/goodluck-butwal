@@ -33,16 +33,19 @@ const WIDTH = /(\/image\/upload\/[^/]*?)w_\d+/;
 const resized = (url: string, width: number) => url.replace(WIDTH, `$1w_${width}`);
 
 // f_auto would rasterise an SVG, which costs more bytes and looks worse than the original.
-export function assetUrl(path: string, width = 960) {
+// "eco" is enough for a card. A full-bleed image shows every compression artefact, so the hero asks for "good".
+export type Quality = "eco" | "good";
+
+export function assetUrl(path: string, width = 960, quality: Quality = "eco") {
   if (!path.startsWith("/")) return resized(path, width);
   if (path.endsWith(".svg")) return `${deliver("image", "", assetId(path))}.svg`;
-  return deliver("image", `f_auto,q_auto:eco,c_limit,w_${width}`, assetId(path));
+  return deliver("image", `f_auto,q_auto:${quality},c_limit,w_${width}`, assetId(path));
 }
 
-export function assetSrcSet(src: string, widths: readonly number[] = IMAGE_WIDTHS) {
+export function assetSrcSet(src: string, widths: readonly number[] = IMAGE_WIDTHS, quality: Quality = "eco") {
   if (src.endsWith(".svg")) return undefined;
   if (!src.startsWith("/") && !WIDTH.test(src)) return undefined;
-  return widths.map((w) => `${assetUrl(src, w)} ${w}w`).join(", ");
+  return widths.map((w) => `${assetUrl(src, w, quality)} ${w}w`).join(", ");
 }
 
 // Same rule as the admin picker, kept here so a public page never imports an admin module.
