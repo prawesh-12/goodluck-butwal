@@ -16,6 +16,7 @@ test("a saved office beats the browser timezone", () => {
 test("the timezone decides when nothing is saved", () => {
   expect(resolveOffice(null, "Asia/Kathmandu", known)).toBe("np");
   expect(resolveOffice(null, "Asia/Katmandu", known)).toBe("np");
+  expect(resolveOffice(null, "Asia/Manila", known)).toBe("ph");
   expect(resolveOffice(null, "Europe/London", known)).toBe("au");
 });
 

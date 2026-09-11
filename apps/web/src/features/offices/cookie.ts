@@ -11,8 +11,11 @@ export const officeCookie = (office: OfficeId) =>
   `${OFFICE_COOKIE}=${office}; path=/; max-age=${OFFICE_COOKIE_MAX_AGE}; samesite=lax`;
 
 // Browsers report "Asia/Kathmandu" or the older "Asia/Katmandu".
-const officeFromTimezone = (timezone: string): OfficeId =>
-  /Asia\/Kat(h)?mandu/.test(timezone) ? "np" : "au";
+function officeFromTimezone(timezone: string): OfficeId {
+  if (/Asia\/Kat(h)?mandu/.test(timezone)) return "np";
+  if (timezone === "Asia/Manila") return "ph";
+  return "au";
+}
 
 // Only a published office counts, otherwise anyone could park a value here and decide what
 // the header shows.
