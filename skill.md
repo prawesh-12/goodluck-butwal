@@ -115,7 +115,7 @@ goodluck/
 ├── designs/             design references
 ├── extras/              briefs, source assets, notes. Not part of the build.
 ├── apps/web/            the Next.js application, workspace package `web`
-└── packages/db/         `@goodluck/db`: schema, client, migrations, local database
+└── packages/db/         `@goodluck/db`: schema, client, migrations
 ```
 
 Inside `apps/web/`:
@@ -143,8 +143,7 @@ packages/db/
 ├── src/client.ts      the Drizzle client over the Neon HTTP driver
 ├── src/schema/        every table in TypeScript
 ├── migrations/        generated SQL that changes the database structure
-├── drizzle.config.ts  Drizzle Kit configuration
-└── docker-compose.yml local Postgres plus the Neon HTTP proxy
+└── drizzle.config.ts  Drizzle Kit configuration
 ```
 
 ### `src/app/`
@@ -478,12 +477,11 @@ destinations, site text, the media rows for everything in `public/`. In `db/seed
 production. Every step matches on a natural key and upserts, so running the seed twice changes
 nothing.
 
-**Local database**: `docker-compose.yml` runs PostgreSQL plus a small proxy that speaks Neon's
-HTTP protocol in front of it, on port 4444. This exists so local development and production run
-the same driver and the same client code with no branching.
+**Local database**: a Neon branch, made in the Neon console and named in `apps/web/.env.local`.
+There is no local Postgres, so development and production run the same driver and the same client
+code with no branching.
 
-**Production database**: Neon itself. `packages/db/src/client.ts` applies the proxy settings only when
-`DATABASE_URL` points at `localtest.me`.
+**Production database**: the `main` branch on Neon.
 
 ---
 
@@ -1128,7 +1126,6 @@ file in the repository. `.env.example` is the annotated list.
 | `CRON_SECRET` | guards the scheduled-publish route |
 | `IP_HASH_SALT` | hashes IPs for rate limiting. Changing it resets rate limits. |
 | `NEXT_PUBLIC_GTM_ID` | analytics container. A Settings value overrides it. |
-| `BUILD_CPUS` | local builds only. See below. |
 
 **Caching in production.** Public pages are ISR at five minutes, plus immediate revalidation when
 an admin saves. Static files under `/images` and `/brand` are cached for an hour and then
@@ -1144,11 +1141,6 @@ blocks the request with no visible error.
 **How content reaches production.** Staff edit at `/admin` on the live site and it writes to the
 production Neon database. Content does not travel through the repository and a content change
 needs no deploy.
-
-**Local-only.** The `docker-compose.yml` PostgreSQL and Neon HTTP proxy are development only;
-production talks to Neon directly. `BUILD_CPUS` exists because the local proxy accepts far fewer
-connections than Neon, so a local build sets it to 1 to prerender one page at a time. Leave it
-unset in CI and production.
 
 **Health check.** `GET /api/health` runs `select 1` and answers 200 or 503. It never returns the
 driver's error message, because that carries the connection string.
@@ -1169,9 +1161,7 @@ pnpm db:seed:dev # fill the local database with starting content
 
 All of these run from the repository root and delegate to the right package.
 
-The local database comes from `docker compose up -d` in `packages/db/`: PostgreSQL plus the Neon HTTP
-proxy on port 4444. `DATABASE_URL` then points at `db.localtest.me`, which
-`packages/db/src/client.ts` recognises.
+The local database is the Neon branch named by `DATABASE_URL` in `apps/web/.env.local`.
 
 **Before considering a change complete**, run `pnpm typecheck`, `pnpm lint` and `pnpm test`. These
 are the three CI runs on every pull request, so a failure here is a failure there. `pnpm build` is

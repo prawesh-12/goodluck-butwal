@@ -40,7 +40,7 @@ Live: https://goodluck-butwal.vercel.app
 
 ```
 apps/web/        the Next.js app: routes, features, components, seed scripts, tests
-packages/db/     @goodluck/db: schema, Neon client, migrations, local Postgres
+packages/db/     @goodluck/db: schema, Neon client, migrations
 ```
 
 `apps/web/src/features/` holds one folder per business area, each with its public queries,
@@ -49,19 +49,18 @@ for the database.
 
 ## Running it locally
 
-Needs Node 22, pnpm 11 and Docker.
+Needs Node 22, pnpm 11 and a Neon branch for development.
 
 ```bash
 pnpm install
-docker compose -f packages/db/docker-compose.yml up -d   # Postgres plus a proxy that speaks Neon's protocol
-cp apps/web/.env.example apps/web/.env.local             # then fill it in
-pnpm db:migrate:dev                                      # apply every migration to the fresh database
-pnpm db:seed:dev                                         # content plus placeholder catalogue rows
+cp apps/web/.env.example apps/web/.env.local   # then fill it in, DATABASE_URL being your dev branch
+pnpm db:migrate:dev                            # apply every migration to that branch
+pnpm db:seed:dev                               # content plus placeholder catalogue rows
 pnpm dev
 ```
 
-The app only talks Neon's HTTP protocol, so the proxy is what makes a plain local Postgres
-reachable. Development and production run the same driver and the same client code.
+The app talks Neon's HTTP protocol, so there is no local Postgres. Development and production run
+the same driver and the same client code against different branches of the same database.
 
 ## Commands
 

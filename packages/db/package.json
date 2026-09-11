@@ -9,7 +9,7 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "migrate:dev": "for f in migrations/*.sql; do docker compose exec -T postgres psql -U postgres -d goodluck -v ON_ERROR_STOP=1 -q < \"$f\" || exit 1; done",
+    "migrate:dev": "node --env-file=../../apps/web/.env.local node_modules/drizzle-kit/bin.cjs migrate",
     "migrate:prod": "node --env-file=../../apps/web/.env.production node_modules/drizzle-kit/bin.cjs migrate"
   },
   "dependencies": {

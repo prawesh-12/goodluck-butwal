@@ -19,7 +19,7 @@ goodluck/                     git repository root
 │   ├── src/components/       UI. The public components are approved and frozen.
 │   ├── src/lib/              auth, permissions, sanitising, dates, email, uploads
 │   └── src/features/         per area: public queries, admin queries, server actions, components.
-└── packages/db/              `@goodluck/db`: schema, Neon client, migrations, local Postgres
+└── packages/db/              `@goodluck/db`: schema, Neon client, migrations
 ```
 
 ## The stack, and why each piece
@@ -82,23 +82,18 @@ ordinary Google Maps addresses and never needed a key either.
 
 ```bash
 pnpm install
-docker compose -f packages/db/docker-compose.yml up -d   # Postgres, plus a proxy that speaks Neon's protocol
-cp apps/web/.env.example apps/web/.env.local             # then fill it in
-pnpm db:migrate:dev           # apply the migrations to the fresh database
+cp apps/web/.env.example apps/web/.env.local   # then fill it in, DATABASE_URL being a Neon dev branch
+pnpm db:migrate:dev           # apply the migrations to that branch
 pnpm db:seed:dev              # content, plus placeholder catalogue rows
 pnpm dev
 ```
 
-The proxy matters. The app only speaks Neon's HTTP protocol, so a plain local Postgres is
-unreachable without it. With it, development and production run the same driver and the same
-client code, which means a query that works locally works deployed.
+There is no local Postgres. The app speaks Neon's HTTP protocol, so development runs against a
+Neon branch, which means a query that works locally works deployed. Make one in the Neon console,
+branched from `main`, and put its URL in `apps/web/.env.local`.
 
-`drizzle-kit migrate` is the one tool that cannot use the proxy, because it wants a WebSocket.
-That is why the two migrate commands do not match: `pnpm db:migrate:dev` pipes every file in
-`packages/db/migrations/` through `psql` in the container, in order. It has no journal, so it applies the
-whole set every time and belongs to a fresh database, not one already migrated.
-
-Production migrations run through `drizzle-kit migrate` in the deploy workflow, which is the path
+`pnpm db:migrate:dev` runs `drizzle-kit migrate` against that branch. Production migrations run the
+same command in the deploy workflow, which is the path
 that matters.
 
 ## Commands
