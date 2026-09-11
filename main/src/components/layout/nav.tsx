@@ -22,7 +22,7 @@ function BlurTop() {
   );
 }
 
-export type NavText = { bookCta: string; loginCta: string; menuOpen: string; menuClose: string };
+export type NavText = { bookCta: string; menuOpen: string; menuClose: string };
 
 export function Nav({ text }: { text: NavText }) {
   const [open, setOpen] = useState(false);
@@ -62,9 +62,6 @@ export function Nav({ text }: { text: NavText }) {
                   </PillButton>
                 </div>
               )}
-              <Link href="/admin/login" className="hidden h-[34px] shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-surface px-3 text-[14px] font-semibold leading-[18.2px] text-ink transition-colors duration-200 hover:bg-hairline md:inline-flex lg:h-[38px] lg:px-4">
-                {text.loginCta}
-              </Link>
               <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} aria-label={open ? text.menuClose : text.menuOpen} className="relative flex size-8 items-center justify-center rounded-full bg-ink md:size-[34px] lg:hidden">
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "rotate-45" : "-translate-y-1"}`} />
                 <span className={`absolute h-[2px] w-5 rounded-[2px] bg-white transition-transform duration-300 ${open ? "-rotate-45" : "translate-y-1"}`} />
@@ -79,18 +76,13 @@ export function Nav({ text }: { text: NavText }) {
                     {l.label}
                   </Link>
                 ))}
-                <div className="mt-2 flex items-center justify-center gap-2 border-t border-hairline px-2 pt-3">
-                  {!onContact && (
-                    <span className="md:hidden">
-                      <PillButton href="/contact/book-consultation" tone="dark" size="sm">
-                        {text.bookCta}
-                      </PillButton>
-                    </span>
-                  )}
-                  <Link href="/admin/login" className="inline-flex h-[34px] items-center justify-center whitespace-nowrap rounded-full bg-surface px-4 text-[14px] font-semibold leading-[18.2px] text-ink hover:bg-hairline md:hidden">
-                    {text.loginCta}
-                  </Link>
-                </div>
+                {!onContact && (
+                  <div className="mt-2 flex items-center justify-center border-t border-hairline px-2 pt-3 md:hidden">
+                    <PillButton href="/contact/book-consultation" tone="dark" size="sm">
+                      {text.bookCta}
+                    </PillButton>
+                  </div>
+                )}
               </motion.nav>
             )}
           </AnimatePresence>
