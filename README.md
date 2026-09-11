@@ -39,7 +39,7 @@ Live: https://goodluck-butwal.vercel.app
 ## Layout
 
 ```
-apps/web/        the Next.js app: routes, features, components, seed scripts, tests
+apps/web/        the Next.js app: routes, features, components, tests
 packages/db/     @goodluck/db: schema, Neon client, migrations
 ```
 
@@ -55,7 +55,6 @@ Needs Node 22, pnpm 11 and a Neon branch for development.
 pnpm install
 cp apps/web/.env.example apps/web/.env.local   # then fill it in, DATABASE_URL being your dev branch
 pnpm db:migrate:dev                            # apply every migration to that branch
-pnpm db:seed:dev                               # content plus placeholder catalogue rows
 pnpm dev
 ```
 
@@ -75,15 +74,13 @@ All of these run from the repository root.
 | `pnpm test` | Vitest. Database tests stand aside when `DATABASE_URL` is unset |
 | `pnpm db:migrate:dev` | Apply every migration to the local database |
 | `pnpm db:migrate:prod` | Apply pending migrations to production |
-| `pnpm db:seed:dev` | Seed the local database |
-| `pnpm db:seed:prod` | Seed production with the real content only |
 | `pnpm assets:upload` | Push `public/` images to Cloudinary. `--force` overwrites |
 
 ## Deploying
 
 Push to `main`. Vercel builds and releases the app from `apps/web`, and the migrate workflow
 applies pending migrations from the same push. CI runs typecheck, lint, tests and a build on every
-pull request against a seeded database.
+pull request against the database named by the `TEST_DATABASE_URL` secret.
 
 ## More
 

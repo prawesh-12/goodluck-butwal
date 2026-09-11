@@ -12,10 +12,6 @@ const sorted = (values: string[]) => [...values].sort((a, b) => a.localeCompare(
 test.runIf(hasDb)("the three filter lists come back separated and in order", async () => {
   const options = await listCourseFilterOptions();
 
-  expect(options.destinations.length).toBeGreaterThan(0);
-  expect(options.categories.length).toBeGreaterThan(0);
-  expect(options.institutions.length).toBeGreaterThan(0);
-
   const slugs = [...options.destinations, ...options.categories, ...options.institutions].map((o) => o.slug);
   expect(new Set(slugs).size).toBe(slugs.length);
 

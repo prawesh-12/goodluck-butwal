@@ -122,7 +122,6 @@ Inside `apps/web/`:
 
 ```text
 apps/web/
-├── db/seed/         scripts that fill an empty database with starting content
 ├── docs/            handover notes for staff and for whoever runs the site
 ├── public/          static files served as-is (about 30 MB of images, video, fonts, icons)
 ├── src/app/         every URL the site answers
@@ -215,8 +214,7 @@ the connection. The app imports them as `@goodluck/db/schema` and `@goodluck/db`
 `src/db/settings.ts` and `src/db/ui-strings.ts` read the two key/value tables and stay in the app
 because they go through the Next data cache.
 
-The SQL migrations live in `packages/db/migrations/`. The seed scripts are in `db/seed/` in the app,
-because they read the site config.
+The SQL migrations live in `packages/db/migrations/`.
 
 ### `src/config/`
 
@@ -409,8 +407,8 @@ to override the wording, and clearing that row falls back to the code rather tha
 See `src/features/site-text/queries.ts`.
 
 The office list is the other in-between case. The `offices` table drives the contact cards,
-office pages, form routing and email routing. The array in `src/config/site.ts` is what seeded that
-table and is still read directly by `/about` and by the team grid's office tabs.
+office pages, form routing and email routing. The array in `src/config/site.ts` mirrors that
+table and is read directly by `/about` and by the team grid's office tabs.
 
 ---
 
@@ -470,12 +468,6 @@ in the app goes through the `db` export from this file.
 **Migrations**: a migration is a versioned change to the database structure, checked into the
 repository so every copy of the database can be brought to the same shape. They are generated from
 the schema by Drizzle Kit and live in `packages/db/migrations/`. Configuration: `packages/db/drizzle.config.ts`.
-
-**Seeds**: scripts that fill an empty database with the starting content: offices, services,
-destinations, site text, the media rows for everything in `public/`. In `db/seed/`, entry point
-`db/seed/from-content.ts`, run with `pnpm db:seed:dev` locally or `pnpm db:seed:prod` against
-production. Every step matches on a natural key and upserts, so running the seed twice changes
-nothing.
 
 **Local database**: a Neon branch, made in the Neon console and named in `apps/web/.env.local`.
 There is no local Postgres, so development and production run the same driver and the same client
@@ -840,8 +832,7 @@ only an id pointing at that row. The row's `kind` column says where the file act
 
 - `kind = "cloudinary"`: uploaded through the admin. The row holds a Cloudinary public id, and
   the URL is built with `f_auto,q_auto,w_<width>`.
-- `kind = "static"`: a file in `public/`, seeded into the table by `db/seed/media.ts` so the
-  picker can offer it. The row holds a path such as `/images/hero/sky-v2.webp`.
+- `kind = "static"`: a file in `public/`, with a row in the table so the picker can offer it. The row holds a path such as `/images/hero/sky-v2.webp`.
 
 `mediaUrl(row, width)` in `src/lib/utils/media-url.ts` is the one function that turns a row into a
 URL. It is the reason the two kinds can coexist: callers pass the row and the width they need and
@@ -1071,11 +1062,6 @@ Why: the entity and the permissions exist, and `src/lib/seo/redirects.ts` serves
 the table, but there is no page under `src/app/admin/(dashboard)/redirects/`.
 Instead: rows go in by hand, or the page needs building.
 
-**The seed overwrites what it seeds**
-What can go wrong: running `pnpm db:seed:prod` against a database an admin has been editing.
-Why: most steps upsert the seeded fields, so an admin's edit to a seeded row can be reverted.
-Instead: seed an empty or development database. Do not run it against production content.
-
 ---
 
 ## 19. Production setup
@@ -1156,7 +1142,6 @@ pnpm typecheck   # check every type without building. The fastest useful check.
 pnpm lint        # check code style and catch common mistakes
 pnpm test        # run the test suite once (Vitest)
 pnpm build       # produce the production build, including prerendered pages
-pnpm db:seed:dev # fill the local database with starting content
 ```
 
 All of these run from the repository root and delegate to the right package.
@@ -1202,8 +1187,6 @@ that copy to everyone, and refreshes it in the background after a set time. Five
 
 **Migration**: a versioned, checked-in change to the database structure, so every copy of the
 database can be brought to the same shape.
-
-**Seed**: a script that fills an empty database with starting content.
 
 **RBAC**: role-based access control. Which role may do what to which kind of record.
 `src/lib/auth/rbac.ts`.

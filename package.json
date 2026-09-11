@@ -11,8 +11,6 @@
     "test": "pnpm -r test",
     "db:migrate:dev": "pnpm --filter @goodluck/db migrate:dev",
     "db:migrate:prod": "pnpm --filter @goodluck/db migrate:prod",
-    "db:seed:dev": "pnpm --filter web db:seed:dev",
-    "db:seed:prod": "pnpm --filter web db:seed:prod",
     "assets:upload": "pnpm --filter web assets:upload"
   },
   "devDependencies": {

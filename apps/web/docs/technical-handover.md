@@ -12,7 +12,6 @@ workspace with two packages: the app in `apps/web` and the database layer in `pa
 goodluck/                     git repository root
 ├── .github/workflows/        CI, deploy and backups. GitHub only reads these from the root.
 ├── apps/web/                 the Next.js application, published as `web`
-│   ├── db/seed/              seed scripts
 │   ├── docs/                 this file and its neighbours
 │   ├── public/               about 180 static assets, served from the CDN, not by the app
 │   ├── src/app/              routes: public pages, /admin, /api
@@ -84,7 +83,6 @@ ordinary Google Maps addresses and never needed a key either.
 pnpm install
 cp apps/web/.env.example apps/web/.env.local   # then fill it in, DATABASE_URL being a Neon dev branch
 pnpm db:migrate:dev           # apply the migrations to that branch
-pnpm db:seed:dev              # content, plus placeholder catalogue rows
 pnpm dev
 ```
 
@@ -107,8 +105,6 @@ that matters.
 | `pnpm build` | The Next build, the same one Vercel runs |
 | `pnpm db:migrate:dev` | Applies every migration to the local database, for a fresh one |
 | `pnpm db:migrate:prod` | Applies pending migrations to production, the same step the deploy runs |
-| `pnpm db:seed:dev` | Seeds the local database, with placeholder catalogue rows marked `[PLACEHOLDER]` as drafts |
-| `pnpm db:seed:prod` | Seeds production with the real content only |
 
 pnpm only. Never `npm` or `yarn`, and never commit a second lockfile.
 
@@ -140,7 +136,7 @@ ADMIN       Users
 
 Those seven content areas are the only editable website content. Page wording, services,
 destinations, office details, `ui_strings` and `settings` still back the public site and still sit
-in Postgres, but they are developer-controlled: change the row, or the seed, and deploy. Keeping
+in Postgres, but they are developer-controlled: change the row and deploy. Keeping
 them out of the admin is the point, not an omission.
 
 Media splits in two. The seven content areas attach a picture through the picker, which stores a

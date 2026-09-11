@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # A Neon branch kept for CI. The seed upserts, so every run leaves it in the same state.
+      # A Neon branch with content in it, kept for CI.
       DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
       # Next inlines this at build time and no .env file reaches CI. The cloud name is public,
       # it sits in every delivery URL; the API key and secret stay out of CI entirely.
@@ -27,9 +27,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm --filter @goodluck/db exec drizzle-kit migrate
-
-      # db:seed:dev reads .env.local, which CI has none of.
-      - run: pnpm --filter web exec tsx db/seed/from-content.ts --dev
 
       - run: pnpm typecheck
       - run: pnpm lint

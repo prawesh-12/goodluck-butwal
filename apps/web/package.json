@@ -9,8 +9,6 @@
     "lint": "NODE_OPTIONS=--max-old-space-size=8192 eslint",
     "typecheck": "tsc --noEmit",
     "test": "node --env-file-if-exists=.env.local node_modules/vitest/vitest.mjs run",
-    "db:seed:dev": "tsx --env-file=.env.local db/seed/from-content.ts --dev",
-    "db:seed:prod": "tsx --env-file=.env.production db/seed/from-content.ts",
     "assets:upload": "tsx --env-file=.env.local scripts/upload-assets.ts"
   },
   "dependencies": {
