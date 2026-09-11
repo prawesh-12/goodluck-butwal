@@ -16,6 +16,14 @@ test("a path resolves to a sized cloudinary url with no lookup", () => {
   expect(assetUrl("/images/hero/sky-v2.webp", 640)).toBe(`${base}/image/upload/f_auto,q_auto:eco,c_limit,w_640/goodluck/hero/sky-v2`);
 });
 
+test("a format and a plain auto quality can be asked for", () => {
+  expect(assetUrl("/images/hero/sky-v2.webp", 1280, "auto", "avif")).toBe(`${base}/image/upload/f_avif,q_auto,c_limit,w_1280/goodluck/hero/sky-v2`);
+  expect(assetUrl("/images/hero/sky-v2.webp", 1280, "eco", "avif")).toBe(`${base}/image/upload/f_avif,q_auto:eco,c_limit,w_1280/goodluck/hero/sky-v2`);
+  expect(assetSrcSet("/images/hero/sky-v2.webp", [320, 640], "eco", "avif")).toBe(
+    `${base}/image/upload/f_avif,q_auto:eco,c_limit,w_320/goodluck/hero/sky-v2 320w, ${base}/image/upload/f_avif,q_auto:eco,c_limit,w_640/goodluck/hero/sky-v2 640w`,
+  );
+});
+
 test("an svg is delivered as itself, with no transformation and no srcset", () => {
   expect(assetUrl("/images/flags/australia.svg")).toBe(`${base}/image/upload/goodluck/flags/australia.svg`);
   expect(assetSrcSet("/images/flags/australia.svg")).toBeUndefined();

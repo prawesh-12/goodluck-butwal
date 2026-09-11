@@ -24,6 +24,15 @@ test("both hero paint candidates carry a priority hint", () => {
   expect(eager.length).toBe(2);
 });
 
+// Phones get a lighter sky encoding. React skips the automatic preload for an img inside <picture>,
+// so each source needs its own preload, scoped by media query so a phone never fetches both.
+test("the hero sky has a phone source and a preload per breakpoint", () => {
+  expect(hero).toMatch(/<source\s+media=\{PHONE\}\s+srcSet=\{phoneSky\}\s+sizes="100vw"\s*\/>\s*<Img\s+src=\{sky\}/);
+  expect(hero).toContain('const PHONE = "(max-width: 809px)";');
+  const preloads = hero.match(/preload\([^\n]*media: (PHONE|"\(min-width: 810px\)")[^\n]*fetchPriority: "high"/g) ?? [];
+  expect(preloads.length).toBe(2);
+});
+
 const WEIGHT_CLASS = /\bfont-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black)\b/g;
 const SHIPPED = new Set(["font-medium", "font-semibold"]);
 
