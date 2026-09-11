@@ -5,6 +5,7 @@ import { formatDate } from "@/lib/utils/datetime";
 import { Appear } from "@/components/ui/appear";
 import { Badge, Chip } from "@/components/ui/bits";
 import { CARD_SIZES, Img } from "@/components/ui/img";
+import { HeroBackdrop } from "@/components/shared/hero-backdrop";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
@@ -45,7 +46,7 @@ export function InnerHero({
     <section className={cx("relative flex w-full flex-col items-center overflow-clip pt-32 md:pt-[158px] lg:pt-[194px]", pb, className)}>
       <div aria-hidden className="absolute inset-0 z-0 overflow-clip">
         <div className="absolute inset-0 z-[1]" style={{ backgroundImage: overlay }} />
-        <Img src={bg === "sky" ? img.heroSky : img.fieldSky} alt="" sizes="100vw" w={1280} className="absolute inset-0 size-full object-cover" style={{ objectPosition: "50% 0%" }} fetchPriority="high" decoding="async" />
+        <HeroBackdrop src={bg === "sky" ? img.heroSky : img.fieldSky} />
       </div>
       {clouds && (
         <>
