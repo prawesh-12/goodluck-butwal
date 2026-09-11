@@ -10,6 +10,7 @@ import { SectionBg } from "@/components/ui/bits";
 import { InnerHero } from "@/components/shared/inner";
 import { ReviewCard } from "@/features/testimonials/components/reviews";
 import { CARD_SIZES, Img } from "@/components/ui/img";
+import { ImageDialog } from "@/components/ui/image-dialog";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
@@ -28,7 +29,9 @@ export default async function SuccessStoriesPage() {
         <div className="grid w-full grid-cols-2 gap-[10px] md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
           {successStories.map((s, i) => (
             <Appear key={s.image} delay={0.05 * (i % 4)} className="aspect-square overflow-clip rounded-[10px] bg-surface ring-1 ring-hairline md:rounded-[20px]">
-              <Img src={s.image} alt={s.alt} sizes={CARD_SIZES} className="size-full object-cover" loading="lazy" decoding="async" />
+              <ImageDialog src={s.image} alt={s.alt} className="size-full">
+                <Img src={s.image} alt={s.alt} sizes={CARD_SIZES} className="size-full object-cover" loading="lazy" decoding="async" />
+              </ImageDialog>
             </Appear>
           ))}
         </div>
