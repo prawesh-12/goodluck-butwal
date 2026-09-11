@@ -179,26 +179,6 @@
    covers the page, the sidebar and every scrolling panel under it. */
 .admin-root { scrollbar-width: thin; scrollbar-color: var(--color-gray-text) transparent; }
 
-/* The sidebar list is the only scrollable column in the admin shell. Thin, quiet, overlay-free:
-   the layout must not shift when it appears, and a scroll in the nav must never move the page
-   behind it. */
-.admin-sidebar-nav {
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-border) transparent;
-  scrollbar-gutter: stable;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
-.admin-sidebar-nav::-webkit-scrollbar { width: 10px; }
-.admin-sidebar-nav::-webkit-scrollbar-track { background: transparent; }
-.admin-sidebar-nav::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 8px;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-.admin-sidebar-nav::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); border: 3px solid transparent; background-clip: content-box; }
-
 /* Scroll reveal. Content is only hidden where scripts run, so a browser without JavaScript
    still shows the page. */
 [data-appear] {
