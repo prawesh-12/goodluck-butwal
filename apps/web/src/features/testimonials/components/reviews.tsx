@@ -33,9 +33,9 @@ export function ReviewCard({ r, className = "" }: { r: Review; className?: strin
 }
 
 // Magic UI's testimonial card: photo, name and source up top, stars where the bird icon sits, quote below.
-function ReviewTile({ r, source }: { r: Review; source: string }) {
+function ReviewTile({ r, source, className = "w-[300px] md:w-[400px]" }: { r: Review; source: string; className?: string }) {
   return (
-    <figure className="flex w-[300px] flex-col gap-4 rounded-2xl border border-hairline bg-white p-5 md:w-[400px]">
+    <figure className={`flex flex-col gap-4 rounded-2xl border border-hairline bg-white p-5 ${className}`}>
       <div className="flex flex-wrap items-center gap-3">
         <Img src={r.avatar} alt="" w={80} width={40} height={40} className="size-10 shrink-0 rounded-full bg-surface object-cover" loading="lazy" decoding="async" />
         <figcaption className="flex min-w-[150px] flex-1 flex-col gap-[2px]">
@@ -89,7 +89,10 @@ export async function Reviews({ googleRating, values }: { googleRating: GoogleRa
           </Appear>
         </div>
       </div>
-      <Appear delay={0.2} className="relative z-[1] mt-[30px] flex w-full flex-col gap-5 md:mt-10 lg:mt-[50px]">
+      <Appear delay={0.2} className="container-x relative z-[1] mt-[30px] flex flex-col gap-3 md:hidden">
+        {reviews.slice(0, 3).map((r) => <ReviewTile key={r.name} r={r} source={t("home.reviews.source", "Google review, {date}")} className="w-full" />)}
+      </Appear>
+      <Appear delay={0.2} className="relative z-[1] mt-[30px] hidden w-full flex-col gap-5 md:mt-10 md:flex lg:mt-[50px]">
         {rows.map((row, i) => (
           <Marquee key={i} pauseOnHover reverse={i === 0} className="p-0 [--duration:32s] [--gap:20px]">
             {row.map((r) => <ReviewTile key={r.name} r={r} source={t("home.reviews.source", "Google review, {date}")} />)}
