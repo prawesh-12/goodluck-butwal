@@ -16,8 +16,8 @@ Live: https://goodluck-butwal.vercel.app
 - **Enquiries and consultations.** Forms post to the API, are bot-checked with Turnstile, rate
   limited, and emailed to the right office.
 - **Admin panel** at `/admin`. Staff sign in with email and password. Roles scope what each
-  person can see and edit: a super admin sees everything, office admins see their own office,
-  editors write but cannot publish.
+  person can see and edit: an admin manages users, a member does everything else, and a member
+  with an office only sees that office.
 - **Media.** Uploads go to Cloudinary. The static images under `public/` are served through the
   same CDN with automatic format and size.
 

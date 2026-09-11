@@ -1,8 +1,6 @@
 export const ROLE_OPTIONS = [
-  { value: "super_admin", label: "Super admin" },
-  { value: "au_admin", label: "Australia admin" },
-  { value: "np_admin", label: "Nepal admin" },
-  { value: "content_editor", label: "Content editor" },
+  { value: "admin", label: "Admin" },
+  { value: "member", label: "Member" },
 ];
 
 export const roleLabel = (role: string) =>

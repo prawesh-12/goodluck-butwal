@@ -13,10 +13,10 @@ import { createUserSchema, updateUserSchema } from "@/features/users/validators"
 
 type Result<T> = { ok: true; data: T } | { ok: false; error: string; fieldErrors?: Record<string, string[]> };
 
-async function countActiveSuperAdmins(exceptId?: string) {
+async function countActiveAdmins(exceptId?: string) {
   const where = exceptId
-    ? and(eq(users.role, "super_admin"), eq(users.isActive, true), ne(users.id, exceptId))
-    : and(eq(users.role, "super_admin"), eq(users.isActive, true));
+    ? and(eq(users.role, "admin"), eq(users.isActive, true), ne(users.id, exceptId))
+    : and(eq(users.role, "admin"), eq(users.isActive, true));
   const [row] = await db.select({ n: count() }).from(users).where(where);
   return row.n;
 }
@@ -34,11 +34,11 @@ export async function createUser(input: unknown): Promise<Result<{ id: string }>
   const refusal = refusalReason({
     actorId: actor.id,
     targetId: "new",
-    targetWasSuperAdmin: false,
+    targetWasAdmin: false,
     targetWasActive: false,
     nextRole: data.role,
     nextActive: true,
-    activeSuperAdmins: await countActiveSuperAdmins(),
+    activeAdmins: await countActiveAdmins(),
     confirmation: data.confirmation,
   });
   if (refusal) return { ok: false, error: refusal };
@@ -73,15 +73,15 @@ export async function updateUser(input: unknown): Promise<Result<{ id: string }>
     .where(eq(users.id, data.id));
   if (!existing) return { ok: false, error: "That account no longer exists." };
 
-  const others = await countActiveSuperAdmins(existing.id);
+  const others = await countActiveAdmins(existing.id);
   const refusal = refusalReason({
     actorId: actor.id,
     targetId: existing.id,
-    targetWasSuperAdmin: existing.role === "super_admin",
+    targetWasAdmin: existing.role === "admin",
     targetWasActive: existing.isActive,
     nextRole: data.role,
     nextActive: data.isActive,
-    activeSuperAdmins: others + (existing.role === "super_admin" && existing.isActive ? 1 : 0),
+    activeAdmins: others + (existing.role === "admin" && existing.isActive ? 1 : 0),
     confirmation: data.confirmation,
   });
   if (refusal) return { ok: false, error: refusal };

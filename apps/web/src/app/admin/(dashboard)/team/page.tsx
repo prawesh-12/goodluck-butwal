@@ -1,7 +1,7 @@
 import { Users } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
-import { can } from "@/lib/auth/rbac";
+import { can, seesAllOffices } from "@/lib/auth/rbac";
 import { PageHeader } from "@/components/shared/admin/page-header";
 import { FilterBar } from "@/components/shared/admin/filter-bar";
 import { NewButton, Pager, ResultCount } from "@/components/shared/admin/list-ui";
@@ -52,7 +52,7 @@ export default async function TeamPage({
               { value: "archived", label: "Archived" },
             ],
           },
-          ...(actor.role === "super_admin"
+          ...(seesAllOffices(actor)
             ? [
                 {
                   name: "office",

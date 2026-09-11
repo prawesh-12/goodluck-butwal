@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
-import { can } from "@/lib/auth/rbac";
+import { can, seesAllOffices } from "@/lib/auth/rbac";
 import { contentStatuses } from "@/lib/validators/fields";
 import { eventTypeLabels, eventTypes } from "@/config/content-meta";
 import { formatInOfficeTz } from "@/lib/utils/datetime";
@@ -40,7 +40,7 @@ export default async function EventsPage({
   const filters: EventFilters = { ...params, page: Number(params.page ?? 1) };
   const [{ rows, total, page }, offices] = await Promise.all([
     listAdminEvents(actor, filters),
-    actor.role === "super_admin" ? officeOptions() : Promise.resolve([]),
+    seesAllOffices(actor) ? officeOptions() : Promise.resolve([]),
   ]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const filtered = Boolean(params.q || params.status || params.type || params.office);

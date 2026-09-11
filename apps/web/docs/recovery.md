@@ -86,7 +86,7 @@ outage.
 
 Most content is archived rather than deleted, so check the admin first: set the status filter to
 Archived and look for it. That takes a minute and needs no restore. Only a hard delete, which is
-restricted to a super admin and asks for typed confirmation, actually removes a row.
+asks for typed confirmation, actually removes a row.
 
 ## Restoring one image
 

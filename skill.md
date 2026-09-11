@@ -707,22 +707,20 @@ admin from `admin/users`. A deactivated account is refused at the moment a sessi
 in a cookie, matched against a row in the `sessions` table. Sessions last a week from last use and
 are refreshed at most once a day.
 
-**RBAC**, role-based access control, decides what each administrator may do. There are four
+**RBAC**, role-based access control, decides what each administrator may do. There are two
 roles:
 
 | Role | Roughly |
 | --- | --- |
-| `super_admin` | everything, including users, settings, redirects and all offices |
-| `au_admin` | full content control, scoped to the Australia office. No test-prep editing. |
-| `np_admin` | full content control, scoped to the Nepal office, including test prep |
-| `content_editor` | can create and edit posts and events, but cannot publish them |
+| `admin` | everything, including users |
+| `member` | everything except users |
 
 The complete matrix of role × entity × action is in `src/lib/auth/rbac.ts`, and that file is the
 only place in the application that decides who may do what. Nothing else should carry its own
 version of these rules.
 
-**Office scoping.** A super admin sees every record. Everyone else sees records belonging to their
-own office plus records that belong to no office. Two functions do this: `scopedWhere()` adds the
+**Office scoping.** An admin, and a member with no office, sees every record. A member with an
+office sees records belonging to that office plus records that belong to no office. Two functions do this: `scopedWhere()` adds the
 office condition to a list query, and `requireOwnership()` checks a single record before it is
 changed. `requireOwnership()` checks the row that came back from the database, never the office id
 that came in with the form.
@@ -888,17 +886,16 @@ starting tab, the events list, and the office preselected in the booking form.
 carry an `office_scope` of `both`, `au` or `np`: a service with no office of its own is shared, one
 pinned to an office belongs to that office alone.
 
-**Office permissions in the admin.** Roles are `au_admin` and `np_admin`. Each sees records for
-their own office plus records belonging to no office, enforced by `scopedWhere()` and
-`requireOwnership()` in `src/lib/auth/rbac.ts`. Only Nepal and super admins may edit test
-preparation, since the classes run there.
+**Office permissions in the admin.** A member with an office set sees records for that office plus
+records belonging to no office, enforced by `scopedWhere()` and `requireOwnership()` in
+`src/lib/auth/rbac.ts`.
 
 **Office-based email routing.** A submission tied to the Nepal office notifies the
 `notify_email_np` address, everything else notifies `notify_email_au`.
 `src/lib/email/recipients.ts`
 
-**Note on the Philippines.** It is a full office in the `offices` table and on the public site, but
-there is no `ph_admin` role. Cebu records are managed by a super admin.
+**Note on the Philippines.** It is a full office in the `offices` table and on the public site, so
+a member can be pinned to it like any other office.
 
 ---
 

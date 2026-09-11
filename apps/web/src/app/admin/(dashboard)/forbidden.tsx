@@ -7,7 +7,7 @@ export default function Forbidden() {
     <EmptyState
       icon={Lock}
       title="You don't have access to this"
-      description="Your role does not cover this screen. Ask a super admin if you need it."
+      description="Your role does not cover this screen. Ask an admin if you need it."
       action={<NewButton href="/admin">Back to the dashboard</NewButton>}
     />
   );

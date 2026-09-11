@@ -22,7 +22,7 @@ export default async function NewUserPage() {
           name: "",
           email: "",
           password: "",
-          role: "content_editor",
+          role: "member",
           officeId: "",
           isActive: true,
           confirmation: "",

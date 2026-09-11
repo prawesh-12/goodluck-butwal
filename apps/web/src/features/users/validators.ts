@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const roles = ["super_admin", "au_admin", "np_admin", "content_editor"] as const;
+export const roles = ["admin", "member"] as const;
 
 export const createUserSchema = z.object({
   name: z.string().trim().min(1, "Give the person a name."),

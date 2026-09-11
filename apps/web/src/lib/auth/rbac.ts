@@ -1,7 +1,7 @@
 import { eq, isNull, or, type SQL } from "drizzle-orm";
 import type { AnyPgColumn, PgTable } from "drizzle-orm/pg-core";
 
-export type UserRole = "super_admin" | "au_admin" | "np_admin" | "content_editor";
+export type UserRole = "admin" | "member";
 export type Action = "create" | "read" | "update" | "delete" | "publish" | "export";
 
 export type Actor = {
@@ -31,43 +31,30 @@ export type Entity =
 
 const CRUD: Action[] = ["create", "read", "update", "delete"];
 const CRUDP: Action[] = [...CRUD, "publish"];
-const CRU: Action[] = ["create", "read", "update"];
+const HANDLE: Action[] = ["read", "update", "export"];
 const NONE: Action[] = [];
 
-// Nothing else in the app decides who may do what. "own" scoping lives in scopedWhere and
-// requireOwnership, not here.
+const both = (actions: Action[]): Record<UserRole, Action[]> => ({ admin: actions, member: actions });
+
+// A member does everything an admin does except manage users. Nothing else in the app decides who
+// may do what. "own" scoping lives in scopedWhere and requireOwnership, not here.
 const MATRIX: Record<Entity, Record<UserRole, Action[]>> = {
-  team: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
-  partners: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
-  institutions: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
-  courses: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
-  courseCategories: { super_admin: CRUD, au_admin: ["read"], np_admin: ["read"], content_editor: NONE },
-  testPrep: { super_admin: CRUDP, au_admin: ["read"], np_admin: CRUDP, content_editor: NONE },
-  batches: { super_admin: CRUDP, au_admin: ["read"], np_admin: CRUDP, content_editor: NONE },
-  posts: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: CRU },
-  events: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: CRU },
-  postCategories: { super_admin: CRUD, au_admin: CRU, np_admin: CRU, content_editor: ["create", "read"] },
-  tags: { super_admin: CRUD, au_admin: CRU, np_admin: CRU, content_editor: ["create", "read"] },
-  enquiries: {
-    super_admin: ["read", "update", "export"],
-    au_admin: ["read", "update", "export"],
-    np_admin: ["read", "update", "export"],
-    content_editor: NONE,
-  },
-  consultations: {
-    super_admin: ["read", "update", "export"],
-    au_admin: ["read", "update", "export"],
-    np_admin: ["read", "update", "export"],
-    content_editor: NONE,
-  },
-  registrations: {
-    super_admin: ["read", "update", "export"],
-    au_admin: ["read", "update", "export"],
-    np_admin: ["read", "update", "export"],
-    content_editor: NONE,
-  },
-  media: { super_admin: CRUD, au_admin: CRUD, np_admin: CRUD, content_editor: CRU },
-  users: { super_admin: CRUD, au_admin: NONE, np_admin: NONE, content_editor: NONE },
+  team: both(CRUDP),
+  partners: both(CRUDP),
+  institutions: both(CRUDP),
+  courses: both(CRUDP),
+  courseCategories: both(CRUD),
+  testPrep: both(CRUDP),
+  batches: both(CRUDP),
+  posts: both(CRUDP),
+  events: both(CRUDP),
+  postCategories: both(CRUD),
+  tags: both(CRUD),
+  enquiries: both(HANDLE),
+  consultations: both(HANDLE),
+  registrations: both(HANDLE),
+  media: both(CRUD),
+  users: { admin: CRUD, member: NONE },
 };
 
 export class ForbiddenError extends Error {
@@ -88,20 +75,21 @@ export function requirePermission(user: Actor, entity: Entity, action: Action): 
   }
 }
 
-// Super admins see everything, everyone else is pinned to their office plus office-less rows.
-// Never compare office_id anywhere else.
+// Admins and members with no office see everything. A member with an office is pinned to that
+// office plus office-less rows. Never compare office_id anywhere else.
+export const seesAllOffices = (user: Actor) => user.role === "admin" || !user.officeId;
+
 export function scopedWhere(
   table: PgTable & { officeId: AnyPgColumn },
   user: Actor,
 ): SQL | undefined {
-  if (user.role === "super_admin") return undefined;
-  if (!user.officeId) return isNull(table.officeId);
-  return or(eq(table.officeId, user.officeId), isNull(table.officeId));
+  if (seesAllOffices(user)) return undefined;
+  return or(eq(table.officeId, user.officeId!), isNull(table.officeId));
 }
 
 // Rule 3: check the row that came back from the database, never the id that came from the form.
 export function requireOwnership(user: Actor, row: { officeId: string | null }): void {
-  if (user.role === "super_admin") return;
+  if (seesAllOffices(user)) return;
   if (row.officeId === null) return;
   if (row.officeId !== user.officeId) {
     throw new ForbiddenError("that record belongs to another office");

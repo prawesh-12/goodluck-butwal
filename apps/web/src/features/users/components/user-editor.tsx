@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUser, updateUser } from "@/features/users/actions";
-import { THIRD_SUPER_ADMIN_PHRASE } from "@/lib/auth/user-rules";
+import { THIRD_ADMIN_PHRASE } from "@/lib/auth/user-rules";
 import { EditorActionBar, SectionCard } from "@/components/shared/admin/editor-shell";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
@@ -51,7 +51,7 @@ export function UserEditor({
       confirmation: form.confirmation,
     };
 
-    // Only the server knows how many super admins are already active, so its refusal is what
+    // Only the server knows how many admins are already active, so its refusal is what
     // reveals the phrase field.
     const refusal = { message: "" };
     const saved = await run(
@@ -69,7 +69,7 @@ export function UserEditor({
     );
 
     if (!saved) {
-      setNeedsPhrase(refusal.message.includes(THIRD_SUPER_ADMIN_PHRASE));
+      setNeedsPhrase(refusal.message.includes(THIRD_ADMIN_PHRASE));
       return;
     }
 
@@ -126,8 +126,8 @@ export function UserEditor({
           name="role"
           label="Role"
           required
-          help="An office admin only sees their own office's enquiries and content."
-          value={form.role || "content_editor"}
+          help="An admin also manages users. A member with an office only sees that office's enquiries and content."
+          value={form.role || "member"}
           onChange={(value) => set("role", value)}
           options={ROLE_OPTIONS}
           error={errors.role?.[0]}
@@ -155,7 +155,7 @@ export function UserEditor({
           <TextField
             name="confirmation"
             label="Type the phrase to confirm"
-            help={`Type "${THIRD_SUPER_ADMIN_PHRASE}" to allow a third super admin.`}
+            help={`Type "${THIRD_ADMIN_PHRASE}" to allow a third admin.`}
             value={form.confirmation}
             onChange={(value) => set("confirmation", value)}
           />

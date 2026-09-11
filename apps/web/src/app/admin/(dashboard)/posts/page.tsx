@@ -1,7 +1,7 @@
 import { Newspaper } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
-import { can } from "@/lib/auth/rbac";
+import { can, seesAllOffices } from "@/lib/auth/rbac";
 import { contentStatuses } from "@/lib/validators/fields";
 import { PAGE_SIZE, type EditorialFilters as Filters } from "@/lib/utils/admin-query";
 import { formatDate } from "@/lib/utils/datetime";
@@ -44,7 +44,7 @@ export default async function PostsPage({
     listPostCategories(),
     postsPerCategory(),
     listTags(),
-    actor.role === "super_admin" ? officeOptions() : Promise.resolve([]),
+    seesAllOffices(actor) ? officeOptions() : Promise.resolve([]),
   ]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 

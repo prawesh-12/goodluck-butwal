@@ -6,7 +6,7 @@ import { eq, inArray } from "drizzle-orm";
 import { db } from "@goodluck/db";
 import { redirects, teamMembers } from "@goodluck/db/schema";
 import { requireActor } from "@/lib/auth/session";
-import { can, requireOwnership, requirePermission, type Actor } from "@/lib/auth/rbac";
+import { can, requireOwnership, requirePermission, seesAllOffices, type Actor } from "@/lib/auth/rbac";
 import { sanitize } from "@/lib/security/sanitize";
 import { uniqueSlug } from "@/lib/utils/slug";
 import {
@@ -25,9 +25,9 @@ type Result<T = { id: string }> =
 
 const blank = (value: string) => (value === "" ? null : value);
 
-// An office admin can only ever file a person under their own office.
+// A member pinned to an office can only ever file a person under that office.
 function officeFor(actor: Actor, chosen: string) {
-  return actor.role === "super_admin" ? blank(chosen) : actor.officeId;
+  return seesAllOffices(actor) ? blank(chosen) : actor.officeId;
 }
 
 async function publishRefusal(data: TeamMemberInput) {

@@ -19,10 +19,8 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/admin/sheet";
 
 const ROLE_LABEL: Record<string, string> = {
-  super_admin: "Super admin",
-  au_admin: "Australia",
-  np_admin: "Nepal",
-  content_editor: "Editor",
+  admin: "Admin",
+  member: "Member",
 };
 
 function initials(name: string) {

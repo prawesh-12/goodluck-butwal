@@ -2,12 +2,7 @@ import { pgEnum } from "drizzle-orm/pg-core";
 
 export const contentStatus = pgEnum("content_status", ["draft", "published", "archived"]);
 
-export const userRole = pgEnum("user_role", [
-  "super_admin",
-  "au_admin",
-  "np_admin",
-  "content_editor",
-]);
+export const userRole = pgEnum("user_role", ["admin", "member"]);
 
 export const mediaKind = pgEnum("media_kind", ["static", "cloudinary"]);
 

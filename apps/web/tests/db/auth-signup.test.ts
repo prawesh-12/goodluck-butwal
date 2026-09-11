@@ -9,7 +9,7 @@ const body = {
   password: "averylongpassword123",
 };
 
-// The endpoint was reachable from the internet and handed out a working content_editor account
+// The endpoint was reachable from the internet and handed out a working member account
 // to anyone who posted to it. Only an administrator creates accounts now.
 test.runIf(hasDb)("signing up over http is refused", async () => {
   const request = new Request("http://localhost/api/auth/sign-up/email", { method: "POST" });

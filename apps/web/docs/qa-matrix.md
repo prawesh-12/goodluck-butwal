@@ -13,14 +13,14 @@ Every row below was measured against a running server and a real Postgres, not a
 | Check | Result |
 |---|---|
 | All 17 original public routes return 200 | yes |
-| Every admin section loads for a super admin | 13 of 13 |
+| Every admin section loads for an admin | 13 of 13 |
 | The removed admin editors are gone from the build, not just hidden | yes |
 | All 31 article URLs resolve at their original slugs | 31 of 31 |
 | A `redirects` row produces a real 301 | yes |
 | Signed out, `/admin` redirects to the login page | 307 |
-| A content editor gets 403 on `/admin/users` | yes |
+| A member gets 403 on `/admin/users` | yes |
 | A deactivated account is turned away | yes |
-| A Nepal enquiry is invisible to an Australia admin, in the list and the export | yes |
+| A Nepal enquiry is invisible to an Australia office member, in the list and the export | yes |
 | No Turnstile token writes nothing and returns 400 | yes |
 | A fourth submission within an hour is refused politely | 429 |
 | The honeypot reports success, writes a spam row, sends no email | yes |

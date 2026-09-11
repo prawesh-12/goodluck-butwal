@@ -19,29 +19,29 @@ you have forgotten it, use the reset link and check your email.
 If you are told the email and password do not match, that is all it says on purpose. It never
 tells you which of the two was wrong, because that would tell a stranger which addresses exist.
 
-Five wrong attempts in fifteen minutes and it stops accepting tries for a while. Wait, or ask a
-super admin.
+Five wrong attempts in fifteen minutes and it stops accepting tries for a while. Wait, or ask an
+admin.
 
 ## Where to change what
 
 | I want to change... | Go to | Who can |
 |---|---|---|
 | Add a staff member, change a bio or photo | Team | Your own office |
-| Add a partner logo to the ticker | Partners | Australia or Nepal admin |
+| Add a partner logo to the ticker | Partners | Anyone |
 | Publish a news article | News. Editors can write but not publish. | Any admin |
 | Sort articles into categories or tags | News, at the foot of the list | Any admin |
 | Add an event and open registrations | Events | Your own office |
 | See who registered | Events, then Registrations | Your own office |
-| Add an institution or its gallery | Institutions | Australia or Nepal admin |
-| Add courses, or many at once | Courses, or Courses then Import | Australia or Nepal admin |
-| Group courses by subject area | Courses, at the foot of the list | Super admin |
-| Add an IELTS or PTE batch, change fees or seats | Test preparation, then Batches | Nepal admin |
+| Add an institution or its gallery | Institutions | Anyone |
+| Add courses, or many at once | Courses, or Courses then Import | Anyone |
+| Group courses by subject area | Courses, at the foot of the list | Anyone |
+| Add an IELTS or PTE batch, change fees or seats | Test preparation, then Batches | Anyone |
 | Upload, replace or delete a picture | Images | Any admin |
 | Upload, replace or delete a video | Videos | Any admin |
 | See and respond to enquiries | Enquiries | Your own office |
 | Confirm a consultation | Consultations, then Confirm | Your own office |
 | Download enquiries as a spreadsheet | Enquiries, then Export | Your own office |
-| Add a staff login or change a role | Users | Super admin |
+| Add a staff login or change a role | Users | Admin |
 
 Anything not in that table, page wording, services, destinations, office details, the announcement
 bar, is a developer change. Ask, and it goes out with the next release.
@@ -52,13 +52,11 @@ Give the smallest role that does the job.
 
 | Role | Sees |
 |---|---|
-| Super admin | Everything, plus users. Two people, no more. |
-| Australia admin | Australian content and Australian enquiries |
-| Nepal admin | Nepali content, Nepali enquiries, and IELTS and PTE |
-| Content editor | Writes news and events. **Cannot publish, and never sees enquiries.** |
+| Admin | Everything, plus users. Two people, no more. |
+| Member | Everything except users. With an office set, only that office's content and enquiries. |
 
-Nobody can change their own role or switch off their own account, and the last remaining super
-admin cannot be removed. That is on purpose: it is what stops one mistake locking everyone out.
+Nobody can change their own role or switch off their own account, and the last remaining admin
+cannot be removed. That is on purpose: it is what stops one mistake locking everyone out.
 
 ## Things worth knowing before you start
 
@@ -72,7 +70,7 @@ later. When you want it live, publish it.
 The admin will not let you publish a record whose image has none, and it tells you which image.
 
 **Deleting mostly means archiving.** An archived record leaves the site but stays in the admin, so
-a mistake is a minute to undo. Only a super admin can truly delete something, and it asks you to
+a mistake is a minute to undo. Truly deleting something asks you to
 type a confirmation first.
 
 **A picture in use cannot be deleted.** Images and Videos refuse a delete while something on the
@@ -117,8 +115,8 @@ set those labels, they follow the seats.
 Enquiries. Search by name, email, phone or reference, or narrow by date. Open it. Change the
 status to Contacted, write the note, save. The note is internal and the enquirer never sees it.
 
-### 7. Create a content editor account, then deactivate it
-Users, then New. Name, email, a password of at least twelve characters, role Content editor.
+### 7. Create a member account, then deactivate it
+Users, then New. Name, email, a password of at least twelve characters, role Member.
 Save. To switch it off later, open it and untick **Active**. Deactivating is better than deleting:
 the person is locked out immediately and their work keeps its author.
 
@@ -131,6 +129,6 @@ the person is locked out immediately and their work keeps its author.
   on an image or an empty required field.
 - **It refuses to delete a picture.** Something on the site is still using it. The message says
   what. Change that record first.
-- **You cannot open somebody else's office record.** You are not meant to. Ask a super admin.
+- **You cannot open somebody else's office record.** You are not meant to. Ask an admin.
 - **The wording you want to change is not in the admin.** It is developer-controlled. Ask, and it
   goes out with the next release.
