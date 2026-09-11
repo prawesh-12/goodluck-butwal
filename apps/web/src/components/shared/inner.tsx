@@ -74,8 +74,8 @@ export function NewsCard({ article, delay = 0, className, href }: { article: Art
   return (
     <Appear delay={delay} className={cx("p-1", className)}>
       <Link href={href ?? `/news/${article.slug}`} aria-label={article.title} className="group flex flex-col gap-[10px] overflow-clip rounded-[10px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:rounded-[20px]">
-        <div className="aspect-[1533/458] w-full overflow-clip rounded-[6px] lg:rounded-[10px]">
-          <Img src={article.image} alt={article.title} sizes={CARD_SIZES} className="size-full scale-[1.01] object-cover transition-transform duration-500 group-hover:scale-[1.06]" loading="lazy" decoding="async" />
+        <div className="relative aspect-[1533/458] w-full overflow-clip rounded-[6px] lg:rounded-[10px]">
+          <Img src={article.image} alt={article.title} sizes={CARD_SIZES} className="absolute inset-0 size-full scale-[1.01] object-cover transition-transform duration-500 group-hover:scale-[1.06]" loading="lazy" decoding="async" />
         </div>
         <div className="flex flex-wrap items-center gap-[10px] p-4 lg:p-[10px]">
           <span className="inline-flex h-7 items-center rounded-full bg-surface px-[14px] pb-[6px] pt-1 text-[14px] font-medium leading-[18.2px] text-black">{article.category}</span>
