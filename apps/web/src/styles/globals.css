@@ -190,6 +190,8 @@
 }
 @media (scripting: enabled) {
   [data-appear="hidden"] { opacity: 0.001; transform: translateY(var(--appear-y)); }
+  /* A loop's phase is invisible before the reveal, so it only starts ticking once the section is shown. */
+  [data-appear="hidden"] :is(.ticker-track, .animate-marquee, .animate-marquee-vertical, .animate-orbit, .animate-orbit-back, .animate-float) { animation-play-state: paused; }
 }
 [data-appear="shown"] { opacity: 1; transform: rotate(var(--appear-rotate)); }
 @media (prefers-reduced-motion: reduce) {
