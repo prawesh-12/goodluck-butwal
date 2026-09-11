@@ -5,7 +5,7 @@ import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg, Ticker } from "@/components/ui/bits";
 import { loadText } from "@/features/site-text/queries";
-import { CARD_SIZES, Img } from "@/components/ui/img";
+import { Img } from "@/components/ui/img";
 import { ImageDialog } from "@/components/ui/image-dialog";
 
 // The success-story graphics carry their own text, so each sits on a plain white plate and nothing else is added.
@@ -18,7 +18,7 @@ function StoryCard({ s, tilt }: { s: SuccessStory; tilt: number }) {
       className="shrink-0 rounded-[18px] bg-white p-2 shadow-[0_18px_40px_-18px_rgba(29,29,29,0.25)] ring-1 ring-hairline transition-transform duration-300 hover:-translate-y-2 hover:!rotate-0 md:rounded-[22px] md:p-[10px]"
     >
       <ImageDialog src={s.image} alt={s.alt} className="size-[180px] overflow-clip rounded-[12px] bg-surface md:size-[250px] md:rounded-[14px] lg:size-[290px] lg:rounded-[16px]">
-        <Img src={s.image} alt={s.alt} sizes={CARD_SIZES} className="size-full object-cover" loading="lazy" decoding="async" />
+        <Img src={s.image} alt={s.alt} sizes="(min-width: 1200px) 290px, (min-width: 810px) 250px, 180px" className="size-full object-cover" loading="lazy" decoding="async" />
       </ImageDialog>
     </div>
   );
