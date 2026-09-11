@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/admin/tabs";
 
 export type TestPrepTab = "courses" | "batches" | "registrations";

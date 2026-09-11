@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { listTestPrepCourses } from "@/features/test-prep/queries";
 import { listServiceFaqs } from "@/features/services/queries";
 import { listTeam } from "@/features/team/queries";

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { SocialLinks } from "@/components/ui/bits";
 import { gl, img } from "@/config/assets";
 import { company } from "@/config/site";

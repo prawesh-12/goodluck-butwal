@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { Field } from "@/components/shared/inner";
 import { Select } from "@/features/leads/components/forms";
 import { Chip } from "@/components/ui/bits";

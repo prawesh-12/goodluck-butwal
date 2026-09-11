@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { img } from "@/config/assets";
 import type { PublicService } from "@/features/services/queries";
 import { loadText } from "@/features/site-text/queries";

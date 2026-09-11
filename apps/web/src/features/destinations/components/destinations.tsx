@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { destinationArt, img } from "@/config/assets";
 import type { PublicDestination } from "@/features/destinations/queries";
 import { Appear } from "@/components/ui/appear";

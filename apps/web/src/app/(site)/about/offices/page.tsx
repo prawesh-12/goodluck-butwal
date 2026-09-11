@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { InfoCard, InnerHero } from "@/components/shared/inner";
 import { listOfficeProfiles } from "@/features/offices/queries";
 import { loadText } from "@/features/site-text/queries";

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/link";
 import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
 import type { PublicCourse } from "@/features/courses/queries";

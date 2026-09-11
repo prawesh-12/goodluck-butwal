@@ -3,7 +3,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 const pathname = vi.fn<() => string>();
-vi.mock("next/navigation", () => ({ usePathname: () => pathname() }));
+vi.mock("next/navigation", () => ({ usePathname: () => pathname(), useRouter: () => ({ prefetch: () => {} }) }));
 // The anchor does not carry the prefetch prop, so the stub writes it out to be read back.
 vi.mock("next/link", () => ({
   default: ({ href, prefetch, children, ...rest }: { href: string; prefetch?: boolean; children?: React.ReactNode }) =>
