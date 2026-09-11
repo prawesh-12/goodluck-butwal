@@ -99,13 +99,13 @@ export function Muted({ children }: { children: React.ReactNode }) {
 
 export function NewButton({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Button render={<Link href={href} />}>{children}</Button>
+    <Button nativeButton={false} render={<Link href={href} />}>{children}</Button>
   );
 }
 
 export function ViewSiteLink({ href, label = "View" }: { href: string; label?: string }) {
   return (
-    <Button variant="ghost" size="icon-sm" title={`${label} on the website`} render={<a href={href} target="_blank" rel="noreferrer" />}>
+    <Button variant="ghost" size="icon-sm" title={`${label} on the website`} nativeButton={false} render={<a href={href} target="_blank" rel="noreferrer" />}>
         <ExternalLink />
         <span className="sr-only">{label} on the website</span>
       </Button>
@@ -114,7 +114,7 @@ export function ViewSiteLink({ href, label = "View" }: { href: string; label?: s
 
 export function EditLink({ href, label = "Edit" }: { href: string; label?: string }) {
   return (
-    <Button variant="outline" size="sm" render={<Link href={href} />}>
+    <Button variant="outline" size="sm" nativeButton={false} render={<Link href={href} />}>
         <Pencil />
         {label}
       </Button>

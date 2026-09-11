@@ -15,7 +15,7 @@ export function TestPrepTabs({ active, children }: { active: TestPrepTab; childr
     <Tabs value={active} className="gap-6">
       <TabsList>
         {TABS.map((tab) => (
-          <TabsTrigger key={tab.value} value={tab.value} render={<Link href={tab.href} />}>{tab.label}</TabsTrigger>
+          <TabsTrigger key={tab.value} value={tab.value} nativeButton={false} render={<Link href={tab.href} />}>{tab.label}</TabsTrigger>
         ))}
       </TabsList>
       <TabsContent value={active}>{children}</TabsContent>

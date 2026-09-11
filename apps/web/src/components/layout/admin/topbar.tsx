@@ -47,7 +47,7 @@ export function TopBar({ name, actor }: { name: string; actor: Actor }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" className="hidden text-muted-foreground sm:inline-flex" render={<a href="/" target="_blank" rel="noreferrer" />}>
+          <Button variant="ghost" size="sm" className="hidden text-muted-foreground sm:inline-flex" nativeButton={false} render={<a href="/" target="_blank" rel="noreferrer" />}>
               <ExternalLink />
               View website
             </Button>

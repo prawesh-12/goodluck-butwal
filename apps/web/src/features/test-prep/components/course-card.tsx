@@ -41,20 +41,20 @@ export function CourseCard({ course, batches, actor }: { course: CourseCardRow; 
         <div className="flex flex-wrap items-center gap-2">
           {batches === 0 ? (
             can(actor, "batches", "create") ? (
-              <Button size="sm" render={<Link href={`/admin/test-prep/batches/new?course=${course.id}`} />}>
+              <Button size="sm" nativeButton={false} render={<Link href={`/admin/test-prep/batches/new?course=${course.id}`} />}>
                   <CalendarDays />
                   Add a batch
                 </Button>
             ) : null
           ) : can(actor, "batches", "read") ? (
-            <Button variant="outline" size="sm" render={<Link href={`/admin/test-prep/batches?course=${course.id}`} />}>
+            <Button variant="outline" size="sm" nativeButton={false} render={<Link href={`/admin/test-prep/batches?course=${course.id}`} />}>
                 <CalendarDays />
                 Manage batches
               </Button>
           ) : null}
 
           {can(actor, "registrations", "read") ? (
-            <Button variant="outline" size="sm" render={<Link href={`/admin/test-prep/registrations?course=${course.id}`} />}>
+            <Button variant="outline" size="sm" nativeButton={false} render={<Link href={`/admin/test-prep/registrations?course=${course.id}`} />}>
                 <Users />
                 Registrations
               </Button>

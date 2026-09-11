@@ -75,7 +75,7 @@ export default async function EventRegistrationsPage({
         }
         actions={
           can(actor, "registrations", "export") ? (
-            <Button variant="outline" render={<a href={`/api/admin/export/event-registrations?${download}`} />}>
+            <Button variant="outline" nativeButton={false} render={<a href={`/api/admin/export/event-registrations?${download}`} />}>
                 <Download />
                 Download CSV
               </Button>

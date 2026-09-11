@@ -44,7 +44,7 @@ export default async function EnquiriesPage({
   ).toString();
 
   const exportCsv = (
-    <Button variant="outline" render={<a href={`/api/admin/export/enquiries${query ? `?${query}` : ""}`} />}>
+    <Button variant="outline" nativeButton={false} render={<a href={`/api/admin/export/enquiries${query ? `?${query}` : ""}`} />}>
         <Download />
         Export CSV
       </Button>
@@ -150,7 +150,7 @@ export default async function EnquiriesPage({
                     </TableCell>
                     <TableCell>
                       <span className="flex justify-end">
-                        <Button variant="outline" size="sm" render={<Link href={`/admin/enquiries/${row.id}`} />}>Open</Button>
+                        <Button variant="outline" size="sm" nativeButton={false} render={<Link href={`/admin/enquiries/${row.id}`} />}>Open</Button>
                       </span>
                     </TableCell>
                   </TableRow>

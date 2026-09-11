@@ -41,7 +41,7 @@ export default async function EditBatchPage({ params }: { params: Promise<{ id: 
         actions={
           <>
             {can(actor, "registrations", "read") ? (
-              <Button variant="outline" render={<Link href={`/admin/test-prep/registrations?batch=${row.id}`} />}>
+              <Button variant="outline" nativeButton={false} render={<Link href={`/admin/test-prep/registrations?batch=${row.id}`} />}>
                   <Users />
                   Registrations
                 </Button>

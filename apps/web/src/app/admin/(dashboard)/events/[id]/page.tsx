@@ -48,7 +48,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
           </>
         }
         actions={
-          <Button variant="outline" render={<Link href={`/admin/events/${event.id}/registrations`} />}>
+          <Button variant="outline" nativeButton={false} render={<Link href={`/admin/events/${event.id}/registrations`} />}>
               <Users />
               View registrations
             </Button>

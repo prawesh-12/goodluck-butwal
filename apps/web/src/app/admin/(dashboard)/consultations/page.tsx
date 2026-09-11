@@ -45,7 +45,7 @@ export default async function ConsultationsPage({
   ).toString();
 
   const exportCsv = (
-    <Button variant="outline" render={<a href={`/api/admin/export/consultations${query ? `?${query}` : ""}`} />}>
+    <Button variant="outline" nativeButton={false} render={<a href={`/api/admin/export/consultations${query ? `?${query}` : ""}`} />}>
         <Download />
         Export CSV
       </Button>

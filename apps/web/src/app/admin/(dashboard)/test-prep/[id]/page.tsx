@@ -38,7 +38,7 @@ export default async function EditTestPrepCoursePage({ params }: { params: Promi
         }
         actions={
           can(actor, "batches", "read") ? (
-            <Button variant="outline" render={<Link href={`/admin/test-prep/batches?course=${row.id}`} />}>
+            <Button variant="outline" nativeButton={false} render={<Link href={`/admin/test-prep/batches?course=${row.id}`} />}>
                 <CalendarDays />
                 Manage batches
               </Button>

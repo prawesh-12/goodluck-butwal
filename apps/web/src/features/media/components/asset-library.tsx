@@ -267,7 +267,7 @@ function ManageSheet({
               Play
             </Button>
           ) : (
-            <Button variant="outline" size="sm" render={<a href={asset.viewUrl} target="_blank" rel="noreferrer" />}>
+            <Button variant="outline" size="sm" nativeButton={false} render={<a href={asset.viewUrl} target="_blank" rel="noreferrer" />}>
                 <ExternalLink />
                 Open
               </Button>
@@ -383,7 +383,7 @@ function AssetCard({
               Play
             </Button>
           ) : (
-            <Button variant="outline" size="sm" render={<a href={asset.viewUrl} target="_blank" rel="noreferrer" />}>
+            <Button variant="outline" size="sm" nativeButton={false} render={<a href={asset.viewUrl} target="_blank" rel="noreferrer" />}>
                 <ExternalLink />
                 Open
               </Button>
@@ -509,7 +509,7 @@ export function AssetGrid({
         title={`No ${many} match your search`}
         description="Try a different word, or clear the search to see everything."
         action={
-          <Button variant="outline" render={<Link href={path} />}>Clear the search</Button>
+          <Button variant="outline" nativeButton={false} render={<Link href={path} />}>Clear the search</Button>
         }
       />
     ) : (
@@ -554,10 +554,10 @@ export function AssetGrid({
         {onFirstPage ? <ResultCount shown={assets.length} total={total} noun={many} /> : <span />}
         <div className="flex items-center gap-2">
           {onFirstPage ? null : (
-            <Button variant="ghost" size="sm" render={<Link href={q ? `${path}?q=${encodeURIComponent(q)}` : path} />}>Back to the newest</Button>
+            <Button variant="ghost" size="sm" nativeButton={false} render={<Link href={q ? `${path}?q=${encodeURIComponent(q)}` : path} />}>Back to the newest</Button>
           )}
           {cursor ? (
-            <Button variant="outline" size="sm" render={<Link href={`${path}?${q ? `q=${encodeURIComponent(q)}&` : ""}page=${encodeURIComponent(cursor)}`} />}>
+            <Button variant="outline" size="sm" nativeButton={false} render={<Link href={`${path}?${q ? `q=${encodeURIComponent(q)}&` : ""}page=${encodeURIComponent(cursor)}`} />}>
                 Next page
               </Button>
           ) : null}

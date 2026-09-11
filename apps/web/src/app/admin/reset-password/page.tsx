@@ -26,7 +26,7 @@ function ResetForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button variant="outline" className="w-full" render={<Link href="/admin/login" />}>Back to sign in</Button>
+          <Button variant="outline" className="w-full" nativeButton={false} render={<Link href="/admin/login" />}>Back to sign in</Button>
         </CardContent>
       </Card>
     );

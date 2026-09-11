@@ -25,7 +25,7 @@ export function PageHeader({
 
 export function BackLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Button variant="ghost" size="sm" className="-ml-2 h-7 px-2 text-muted-foreground" render={<Link href={href} />}>
+    <Button variant="ghost" size="sm" className="-ml-2 h-7 px-2 text-muted-foreground" nativeButton={false} render={<Link href={href} />}>
         <ChevronLeft />
         {children}
       </Button>
@@ -73,7 +73,7 @@ export function ViewOnSiteButton({
   className?: string;
 }) {
   return (
-    <Button variant={variant} size="sm" className={className} render={<a href={href} target="_blank" rel="noreferrer" />}>
+    <Button variant={variant} size="sm" className={className} nativeButton={false} render={<a href={href} target="_blank" rel="noreferrer" />}>
         <ExternalLink />
         {label}
       </Button>
@@ -84,7 +84,7 @@ export function ViewOnSiteButton({
 // project already has.
 export function PreviewButton({ href, className }: { href: string; className?: string }) {
   return (
-    <Button variant="outline" size="sm" className={className} render={<a href={href} target="_blank" rel="noreferrer" />}>
+    <Button variant="outline" size="sm" className={className} nativeButton={false} render={<a href={href} target="_blank" rel="noreferrer" />}>
         <Eye />
         Preview
       </Button>
