@@ -102,7 +102,10 @@ export function VideoDialog({ src, poster, title, inline, prefetch, bare, classN
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={() => setOpen(false)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen(false);
+                }}
                 className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
               >
                 <motion.div
@@ -116,7 +119,10 @@ export function VideoDialog({ src, poster, title, inline, prefetch, bare, classN
                   <button
                     type="button"
                     aria-label="Close video"
-                    onClick={() => setOpen(false)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpen(false);
+                    }}
                     className="absolute -top-14 right-0 flex size-10 cursor-pointer items-center justify-center rounded-full bg-white/15 text-white ring-1 ring-white/30 backdrop-blur-md transition-colors hover:bg-white/30"
                   >
                     <X className="size-5" />
