@@ -27,10 +27,18 @@ test("both hero paint candidates carry a priority hint", () => {
 // Phones get a lighter sky encoding. React skips the automatic preload for an img inside <picture>,
 // so each source needs its own preload, scoped by media query so a phone never fetches both.
 test("the hero sky has a phone source and a preload per breakpoint", () => {
-  expect(hero).toMatch(/<source\s+media=\{PHONE\}\s+srcSet=\{phoneSky\}\s+sizes="100vw"\s*\/>\s*<Img\s+src=\{sky\}/);
+  expect(hero).toMatch(/<source\s+media=\{PHONE\}\s+type="image\/avif"\s+srcSet=\{phoneSky\}\s+sizes="100vw"\s*\/>/);
   expect(hero).toContain('const PHONE = "(max-width: 809px)";');
   const preloads = hero.match(/preload\([^\n]*media: (PHONE|"\(min-width: 810px\)")[^\n]*fetchPriority: "high"/g) ?? [];
   expect(preloads.length).toBe(2);
+});
+
+// A browser without AVIF must fall through to the WebP the site served before, and fetch it once:
+// the AVIF source and its preload are both typed, and the fallback source has no preload of its own.
+test("the phone sky falls back to the untyped good-quality source without a second preload", () => {
+  expect(hero).toMatch(/type="image\/avif"\s+srcSet=\{phoneSky\}[^\n]*\/>\s*<source\s+media=\{PHONE\}\s+srcSet=\{assetSrcSet\(sky, WIDE_IMAGE_WIDTHS, "good"\)\}\s+sizes="100vw"\s*\/>\s*<Img\s+src=\{sky\}/);
+  expect(hero).toMatch(/preload\([^\n]*type: "image\/avif"[^\n]*media: PHONE/);
+  expect((hero.match(/preload\(/g) ?? []).length).toBe(2);
 });
 
 const WEIGHT_CLASS = /\bfont-(thin|extralight|light|normal|medium|semibold|bold|extrabold|black)\b/g;

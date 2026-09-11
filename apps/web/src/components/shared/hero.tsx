@@ -33,8 +33,9 @@ export function Hero({
   sky?: string;
 }) {
   // React emits no preload for an img inside <picture>, so both sky sources are preloaded by hand behind their media queries.
+  // The phone preload is typed, so a browser without AVIF skips it and fetches the WebP source once, from the img.
   const phoneSky = assetSrcSet(sky, IMAGE_WIDTHS, ...PHONE_SKY);
-  preload(assetUrl(sky, 1280, ...PHONE_SKY), { as: "image", imageSrcSet: phoneSky, imageSizes: "100vw", media: PHONE, fetchPriority: "high" });
+  preload(assetUrl(sky, 1280, ...PHONE_SKY), { as: "image", type: "image/avif", imageSrcSet: phoneSky, imageSizes: "100vw", media: PHONE, fetchPriority: "high" });
   preload(assetUrl(sky, 1920, "good"), { as: "image", imageSrcSet: assetSrcSet(sky, WIDE_IMAGE_WIDTHS, "good"), imageSizes: "100vw", media: "(min-width: 810px)", fetchPriority: "high" });
   const { scrollY } = useScroll();
   const grass = useTransform(scrollY, [380, 460], [1, 0], { ease: easeInOut });
@@ -63,7 +64,8 @@ export function Hero({
     <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1200px,100vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
       <div aria-hidden className="absolute inset-0 z-0 flex items-center justify-center overflow-clip">
         <picture>
-          <source media={PHONE} srcSet={phoneSky} sizes="100vw" />
+          <source media={PHONE} type="image/avif" srcSet={phoneSky} sizes="100vw" />
+          <source media={PHONE} srcSet={assetSrcSet(sky, WIDE_IMAGE_WIDTHS, "good")} sizes="100vw" />
           <Img src={sky} alt="" sizes="100vw" w={1920} widths={WIDE_IMAGE_WIDTHS} quality="good" fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
         </picture>
       </div>
