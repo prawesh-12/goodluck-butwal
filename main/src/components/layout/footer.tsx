@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { FlatButton } from "@/components/ui/button";
 import { SocialLinks } from "@/components/ui/bits";
 import { gl, img } from "@/config/assets";
 import { company } from "@/config/site";
@@ -9,7 +10,7 @@ import { Appear } from "@/components/ui/appear";
 import { useOffice } from "@/features/offices/components/office";
 import { Img } from "@/components/ui/img";
 
-export type FooterText = { tagline: string; officesHeading: string; copyright: string };
+export type FooterText = { tagline: string; officesHeading: string; copyright: string; staffLogin: string };
 
 export function Footer({ columns, socials, text }: { columns: FooterColumn[]; socials: SocialLink[]; text: FooterText }) {
   const { office, offices } = useOffice();
@@ -38,6 +39,9 @@ export function Footer({ columns, socials, text }: { columns: FooterColumn[]; so
             <a href={`mailto:${company.email}`} className="t-lead font-semibold text-ink transition-colors hover:text-muted">
               {company.email}
             </a>
+            {/* Staff only. It lives here rather than in the header, where a visitor read it as a
+                customer account the site does not have. */}
+            <FlatButton href="/admin/login">{text.staffLogin}</FlatButton>
             <SocialLinks links={socials} />
           </Appear>
 

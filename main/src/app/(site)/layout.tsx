@@ -43,7 +43,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Nav
             text={{
               bookCta: t("nav.book_cta", "Book a consultation"),
-              loginCta: t("nav.login_cta", "Login"),
               menuOpen: t("nav.menu_open", "Open menu"),
               menuClose: t("nav.menu_close", "Close menu"),
             }}
@@ -56,6 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               tagline: t("footer.tagline", "Ready to create your luck?"),
               officesHeading: t("footer.offices.title", "Offices"),
               copyright: t("footer.copyright", "© {year} {name}. All rights reserved."),
+              staffLogin: t("footer.staff_login", "Staff login"),
             }}
           />
         </OfficeProvider>
