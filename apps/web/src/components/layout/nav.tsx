@@ -41,7 +41,7 @@ export function Nav({ text }: { text: NavText }) {
       <div className="fixed inset-x-0 top-0 z-[9] flex flex-col items-center py-4 md:py-5">
         <div className="w-full px-4 md:w-auto md:max-w-[860px] md:px-5 lg:max-w-[1280px] lg:px-6">
           <div className="flex h-[52px] items-center gap-4 overflow-hidden rounded-full bg-white p-[10px] shadow-[0_0_0_2px_rgba(221,229,237,0.7)] md:h-[54px] md:shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:h-[58px] lg:gap-5">
-            <Link href="/" aria-label="Goodluck Education and Migration, home" className="block h-7 shrink-0 md:h-8">
+            <Link href="/" prefetch={path === "/" ? false : undefined} aria-label="Goodluck Education and Migration, home" className="block h-7 shrink-0 md:h-8">
               <Img src={gl.logo} alt="Goodluck Education and Migration" w={320} className="h-full w-auto object-contain" />
             </Link>
             <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
