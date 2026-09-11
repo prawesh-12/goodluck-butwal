@@ -10,6 +10,8 @@ const CLOUD = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
 // width Cloudinary hands back a re-encode several times bigger than the file it started from
 // (the hero meadow: 262 KB on disk, 1.1 MB at w_1920). Below 1280 it wins on every one of them.
 export const IMAGE_WIDTHS = [320, 640, 960, 1280] as const;
+// The hero sky is the one source wide enough to be worth serving past 1280.
+export const WIDE_IMAGE_WIDTHS = [...IMAGE_WIDTHS, 1920, 2560] as const;
 
 // A space becomes a hyphen because that is what Cloudinary does to a filename on upload.
 export function assetId(path: string) {

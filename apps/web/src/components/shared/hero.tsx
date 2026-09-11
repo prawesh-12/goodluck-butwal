@@ -7,7 +7,7 @@ import type { GoogleRating } from "@/features/settings/queries";
 import { Appear } from "@/components/ui/appear";
 import { FlatButton, PillButton } from "@/components/ui/button";
 import { Img } from "@/components/ui/img";
-import { assetSrcSet } from "@/lib/utils/media-url";
+import { assetSrcSet, WIDE_IMAGE_WIDTHS } from "@/lib/utils/media-url";
 
 const BLANK = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
@@ -54,7 +54,7 @@ export function Hero({
   return (
     <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
       <div aria-hidden className="absolute inset-0 z-0 flex items-center justify-center overflow-clip">
-        <Img src={sky} alt="" sizes="100vw" w={1280} fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
+        <Img src={sky} alt="" sizes="100vw" w={1920} widths={WIDE_IMAGE_WIDTHS} fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
       </div>
 
       <div className="container-x relative z-[1]">
