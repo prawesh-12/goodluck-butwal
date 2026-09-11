@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const s = await getService(slug);
   if (!s) return buildMetadata({ path: "/services", title: "Service", noindex: true });
-  return buildEntityMetadata("service", slug, {
+  return buildMetadata({
     path: `/services/${slug}`,
     title: s.title,
     description: s.intro,

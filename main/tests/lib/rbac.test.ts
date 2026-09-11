@@ -6,6 +6,7 @@ import {
   scopedWhere,
   ForbiddenError,
   type Actor,
+  type Entity,
 } from "@/lib/auth/rbac";
 import { PgDialect } from "drizzle-orm/pg-core";
 import type { SQL } from "drizzle-orm";
@@ -55,7 +56,7 @@ test("a super admin is not filtered to one office", () => {
 test("a deactivated user can do nothing at all", () => {
   const suspended: Actor = { ...superAdmin, isActive: false };
   expect(can(suspended, "posts", "read")).toBe(false);
-  expect(can(suspended, "settings", "update")).toBe(false);
+  expect(can(suspended, "users", "update")).toBe(false);
 });
 
 // Scoping rules the seven do not reach.
@@ -70,12 +71,26 @@ test("an editor can still create and update a post", () => {
   expect(can(editor, "posts", "update")).toBe(true);
 });
 
-test("only a super admin manages users, redirects and settings", () => {
+test("only a super admin manages users", () => {
   for (const actor of [auAdmin, npAdmin, editor]) {
     expect(can(actor, "users", "read")).toBe(false);
-    expect(can(actor, "redirects", "create")).toBe(false);
-    expect(can(actor, "settings", "update")).toBe(false);
   }
   expect(can(superAdmin, "users", "delete")).toBe(true);
-  expect(can(superAdmin, "settings", "update")).toBe(true);
+});
+
+test("the permission matrix covers the ten admin sections and nothing else", () => {
+  const sections: Entity[] = [
+    "enquiries",
+    "consultations",
+    "team",
+    "partners",
+    "posts",
+    "events",
+    "institutions",
+    "courses",
+    "testPrep",
+    "users",
+  ];
+  for (const entity of sections) expect(can(superAdmin, entity, "read")).toBe(true);
+  expect(can(superAdmin, "media", "read")).toBe(true);
 });

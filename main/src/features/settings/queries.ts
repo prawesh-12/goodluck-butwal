@@ -1,10 +1,6 @@
 import { cache } from "react";
-import { eq } from "drizzle-orm";
-import { db } from "@db/client";
-import { mediaAssets } from "@db/schema";
 import { allSettings } from "@db/settings";
 import { allUiStrings } from "@db/ui-strings";
-import { mediaUrl } from "@/lib/utils/media-url";
 
 export type FooterColumn = { title: string; links: { label: string; href: string }[] };
 export type SocialLink = { label: string; href: string; icon: string };
@@ -36,23 +32,6 @@ export const getFooterColumns = cache(async (): Promise<FooterColumn[]> => {
 export const getSocialLinks = cache(async (): Promise<SocialLink[]> => {
   const links = ((await allSettings()).get("social_links") as SocialLink[] | undefined) ?? [];
   return links.filter((link) => link.href && link.href !== "#");
-});
-
-// Undefined, not "": nothing set here means the hero keeps the image it ships with.
-export const getHeroImage = cache(async (): Promise<string | undefined> => {
-  const id = String((await allSettings()).get("hero_image_id") ?? "");
-  if (!id) return undefined;
-
-  const [asset] = await db
-    .select({
-      kind: mediaAssets.kind,
-      staticPath: mediaAssets.staticPath,
-      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
-    })
-    .from(mediaAssets)
-    .where(eq(mediaAssets.id, id));
-
-  return (asset ? mediaUrl(asset, 1920) : "") || undefined;
 });
 
 export const getGoogleRating = cache(async () => {

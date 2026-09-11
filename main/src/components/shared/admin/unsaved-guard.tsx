@@ -1,54 +1,40 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/admin/alert-dialog";
 
-// beforeunload covers a closed tab; the link handler covers admin navigation, which Next does
-// without a page load so the browser never fires it.
-export function UnsavedGuard({ formId }: { formId: string }) {
-  const [dirty, setDirty] = useState(false);
-  const saving = useRef(false);
-
-  useEffect(() => {
-    const form = document.getElementById(formId) as HTMLFormElement | null;
-    if (!form) return;
-
-    const touch = () => setDirty(true);
-    const submitted = () => {
-      saving.current = true;
-      setDirty(false);
-    };
-
-    form.addEventListener("input", touch);
-    form.addEventListener("change", touch);
-    form.addEventListener("submit", submitted);
-
-    return () => {
-      form.removeEventListener("input", touch);
-      form.removeEventListener("change", touch);
-      form.removeEventListener("submit", submitted);
-    };
-  }, [formId]);
+// beforeunload covers a closed tab. The click handler covers admin navigation, which Next does
+// without a page load so the browser never fires beforeunload.
+export function UnsavedGuard({ dirty }: { dirty: boolean }) {
+  const router = useRouter();
+  const [pending, setPending] = useState<string | null>(null);
 
   useEffect(() => {
     if (!dirty) return;
 
-    const warnOnClose = (event: BeforeUnloadEvent) => {
-      if (saving.current) return;
-      event.preventDefault();
-    };
+    const warnOnClose = (event: BeforeUnloadEvent) => event.preventDefault();
 
     const warnOnLink = (event: MouseEvent) => {
-      if (saving.current) return;
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey) return;
       const link = (event.target as HTMLElement | null)?.closest("a");
       if (!link || link.target === "_blank") return;
 
       const href = link.getAttribute("href");
-      if (!href || href.startsWith("#")) return;
+      if (!href || href.startsWith("#") || href.startsWith("http")) return;
 
-      if (!window.confirm("You have changes that are not saved. Leave anyway?")) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
+      event.preventDefault();
+      event.stopPropagation();
+      setPending(href);
     };
 
     window.addEventListener("beforeunload", warnOnClose);
@@ -60,5 +46,26 @@ export function UnsavedGuard({ formId }: { formId: string }) {
     };
   }, [dirty]);
 
-  return null;
+  return (
+    <AlertDialog open={pending !== null} onOpenChange={(open) => (open ? null : setPending(null))}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Leave without saving?</AlertDialogTitle>
+          <AlertDialogDescription>Your changes on this page will be lost.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Stay here</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={() => {
+              const href = pending;
+              setPending(null);
+              if (href) router.push(href);
+            }}
+          >
+            Leave
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 }

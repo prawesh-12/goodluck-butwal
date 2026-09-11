@@ -1,4 +1,3 @@
-import { join } from "node:path";
 import { runAll, step } from "./runner";
 import { seedMedia } from "./media";
 import { seedOffices } from "./offices";
@@ -8,15 +7,12 @@ import { seedServices } from "./services";
 import { seedDestinations, seedFaqs } from "./destinations";
 import { seedAltText } from "./alt-text";
 import { seedPages } from "./pages";
-import { seedPostCategories, seedPosts, seedRating, seedTestimonials } from "./editorial";
+import { seedPostCategories, seedPosts, seedRating } from "./editorial";
 import { seedEvents } from "./events";
 import { seedTestPrep } from "./test-prep";
 import { seedCourseCategories, seedPlaceholderCatalogue } from "./catalogue";
 
-// Run from the app root, so public/ is one level down from here.
-const ROOT = process.cwd();
-
-step("media_assets", () => seedMedia(join(ROOT, "public")));
+step("media_assets", seedMedia);
 step("offices", seedOffices);
 step("ui_strings", seedUiStrings);
 step("settings", seedSettings);
@@ -31,7 +27,6 @@ step("catalogue", seedPlaceholderCatalogue);
 step("post_categories", seedPostCategories);
 step("posts", seedPosts);
 step("events", seedEvents);
-step("testimonials", seedTestimonials);
 step("rating", seedRating);
 step("test_prep", seedTestPrep);
 step("pages", seedPages);

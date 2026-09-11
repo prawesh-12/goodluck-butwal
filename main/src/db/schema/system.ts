@@ -1,17 +1,14 @@
 import {
   boolean,
-  index,
   integer,
   jsonb,
   pgTable,
   text,
   timestamp,
   uniqueIndex,
-  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { base, users } from "./core";
-import { auditAction } from "./enums";
 
 // Key-value by design: the admin edits values, so a row per setting beats a wide table.
 export const settings = pgTable("settings", {
@@ -32,20 +29,4 @@ export const redirects = pgTable(
     note: text("note"),
   },
   (t) => [uniqueIndex("redirects_from_path_idx").on(t.fromPath)],
-);
-
-// No created_by or updated_by: an audit row is never edited, and user_id is the actor.
-export const auditLog = pgTable(
-  "audit_log",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    userId: text("user_id").references(() => users.id),
-    action: auditAction("action").notNull(),
-    entityType: text("entity_type"),
-    entityId: text("entity_id"),
-    summary: text("summary"),
-    ipHash: text("ip_hash"),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  },
-  (t) => [index("audit_log_created_idx").on(t.createdAt.desc())],
 );

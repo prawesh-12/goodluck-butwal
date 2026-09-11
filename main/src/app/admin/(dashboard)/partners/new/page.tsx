@@ -1,6 +1,7 @@
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader } from "@/components/shared/admin/page-header";
 import { PartnerEditor } from "@/features/partners/components/partner-editor";
 
 export const dynamic = "force-dynamic";
@@ -11,10 +12,10 @@ export default async function NewPartnerPage() {
 
   return (
     <>
-      <h1 className="t-h4">Add a partner</h1>
+      <EditorHeader backHref="/admin/partners" backLabel="Partners" title="Add partner" />
 
       <PartnerEditor
-        values={{ id: "", name: "", websiteUrl: "", isFeatured: false, status: "draft" }}
+        values={{ id: "", name: "", logoId: "", websiteUrl: "", isFeatured: false, status: "draft" }}
         logo={null}
         canPublish={can(actor, "partners", "publish")}
         canDelete={false}

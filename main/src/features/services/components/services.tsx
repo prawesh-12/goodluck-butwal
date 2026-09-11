@@ -6,6 +6,7 @@ import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, Chip } from "@/components/ui/bits";
 import { VideoDialog } from "@/components/ui/video-dialog";
+import { CARD_SIZES, Img } from "@/components/ui/img";
 
 // White frame with the service artwork. A service with a reel shows the video's poster frame as the play thumbnail instead.
 export function Artwork({ s, className, pad }: { s: Service; className: string; pad: string }) {
@@ -13,7 +14,7 @@ export function Artwork({ s, className, pad }: { s: Service; className: string; 
     <VideoDialog src={s.video} poster={s.poster} title={s.title} className={className} />
   ) : (
     <div className={`relative ${className}`}>
-      <img src={s.image} alt={s.imageAlt} className={`absolute inset-0 size-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.04] ${pad}`} loading="lazy" decoding="async" />
+      <Img src={s.image} alt={s.imageAlt} sizes={CARD_SIZES} className={`absolute inset-0 size-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.04] ${pad}`} loading="lazy" decoding="async" />
     </div>
   );
 }
@@ -35,7 +36,7 @@ export function ServiceCard({ service, slug, label, title, line, className = "" 
           </div>
         </div>
         <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ink transition-transform duration-300 group-hover:translate-x-1">
-          <img src={img.arrow} alt="" className="h-2 w-3 invert" loading="lazy" decoding="async" />
+          <Img src={img.arrow} alt="" w={24} className="h-2 w-3 invert" loading="lazy" decoding="async" />
         </span>
       </div>
     </Link>
@@ -58,7 +59,7 @@ function Tile({ s, icon, t, className = "" }: { s: Service; icon: string; t: Ton
       <div className="flex items-start justify-between gap-4">
         <span className={`inline-flex h-7 items-center rounded-full px-[14px] pb-[6px] pt-1 text-[14px] font-medium leading-[18.2px] ${c.chip}`}>{s.label}</span>
         <span className={`flex size-10 shrink-0 items-center justify-center rounded-full ${c.icon}`}>
-          <img src={icon} alt="" className={`size-5 object-contain ${t === "dark" ? "invert" : ""}`} loading="lazy" decoding="async" />
+          <Img src={icon} alt="" w={40} className={`size-5 object-contain ${t === "dark" ? "invert" : ""}`} loading="lazy" decoding="async" />
         </span>
       </div>
       <Artwork s={s} pad="p-3" className="aspect-[16/9] w-full overflow-clip rounded-[10px] bg-white md:rounded-[16px]" />
@@ -68,7 +69,7 @@ function Tile({ s, icon, t, className = "" }: { s: Service; icon: string; t: Ton
           <p className={`t-body ${c.text}`}>{s.line}</p>
         </div>
         <span className={`flex size-10 shrink-0 items-center justify-center rounded-full transition-transform duration-300 group-hover:translate-x-1 ${c.arrow}`}>
-          <img src={img.arrow} alt="" className={`h-2 w-3 ${c.arrowImg}`} loading="lazy" decoding="async" />
+          <Img src={img.arrow} alt="" w={24} className={`h-2 w-3 ${c.arrowImg}`} loading="lazy" decoding="async" />
         </span>
       </div>
     </Link>

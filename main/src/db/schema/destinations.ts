@@ -1,5 +1,5 @@
 import { boolean, index, integer, jsonb, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
-import { base, mediaAssets, publishing, seo } from "./core";
+import { base, publishing } from "./core";
 import { officeScope, serviceCategory } from "./enums";
 
 export const destinations = pgTable(
@@ -7,14 +7,10 @@ export const destinations = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
     countryCode: text("country_code"),
     tagline: text("tagline"),
-    heroImageId: uuid("hero_image_id").references(() => mediaAssets.id),
-    flagImageId: uuid("flag_image_id").references(() => mediaAssets.id),
-    cardImageId: uuid("card_image_id").references(() => mediaAssets.id),
     factPill: text("fact_pill"),
     overviewHtml: text("overview_html"),
     academicHtml: text("academic_html"),
@@ -50,7 +46,6 @@ export const services = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
     category: serviceCategory("category").notNull(),
@@ -60,8 +55,6 @@ export const services = pgTable(
     steps: jsonb("steps").$type<{ title: string; body: string }[]>(),
     facts: jsonb("facts").$type<{ label: string; value: string }[]>(),
     documents: jsonb("documents").$type<{ label: string }[]>(),
-    artworkId: uuid("artwork_id").references(() => mediaAssets.id),
-    reelId: uuid("reel_id").references(() => mediaAssets.id),
     tone: varchar("tone", { length: 20 }),
     isFeatured: boolean("is_featured").notNull().default(false),
   },

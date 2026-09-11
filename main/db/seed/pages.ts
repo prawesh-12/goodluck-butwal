@@ -1,17 +1,10 @@
 import { db } from "@db/client";
-import { mediaAssets, pages } from "@db/schema";
+import { pages } from "@db/schema";
 import { about } from "./source/about";
-
-async function mediaIdByPath() {
-  const rows = await db.select({ id: mediaAssets.id, path: mediaAssets.staticPath }).from(mediaAssets);
-  return new Map(rows.map((row) => [row.path, row.id]));
-}
 
 // One row per About route. The shape of `blocks` is fixed per slug, and the admin edits it
 // through a repeater form rather than a raw JSON box.
 export async function seedPages() {
-  const media = await mediaIdByPath();
-
   const rows = [
     {
       slug: "about",
@@ -41,12 +34,7 @@ export async function seedPages() {
       title: "Corporate social responsibility",
       intro: about.csrIntro,
       blocks: {
-        partners: about.csr.map((c) => ({
-          name: c.name,
-          photo_id: c.photo ? (media.get(c.photo) ?? null) : null,
-          logo_id: media.get(c.logo) ?? null,
-          line: c.line,
-        })),
+        partners: about.csr.map((c) => ({ name: c.name, line: c.line })),
       },
     },
     {

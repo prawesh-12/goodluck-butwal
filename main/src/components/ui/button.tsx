@@ -5,12 +5,13 @@ import { motion } from "motion/react";
 import type { ReactNode } from "react";
 import type { Variants } from "motion/react";
 import { img } from "@/config/assets";
+import { Img } from "@/components/ui/img";
 
 const spring = { type: "spring", stiffness: 380, damping: 32 } as const;
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
-// Hoisted, because motion(Link) inside the body would be a new component type on every render
-// and React would remount the link instead of updating it.
-const MotionLink = motion(Link);
+// Hoisted, because motion.create(Link) inside the body would be a new component type on every
+// render and React would remount the link instead of updating it.
+const MotionLink = motion.create(Link);
 
 function ArrowChip({ side, lg, flip, variants }: { side: "left" | "right"; lg: boolean; flip: boolean; variants: Variants }) {
   return (
@@ -24,7 +25,7 @@ function ArrowChip({ side, lg, flip, variants }: { side: "left" | "right"; lg: b
         side === "left" ? (lg ? "left-[6px] lg:left-2" : "left-[7px] lg:left-2") : lg ? "right-[6px] lg:right-2" : "right-[7px] lg:right-2",
       )}
     >
-      <img src={flip ? img.arrowLeft : img.arrow} alt="" className="h-2 w-3" loading="lazy" decoding="async" />
+      <Img src={flip ? img.arrowLeft : img.arrow} alt="" w={24} className="h-2 w-3" loading="lazy" decoding="async" />
     </motion.span>
   );
 }

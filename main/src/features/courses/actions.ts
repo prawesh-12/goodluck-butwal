@@ -1,16 +1,15 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { TAGS, invalidate, revalidateSitemap } from "@/lib/cache";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
 import { courses, institutions, redirects } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
-import { requirePermission } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
+import { can, requirePermission } from "@/lib/auth/rbac";
 import { sanitize } from "@/lib/security/sanitize";
 import { uniqueSlug } from "@/lib/utils/slug";
-import { mediaAlt } from "@/features/media/admin-queries";
 import { courseSlugs, idsBySlug } from "@/features/courses/admin-queries";
 import { parseCourseCsv, type ImportProblem, type ParsedCourse } from "@/features/courses/import";
 import {
@@ -20,14 +19,11 @@ import {
   updateCourseSchema,
   type CourseInput,
 } from "@/features/courses/validators";
-import { type AttachedImage } from "@/lib/validators/content-fields";
-import { publishRefusal, seoValues, slugRedirect } from "@/features/pages/validators";
+import { publishRefusal, slugRedirect } from "@/lib/validators/content-fields";
 
 type Result<T = { id: string }> =
   | { ok: true; data: T }
   | { ok: false; error: string; fieldErrors?: Record<string, string[]> };
-
-const GOING_LIVE = new Set(["published", "scheduled"]);
 
 const blank = (value: string) => (value === "" ? null : value);
 
@@ -49,17 +45,7 @@ function columns(data: CourseInput) {
     entryRequirementsHtml: sanitize(data.entryRequirementsHtml) || null,
     status: data.status,
     sortOrder: data.sortOrder,
-    ...seoValues(data),
   };
-}
-
-async function publishProblems(data: CourseInput) {
-  const images = [{ label: "The share image", id: data.seoOgImageId }].filter(
-    (image) => image.id,
-  ) as { label: string; id: string }[];
-  const alt = await mediaAlt(images.map((image) => image.id));
-  const described: AttachedImage[] = images.map((image) => ({ ...image, altText: alt.get(image.id) ?? null }));
-  return coursePublishProblems(data, described);
 }
 
 async function institutionExists(id: string) {
@@ -67,7 +53,13 @@ async function institutionExists(id: string) {
   return Boolean(row);
 }
 
+function publishedDate(data: { status: string }, existing: Date | null) {
+  return data.status === "published" ? (existing ?? new Date()) : existing;
+}
+
 function refresh(paths: string[]) {
+  invalidate(TAGS.courses);
+  revalidateSitemap();
   revalidatePath("/admin/courses");
   revalidatePath("/courses");
   for (const path of paths) revalidatePath(path);
@@ -91,9 +83,12 @@ export async function createCourse(input: unknown): Promise<Result> {
     };
   }
 
-  if (GOING_LIVE.has(data.status)) {
-    requirePermission(actor, "courses", "publish");
-    const problems = await publishProblems(data);
+  if (data.status === "published" && !can(actor, "courses", "publish")) {
+    return { ok: false, error: "You cannot publish. Save it as a draft and ask an admin." };
+  }
+
+  if (data.status === "published") {
+    const problems = coursePublishProblems(data);
     if (problems.length > 0) return publishRefusal(problems);
   }
 
@@ -103,19 +98,11 @@ export async function createCourse(input: unknown): Promise<Result> {
     .values({
       ...columns(data),
       slug,
-      publishedAt: data.status === "published" ? new Date() : null,
+      publishedAt: publishedDate(data, null),
       createdBy: actor.id,
       updatedBy: actor.id,
     })
     .returning({ id: courses.id });
-
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "courses",
-    entityId: row.id,
-    summary: `added the course ${data.name}`,
-  });
 
   refresh([coursePath(slug)]);
   return { ok: true, data: { id: row.id } };
@@ -152,9 +139,12 @@ export async function updateCourse(input: unknown): Promise<Result> {
     };
   }
 
-  if (GOING_LIVE.has(data.status)) {
-    requirePermission(actor, "courses", "publish");
-    const problems = await publishProblems(data);
+  if (data.status !== existing.status && !can(actor, "courses", "publish")) {
+    return { ok: false, error: `You cannot change whether a course is live. Ask an admin.` };
+  }
+
+  if (data.status === "published") {
+    const problems = coursePublishProblems(data);
     if (problems.length > 0) return publishRefusal(problems);
   }
 
@@ -176,19 +166,11 @@ export async function updateCourse(input: unknown): Promise<Result> {
     .set({
       ...columns(data),
       slug: data.slug,
-      publishedAt: data.status === "published" ? (existing.publishedAt ?? new Date()) : existing.publishedAt,
+      publishedAt: publishedDate(data, existing.publishedAt),
       updatedBy: actor.id,
       updatedAt: new Date(),
     })
     .where(eq(courses.id, data.id));
-
-  await writeAudit({
-    userId: actor.id,
-    action: data.status === "published" && existing.status !== "published" ? "publish" : "update",
-    entityType: "courses",
-    entityId: data.id,
-    summary: redirect ? `${existing.slug} is now ${data.slug}, 301 written` : `saved the course ${data.name}`,
-  });
 
   refresh([before, after]);
   return { ok: true, data: { id: data.id } };
@@ -208,13 +190,6 @@ export async function deleteCourse(input: unknown): Promise<Result> {
   if (!existing) return { ok: false, error: "That course no longer exists." };
 
   await db.delete(courses).where(eq(courses.id, existing.id));
-  await writeAudit({
-    userId: actor.id,
-    action: "delete",
-    entityType: "courses",
-    entityId: existing.id,
-    summary: `deleted the course ${existing.name}`,
-  });
 
   refresh([coursePath(existing.slug)]);
   return { ok: true, data: { id: existing.id } };
@@ -311,13 +286,6 @@ export async function importCourses(input: unknown): Promise<ImportResultShape> 
   });
 
   await db.insert(courses).values(values);
-
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "courses",
-    summary: `imported ${values.length} courses from a spreadsheet`,
-  });
 
   refresh([]);
   return { ok: true, data: { created: values.length } };

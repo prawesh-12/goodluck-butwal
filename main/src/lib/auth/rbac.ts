@@ -12,31 +12,22 @@ export type Actor = {
 };
 
 export type Entity =
-  | "offices"
   | "team"
   | "partners"
-  | "pages"
-  | "uiStrings"
-  | "destinations"
   | "institutions"
   | "courses"
-  | "services"
   | "courseCategories"
   | "testPrep"
   | "batches"
   | "posts"
   | "events"
-  | "testimonials"
   | "postCategories"
   | "tags"
   | "enquiries"
   | "consultations"
   | "registrations"
   | "media"
-  | "redirects"
-  | "users"
-  | "settings"
-  | "auditLog";
+  | "users";
 
 const CRUD: Action[] = ["create", "read", "update", "delete"];
 const CRUDP: Action[] = [...CRUD, "publish"];
@@ -46,21 +37,15 @@ const NONE: Action[] = [];
 // Nothing else in the app decides who may do what. "own" scoping lives in scopedWhere and
 // requireOwnership, not here.
 const MATRIX: Record<Entity, Record<UserRole, Action[]>> = {
-  offices: { super_admin: CRUDP, au_admin: ["read", "update"], np_admin: ["read", "update"], content_editor: NONE },
   team: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
   partners: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
-  pages: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
-  uiStrings: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
-  destinations: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
   institutions: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
   courses: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
-  services: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: NONE },
   courseCategories: { super_admin: CRUD, au_admin: ["read"], np_admin: ["read"], content_editor: NONE },
   testPrep: { super_admin: CRUDP, au_admin: ["read"], np_admin: CRUDP, content_editor: NONE },
   batches: { super_admin: CRUDP, au_admin: ["read"], np_admin: CRUDP, content_editor: NONE },
   posts: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: CRU },
   events: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: CRU },
-  testimonials: { super_admin: CRUDP, au_admin: CRUDP, np_admin: CRUDP, content_editor: CRU },
   postCategories: { super_admin: CRUD, au_admin: CRU, np_admin: CRU, content_editor: ["create", "read"] },
   tags: { super_admin: CRUD, au_admin: CRU, np_admin: CRU, content_editor: ["create", "read"] },
   enquiries: {
@@ -82,10 +67,7 @@ const MATRIX: Record<Entity, Record<UserRole, Action[]>> = {
     content_editor: NONE,
   },
   media: { super_admin: CRUD, au_admin: CRUD, np_admin: CRUD, content_editor: CRU },
-  redirects: { super_admin: CRUD, au_admin: NONE, np_admin: NONE, content_editor: NONE },
   users: { super_admin: CRUD, au_admin: NONE, np_admin: NONE, content_editor: NONE },
-  settings: { super_admin: ["read", "update"], au_admin: ["read"], np_admin: ["read"], content_editor: NONE },
-  auditLog: { super_admin: ["read"], au_admin: ["read"], np_admin: ["read"], content_editor: NONE },
 };
 
 export class ForbiddenError extends Error {

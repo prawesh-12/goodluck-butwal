@@ -1,12 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { TAGS, invalidate, revalidateSitemap } from "@/lib/cache";
 import { eq, inArray } from "drizzle-orm";
 import { db } from "@db/client";
 import { redirects, teamMembers } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
 import { can, requireOwnership, requirePermission, type Actor } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
 import { sanitize } from "@/lib/security/sanitize";
 import { uniqueSlug } from "@/lib/utils/slug";
 import {
@@ -16,7 +16,7 @@ import {
   updateTeamMemberSchema,
   type TeamMemberInput,
 } from "@/features/team/validators";
-import { altTextByIds } from "@/features/offices/admin-queries";
+import { mediaAlt } from "@/features/media/admin-queries";
 import { teamSlugs } from "@/features/team/admin-queries";
 
 type Result<T = { id: string }> =
@@ -32,12 +32,20 @@ function officeFor(actor: Actor, chosen: string) {
 
 async function publishRefusal(data: TeamMemberInput) {
   if (data.status !== "published") return null;
-  const alt = await altTextByIds([data.photoId, data.seoOgImageId]);
-  const problems = teamPublishProblems(data, {
-    photo: alt.get(data.photoId),
-    shareImage: alt.get(data.seoOgImageId),
-  });
+  const alt = await mediaAlt([data.photoId]);
+  const problems = teamPublishProblems(data, { photo: alt.get(data.photoId) });
   return problems.length > 0 ? `Not ready to publish. Add: ${problems.join(", ")}.` : null;
+}
+
+// The rest of the site only carries a face, which the layout's own 300s revalidate catches.
+function refresh(slugs: string[]) {
+  invalidate(TAGS.team);
+  revalidateSitemap();
+  revalidatePath("/admin/team");
+  revalidatePath("/about/team");
+  revalidatePath("/about");
+  revalidatePath("/");
+  for (const slug of slugs) revalidatePath(`/team/${slug}`);
 }
 
 function columns(data: TeamMemberInput, officeId: string | null) {
@@ -55,11 +63,6 @@ function columns(data: TeamMemberInput, officeId: string | null) {
     isCoFounder: data.isCoFounder,
     isFeatured: data.isFeatured,
     status: data.status,
-    seoTitle: blank(data.seoTitle),
-    seoDescription: blank(data.seoDescription),
-    seoOgImageId: blank(data.seoOgImageId),
-    seoNoindex: data.seoNoindex,
-    canonicalUrl: blank(data.canonicalUrl),
   };
 }
 
@@ -90,18 +93,9 @@ export async function createTeamMember(input: unknown): Promise<Result> {
       createdBy: actor.id,
       updatedBy: actor.id,
     })
-    .returning({ id: teamMembers.id });
+    .returning({ id: teamMembers.id, slug: teamMembers.slug });
 
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "team_members",
-    entityId: created.id,
-    summary: `added ${data.fullName}`,
-  });
-
-  revalidatePath("/admin/team");
-  revalidatePath("/about/team");
+  refresh([created.slug]);
   return { ok: true, data: { id: created.id } };
 }
 
@@ -171,17 +165,7 @@ export async function updateTeamMember(input: unknown): Promise<Result> {
       });
   }
 
-  await writeAudit({
-    userId: actor.id,
-    action:
-      data.status === existing.status ? "update" : data.status === "published" ? "publish" : "unpublish",
-    entityType: "team_members",
-    entityId: data.id,
-    summary: `${data.fullName} updated`,
-  });
-
-  revalidatePath("/admin/team");
-  revalidatePath("/about/team");
+  refresh([slug, existing.slug]);
   return { ok: true, data: { id: data.id } };
 }
 
@@ -193,7 +177,7 @@ export async function deleteTeamMember(input: unknown): Promise<Result<{ id: str
   if (!parsed.success) return { ok: false, error: "That person could not be found." };
 
   const [existing] = await db
-    .select({ id: teamMembers.id, officeId: teamMembers.officeId, fullName: teamMembers.fullName })
+    .select({ id: teamMembers.id, slug: teamMembers.slug, officeId: teamMembers.officeId })
     .from(teamMembers)
     .where(eq(teamMembers.id, parsed.data.id));
   if (!existing) return { ok: false, error: "That person is no longer in the team list." };
@@ -202,16 +186,7 @@ export async function deleteTeamMember(input: unknown): Promise<Result<{ id: str
 
   await db.delete(teamMembers).where(eq(teamMembers.id, existing.id));
 
-  await writeAudit({
-    userId: actor.id,
-    action: "delete",
-    entityType: "team_members",
-    entityId: existing.id,
-    summary: `removed ${existing.fullName}`,
-  });
-
-  revalidatePath("/admin/team");
-  revalidatePath("/about/team");
+  refresh([existing.slug]);
   return { ok: true, data: { id: existing.id } };
 }
 
@@ -237,14 +212,6 @@ export async function reorderTeam(input: unknown): Promise<Result<{ moved: numbe
       .where(eq(teamMembers.id, id));
   }
 
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "team_members",
-    summary: `reordered ${ids.length} team members`,
-  });
-
-  revalidatePath("/admin/team");
-  revalidatePath("/about/team");
+  refresh([]);
   return { ok: true, data: { moved: ids.length } };
 }

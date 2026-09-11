@@ -1,10 +1,11 @@
 import { cache } from "react";
+import { TAGS, cached } from "@/lib/cache";
 import { asc, eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets, partners } from "@db/schema";
 import { mediaUrl } from "@/lib/utils/media-url";
 
-export const listPartnerLogos = cache(async (): Promise<string[]> => {
+const listPartnerLogosUncached = cached(async (): Promise<string[]> => {
   const rows = await db
     .select({ kind: mediaAssets.kind, staticPath: mediaAssets.staticPath, cloudinaryPublicId: mediaAssets.cloudinaryPublicId })
     .from(partners)
@@ -13,4 +14,6 @@ export const listPartnerLogos = cache(async (): Promise<string[]> => {
     .orderBy(asc(partners.sortOrder));
 
   return rows.map((row) => mediaUrl(row, 240)).filter(Boolean);
-});
+}, ["partner-logos"], [TAGS.partners]);
+
+export const listPartnerLogos = cache(listPartnerLogosUncached);

@@ -4,6 +4,7 @@ import { db } from "@db/client";
 import { offices, services } from "@db/schema";
 import { formatOpeningHours, type OpeningHours } from "@/lib/utils/datetime";
 import type { OfficeId } from "@/config/site";
+import { TAGS, cached } from "@/lib/cache";
 
 export type PublicOffice = {
   id: OfficeId;
@@ -25,7 +26,7 @@ export const whatsappLink = (number: string | null) => {
   return digits ? `https://wa.me/${digits}` : undefined;
 };
 
-export const listOffices = cache(async (): Promise<PublicOffice[]> => {
+const officeRows = cached(async (): Promise<PublicOffice[]> => {
   const rows = await db
     .select({
       code: offices.code,
@@ -56,7 +57,9 @@ export const listOffices = cache(async (): Promise<PublicOffice[]> => {
     flag: `/images/flags/${row.country.toLowerCase().replace(/\s+/g, "-")}.svg`,
     hours: formatOpeningHours(row.openingHours) ?? undefined,
   }));
-});
+}, ["offices"], [TAGS.offices]);
+
+export const listOffices = cache(officeRows);
 
 export type OfficeProfile = PublicOffice & {
   slug: string;
@@ -129,3 +132,9 @@ export const listServiceLinks = cache(async () =>
     .where(eq(services.status, "published"))
     .orderBy(asc(services.sortOrder)),
 );
+
+// The office select on the team, users, posts and events editors. Not cached: an admin form
+// should see a new office the moment it exists.
+export async function officeOptions() {
+  return db.select({ id: offices.id, name: offices.name }).from(offices).orderBy(asc(offices.name));
+}

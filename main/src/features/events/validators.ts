@@ -15,12 +15,6 @@ const localDateTime = z
   .refine((v) => v === "" || localPattern.test(v), "Give a date and a time.")
   .default("");
 
-const goLiveAt = z
-  .string()
-  .trim()
-  .refine((v) => v === "" || !Number.isNaN(Date.parse(v)), "Choose a date and a time.")
-  .default("");
-
 const fields = {
   title: z.string().trim().min(1, "Give the event a title."),
   slug: slugOrBlank,
@@ -40,15 +34,10 @@ const fields = {
   registrationEnabled: z.boolean().default(true),
   registrationDeadline: localDateTime,
   status: z.enum(contentStatuses),
-  publishedAt: goLiveAt,
-  seoTitle: text,
-  seoDescription: text,
-  seoOgImageId: mediaId,
-  seoNoindex: z.boolean().default(false),
-  canonicalUrl: httpsUrl,
 };
 
 type Shape = {
+  status: string;
   startsAt: string;
   endsAt: string;
   registrationDeadline: string;
@@ -97,7 +86,7 @@ export const updateEventSchema = z.object({ id: z.uuid(), ...fields }).superRefi
 
 export type EventInput = z.infer<typeof createEventSchema>;
 
-export type EventAltText = { cover?: string | null; shareImage?: string | null };
+export type EventAltText = { cover?: string | null };
 
 export function eventPublishProblems(data: EventInput, alt: EventAltText): string[] {
   const missing: string[] = [];
@@ -107,7 +96,6 @@ export function eventPublishProblems(data: EventInput, alt: EventAltText): strin
   if (!data.officeId) missing.push("Office");
   if (!data.coverImageId) missing.push("Cover image");
   if (data.coverImageId && !alt.cover) missing.push("Alt text on the cover image");
-  if (data.seoOgImageId && !alt.shareImage) missing.push("Alt text on the share image");
   if (data.isOnline && !data.onlineUrl) missing.push("Joining link");
   if (!data.isOnline && !data.venueName) missing.push("Venue");
   return missing;

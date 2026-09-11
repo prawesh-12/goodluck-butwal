@@ -4,15 +4,18 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Play, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
+import { assetUrl, videoStreamUrl, videoUrl } from "@/lib/utils/media-url";
+import { CARD_SIZES, Img } from "@/components/ui/img";
 
 // Portalled to <body>: the thumbnail sits inside a card link, and the play button must not navigate it.
-export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bare, className = "" }: { src: string; loopSrc?: string; poster?: string; title: string; inline?: boolean; prefetch?: boolean; bare?: boolean; className?: string }) {
+export function VideoDialog({ src, poster, title, inline, prefetch, bare, className = "" }: { src: string; poster?: string; title: string; inline?: boolean; prefetch?: boolean; bare?: boolean; className?: string }) {
   const [open, setOpen] = useState(false);
   // prefetch mounts and buffers, inline starts and stops playback. Splitting them keeps the
   // decode off the frame the card arrives on. Once mounted the element stays, so scrolling
   // back does not restart the download.
   const [mounted, setMounted] = useState(false);
   const loop = useRef<HTMLVideoElement>(null);
+  const player = useRef<HTMLVideoElement>(null);
   if ((inline || prefetch) && !mounted) setMounted(true);
   useEffect(() => {
     const v = loop.current;
@@ -20,6 +23,36 @@ export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bar
     if (inline) void v.play().catch(() => {});
     else v.pause();
   }, [inline, mounted]);
+
+  // Safari plays HLS natively; everyone else needs the library, so it is fetched on open only.
+  useEffect(() => {
+    const v = player.current;
+    if (!open || !v) return;
+    const stream = videoStreamUrl(src);
+    if (v.canPlayType("application/vnd.apple.mpegurl")) {
+      v.src = stream;
+      return;
+    }
+
+    let cancelled = false;
+    let hls: { destroy: () => void } | undefined;
+    void import("hls.js").then(({ default: Hls }) => {
+      if (cancelled) return;
+      if (!Hls.isSupported()) {
+        v.src = videoUrl(src, 1280);
+        return;
+      }
+      const instance = new Hls();
+      hls = instance;
+      instance.loadSource(stream);
+      instance.attachMedia(v);
+    });
+
+    return () => {
+      cancelled = true;
+      hls?.destroy();
+    };
+  }, [open, src]);
 
   useEffect(() => {
     if (!open) return;
@@ -44,12 +77,12 @@ export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bar
         }}
         className={`relative block cursor-pointer ${className}`}
       >
-        {poster && <img src={poster} alt="" className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" loading="lazy" decoding="async" />}
+        {poster && <Img src={poster} alt="" sizes={CARD_SIZES} className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" loading="lazy" decoding="async" />}
         {/* Layered over the poster rather than swapped with it, so buffering and loop restarts cannot
             flash through. With no poster the video mounts straight away and paints its own first
             frame, reading only the header until the card is warmed. */}
         {(mounted || !poster) && (
-          <video ref={loop} src={loopSrc ?? src} poster={poster} muted loop playsInline preload={mounted ? "auto" : "metadata"} disablePictureInPicture disableRemotePlayback className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" />
+          <video ref={loop} src={videoUrl(src, 480)} poster={poster && assetUrl(poster, 640)} muted loop playsInline preload={mounted ? "auto" : "metadata"} disablePictureInPicture disableRemotePlayback className="absolute inset-0 size-full object-cover transition-[filter] duration-200 ease-out group-hover:brightness-[0.85]" />
         )}
         {!bare && (
           <span className="absolute inset-0 flex scale-90 items-center justify-center transition-transform duration-200 ease-out group-hover:scale-100">
@@ -89,7 +122,7 @@ export function VideoDialog({ src, loopSrc, poster, title, inline, prefetch, bar
                     <X className="size-5" />
                   </button>
                   <div className="overflow-hidden rounded-2xl border-2 border-white bg-black">
-                    <video src={src} title={title} controls autoPlay playsInline className="block h-[min(85vh,760px)] w-auto max-w-[92vw]" />
+                    <video ref={player} title={title} controls autoPlay playsInline className="block h-[min(85vh,760px)] w-auto max-w-[92vw]" />
                   </div>
                 </motion.div>
               </motion.div>

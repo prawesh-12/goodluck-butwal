@@ -1,13 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { TAGS, invalidate, revalidateSitemap } from "@/lib/cache";
 import { eq, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@db/client";
 import { institutionImages, institutions, partners, redirects } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
-import { requirePermission } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
+import { can, requirePermission } from "@/lib/auth/rbac";
 import { sanitize } from "@/lib/security/sanitize";
 import { uniqueSlug } from "@/lib/utils/slug";
 import { mediaAlt } from "@/features/media/admin-queries";
@@ -21,14 +21,11 @@ import {
   updateInstitutionSchema,
   type InstitutionInput,
 } from "@/features/institutions/validators";
-import { type AttachedImage } from "@/lib/validators/content-fields";
-import { publishRefusal, seoValues, slugRedirect } from "@/features/pages/validators";
+import { publishRefusal, slugRedirect, type AttachedImage } from "@/lib/validators/content-fields";
 
 type Result<T = { id: string }> =
   | { ok: true; data: T }
   | { ok: false; error: string; fieldErrors?: Record<string, string[]> };
-
-const GOING_LIVE = new Set(["published", "scheduled"]);
 
 const blank = (value: string) => (value === "" ? null : value);
 
@@ -45,7 +42,6 @@ function columns(data: InstitutionInput) {
     isFeatured: data.isFeatured,
     status: data.status,
     sortOrder: data.sortOrder,
-    ...seoValues(data),
   };
 }
 
@@ -53,7 +49,6 @@ async function publishProblems(data: InstitutionInput, id?: string) {
   const gallery = id ? await institutionGallery(id) : [];
   const images = [
     { label: "The logo", id: data.logoId },
-    { label: "The share image", id: data.seoOgImageId },
     ...gallery.map((row, i) => ({ label: `Gallery picture ${i + 1}`, id: row.mediaId })),
   ].filter((image) => image.id) as { label: string; id: string }[];
 
@@ -63,11 +58,20 @@ async function publishProblems(data: InstitutionInput, id?: string) {
   return institutionPublishProblems(data, described);
 }
 
+function publishedDate(data: { status: string }, existing: Date | null) {
+  return data.status === "published" ? (existing ?? new Date()) : existing;
+}
+
 function refresh(paths: string[]) {
+  invalidate(TAGS.institutions, TAGS.courses);
+  revalidateSitemap();
   revalidatePath("/admin/institutions");
   revalidatePath("/institutions");
   revalidatePath("/courses");
   for (const path of paths) revalidatePath(path);
+  // Course pages carry the institution's name and logo and are gated on it staying published.
+  revalidatePath("/study-abroad/[destination]", "page");
+  revalidatePath("/courses/[slug]", "page");
 }
 
 export async function createInstitution(input: unknown): Promise<Result> {
@@ -80,8 +84,11 @@ export async function createInstitution(input: unknown): Promise<Result> {
   }
   const data = parsed.data;
 
-  if (GOING_LIVE.has(data.status)) {
-    requirePermission(actor, "institutions", "publish");
+  if (data.status === "published" && !can(actor, "institutions", "publish")) {
+    return { ok: false, error: "You cannot publish. Save it as a draft and ask an admin." };
+  }
+
+  if (data.status === "published") {
     const problems = await publishProblems(data);
     if (problems.length > 0) return publishRefusal(problems);
   }
@@ -92,19 +99,11 @@ export async function createInstitution(input: unknown): Promise<Result> {
     .values({
       ...columns(data),
       slug,
-      publishedAt: data.status === "published" ? new Date() : null,
+      publishedAt: publishedDate(data, null),
       createdBy: actor.id,
       updatedBy: actor.id,
     })
     .returning({ id: institutions.id });
-
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "institutions",
-    entityId: row.id,
-    summary: `added the institution ${data.name}`,
-  });
 
   refresh([institutionPath(slug)]);
   return { ok: true, data: { id: row.id } };
@@ -133,8 +132,11 @@ export async function updateInstitution(input: unknown): Promise<Result> {
     };
   }
 
-  if (GOING_LIVE.has(data.status)) {
-    requirePermission(actor, "institutions", "publish");
+  if (data.status !== existing.status && !can(actor, "institutions", "publish")) {
+    return { ok: false, error: `You cannot change whether a institution is live. Ask an admin.` };
+  }
+
+  if (data.status === "published") {
     const problems = await publishProblems(data, existing.id);
     if (problems.length > 0) return publishRefusal(problems);
   }
@@ -157,19 +159,11 @@ export async function updateInstitution(input: unknown): Promise<Result> {
     .set({
       ...columns(data),
       slug: data.slug,
-      publishedAt: data.status === "published" ? (existing.publishedAt ?? new Date()) : existing.publishedAt,
+      publishedAt: publishedDate(data, existing.publishedAt),
       updatedBy: actor.id,
       updatedAt: new Date(),
     })
     .where(eq(institutions.id, data.id));
-
-  await writeAudit({
-    userId: actor.id,
-    action: data.status === "published" && existing.status !== "published" ? "publish" : "update",
-    entityType: "institutions",
-    entityId: data.id,
-    summary: redirect ? `${existing.slug} is now ${data.slug}, 301 written` : `saved the institution ${data.name}`,
-  });
 
   refresh([before, after]);
   return { ok: true, data: { id: data.id } };
@@ -198,13 +192,6 @@ export async function deleteInstitution(input: unknown): Promise<Result> {
   }
 
   await db.delete(institutions).where(eq(institutions.id, existing.id));
-  await writeAudit({
-    userId: actor.id,
-    action: "delete",
-    entityType: "institutions",
-    entityId: existing.id,
-    summary: `deleted the institution ${existing.name}`,
-  });
 
   refresh([institutionPath(existing.slug)]);
   return { ok: true, data: { id: existing.id } };
@@ -260,14 +247,6 @@ export async function saveInstitutionGallery(input: unknown): Promise<Result> {
     else await db.insert(institutionImages).values({ ...values, createdBy: actor.id });
   }
 
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "institution_images",
-    entityId: owner.id,
-    summary: `saved ${items.length} gallery pictures on ${owner.name}`,
-  });
-
   refresh([institutionPath(owner.slug)]);
   return { ok: true, data: { id: owner.id } };
 }
@@ -289,13 +268,7 @@ export async function linkPartnersToInstitutions(): Promise<Result<{ linked: num
       .where(eq(partners.id, pair.partnerId));
   }
 
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "partners",
-    summary: `linked ${pairs.length} partner logos to institutions`,
-  });
-
+  invalidate(TAGS.partners);
   revalidatePath("/admin/partners");
   revalidatePath("/admin/institutions");
   revalidatePath("/");

@@ -1,13 +1,14 @@
-import { EmptyState, ListHeader, NewButton } from "@/components/shared/admin/list-ui";
+import { Lock } from "lucide-react";
+import { NewButton } from "@/components/shared/admin/list-ui";
+import { EmptyState } from "@/components/shared/admin/states";
 
 export default function Forbidden() {
   return (
-    <div className="space-y-4">
-      <ListHeader title="Not your area" />
-      <EmptyState>
-        Your role does not cover this screen. If you need it, ask a super admin.
-      </EmptyState>
-      <NewButton href="/admin">Back to the dashboard</NewButton>
-    </div>
+    <EmptyState
+      icon={Lock}
+      title="You don't have access to this"
+      description="Your role does not cover this screen. Ask a super admin if you need it."
+      action={<NewButton href="/admin">Back to the dashboard</NewButton>}
+    />
   );
 }

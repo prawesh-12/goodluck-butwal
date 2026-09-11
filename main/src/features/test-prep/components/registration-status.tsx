@@ -1,33 +1,45 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAction } from "@/components/shared/admin/use-action";
+import { statusLabel } from "@/components/shared/admin/list-ui";
 import { updateRegistration } from "@/features/test-prep/actions";
-import { Dropdown } from "@/components/ui/dropdown";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/admin/select";
 
 const STATUSES = ["registered", "attended", "cancelled"];
 
 export function RegistrationStatus({ id, status }: { id: string; status: string }) {
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { busy, run } = useAction();
 
   return (
-    <>
-      <Dropdown
-        ariaLabel="Registration status"
-        value={status}
-        disabled={busy}
-        options={STATUSES.map((s) => ({ value: s, label: s }))}
-        onChange={async (next) => {
-          setBusy(true);
-          const result = await updateRegistration({ id, status: next });
-          setBusy(false);
-          setError(result.ok ? null : result.error);
-          if (result.ok) router.refresh();
-        }}
-      />
-      {error ? <span className="admin-clash">{error}</span> : null}
-    </>
+    <Select
+      value={status}
+      disabled={busy}
+      onValueChange={async (next) => {
+        const saved = await run(() => updateRegistration({ id, status: next }), {
+          success: "Registration updated",
+          failure: "Couldn't update the registration.",
+        });
+        if (saved) router.refresh();
+      }}
+    >
+      <SelectTrigger size="sm" className="w-36" aria-label="Registration status">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {STATUSES.map((option) => (
+          <SelectItem key={option} value={option}>
+            {statusLabel(option)}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

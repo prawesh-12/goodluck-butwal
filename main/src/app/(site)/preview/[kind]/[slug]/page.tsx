@@ -2,16 +2,7 @@ import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import { db } from "@db/client";
-import {
-  courses,
-  destinations,
-  events,
-  institutions,
-  pages,
-  services,
-  testPrepCourses,
-  testimonials,
-} from "@db/schema";
+import { courses, events, institutions, testPrepCourses } from "@db/schema";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { previewMetadata } from "@/lib/security/preview";
@@ -28,14 +19,10 @@ const KINDS: Record<
   string,
   { entity: Entity; table: PgTable; slug: PgColumn; title: PgColumn; body: PgColumn | null; status: PgColumn }
 > = {
-  page: { entity: "pages", table: pages, slug: pages.slug, title: pages.title, body: pages.bodyHtml, status: pages.status },
-  destination: { entity: "destinations", table: destinations, slug: destinations.slug, title: destinations.name, body: destinations.overviewHtml, status: destinations.status },
-  service: { entity: "services", table: services, slug: services.slug, title: services.name, body: services.introHtml, status: services.status },
   institution: { entity: "institutions", table: institutions, slug: institutions.slug, title: institutions.name, body: institutions.descriptionHtml, status: institutions.status },
   course: { entity: "courses", table: courses, slug: courses.slug, title: courses.name, body: courses.descriptionHtml, status: courses.status },
   event: { entity: "events", table: events, slug: events.slug, title: events.title, body: events.descriptionHtml, status: events.status },
   "test-prep": { entity: "testPrep", table: testPrepCourses, slug: testPrepCourses.slug, title: testPrepCourses.name, body: testPrepCourses.descriptionHtml, status: testPrepCourses.status },
-  testimonial: { entity: "testimonials", table: testimonials, slug: testimonials.displayName, title: testimonials.displayName, body: testimonials.bodyHtml, status: testimonials.status },
 };
 
 export default async function Preview({

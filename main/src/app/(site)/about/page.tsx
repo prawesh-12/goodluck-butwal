@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildEntityMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo";
 import { gl, img } from "@/config/assets";
 import { offices } from "@/config/site";
 import { getAboutContent } from "@/features/pages/queries";
@@ -14,10 +14,11 @@ import { VideoDialog } from "@/components/ui/video-dialog";
 import { InnerHero, SectionHead, StatCard, TeamCard } from "@/components/shared/inner";
 import { Partners } from "@/features/partners/components/partners";
 import { TabShoulders } from "@/components/shared/steps";
+import { Img } from "@/components/ui/img";
 
 export async function generateMetadata(): Promise<Metadata> {
   const about = await getAboutContent();
-  return buildEntityMetadata("page", "about", {
+  return buildMetadata({
     path: "/about",
     title: "About us",
     description: about.established,
@@ -69,7 +70,7 @@ export default async function AboutPage() {
                 {about.ethics.map((text, i) => (
                   <div key={text} className="flex items-start gap-4">
                     <span className="icon-dark flex size-10 shrink-0 items-center justify-center overflow-clip rounded-[10px] ring-1 ring-inset ring-white/10">
-                      <img src={img.overviewIcons[i % 3]} alt="" className="h-5" loading="lazy" decoding="async" />
+                      <Img src={img.overviewIcons[i % 3]} alt="" w={40} className="h-5" loading="lazy" decoding="async" />
                     </span>
                     <p className="t-body max-w-[500px] pt-2 text-muted">{text}</p>
                   </div>
@@ -90,7 +91,7 @@ export default async function AboutPage() {
             <div className="relative w-full overflow-clip rounded-[10px] p-[6px] ring-1 ring-inset ring-hairline md:rounded-[30px]">
               <div className="grid overflow-clip rounded-[6px] bg-surface md:grid-cols-[0.9fr_1.1fr] md:rounded-[24px]">
                 <div className="relative min-h-[320px] md:min-h-0">
-                  <img src={gl.founders} alt="Bimal Gurung and Kishor Gharti Magar" className="absolute inset-0 size-full object-cover object-[40%_20%]" loading="lazy" decoding="async" />
+                  <Img src={gl.founders} alt="Bimal Gurung and Kishor Gharti Magar" sizes="(min-width: 810px) 50vw, 100vw" className="absolute inset-0 size-full object-cover object-[40%_20%]" loading="lazy" decoding="async" />
                   <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_55%,rgba(0,0,0,0.55)_100%)]" />
                   <div className="absolute inset-x-5 bottom-5 flex flex-col gap-[2px]">
                     <p className="text-[18px] font-semibold leading-[23.4px] text-white md:text-[20px] md:leading-[26px]">{about.founders}</p>

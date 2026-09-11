@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Appear } from "@/components/ui/appear";
 import { Chip } from "@/components/ui/bits";
 import type { PublicInstitution } from "@/features/institutions/queries";
+import { Img } from "@/components/ui/img";
 
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
 
@@ -25,7 +26,7 @@ export function InstitutionCard({
       >
         <div className="flex aspect-[1533/458] w-full items-center justify-center overflow-clip rounded-[6px] bg-surface p-6 lg:rounded-[10px]">
           {institution.logo ? (
-            <img src={institution.logo} alt={institution.name} className="max-h-full w-auto max-w-[70%] object-contain transition-transform duration-500 group-hover:scale-[1.06]" loading="lazy" decoding="async" />
+            <Img src={institution.logo} alt={institution.name} w={320} className="max-h-full w-auto max-w-[70%] object-contain transition-transform duration-500 group-hover:scale-[1.06]" loading="lazy" decoding="async" />
           ) : (
             <span className="t-base px-4 text-center text-muted">{institution.name}</span>
           )}

@@ -1,11 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Field, SaveBar, Select, TextArea } from "@/components/shared/admin/repeater";
-import { createBatch, deleteBatch, updateBatch } from "@/features/test-prep/actions";
+import { Trash2 } from "lucide-react";
 import { DAY_NAMES } from "@/config/content-meta";
-import { seatLabel, type BatchStatus } from "@/features/test-prep/seats";
+import { seatLabel, seatsRemaining, type BatchStatus } from "@/features/test-prep/seats";
+import { CheckboxGroup, SelectField, TextAreaField, TextField } from "@/components/shared/admin/fields";
+import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
+import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
+import { Button } from "@/components/ui/admin/button";
+import { createBatch, deleteBatch, updateBatch } from "@/features/test-prep/actions";
 
 export type BatchValue = {
   id?: string;
@@ -27,6 +33,16 @@ export type BatchValue = {
 
 export type Option = { id: string; name: string };
 
+const STATUSES = [
+  { value: "open", label: "Open" },
+  { value: "filling_fast", label: "Filling fast" },
+  { value: "full", label: "Full" },
+  { value: "closed", label: "Closed" },
+  { value: "completed", label: "Completed" },
+];
+
+const DAY_OPTIONS = DAY_NAMES.map((name, day) => ({ value: String(day), label: name.slice(0, 3) }));
+
 export function BatchEditor({
   value,
   courses,
@@ -39,200 +55,234 @@ export function BatchEditor({
   canDelete: boolean;
 }) {
   const router = useRouter();
+  const { busy, errors, run } = useAction();
   const [row, setRow] = useState<BatchValue>(value);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string[] | undefined>>({});
+  const [dirty, setDirty] = useState(false);
 
-  const set = (patch: Partial<BatchValue>) => setRow((current) => ({ ...current, ...patch }));
+  useEffect(() => {
+    focusFirstError(errors);
+  }, [errors]);
 
-  const toggleDay = (day: number) =>
-    set({
-      scheduleDays: row.scheduleDays.includes(day)
-        ? row.scheduleDays.filter((d) => d !== day)
-        : [...row.scheduleDays, day].sort((a, b) => a - b),
-    });
+  const set = (patch: Partial<BatchValue>) => {
+    setRow((current) => ({ ...current, ...patch }));
+    setDirty(true);
+  };
 
+  const id = row.id;
   const label = seatLabel({
     totalSeats: row.totalSeats,
     seatsTaken: row.seatsTaken,
     status: row.status as BatchStatus,
   });
 
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const saved = await run(() => (id ? updateBatch(row) : createBatch(row)), {
+      success: id ? "Batch saved" : "Batch created",
+      failure: id ? "Couldn't save the batch." : "Couldn't create the batch.",
+    });
+    if (!saved) return;
+    setDirty(false);
+    if (id) router.refresh();
+    else router.push(`/admin/test-prep/batches/${saved.id}`);
+  };
+
   return (
-    <form
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const result = row.id ? await updateBatch(row) : await createBatch(row);
-        setBusy(false);
-        setErrors(result.ok ? {} : (result.fieldErrors ?? {}));
-        setMessage(result.ok ? "Saved." : result.error);
-        if (result.ok && !row.id) router.push(`/admin/test-prep/batches/${result.data.id}`);
-        else if (result.ok) router.refresh();
-      }}
-    >
-      <Select
-        label="Course"
-        help="Which course this batch teaches. The batch is listed under it."
-        value={row.courseId}
-        onChange={(courseId) => set({ courseId })}
-        options={[
-          { value: "", label: "Choose a course", disabled: true },
-          ...courses.map((c) => ({ value: c.id, label: c.name })),
-        ]}
-        error={errors.courseId?.[0]}
-      />
+    <form onSubmit={save} className="space-y-6">
+      <UnsavedGuard dirty={dirty} />
 
-      <Field
-        label="Batch name"
-        help="What staff and students call this run, like Morning batch."
-        value={row.batchName}
-        onChange={(batchName) => set({ batchName })}
-        error={errors.batchName?.[0]}
-      />
+      <EditorLayout
+        aside={
+          <>
+            <SectionCard title="Availability">
+              <SelectField
+                name="status"
+                label="Registration status"
+                value={row.status}
+                onChange={(status) => set({ status })}
+                options={STATUSES}
+                help="Open lets the seat count speak for itself."
+              />
+              <p className="text-xs text-muted-foreground">
+                Shown as {label.toLowerCase()}, with {Math.max(0, seatsRemaining(row.totalSeats, row.seatsTaken))}{" "}
+                seats left.
+              </p>
+            </SectionCard>
 
-      <Field
-        label="Starts"
-        type="date"
-        help="The first class. Batches that have started are off the public batch table."
-        value={row.startDate}
-        onChange={(startDate) => set({ startDate })}
-        error={errors.startDate?.[0]}
-      />
+            <SectionCard title="Internal notes" description="For staff only. Never shown on the site.">
+              <TextAreaField
+                name="notes"
+                label="Notes"
+                rows={4}
+                value={row.notes}
+                onChange={(notes) => set({ notes })}
+              />
+            </SectionCard>
+          </>
+        }
+      >
+        <SectionCard title="Batch details">
+          <SelectField
+            name="courseId"
+            label="Course"
+            required
+            value={row.courseId}
+            error={errors.courseId?.[0]}
+            onChange={(courseId) => set({ courseId })}
+            options={courses.map((course) => ({ value: course.id, label: course.name }))}
+            placeholder="Choose a course"
+          />
 
-      <Field
-        label="Ends"
-        type="date"
-        help="The last class. Leave empty if it is not set yet."
-        value={row.endDate}
-        onChange={(endDate) => set({ endDate })}
-        error={errors.endDate?.[0]}
-      />
+          <TextField
+            name="batchName"
+            label="Batch name"
+            required
+            help="What staff and students call this run, like Morning batch."
+            value={row.batchName}
+            error={errors.batchName?.[0]}
+            onChange={(batchName) => set({ batchName })}
+          />
 
-      <fieldset className="admin-field">
-        <span className="t-small">Class days</span>
-        <span className="t-small admin-help">The days of the week this batch runs.</span>
-        <div className="admin-actions">
-          {DAY_NAMES.map((name, day) => (
-            <label key={name} className="t-small">
-              <input type="checkbox" checked={row.scheduleDays.includes(day)} onChange={() => toggleDay(day)} />{" "}
-              {name.slice(0, 3)}
-            </label>
-          ))}
-        </div>
-        {errors.scheduleDays?.[0] ? <span className="admin-clash">{errors.scheduleDays[0]}</span> : null}
-      </fieldset>
+          <SelectField
+            name="trainerId"
+            label="Trainer"
+            value={row.trainerId ?? ""}
+            emptyLabel="Not decided"
+            onChange={(trainerId) => set({ trainerId: trainerId || null })}
+            options={trainers.map((trainer) => ({ value: trainer.id, label: trainer.name }))}
+          />
 
-      <Field
-        label="Starts at"
-        type="time"
-        help="Local time at the office that runs the batch."
-        value={row.startTime}
-        onChange={(startTime) => set({ startTime })}
-        error={errors.startTime?.[0]}
-      />
+          <SelectField
+            name="mode"
+            label="Taught"
+            value={row.mode}
+            onChange={(mode) => set({ mode })}
+            options={[
+              { value: "in_person", label: "In person" },
+              { value: "online", label: "Online" },
+              { value: "hybrid", label: "Hybrid" },
+            ]}
+          />
+        </SectionCard>
 
-      <Field
-        label="Ends at"
-        type="time"
-        help="Local time at the office that runs the batch."
-        value={row.endTime}
-        onChange={(endTime) => set({ endTime })}
-        error={errors.endTime?.[0]}
-      />
+        <SectionCard title="Schedule">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField
+              name="startDate"
+              label="First class"
+              required
+              type="date"
+              value={row.startDate}
+              error={errors.startDate?.[0]}
+              onChange={(startDate) => set({ startDate })}
+            />
+            <TextField
+              name="endDate"
+              label="Last class"
+              type="date"
+              help="Leave it empty if it is not decided."
+              value={row.endDate}
+              error={errors.endDate?.[0]}
+              onChange={(endDate) => set({ endDate })}
+            />
+          </div>
 
-      <Select
-        label="Mode"
-        help="How the class is taught. Visitors filter the batch table by it."
-        value={row.mode}
-        onChange={(mode) => set({ mode })}
-        options={[
-          { value: "in_person", label: "In person" },
-          { value: "online", label: "Online" },
-          { value: "hybrid", label: "Hybrid" },
-        ]}
-      />
+          <CheckboxGroup
+            name="scheduleDays"
+            label="Class days"
+            options={DAY_OPTIONS}
+            error={errors.scheduleDays?.[0]}
+            columns={4}
+            selected={row.scheduleDays.map(String)}
+            onChange={(days) => set({ scheduleDays: days.map(Number).sort((a, b) => a - b) })}
+          />
 
-      <Select
-        label="Trainer"
-        help="Only Nepal team members teach test preparation."
-        value={row.trainerId ?? ""}
-        onChange={(trainerId) => set({ trainerId: trainerId || null })}
-        options={[
-          { value: "", label: "Not decided" },
-          ...trainers.map((t) => ({ value: t.id, label: t.name })),
-        ]}
-      />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField
+              name="startTime"
+              label="Starts at"
+              type="time"
+              value={row.startTime}
+              error={errors.startTime?.[0]}
+              onChange={(startTime) => set({ startTime })}
+            />
+            <TextField
+              name="endTime"
+              label="Ends at"
+              type="time"
+              value={row.endTime}
+              error={errors.endTime?.[0]}
+              onChange={(endTime) => set({ endTime })}
+            />
+          </div>
+        </SectionCard>
 
-      <Field
-        label="Total seats"
-        type="number"
-        help="How many people fit in the class."
-        value={String(row.totalSeats)}
-        onChange={(totalSeats) => set({ totalSeats: Number(totalSeats) || 0 })}
-        error={errors.totalSeats?.[0]}
-      />
+        <SectionCard title="Seats">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField
+              name="totalSeats"
+              label="Total seats"
+              required
+              type="number"
+              value={String(row.totalSeats)}
+              error={errors.totalSeats?.[0]}
+              onChange={(totalSeats) => set({ totalSeats: Number(totalSeats) || 0 })}
+            />
+            <TextField
+              name="seatsTaken"
+              label="Seats taken"
+              type="number"
+              help="Registrations count themselves. Change this only to correct it."
+              value={String(row.seatsTaken)}
+              error={errors.seatsTaken?.[0]}
+              onChange={(seatsTaken) => set({ seatsTaken: Number(seatsTaken) || 0 })}
+            />
+          </div>
+        </SectionCard>
 
-      <Field
-        label="Seats taken"
-        type="number"
-        help="Registrations from the site count themselves. Change this only to correct it."
-        value={String(row.seatsTaken)}
-        onChange={(seatsTaken) => set({ seatsTaken: Number(seatsTaken) || 0 })}
-        error={errors.seatsTaken?.[0]}
-      />
+        <SectionCard title="Fee" description="Leave it empty to charge the course fee.">
+          <TextField
+            name="fee"
+            label="Fee"
+            value={row.fee}
+            error={errors.fee?.[0]}
+            onChange={(fee) => set({ fee })}
+          />
+        </SectionCard>
+      </EditorLayout>
 
-      <Select
-        label="Status"
-        help="Open lets the seat count speak. Anything else overrides it on the site."
-        value={row.status}
-        onChange={(status) => set({ status })}
-        options={[
-          { value: "open", label: "Open" },
-          { value: "filling_fast", label: "Filling fast" },
-          { value: "full", label: "Full" },
-          { value: "closed", label: "Closed" },
-          { value: "completed", label: "Completed" },
-        ]}
-      />
-
-      <p className="t-small admin-help">
-        The site will show this batch as {label}, with {Math.max(0, row.totalSeats - row.seatsTaken)} seats left.
-      </p>
-
-      <Field
-        label="Fee"
-        help="Charged instead of the course fee. Leave empty to use the course fee."
-        value={row.fee}
-        onChange={(fee) => set({ fee })}
-        error={errors.fee?.[0]}
-      />
-
-      <TextArea
-        label="Internal notes"
-        help="For staff only. Never shown on the site."
-        rows={3}
-        value={row.notes}
-        onChange={(notes) => set({ notes })}
-      />
-
-      <SaveBar
+      <EditorActionBar
+        dirty={dirty}
         busy={busy}
-        message={message}
-        viewHref="/test-preparation/batches"
-        onDelete={
-          canDelete && row.id
-            ? async () => {
-                if (!confirm(`Delete ${row.batchName}? This cannot be undone.`)) return;
-                setBusy(true);
-                const result = await deleteBatch({ id: row.id });
-                setBusy(false);
-                if (result.ok) router.push("/admin/test-prep/batches");
-                else setMessage(result.error);
+        destructive={
+          canDelete && id ? (
+            <ConfirmDialog
+              trigger={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  <Trash2 />
+                  Delete
+                </Button>
               }
-            : undefined
+              title={`Delete ${row.batchName || "this batch"}?`}
+              description="This cannot be undone. A batch with registrations has to be closed instead."
+              confirmLabel="Delete batch"
+              onConfirm={async () => {
+                const deleted = await run(() => deleteBatch({ id }), {
+                  success: "Batch deleted",
+                  failure: "Couldn't delete the batch.",
+                });
+                if (deleted) {
+                  setDirty(false);
+                  router.push("/admin/test-prep/batches");
+                }
+              }}
+            />
+          ) : null
         }
       />
     </form>

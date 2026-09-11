@@ -1,8 +1,8 @@
 import { cache } from "react";
-import { asc, eq, inArray, like } from "drizzle-orm";
+import { asc, eq, like } from "drizzle-orm";
 import { db } from "@db/client";
-import { destinations, mediaAssets, uiStrings } from "@db/schema";
-import { mediaUrl } from "@/lib/utils/media-url";
+import { destinations, uiStrings } from "@db/schema";
+import { destinationArt } from "@/config/assets";
 
 export type PublicDestination = {
   slug: string;
@@ -28,17 +28,12 @@ export type PublicDestination = {
 
 export type FaqItem = { q: string; a: string };
 
-const hero = mediaAssets;
-
 export const listDestinations = cache(async (): Promise<PublicDestination[]> => {
   const [rows, strings] = await Promise.all([
     db
       .select({
         slug: destinations.slug,
         name: destinations.name,
-        flagImageId: destinations.flagImageId,
-        cardImageId: destinations.cardImageId,
-        heroImageId: destinations.heroImageId,
         overviewHtml: destinations.overviewHtml,
         highlights: destinations.highlights,
         academicHtml: destinations.academicHtml,
@@ -59,37 +54,12 @@ export const listDestinations = cache(async (): Promise<PublicDestination[]> => 
       .where(like(uiStrings.key, "destination.%")),
   ]);
 
-  const wanted = [...new Set(
-    rows.flatMap((row) => [row.flagImageId, row.cardImageId, row.heroImageId])
-      .filter((id): id is string => Boolean(id)),
-  )];
-  const paths = wanted.length
-    ? await db
-        .select({
-          id: hero.id,
-          kind: hero.kind,
-          staticPath: hero.staticPath,
-          cloudinaryPublicId: hero.cloudinaryPublicId,
-          alt: hero.altText,
-        })
-        .from(hero)
-        .where(inArray(hero.id, wanted))
-    : [];
-
   const text = new Map(strings.map((s) => [s.key, s.value]));
-  const media = new Map(paths.map((m) => [m.id, m]));
-  const path = (id: string | null, width: number) => {
-    const row = id ? media.get(id) : undefined;
-    return row ? mediaUrl(row, width) : "";
-  };
 
   return rows.map((row) => ({
     slug: row.slug,
     name: row.name,
-    flag: path(row.flagImageId, 320),
-    card: path(row.cardImageId, 640),
-    hero: path(row.heroImageId, 1920),
-    heroAlt: row.heroImageId ? (media.get(row.heroImageId)?.alt ?? "") : "",
+    ...(destinationArt[row.slug] ?? { flag: "", card: "", hero: "", heroAlt: "" }),
     overview: row.overviewHtml ?? "",
     highlights: (row.highlights ?? []).map((h) => ({ title: h.label, line: h.value })),
     academic: row.academicHtml ?? "",

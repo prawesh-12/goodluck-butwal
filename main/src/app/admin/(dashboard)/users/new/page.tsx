@@ -1,6 +1,7 @@
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
-import { officeOptions } from "@/features/offices/admin-queries";
+import { EditorHeader } from "@/components/shared/admin/page-header";
+import { officeOptions } from "@/features/offices/queries";
 import { UserEditor } from "@/features/users/components/user-editor";
 
 export const dynamic = "force-dynamic";
@@ -13,10 +14,19 @@ export default async function NewUserPage() {
 
   return (
     <>
-      <h1 className="t-h4">Add a user</h1>
+      <EditorHeader backHref="/admin/users" backLabel="Users" title="Add user" />
 
       <UserEditor
-        values={{ id: "", name: "", email: "", role: "content_editor", officeId: "", isActive: true }}
+        values={{
+          id: "",
+          name: "",
+          email: "",
+          password: "",
+          role: "content_editor",
+          officeId: "",
+          isActive: true,
+          confirmation: "",
+        }}
         offices={offices}
       />
     </>

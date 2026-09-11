@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { breadcrumbs, event as eventSchema } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
@@ -13,6 +13,7 @@ import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
 import { RegistrationForm } from "@/features/events/components/registration-form";
 import { formText } from "@/features/site-text/form-text";
 import { loadText } from "@/features/site-text/queries";
+import { Img } from "@/components/ui/img";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const event = await getEvent(slug);
   if (!event) return buildMetadata({ path: "/events", title: "Events", noindex: true });
-  return buildEntityMetadata("event", slug, {
+  return buildMetadata({
     path: `/events/${slug}`,
     title: event.title,
     description: event.summary,
@@ -81,7 +82,7 @@ export default async function EventPage({ params }: Props) {
           <div className="flex flex-col items-center gap-[50px]">
             {event.image ? (
               <Appear y={10} duration={0.6} className="aspect-[1533/458] w-full overflow-clip rounded-[10px] md:rounded-[20px]">
-                <img src={event.image} alt={event.title} className="size-full object-cover" loading="lazy" decoding="async" />
+                <Img src={event.image} alt={event.title} sizes="(min-width: 810px) 800px, 100vw" className="size-full object-cover" loading="lazy" decoding="async" />
               </Appear>
             ) : null}
 

@@ -12,14 +12,13 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { base, mediaAssets, offices, publishing, seo } from "./core";
+import { base, mediaAssets, offices, publishing } from "./core";
 import { batchMode, batchStatus, regStatus, testType } from "./enums";
 import { teamMembers } from "./people";
 
 export const testPrepCourses = pgTable("test_prep_courses", {
   ...base,
   ...publishing,
-  ...seo,
   slug: text("slug").notNull().unique(),
   testType: testType("test_type").notNull(),
   name: text("name").notNull(),

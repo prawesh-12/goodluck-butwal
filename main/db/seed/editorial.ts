@@ -1,9 +1,8 @@
-import { eq } from "drizzle-orm";
 import { db } from "@db/client";
-import { mediaAssets, postCategories, posts, settings, testimonials } from "@db/schema";
+import { mediaAssets, postCategories, posts, settings } from "@db/schema";
 import { slugify } from "@/lib/utils/slug";
 import articles from "./source/articles.json";
-import { googleRating, reviews, successStories } from "./source/stories";
+import { googleRating } from "./source/stories";
 
 async function mediaIdByPath() {
   const rows = await db.select({ id: mediaAssets.id, path: mediaAssets.staticPath }).from(mediaAssets);
@@ -51,46 +50,6 @@ export async function seedPosts() {
       .onConflictDoUpdate({ target: posts.slug, set: { ...row, updatedAt: new Date() } });
   }
   return articles.length;
-}
-
-export async function seedTestimonials() {
-  const media = await mediaIdByPath();
-
-  const written = reviews.map((review, index) => ({
-    type: "text" as const,
-    authorName: review.name,
-    displayName: review.name,
-    authorPhotoId: media.get(review.avatar) ?? null,
-    quote: review.quote,
-    rating: 5,
-    status: "published" as const,
-    publishedAt: new Date(),
-    sortOrder: index,
-  }));
-
-  const graphics = successStories.map((story, index) => ({
-    type: "image" as const,
-    displayName: story.alt,
-    imageId: media.get(story.image) ?? null,
-    status: "published" as const,
-    publishedAt: new Date(),
-    sortOrder: reviews.length + index,
-  }));
-
-  for (const row of [...written, ...graphics]) {
-    const key = row.displayName!;
-    const existing = await db
-      .select({ id: testimonials.id })
-      .from(testimonials)
-      .where(eq(testimonials.displayName, key));
-
-    if (existing.length) {
-      await db.update(testimonials).set({ ...row, updatedAt: new Date() }).where(eq(testimonials.id, existing[0].id));
-    } else {
-      await db.insert(testimonials).values(row);
-    }
-  }
-  return written.length + graphics.length;
 }
 
 export async function seedRating() {

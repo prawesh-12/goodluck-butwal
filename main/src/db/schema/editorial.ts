@@ -4,17 +4,15 @@ import {
   integer,
   pgTable,
   primaryKey,
-  smallint,
   text,
   timestamp,
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { base, mediaAssets, offices, publishing, seo, users } from "./core";
-import { eventType, regStatus, testimonialType, videoProvider } from "./enums";
-import { destinations, services } from "./destinations";
-import { institutions } from "./institutions";
+import { base, mediaAssets, offices, publishing, users } from "./core";
+import { eventType, regStatus } from "./enums";
+import { destinations } from "./destinations";
 
 export const postCategories = pgTable("post_categories", {
   ...base,
@@ -51,7 +49,6 @@ export const posts = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     slug: text("slug").notNull().unique(),
     title: text("title").notNull(),
     excerpt: text("excerpt"),
@@ -76,7 +73,6 @@ export const events = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     slug: text("slug").notNull().unique(),
     title: text("title").notNull(),
     eventType: eventType("event_type").notNull(),
@@ -119,29 +115,3 @@ export const eventRegistrations = pgTable(
   ],
 );
 
-export const testimonials = pgTable(
-  "testimonials",
-  {
-    ...base,
-    ...publishing,
-    type: testimonialType("type").notNull().default("text"),
-    // author_name stays admin-only when anonymised, display_name is what the public sees.
-    authorName: text("author_name"),
-    displayName: text("display_name"),
-    isAnonymised: boolean("is_anonymised").notNull().default(false),
-    authorPhotoId: uuid("author_photo_id").references(() => mediaAssets.id),
-    authorLocation: text("author_location"),
-    quote: text("quote"),
-    bodyHtml: text("body_html"),
-    imageId: uuid("image_id").references(() => mediaAssets.id),
-    videoUrl: text("video_url"),
-    videoProvider: videoProvider("video_provider"),
-    destinationId: uuid("destination_id").references(() => destinations.id),
-    institutionId: uuid("institution_id").references(() => institutions.id),
-    serviceId: uuid("service_id").references(() => services.id),
-    officeId: uuid("office_id").references(() => offices.id),
-    rating: smallint("rating"),
-    isFeatured: boolean("is_featured").notNull().default(false),
-  },
-  (t) => [index("testimonials_status_featured_type_idx").on(t.status, t.isFeatured, t.type)],
-);

@@ -2,10 +2,11 @@ import { notFound } from "next/navigation";
 import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader, PreviewButton, ViewOnSiteButton } from "@/components/shared/admin/page-header";
+import { StatusBadge } from "@/components/shared/admin/list-ui";
 import { PostForm } from "@/features/posts/components/post-form";
-import { pickedMedia } from "@/features/media/picked-media-map";
-import { editorialOptions } from "@/features/posts/admin-queries";
-import { getAdminPost } from "@/features/posts/admin-queries";
+import { pickedMedia } from "@/features/media/admin-queries";
+import { editorialOptions, getAdminPost } from "@/features/posts/admin-queries";
 
 export const dynamic = "force-dynamic";
 
@@ -20,17 +21,23 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
 
   const [options, media] = await Promise.all([
     editorialOptions(),
-    pickedMedia([post.bannerImageId, post.seoOgImageId]),
+    pickedMedia([post.bannerImageId]),
   ]);
 
   return (
     <>
-      <h1 className="t-h4">{post.title}</h1>
-      <p className="t-small admin-help">
-        <a href={`/news/${post.slug}`} target="_blank" rel="noreferrer">
-          View on site
-        </a>
-      </p>
+      <EditorHeader
+        backHref="/admin/posts"
+        backLabel="News"
+        title={post.title}
+        meta={<StatusBadge status={post.status} />}
+        actions={
+          <>
+            <PreviewButton href={`/preview/post/${post.slug}`} />
+            {post.status === "published" ? <ViewOnSiteButton href={`/news/${post.slug}`} /> : null}
+          </>
+        }
+      />
 
       <PostForm
         values={{
@@ -46,16 +53,9 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
           tagIds: post.tagIds,
           authorDisplayName: post.authorDisplayName ?? "",
           status: post.status,
-          publishedAt: post.publishedAt ? post.publishedAt.toISOString().slice(0, 16) : "",
-          seoTitle: post.seoTitle ?? "",
-          seoDescription: post.seoDescription ?? "",
-          seoOgImageId: post.seoOgImageId ?? "",
-          seoNoindex: post.seoNoindex,
-          canonicalUrl: post.canonicalUrl ?? "",
         }}
         options={options}
-        banner={media.get(post.bannerImageId ?? "") ?? null}
-        shareImage={media.get(post.seoOgImageId ?? "") ?? null}
+        banner={media[post.bannerImageId ?? ""] ?? null}
         canPublish={can(actor, "posts", "publish")}
         canDelete={can(actor, "posts", "delete")}
       />

@@ -10,6 +10,7 @@ import { PillButton } from "@/components/ui/button";
 import { CheckRow, SocialLinks } from "@/components/ui/bits";
 import { InnerHero } from "@/components/shared/inner";
 import { loadText } from "@/features/site-text/queries";
+import { Img } from "@/components/ui/img";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -73,7 +74,7 @@ export default async function TeamMemberPage({ params }: Props) {
         <section className="flex w-full flex-col items-center">
           <div className="w-full px-4 md:max-w-[860px] md:px-5 lg:px-[30px]">
             <Appear className="mx-auto aspect-[345/400] w-full max-w-[420px] overflow-clip rounded-[10px] bg-surface md:rounded-[20px]">
-              <img src={member.photo} alt={member.name} className="size-full object-cover object-top" loading="lazy" decoding="async" />
+              <Img src={member.photo} alt={member.name} sizes="(min-width: 810px) 420px, 100vw" w={840} className="size-full object-cover object-top" fetchPriority="high" decoding="async" />
             </Appear>
           </div>
         </section>

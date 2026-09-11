@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { gl, img } from "@/config/assets";
+import { destinationArt, img } from "@/config/assets";
 import type { PublicDestination } from "@/features/destinations/queries";
 import { Appear } from "@/components/ui/appear";
 import { Badge } from "@/components/ui/bits";
 import { loadText } from "@/features/site-text/queries";
+import { CARD_SIZES, Img } from "@/components/ui/img";
 
 type Card = { slug: string; name: string; line: string; fact?: [string, string]; bg: string; pos: string; flag: string; href: string };
 
@@ -24,7 +25,7 @@ const fromRow = (rows: PublicDestination[], slug: string): Card => {
 // New Zealand has no page of its own yet, so its card only invites an enquiry.
 export const destinationCards = (rows: PublicDestination[]): Card[] => [
   fromRow(rows, "australia"),
-  { slug: "new-zealand", name: "New Zealand", line: "Ask our counsellors about studying in New Zealand.", bg: gl.newZealand, pos: focus["new-zealand"], flag: "/images/flags/new-zealand.svg", href: "/contact/book-consultation" },
+  { slug: "new-zealand", name: "New Zealand", line: "Ask our counsellors about studying in New Zealand.", bg: destinationArt["new-zealand"].card, pos: focus["new-zealand"], flag: destinationArt["new-zealand"].flag, href: "/contact/book-consultation" },
   fromRow(rows, "united-kingdom"),
 ];
 
@@ -35,12 +36,12 @@ export function DestinationCard({ cards, slug, phone, className = "", cta = "Boo
       href={d.href}
       className={`group flex h-full w-full flex-col overflow-clip rounded-[20px] bg-white ring-1 ring-hairline shadow-[0_24px_50px_-32px_rgba(29,29,29,0.35)] md:rounded-[28px] ${className}`}
     >
-      <div className={`relative w-full overflow-clip bg-surface ${phone ? "aspect-[16/10]" : "aspect-[4/3]"}`}>
-        <img src={d.bg} alt={d.name} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover" loading="lazy" decoding="async" />
+      <div className={`relative w-full overflow-clip bg-surface ${phone ? "aspect-[16/10] md:aspect-[4/3]" : "aspect-[4/3]"}`}>
+        <Img src={d.bg} alt={d.name} sizes={CARD_SIZES} style={{ objectPosition: d.pos }} className="absolute inset-0 size-full object-cover" loading="lazy" decoding="async" />
       </div>
       <div className="relative flex flex-1 flex-col gap-5 p-5 pt-8 md:p-6 md:pt-9">
         <span className="absolute -top-6 left-5 flex size-12 items-center justify-center rounded-full bg-white shadow-[0_6px_16px_rgba(29,29,29,0.18)] ring-4 ring-white md:left-6">
-          <img src={d.flag} alt="" className="size-6 rounded-full" loading="lazy" decoding="async" />
+          <Img src={d.flag} alt="" w={48} className="size-6 rounded-full" loading="lazy" decoding="async" />
         </span>
         <div className="flex flex-col gap-[6px]">
           <h3 className="t-h4">{d.name}</h3>
@@ -55,7 +56,7 @@ export function DestinationCard({ cards, slug, phone, className = "", cta = "Boo
             <p className="t-small inline-flex h-9 items-center rounded-full bg-surface px-4 font-semibold text-ink">{cta}</p>
           )}
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ink transition-transform duration-300 group-hover:translate-x-1">
-            <img src={img.arrow} alt="" className="h-2 w-3 invert" loading="lazy" decoding="async" />
+            <Img src={img.arrow} alt="" w={24} className="h-2 w-3 invert" loading="lazy" decoding="async" />
           </span>
         </div>
       </div>
@@ -76,11 +77,10 @@ export async function Destinations({ cards }: { cards: Card[] }) {
         </Appear>
         <div className="container-x">
           <div className="grid w-full gap-[10px] md:grid-cols-3 md:gap-[30px]">
+            {/* One card per destination. Two, one hidden per breakpoint, downloaded every
+                picture twice. `phone` now carries the crop change on its own. */}
             {cards.map((d, i) => (
-              <Appear key={d.slug} delay={0.1 * i} className="md:hidden"><DestinationCard cards={cards} slug={d.slug} phone cta={cardCta} /></Appear>
-            ))}
-            {cards.map((d, i) => (
-              <Appear key={d.slug} delay={0.1 * i} className="hidden md:block"><DestinationCard cards={cards} slug={d.slug} cta={cardCta} /></Appear>
+              <Appear key={d.slug} delay={0.1 * i}><DestinationCard cards={cards} slug={d.slug} phone cta={cardCta} /></Appear>
             ))}
           </div>
         </div>

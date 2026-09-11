@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader } from "@/components/shared/admin/page-header";
+import { StatusBadge } from "@/components/shared/admin/list-ui";
 import { CourseEditor } from "@/features/courses/components/course-editor";
-import { coursePath } from "@/config/course-meta";
-import { pickedMedia } from "@/features/media/admin-queries";
 import { destinationOptions, getAdminCourse, listCourseCategories } from "@/features/courses/admin-queries";
 import { institutionOptions } from "@/features/institutions/admin-queries";
 
@@ -17,22 +17,20 @@ export default async function EditCoursePage({ params }: { params: Promise<{ id:
   const row = await getAdminCourse((await params).id);
   if (!row) notFound();
 
-  const [institutions, categories, destinations, media] = await Promise.all([
+  const [institutions, categories, destinations] = await Promise.all([
     institutionOptions(),
     listCourseCategories(),
     destinationOptions(),
-    pickedMedia([row.seoOgImageId]),
   ]);
-  const path = coursePath(row.slug);
 
   return (
-    <>
-      <div className="admin-actions">
-        <h1 className="t-h4">{row.name}</h1>
-        <a className="admin-btn" href={path} target="_blank" rel="noreferrer">
-          View on site
-        </a>
-      </div>
+    <div className="space-y-6">
+      <EditorHeader
+        backHref="/admin/courses"
+        backLabel="Courses"
+        title={row.name}
+        meta={<StatusBadge status={row.status} />}
+      />
 
       <CourseEditor
         canDelete={can(actor, "courses", "delete")}
@@ -40,7 +38,6 @@ export default async function EditCoursePage({ params }: { params: Promise<{ id:
         institutions={institutions}
         categories={categories}
         destinations={destinations}
-        shareImage={row.seoOgImageId ? (media[row.seoOgImageId] ?? null) : null}
         value={{
           id: row.id,
           slug: row.slug,
@@ -60,13 +57,8 @@ export default async function EditCoursePage({ params }: { params: Promise<{ id:
           entryRequirementsHtml: row.entryRequirementsHtml ?? "",
           status: row.status,
           sortOrder: row.sortOrder,
-          seoTitle: row.seoTitle ?? "",
-          seoDescription: row.seoDescription ?? "",
-          seoOgImageId: row.seoOgImageId,
-          seoNoindex: row.seoNoindex,
-          canonicalUrl: row.canonicalUrl ?? "",
         }}
       />
-    </>
+    </div>
   );
 }

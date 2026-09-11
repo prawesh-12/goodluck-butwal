@@ -1,9 +1,6 @@
 services:
   postgres:
     image: postgres:17-alpine
-    # A public page fans out one query per image row and the proxy takes a connection for each,
-    # so a seeded database goes past the default 100 during the tests.
-    command: postgres -c max_connections=300
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

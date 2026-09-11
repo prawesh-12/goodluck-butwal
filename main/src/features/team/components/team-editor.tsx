@@ -1,12 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createTeamMember, deleteTeamMember, updateTeamMember } from "@/features/team/actions";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
-import { Field, SeoSection } from "@/components/shared/admin/seo-section";
-import { Select } from "@/components/shared/admin/repeater";
-import type { OfficeOption } from "@/components/shared/admin/content-filters";
+import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
+import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
+import {
+  ChipField,
+  FieldShell,
+  SelectField,
+  SwitchField,
+  TextAreaField,
+  TextField,
+  type OfficeOption,
+} from "@/components/shared/admin/fields";
+import { StatusBadge } from "@/components/shared/admin/list-ui";
+import { Button } from "@/components/ui/admin/button";
 
 export type TeamValues = {
   id: string;
@@ -14,6 +26,7 @@ export type TeamValues = {
   slug: string;
   fullName: string;
   position: string;
+  photoId: string;
   bioHtml: string;
   qualifications: string[];
   expertise: string[];
@@ -23,264 +36,246 @@ export type TeamValues = {
   isCoFounder: boolean;
   isFeatured: boolean;
   status: string;
-  seoTitle: string;
-  seoDescription: string;
-  seoNoindex: boolean;
-  canonicalUrl: string;
 };
+
+const STATUSES = [
+  { value: "draft", label: "Draft" },
+  { value: "published", label: "Published" },
+  { value: "archived", label: "Archived" },
+];
 
 export function TeamEditor({
   values,
   photo,
-  shareImage,
   offices,
   canPublish,
   canDelete,
 }: {
   values: TeamValues;
   photo: PickedMedia | null;
-  shareImage: PickedMedia | null;
   offices: OfficeOption[];
   canPublish: boolean;
   canDelete: boolean;
 }) {
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string[] | undefined>>({});
-  const [qualifications, setQualifications] = useState(values.qualifications);
-  const [expertise, setExpertise] = useState(values.expertise);
+  const { busy, errors, run } = useAction();
+  const [form, setForm] = useState(values);
+  const [dirty, setDirty] = useState(false);
   const isNew = values.id === "";
 
-  return (
-    <form
-      className="admin-editor"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        setBusy(true);
-        const form = new FormData(event.currentTarget);
-        const text = (key: string) => String(form.get(key) ?? "");
-        const payload = {
-          officeId: text("officeId"),
-          slug: text("slug"),
-          fullName: text("fullName"),
-          position: text("position"),
-          photoId: text("photoId"),
-          bioHtml: text("bioHtml"),
-          qualifications,
-          expertise,
-          email: text("email"),
-          phone: text("phone"),
-          linkedinUrl: text("linkedinUrl"),
-          isCoFounder: form.get("isCoFounder") === "on",
-          isFeatured: form.get("isFeatured") === "on",
-          status: canPublish ? text("status") : values.status || "draft",
-          seoTitle: text("seoTitle"),
-          seoDescription: text("seoDescription"),
-          seoOgImageId: text("seoOgImageId"),
-          seoNoindex: form.get("seoNoindex") === "on",
-          canonicalUrl: text("canonicalUrl"),
-        };
+  const set = <K extends keyof TeamValues>(key: K, value: TeamValues[K]) => {
+    setForm((current) => ({ ...current, [key]: value }));
+    setDirty(true);
+  };
 
-        const result = isNew
-          ? await createTeamMember(payload)
-          : await updateTeamMember({ ...payload, id: values.id });
+  useEffect(() => focusFirstError(errors), [errors]);
 
-        setBusy(false);
-        setErrors(result.ok ? {} : (result.fieldErrors ?? {}));
-        setMessage(result.ok ? "Saved." : result.error);
-        if (result.ok && isNew) router.push(`/admin/team/${result.data.id}`);
-        else if (result.ok) router.refresh();
-      }}
-    >
-      <h2 className="t-h5 admin-subhead">The person</h2>
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const payload = {
+      officeId: form.officeId,
+      slug: form.slug,
+      fullName: form.fullName,
+      position: form.position,
+      photoId: form.photoId,
+      bioHtml: form.bioHtml,
+      qualifications: form.qualifications,
+      expertise: form.expertise,
+      email: form.email,
+      phone: form.phone,
+      linkedinUrl: form.linkedinUrl,
+      isCoFounder: form.isCoFounder,
+      isFeatured: form.isFeatured,
+      status: canPublish ? form.status : values.status || "draft",
+    };
 
-      <Field name="fullName" label="Full name" defaultValue={values.fullName} error={errors.fullName?.[0]}
-        help="Printed under the photo on the team page." />
-      <Field name="position" label="Position" defaultValue={values.position} error={errors.position?.[0]}
-        help="The line under the name on the team page, like Migration Agent." />
-      <Field name="slug" label="Address on the site" defaultValue={values.slug} error={errors.slug?.[0]}
-        help="The last part of this person's own web address. Leave empty and it is made from the name." />
+    const saved = await run(
+      () => (isNew ? createTeamMember(payload) : updateTeamMember({ ...payload, id: values.id })),
+      {
+        success: isNew ? "Team member added" : "Team member saved",
+        failure: isNew ? "Couldn't add this team member." : "Couldn't save this team member.",
+      },
+    );
+    if (!saved) return;
 
-      <Select
-        label="Office"
-        name="officeId"
-        defaultValue={values.officeId}
-        help="Which office the person is listed under on the team page."
-        error={errors.officeId?.[0]}
-        options={[
-          { value: "", label: "No office" },
-          ...offices.map((office) => ({ value: office.id, label: office.name })),
-        ]}
-      />
+    setDirty(false);
+    if (isNew) router.push(`/admin/team/${saved.id}`);
+    else router.refresh();
+  };
 
-      <MediaPicker
-        label="Photo"
-        name="photoId"
-        value={photo}
-        help="The headshot on the team page. It needs alt text before this person can be published."
-      />
-
-      <label className="admin-field">
-        <span className="t-small">Biography</span>
-        <textarea name="bioHtml" rows={6} defaultValue={values.bioHtml} />
-        <span className="t-small admin-help">
-          The paragraphs on this person&apos;s own page. Leave empty until the client sends the text.
-        </span>
-      </label>
-
-      <TagInput
-        label="Qualifications"
-        values={qualifications}
-        onChange={setQualifications}
-        help="Listed on this person's page. Type one and press Enter, like MARA 1234567."
-      />
-      <TagInput
-        label="Areas of expertise"
-        values={expertise}
-        onChange={setExpertise}
-        help="Listed on this person's page. Type one and press Enter, like Student visas."
-      />
-
-      <h2 className="t-h5 admin-subhead">How people reach them</h2>
-
-      <Field name="email" label="Email address" defaultValue={values.email} error={errors.email?.[0]}
-        help="Shown on this person's page. Leave empty to hide it." />
-      <Field name="phone" label="Phone number" defaultValue={values.phone} error={errors.phone?.[0]}
-        help="Shown on this person's page. International form, like +61390000000." />
-      <Field name="linkedinUrl" label="LinkedIn" defaultValue={values.linkedinUrl} error={errors.linkedinUrl?.[0]}
-        help="The LinkedIn button on this person's page. Must start with https://" />
-
-      <h2 className="t-h5 admin-subhead">Publishing</h2>
-
-      {canPublish ? (
-        <Select
-          label="Status"
-          name="status"
-          defaultValue={values.status || "draft"}
-          help="Only published people appear on the team page. Publishing is refused while anything above is missing."
-          options={[
-            { value: "draft", label: "Draft" },
-            { value: "published", label: "Published" },
-            { value: "archived", label: "Archived" },
-          ]}
-        />
-      ) : (
-        <p className="t-small admin-help">Your role can save this person but not publish them.</p>
-      )}
-
-      <label className="admin-field">
-        <span className="t-small">
-          <input type="checkbox" name="isCoFounder" defaultChecked={values.isCoFounder} /> Co-founder
-        </span>
-        <span className="t-small admin-help">
-          Co-founders are the two people shown on the message from the co-founders page.
-        </span>
-      </label>
-
-      <label className="admin-field">
-        <span className="t-small">
-          <input type="checkbox" name="isFeatured" defaultChecked={values.isFeatured} /> Featured
-        </span>
-        <span className="t-small admin-help">Featured people are shown first on the team page.</span>
-      </label>
-
-      <SeoSection
-        values={{
-          seoTitle: values.seoTitle,
-          seoDescription: values.seoDescription,
-          seoNoindex: values.seoNoindex,
-          canonicalUrl: values.canonicalUrl,
-        }}
-        path={`/team/${values.slug || "new-person"}`}
-        fallbackTitle={values.fullName || "New team member"}
-        shareImage={shareImage}
-      />
-
-      <div className="admin-actions">
-        <button type="submit" className="admin-btn admin-btn-primary" disabled={busy}>
-          {busy ? "Saving" : "Save"}
-        </button>
-
-        {!isNew && canDelete ? (
-          <button
-            type="button"
-            className="admin-btn admin-btn-danger"
-            disabled={busy}
-            onClick={async () => {
-              if (!confirm(`Remove ${values.fullName} from the team list?`)) return;
-              setBusy(true);
-              const result = await deleteTeamMember({ id: values.id });
-              setBusy(false);
-              if (result.ok) router.push("/admin/team");
-              else setMessage(result.error);
-            }}
-          >
-            Delete
-          </button>
-        ) : null}
-
-        {message ? <span className="t-small">{message}</span> : null}
-      </div>
-    </form>
-  );
-}
-
-function TagInput({
-  label,
-  values,
-  onChange,
-  help,
-}: {
-  label: string;
-  values: string[];
-  onChange: (next: string[]) => void;
-  help: string;
-}) {
-  const [draft, setDraft] = useState("");
-
-  const add = () => {
-    const value = draft.trim();
-    if (!value || values.includes(value)) {
-      setDraft("");
-      return;
-    }
-    onChange([...values, value]);
-    setDraft("");
+  const remove = async () => {
+    const done = await run(() => deleteTeamMember({ id: values.id }), {
+      success: "Team member deleted",
+      failure: "Couldn't delete this team member.",
+    });
+    if (!done) return;
+    setDirty(false);
+    router.push("/admin/team");
   };
 
   return (
-    <div className="admin-field">
-      <span className="t-small">{label}</span>
+    <form onSubmit={save} className="space-y-6">
+      <UnsavedGuard dirty={dirty} />
 
-      <div className="admin-actions">
-        {values.length === 0 ? <span className="t-small admin-empty">None yet.</span> : null}
-        {values.map((value) => (
-          <span key={value} className="admin-badge">
-            {value}{" "}
-            <button
-              type="button"
-              aria-label={`Remove ${value}`}
-              onClick={() => onChange(values.filter((item) => item !== value))}
-            >
-              ×
-            </button>
-          </span>
-        ))}
-      </div>
+      <EditorLayout
+        aside={
+          <SectionCard title="Visibility">
+            {canPublish ? (
+              <SelectField
+                name="status"
+                label="Status"
+                value={form.status || "draft"}
+                onChange={(value) => set("status", value)}
+                options={STATUSES}
+                error={errors.status?.[0]}
+              />
+            ) : (
+              <FieldShell label="Status">
+                <div className="space-y-2">
+                  <StatusBadge status={form.status || "draft"} />
+                  <p className="text-xs text-muted-foreground">
+                    Your role can save this person but not publish them.
+                  </p>
+                </div>
+              </FieldShell>
+            )}
 
-      <input
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key !== "Enter" && e.key !== ",") return;
-          // Enter inside a form would submit it, and a comma is how people type lists.
-          e.preventDefault();
-          add();
-        }}
-        onBlur={add}
+            <SwitchField
+              label="Co-founder"
+              help="Shown on the message from the co-founders page."
+              checked={form.isCoFounder}
+              onChange={(checked) => set("isCoFounder", checked)}
+            />
+            <SwitchField
+              label="Featured"
+              help="Featured people are shown first on the team page."
+              checked={form.isFeatured}
+              onChange={(checked) => set("isFeatured", checked)}
+            />
+          </SectionCard>
+        }
+      >
+        <SectionCard title="Profile">
+          <TextField
+            name="fullName"
+            label="Full name"
+            value={form.fullName}
+            required
+            onChange={(value) => set("fullName", value)}
+            error={errors.fullName?.[0]}
+          />
+          <TextField
+            name="position"
+            label="Position"
+            value={form.position}
+            onChange={(value) => set("position", value)}
+            placeholder="Migration Agent"
+            error={errors.position?.[0]}
+          />
+          <SelectField
+            name="officeId"
+            label="Office"
+            value={form.officeId}
+            onChange={(value) => set("officeId", value)}
+            emptyLabel="No office"
+            options={offices.map((office) => ({ value: office.id, label: office.name }))}
+            error={errors.officeId?.[0]}
+          />
+          <MediaPicker
+            label="Photo"
+            name="photoId"
+            value={photo}
+            type="image"
+            onChange={(id) => set("photoId", id ?? "")}
+          />
+          <TextField
+            name="slug"
+            label="URL slug"
+            help="Leave it empty and the address is made from the name."
+            value={form.slug}
+            onChange={(value) => set("slug", value)}
+            error={errors.slug?.[0]}
+          />
+        </SectionCard>
+
+        <SectionCard title="About">
+          <TextAreaField
+            name="bioHtml"
+            label="Biography"
+            rows={8}
+            value={form.bioHtml}
+            onChange={(value) => set("bioHtml", value)}
+            error={errors.bioHtml?.[0]}
+          />
+          <ChipField
+            name="qualifications"
+            label="Qualifications"
+            placeholder="MARA 1234567"
+            values={form.qualifications}
+            onChange={(next) => set("qualifications", next)}
+          />
+          <ChipField
+            name="expertise"
+            label="Areas of expertise"
+            placeholder="Student visas"
+            values={form.expertise}
+            onChange={(next) => set("expertise", next)}
+          />
+        </SectionCard>
+
+        <SectionCard title="Links" description="Shown on this person's own page.">
+          <TextField
+            name="email"
+            label="Email address"
+            type="email"
+            value={form.email}
+            onChange={(value) => set("email", value)}
+            error={errors.email?.[0]}
+          />
+          <TextField
+            name="phone"
+            label="Phone number"
+            value={form.phone}
+            onChange={(value) => set("phone", value)}
+            placeholder="+61390000000"
+            error={errors.phone?.[0]}
+          />
+          <TextField
+            name="linkedinUrl"
+            label="LinkedIn"
+            value={form.linkedinUrl}
+            onChange={(value) => set("linkedinUrl", value)}
+            placeholder="https://www.linkedin.com/in/"
+            error={errors.linkedinUrl?.[0]}
+          />
+        </SectionCard>
+      </EditorLayout>
+
+      <EditorActionBar
+        dirty={dirty}
+        busy={busy}
+        saveLabel={isNew ? "Add team member" : "Save"}
+        destructive={
+          !isNew && canDelete ? (
+            <ConfirmDialog
+              trigger={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                >
+                  Delete
+                </Button>
+              }
+              title={`Remove ${values.fullName} from the team?`}
+              description="They will no longer appear on the website. This cannot be undone."
+              confirmLabel="Delete team member"
+              onConfirm={remove}
+            />
+          ) : null
+        }
       />
-      <span className="t-small admin-help">{help}</span>
-    </div>
+    </form>
   );
 }

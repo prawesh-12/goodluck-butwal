@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildEntityMetadata, buildMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { breadcrumbs } from "@/lib/seo/schema";
 import { notFound } from "next/navigation";
@@ -15,6 +15,7 @@ import { listTeam } from "@/features/team/queries";
 import { listInstitutions } from "@/features/institutions/queries";
 import { InstitutionCard } from "@/features/institutions/components/institution-card";
 import { loadText } from "@/features/site-text/queries";
+import { CARD_SIZES, Img } from "@/components/ui/img";
 
 type Props = { params: Promise<{ destination: string }> };
 export const generateStaticParams = async () =>
@@ -23,14 +24,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { destination } = await params;
   const d = await getDestination(destination);
   if (!d) return buildMetadata({ path: "/study-abroad", title: "Study abroad", noindex: true });
-  return buildEntityMetadata("destination", destination, {
+  return buildMetadata({
     path: `/study-abroad/${destination}`,
     title: `Study in ${d.name}`,
     description: d.overview,
   });
 }
 
+// The fallback matches plain text, not a regex: the name is admin input and would need escaping.
 const keyword: Record<string, RegExp> = { australia: /australia/i, "united-kingdom": /\bUK\b|United Kingdom/i };
+
+function mentions(title: string, slug: string, name: string) {
+  const pattern = keyword[slug];
+  return pattern ? pattern.test(title) : title.toLowerCase().includes(name.toLowerCase());
+}
 
 export default async function DestinationPage({ params }: Props) {
   const [faces, allFaqs, t] = await Promise.all([
@@ -43,7 +50,7 @@ export default async function DestinationPage({ params }: Props) {
   const d = await getDestination(destination);
   if (!d) notFound();
   const articles = await listArticles();
-  const news = articles.filter((a) => keyword[d.slug].test(a.title)).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
+  const news = articles.filter((a) => mentions(a.title, d.slug, d.name)).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3);
   const relevantInstitutions = (await listInstitutions()).filter((i) => i.destinationSlug === d.slug).slice(0, 6);
 
   return (
@@ -52,12 +59,12 @@ export default async function DestinationPage({ params }: Props) {
       <InnerHero bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" title={`${t("study.destination.hero.title_prefix", "Study in")} ${d.name}`} lead={d.overview} badge={undefined} className="[&_h1]:order-2 [&_p]:order-3" after={
         <Appear delay={0.1} className="w-full">
           <div className="aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]">
-            <img src={d.hero} alt={d.heroAlt} className="size-full object-cover" loading="lazy" decoding="async" />
+            <Img src={d.hero} alt={d.heroAlt} sizes="100vw" w={1280} className="size-full object-cover" fetchPriority="high" decoding="async" />
           </div>
         </Appear>
       }>
         <div className="order-1 flex items-center gap-[10px]">
-          <span className="flex size-[38px] items-center justify-center rounded-full bg-white ring-1 ring-hairline"><img src={d.flag} alt="" className="size-5 rounded-full" loading="lazy" decoding="async" /></span>
+          <span className="flex size-[38px] items-center justify-center rounded-full bg-white ring-1 ring-hairline"><Img src={d.flag} alt="" w={48} className="size-5 rounded-full" loading="lazy" decoding="async" /></span>
           <Chip tone="white">{t("study.destination.hero.chip", "Study abroad")}</Chip>
         </div>
       </InnerHero>
@@ -106,7 +113,7 @@ export default async function DestinationPage({ params }: Props) {
           <div className="flex flex-col gap-[30px] md:flex-row md:items-start lg:gap-[70px]">
             <Appear className="order-2 flex w-full flex-col items-start gap-10 overflow-clip rounded-[10px] bg-surface p-5 md:order-1 md:w-[517px] md:rounded-[30px] lg:w-[628px] lg:px-[60px] lg:py-[30px]">
               <div className="aspect-[1.27586] w-full overflow-clip rounded-[20px]">
-                <img src={d.card} alt={d.name} className="size-full object-cover" loading="lazy" decoding="async" />
+                <Img src={d.card} alt={d.name} sizes={CARD_SIZES} className="size-full object-cover" loading="lazy" decoding="async" />
               </div>
             </Appear>
             <Appear delay={0.1} className="order-1 flex flex-1 flex-col items-start gap-5 md:order-2 md:gap-10">

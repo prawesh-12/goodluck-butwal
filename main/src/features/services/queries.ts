@@ -1,8 +1,8 @@
 import { cache } from "react";
-import { asc, eq, inArray, like } from "drizzle-orm";
+import { asc, eq, like } from "drizzle-orm";
 import { db } from "@db/client";
-import { mediaAssets, serviceFaqs, services, uiStrings } from "@db/schema";
-import { mediaUrl } from "@/lib/utils/media-url";
+import { serviceFaqs, services, uiStrings } from "@db/schema";
+import { serviceArt } from "@/config/assets";
 import type { FaqItem } from "@/features/destinations/queries";
 
 // The shape the approved service pages already render.
@@ -23,8 +23,6 @@ export type PublicService = {
   facts?: { value: string; label: string }[];
 };
 
-const artwork = mediaAssets;
-
 export const listServices = cache(async (): Promise<PublicService[]> => {
   const [rows, strings] = await Promise.all([
     db
@@ -37,14 +35,8 @@ export const listServices = cache(async (): Promise<PublicService[]> => {
         facts: services.facts,
         documents: services.documents,
         tone: services.tone,
-        kind: artwork.kind,
-        staticPath: artwork.staticPath,
-        cloudinaryPublicId: artwork.cloudinaryPublicId,
-        imageAlt: artwork.altText,
-        reelId: services.reelId,
       })
       .from(services)
-      .leftJoin(artwork, eq(services.artworkId, artwork.id))
       .where(eq(services.status, "published"))
       .orderBy(asc(services.sortOrder)),
     db
@@ -53,14 +45,6 @@ export const listServices = cache(async (): Promise<PublicService[]> => {
       .where(like(uiStrings.key, "service.%")),
   ]);
 
-  const reelIds = [...new Set(rows.map((row) => row.reelId).filter((id): id is string => Boolean(id)))];
-  const reels = reelIds.length
-    ? await db
-        .select({ id: mediaAssets.id, path: mediaAssets.staticPath })
-        .from(mediaAssets)
-        .where(inArray(mediaAssets.id, reelIds))
-    : [];
-  const reelPath = new Map(reels.map((r) => [r.id, r.path]));
   const text = new Map(strings.map((s) => [s.key, s.value]));
 
   return rows.map((row) => ({
@@ -69,10 +53,7 @@ export const listServices = cache(async (): Promise<PublicService[]> => {
     label: text.get(`service.${row.slug}.label`) ?? "",
     line: row.line ?? "",
     intro: row.intro ?? "",
-    image: mediaUrl(row, 960),
-    imageAlt: row.imageAlt ?? "",
-    video: row.reelId ? (reelPath.get(row.reelId) ?? undefined) : undefined,
-    poster: text.get(`service.${row.slug}.poster`),
+    ...(serviceArt[row.slug] ?? { image: "", imageAlt: "" }),
     stepsTitle: text.get(`service.${row.slug}.stepsTitle`) ?? "",
     steps: (row.steps ?? []).map((s) => ({ title: s.title, line: s.body })),
     listTitle: text.get(`service.${row.slug}.listTitle`),

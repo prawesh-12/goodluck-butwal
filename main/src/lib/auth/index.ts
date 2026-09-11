@@ -6,7 +6,6 @@ import { eq } from "drizzle-orm";
 import { db } from "@db/client";
 import { users, sessions, accounts, verifications } from "@db/schema";
 import { sendEmail } from "@/lib/email";
-import { writeAudit } from "@/lib/security/audit";
 
 const WEEK = 60 * 60 * 24 * 7;
 const DAY = 60 * 60 * 24;
@@ -82,19 +81,6 @@ export const auth = betterAuth({
       if (ctx.path === "/sign-up/email" && ctx.request) {
         throw new APIError("FORBIDDEN", { message: "An administrator creates accounts." });
       }
-    }),
-
-    after: createAuthMiddleware(async (ctx) => {
-      if (ctx.path !== "/sign-in/email") return;
-
-      const signedIn = ctx.context.newSession?.user;
-      await writeAudit({
-        userId: signedIn?.id ?? null,
-        action: signedIn ? "login" : "login_failed",
-        entityType: "users",
-        entityId: signedIn?.id,
-        summary: signedIn ? `${signedIn.email} signed in` : `failed sign in for ${ctx.body?.email}`,
-      });
     }),
   },
 

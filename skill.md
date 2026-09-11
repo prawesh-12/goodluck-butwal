@@ -152,7 +152,7 @@ what it fetches and what it renders. The fetching itself belongs in a feature.
 ### `src/features/`
 
 The bulk of the application, one folder per business area: `services`, `destinations`,
-`institutions`, `courses`, `test-prep`, `posts` (news), `events`, `testimonials`, `team`,
+`institutions`, `courses`, `test-prep`, `posts` (news), `events`, `team`,
 `partners`, `offices`, `pages`, `leads` (enquiries and consultations), `media`, `settings`,
 `site-text`, `search`, `users`.
 
@@ -285,8 +285,9 @@ Data: `events`, `event_registrations`
 **Success stories and testimonials**: client quotes and outcomes, on the homepage and their own
 page.
 Route: `src/app/(site)/success-stories/page.tsx`
-Feature: `src/features/testimonials/`
-Data: the `testimonials` table
+Feature: `src/features/testimonials/components/` for the two sections
+Data: `src/config/testimonials.ts`, checked in rather than a table, because the graphics and the
+Google quotes only change when a developer adds files to `public/`
 
 **Contact**: office cards, the general enquiry form, and FAQs.
 Route: `src/app/(site)/contact/page.tsx`
@@ -321,14 +322,15 @@ to read that kind of record.
 | Section | What you manage | Screens |
 | --- | --- | --- |
 | Enquiries | enquiries and consultation requests, their status, CSV export | `admin/enquiries`, `admin/consultations` |
-| Editorial | news posts, categories, tags, events and their registrations, testimonials | `admin/posts`, `admin/events`, `admin/testimonials` |
+| Editorial | news posts, categories, tags, events and their registrations | `admin/posts`, `admin/events` |
 | Study | destinations, institutions, courses, course categories, IELTS/PTE courses and batches | `admin/destinations`, `admin/institutions`, `admin/courses`, `admin/test-prep` |
 | Site | About-style pages, services, offices, team, partners, site text, media library | `admin/pages`, `admin/services`, `admin/offices`, `admin/team`, `admin/partners`, `admin/site-text`, `admin/media` |
 | Admin | settings, users, audit log, help | `admin/settings`, `admin/users`, `admin/audit-log`, `admin/help` |
 
 Homepage content is not one screen. It is assembled from the features it shows: change a service
-in Services, a partner logo in Partners, a story in Testimonials, the hero image and Google rating
-in Settings, and the headings in Site text.
+in Services, a partner logo in Partners, the hero image and Google rating in Settings, and the
+headings in Site text. Success stories and the client quotes are not in the admin at all: they
+live in `src/config/testimonials.ts`.
 
 ### What happens when you save
 
@@ -368,7 +370,7 @@ admin and others are not.
 **CMS-managed content** lives in the database. Staff change it and the site follows.
 
 Examples: office phone numbers and opening hours, staff bios and photos, service descriptions and
-their step lists, destination pages, courses and institutions, news articles, events, testimonials,
+their step lists, destination pages, courses and institutions, news articles, events,
 the hero image, the Google rating, footer links, and almost every visible heading and button label.
 
 **Application content** lives in the code and needs a developer and a deploy to change.
@@ -414,7 +416,7 @@ related tables:
 | `destinations.ts` | `destinations`, `destination_faqs`, `services`, `service_faqs` |
 | `institutions.ts` | `institutions`, `institution_images`, `courses`, `course_categories` |
 | `test-prep.ts` | `test_prep_courses`, `test_prep_batches`, `test_prep_registrations` |
-| `editorial.ts` | `posts`, `post_categories`, `tags`, `post_tags`, `events`, `event_registrations`, `testimonials` |
+| `editorial.ts` | `posts`, `post_categories`, `tags`, `post_tags`, `events`, `event_registrations` |
 | `leads.ts` | `enquiries`, `consultations` |
 | `system.ts` | `settings`, `redirects`, `audit_log` |
 | `enums.ts` | the fixed value lists: statuses, roles, categories, levels |
@@ -458,8 +460,9 @@ the schema by Drizzle Kit and live in `db/migrations/`. Configuration: `drizzle.
 
 **Seeds**: scripts that fill an empty database with the starting content: offices, services,
 destinations, site text, the media rows for everything in `public/`. In `db/seed/`, entry point
-`db/seed/from-content.ts`, run with `pnpm db:seed`. Every step matches on a natural key and
-upserts, so running the seed twice changes nothing.
+`db/seed/from-content.ts`, run with `pnpm db:seed:dev` locally or `pnpm db:seed:prod` against
+production. Every step matches on a natural key and upserts, so running the seed twice changes
+nothing.
 
 **Local database**: `docker-compose.yml` runs PostgreSQL plus a small proxy that speaks Neon's
 HTTP protocol in front of it, on port 4444. This exists so local development and production run
@@ -495,11 +498,11 @@ browser: forms, the FAQ accordion, the office context, the animation wrappers.
 
 ### Example: the homepage
 
-`src/app/(site)/page.tsx` starts fourteen queries at once inside a single `Promise.all`, because
+`src/app/(site)/page.tsx` starts twelve queries at once inside a single `Promise.all`, because
 none of them depends on another. Each is a feature query, for example `listServices()` from
-`src/features/services/queries.ts` and `listReviews()` from
-`src/features/testimonials/queries.ts`. Each returns rows already shaped for the components. The
-page then passes those objects straight into `<Hero>`, `<Services>`, `<Reviews>` and the rest.
+`src/features/services/queries.ts`. Each returns rows already shaped for the components. The page
+then passes those objects straight into `<Hero>`, `<Services>` and the rest. `<Reviews>` and
+`<Stories>` take no rows: they read `src/config/testimonials.ts` themselves.
 
 ### Example: a service page
 
@@ -620,7 +623,7 @@ redirect table is loaded once and held in memory for five minutes, with one refr
 time and the previous map kept if a refresh fails.
 `src/lib/seo/redirects.ts`
 
-**Static assets are served with a one-year immutable cache header** under `/images` and `/brand`.
+**Static assets under `/images` and `/brand` are cached for an hour and then revalidated.**
 `next.config.ts`
 
 ---
@@ -708,7 +711,7 @@ roles:
 | `super_admin` | everything, including users, settings, redirects and all offices |
 | `au_admin` | full content control, scoped to the Australia office. No test-prep editing. |
 | `np_admin` | full content control, scoped to the Nepal office, including test prep |
-| `content_editor` | can create and edit posts, events and testimonials, but cannot publish them |
+| `content_editor` | can create and edit posts and events, but cannot publish them |
 
 The complete matrix of role × entity × action is in `src/lib/auth/rbac.ts`, and that file is the
 only place in the application that decides who may do what. Nothing else should carry its own
@@ -844,7 +847,7 @@ are referenced by URL rather than by id, so those are found by searching the HTM
 
 **Static assets that are not CMS-managed** are the page furniture: the hero sky and meadow,
 background textures, arrows, icons, flags, the brand logo. They are referenced from
-`src/config/assets.ts` and served from `public/`, with a one-year immutable cache header.
+`src/config/assets.ts` and served from `public/`, cached for an hour and then revalidated.
 
 **Before adding another image mechanism**, read `src/lib/utils/media-url.ts`, the `media_assets`
 part of `src/db/schema/core.ts`, and `src/lib/integrations/cloudinary.ts`. There is one path from
@@ -1057,7 +1060,7 @@ the table, but there is no page under `src/app/admin/(dashboard)/redirects/`.
 Instead: rows go in by hand, or the page needs building.
 
 **The seed overwrites what it seeds**
-What can go wrong: running `pnpm db:seed` against a database an admin has been editing.
+What can go wrong: running `pnpm db:seed:prod` against a database an admin has been editing.
 Why: most steps upsert the seeded fields, so an admin's edit to a seeded row can be reverted.
 Instead: seed an empty or development database. Do not run it against production content.
 
@@ -1114,8 +1117,10 @@ file in the repository. `main/.env.example` is the annotated list.
 | `BUILD_CPUS` | local builds only. See below. |
 
 **Caching in production.** Public pages are ISR at five minutes, plus immediate revalidation when
-an admin saves. Static files under `/images` and `/brand` carry a one-year immutable header. The
-admin, the form endpoints and the exports are never cached.
+an admin saves. Static files under `/images` and `/brand` are cached for an hour and then
+revalidated, because their names stay the same when the file behind one is replaced and an
+immutable header would hide the replacement for a year. The admin, the form endpoints and the
+exports are never cached.
 
 **Security headers** are set for every response in `next.config.ts`: a Content Security Policy,
 HSTS, `X-Content-Type-Options`, `X-Frame-Options`, a referrer policy and a permissions policy. The
@@ -1145,7 +1150,7 @@ pnpm typecheck   # check every type without building. The fastest useful check.
 pnpm lint        # check code style and catch common mistakes
 pnpm test        # run the test suite once (Vitest)
 pnpm build       # produce the production build, including prerendered pages
-pnpm db:seed     # fill the database with starting content
+pnpm db:seed:dev # fill the local database with starting content
 ```
 
 All of these run from `main/`.

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { buildEntityMetadata } from "@/lib/seo";
+import { buildMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/shared/json-ld";
 import { breadcrumbs } from "@/lib/seo/schema";
 import { img } from "@/config/assets";
@@ -12,7 +12,7 @@ import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
 import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildEntityMetadata("page", "careers", { path: "/about/careers", title: "Careers" });
+  return buildMetadata({ path: "/about/careers", title: "Careers" });
 }
 const tones = ["surface", "dark", "blue", "surface"] as const;
 

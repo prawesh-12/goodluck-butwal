@@ -1,6 +1,8 @@
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
+import { EditorHeader } from "@/components/shared/admin/page-header";
+import { StatusBadge } from "@/components/shared/admin/list-ui";
 import { PostForm, type PostValues } from "@/features/posts/components/post-form";
 import { editorialOptions } from "@/features/posts/admin-queries";
 
@@ -18,12 +20,6 @@ const empty: PostValues = {
   tagIds: [],
   authorDisplayName: "",
   status: "draft",
-  publishedAt: "",
-  seoTitle: "",
-  seoDescription: "",
-  seoOgImageId: "",
-  seoNoindex: false,
-  canonicalUrl: "",
 };
 
 export default async function NewPostPage() {
@@ -34,12 +30,16 @@ export default async function NewPostPage() {
 
   return (
     <>
-      <h1 className="t-h4">Write a post</h1>
+      <EditorHeader
+        backHref="/admin/posts"
+        backLabel="News"
+        title="New article"
+        meta={<StatusBadge status="draft" />}
+      />
       <PostForm
         values={empty}
         options={options}
         banner={null}
-        shareImage={null}
         canPublish={can(actor, "posts", "publish")}
         canDelete={false}
       />

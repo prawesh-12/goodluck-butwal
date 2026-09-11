@@ -47,7 +47,8 @@ export async function seedPlaceholderCatalogue() {
       city: "[PLACEHOLDER]",
       isPartner: i % 3 === 0,
       isFeatured: i <= 3,
-      status: "draft" as const,
+      status: "published" as const,
+      publishedAt: new Date(),
       sortOrder: i,
     };
     const [saved] = await db
@@ -71,7 +72,8 @@ export async function seedPlaceholderCatalogue() {
       tuitionFeeMin: String(15000 + i * 100),
       tuitionFeeMax: String(25000 + i * 100),
       tuitionCurrency: "AUD",
-      status: "draft" as const,
+      status: "published" as const,
+      publishedAt: new Date(),
       sortOrder: i,
     };
     await db

@@ -1,51 +1,34 @@
-import { readdir } from "node:fs/promises";
-import { join, extname } from "node:path";
+import { extname } from "node:path";
 import { sql } from "drizzle-orm";
 import { db } from "@db/client";
 import { mediaAssets } from "@db/schema";
+import { team } from "./source/team";
+import { partnerLogos } from "./source/partners";
+import articles from "./source/articles.json";
 
 const MIME: Record<string, string> = {
   ".webp": "image/webp",
   ".png": "image/png",
   ".jpg": "image/jpeg",
   ".jpeg": "image/jpeg",
-  ".svg": "image/svg+xml",
-  ".ico": "image/x-icon",
-  ".gif": "image/gif",
-  ".mp4": "video/mp4",
-  ".webm": "video/webm",
+  ".avif": "image/avif",
 };
 
-async function walk(dir: string, base = ""): Promise<string[]> {
-  const entries = await readdir(dir, { withFileTypes: true });
-  const files: string[] = [];
-
-  for (const entry of entries) {
-    const rel = base ? `${base}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
-      files.push(...(await walk(join(dir, entry.name), rel)));
-    } else if (MIME[extname(entry.name).toLowerCase()]) {
-      files.push(rel);
-    }
-  }
-  return files;
+// Only what a CMS record points at. Everything else under public/ is developer-controlled art
+// that the app resolves straight through Cloudinary, so it needs no row here.
+function cmsPaths() {
+  return [...new Set([...team.map((person) => person.photo), ...partnerLogos, ...articles.map((a) => a.image)])];
 }
 
-export async function seedMedia(publicDir: string) {
-  const files = await walk(publicDir);
-
-  const rows = files.map((path) => {
-    const ext = extname(path).toLowerCase();
-    return {
-      kind: "static" as const,
-      type: MIME[ext].startsWith("video") ? "video" : "image",
-      staticPath: `/${path}`,
-      filename: path.split("/").pop()!,
-      mimeType: MIME[ext],
-      // The top folder is how the admin media library groups these.
-      folder: path.includes("/") ? path.split("/")[0] : "general",
-    };
-  });
+export async function seedMedia() {
+  const rows = cmsPaths().map((path) => ({
+    kind: "static" as const,
+    type: "image",
+    staticPath: path,
+    filename: path.split("/").pop()!,
+    mimeType: MIME[extname(path).toLowerCase()] ?? "image/webp",
+    folder: path.split("/")[2] ?? "general",
+  }));
 
   await db
     .insert(mediaAssets)

@@ -1,18 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
-import { Field, SaveBar, Select, Toggle } from "@/components/shared/admin/repeater";
-import { SeoFields, type SeoValue } from "@/components/shared/admin/page-seo-fields";
-import { institutionPath } from "@/config/course-meta";
-import { createInstitution, deleteInstitution, updateInstitution } from "@/features/institutions/actions";
+import { Trash2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/admin/alert";
+import { Button } from "@/components/ui/admin/button";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { AdvancedSection, EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { SelectField, SwitchField, TextField } from "@/components/shared/admin/fields";
+import { PreviewButton, ViewOnSiteButton } from "@/components/shared/admin/page-header";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
+import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
+import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
+import { institutionPath } from "@/config/course-meta";
+import { slugify } from "@/lib/utils/slug";
+import { createInstitution, deleteInstitution, updateInstitution } from "@/features/institutions/actions";
 
 const RichText = dynamic(() => import("@/components/shared/admin/editor-rich-text"), { ssr: false });
 
-export type InstitutionValue = SeoValue & {
+export type InstitutionValue = {
   id?: string;
   slug: string;
   name: string;
@@ -32,166 +40,301 @@ export function InstitutionEditor({
   value,
   media,
   destinations,
+  courses,
+  gallery,
   canDelete,
   canPublish,
 }: {
   value: InstitutionValue;
   media: Record<string, PickedMedia>;
   destinations: { id: string; name: string }[];
+  courses?: number;
+  gallery?: ReactNode;
   canDelete: boolean;
   canPublish: boolean;
 }) {
   const router = useRouter();
-  const [row, setRow] = useState<InstitutionValue>(value);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [errors, setErrors] = useState<Record<string, string[] | undefined>>({});
+  const { busy, errors, run } = useAction();
+  const [form, setForm] = useState<InstitutionValue>(value);
+  const [dirty, setDirty] = useState(false);
+  const [askPublish, setAskPublish] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(Boolean(value.id));
 
-  const set = (patch: Partial<InstitutionValue>) => setRow((current) => ({ ...current, ...patch }));
-  const pick = (id: string | null) => (id ? (media[id] ?? null) : null);
-  const path = institutionPath(row.slug);
+  useEffect(() => {
+    focusFirstError(errors);
+  }, [errors]);
+
+  const set = <K extends keyof InstitutionValue>(key: K, next: InstitutionValue[K]) => {
+    setForm((current) => ({ ...current, [key]: next }));
+    setDirty(true);
+  };
+
+  const setName = (name: string) => {
+    setForm((current) => ({ ...current, name, slug: slugTouched ? current.slug : slugify(name) }));
+    setDirty(true);
+  };
+
+  // The saved address, not the one being typed: only what is stored has a page.
+  const path = institutionPath(value.slug);
+  const goingLive = form.status === "published" && value.status !== "published";
+  const publishProblems = errors.publish ?? [];
+  const slugProblem = errors.slug?.[0];
+
+  const save = async () => {
+    const id = form.id;
+    const saved = await run(() => (id ? updateInstitution({ ...form, id }) : createInstitution(form)), {
+      success: id ? "Institution saved" : "Institution created",
+      failure: id ? "Couldn't save the institution." : "Couldn't create the institution.",
+    });
+    if (!saved) return;
+    setDirty(false);
+    if (id) router.refresh();
+    else router.push(`/admin/institutions/${saved.id}`);
+  };
+
+  const remove = async () => {
+    const id = form.id;
+    if (!id) return;
+    const gone = await run(() => deleteInstitution({ id }), {
+      success: "Institution deleted",
+      failure: "Couldn't delete the institution.",
+    });
+    if (!gone) return;
+    setDirty(false);
+    router.push("/admin/institutions");
+  };
 
   return (
-    <form id="admin-institution-form"
-      className="admin-editor"
-      onSubmit={async (event) => {
+    <form
+      className="space-y-6"
+      onSubmit={(event) => {
         event.preventDefault();
-        setBusy(true);
-        const result = row.id ? await updateInstitution(row) : await createInstitution(row);
-        setBusy(false);
-        setErrors(result.ok ? {} : (result.fieldErrors ?? {}));
-        setMessage(result.ok ? "Saved." : result.error);
-        if (result.ok && !row.id) router.push(`/admin/institutions/${result.data.id}`);
-        else if (result.ok) router.refresh();
+        if (goingLive) setAskPublish(true);
+        else void save();
       }}
     >
-      <UnsavedGuard formId="admin-institution-form" />
-      <Field
-        label="Name"
-        help="The name on the institution card, at the top of its page and on every course it runs."
-        value={row.name}
-        onChange={(name) => set({ name })}
-        error={errors.name?.[0]}
-      />
+      <UnsavedGuard dirty={dirty} />
 
-      <Field
-        label="Web address"
-        help={`This institution will live at ${path}. Changing it leaves a redirect behind so old links still work.`}
-        value={row.slug}
-        onChange={(slug) => set({ slug })}
-        error={errors.slug?.[0]}
-      />
+      <EditorLayout
+        aside={
+          <SectionCard title="Publishing">
+            <SelectField
+              name="status"
+              label="Status"
+              value={form.status}
+              onChange={(status) => set("status", status)}
+              options={[
+                { value: "draft", label: "Draft" },
+                { value: "published", label: "Published", disabled: !canPublish },
+                { value: "archived", label: "Archived" },
+              ]}
+            />
 
-      <MediaPicker
-        label="Logo"
-        name="logoId"
-        value={pick(row.logoId)}
-        help="Shown on the institution card, on the course pages and in the logo strip on the home page."
-        onChange={(logoId) => set({ logoId })}
-      />
+            {publishProblems.length > 0 ? (
+              <Alert variant="destructive">
+                <AlertTitle>This cannot go live yet</AlertTitle>
+                <AlertDescription>
+                  <ul className="list-disc space-y-1 pl-4">
+                    {publishProblems.map((problem) => (
+                      <li key={problem}>{problem}</li>
+                    ))}
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            ) : null}
 
-      <Select
-        label="Destination"
-        help="Which study destination page this institution is listed under."
-        value={row.destinationId ?? ""}
-        onChange={(destinationId) => set({ destinationId: destinationId || null })}
-        options={[
-          { value: "", label: "Not set" },
-          ...destinations.map((destination) => ({ value: destination.id, label: destination.name })),
-        ]}
-      />
+            {value.id ? (
+              <div className="space-y-3">
+                <div className="*:w-full">
+                  {value.status === "published" ? (
+                    <ViewOnSiteButton href={path} />
+                  ) : (
+                    <PreviewButton href={`/preview/institution/${value.slug}`} />
+                  )}
+                </div>
+                {courses !== undefined ? (
+                  <p className="text-xs text-muted-foreground">
+                    {courses === 0 ? (
+                      "No courses here yet."
+                    ) : (
+                      <>
+                        <Link
+                          href={`/admin/courses?institution=${value.id}`}
+                          className="underline underline-offset-2"
+                        >
+                          {courses} {courses === 1 ? "course" : "courses"}
+                        </Link>{" "}
+                        {courses === 1 ? "runs" : "run"} here. Move {courses === 1 ? "it" : "them"}{" "}
+                        before deleting this institution.
+                      </>
+                    )}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
 
-      <Field
-        label="Country"
-        help="Shown on the institution card and used by the country filter on the courses page."
-        value={row.country}
-        onChange={(country) => set({ country })}
-      />
+            <WebAddress
+              value={form.slug}
+              error={slugProblem}
+              published={value.status === "published"}
+              onChange={(slug) => {
+                setSlugTouched(true);
+                set("slug", slug);
+              }}
+            />
+          </SectionCard>
+        }
+      >
+        <SectionCard title="Basic information">
+          <TextField
+            name="name"
+            label="Institution name"
+            required
+            value={form.name}
+            onChange={setName}
+            error={errors.name?.[0]}
+          />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <SelectField
+              name="destinationId"
+              label="Destination"
+              emptyLabel="Not set"
+              value={form.destinationId ?? ""}
+              onChange={(id) => set("destinationId", id || null)}
+              options={destinations.map((destination) => ({ value: destination.id, label: destination.name }))}
+            />
+            <TextField
+              name="country"
+              label="Country"
+              value={form.country}
+              onChange={(country) => set("country", country)}
+              error={errors.country?.[0]}
+            />
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField
+              name="city"
+              label="City"
+              value={form.city}
+              onChange={(city) => set("city", city)}
+              error={errors.city?.[0]}
+            />
+            <TextField
+              name="websiteUrl"
+              label="Website"
+              placeholder="https://"
+              value={form.websiteUrl}
+              onChange={(websiteUrl) => set("websiteUrl", websiteUrl)}
+              error={errors.websiteUrl?.[0]}
+            />
+          </div>
+        </SectionCard>
 
-      <Field
-        label="City"
-        help="Shown under the name on the institution page."
-        value={row.city}
-        onChange={(city) => set({ city })}
-      />
+        <SectionCard title="Profile">
+          <RichText
+            label="Description"
+            value={form.descriptionHtml}
+            onChange={(descriptionHtml: string) => set("descriptionHtml", descriptionHtml)}
+          />
+        </SectionCard>
 
-      <Field
-        label="Website"
-        help="The Apply or Visit website link on the institution page. Must start with https://"
-        value={row.websiteUrl}
-        onChange={(websiteUrl) => set({ websiteUrl })}
-        error={errors.websiteUrl?.[0]}
-      />
+        <SectionCard title="Media">
+          <MediaPicker
+            label="Logo"
+            name="logoId"
+            value={form.logoId ? (media[form.logoId] ?? null) : null}
+            onChange={(logoId) => set("logoId", logoId)}
+          />
+          {gallery}
+          {value.id ? null : (
+            <p className="border-t border-border pt-5 text-xs text-muted-foreground">
+              The gallery opens once this institution is saved.
+            </p>
+          )}
+        </SectionCard>
 
-      <RichText
-        label="Description"
-        help="The main body of the institution page, above the course list."
-        value={row.descriptionHtml}
-        onChange={(descriptionHtml) => set({ descriptionHtml })}
-      />
+        <SectionCard title="Features">
+          <SwitchField
+            label="Partner institution"
+            help="Shown as one Goodluck works with directly."
+            checked={form.isPartner}
+            onChange={(isPartner) => set("isPartner", isPartner)}
+          />
+          <SwitchField
+            label="Featured"
+            help="Pulled to the front of the institutions page."
+            checked={form.isFeatured}
+            onChange={(isFeatured) => set("isFeatured", isFeatured)}
+          />
+          <TextField
+            name="sortOrder"
+            label="Display order"
+            type="number"
+            help="Lower numbers appear first."
+            value={String(form.sortOrder)}
+            onChange={(sortOrder) => set("sortOrder", Number(sortOrder) || 0)}
+            className="sm:max-w-40"
+          />
+        </SectionCard>
+      </EditorLayout>
 
-      <h2 className="t-h5 admin-subhead">Publishing</h2>
-
-      <Toggle
-        label="Partner institution"
-        help="Ticked, the institution is shown as one Goodluck works with directly."
-        checked={row.isPartner}
-        onChange={(isPartner) => set({ isPartner })}
-      />
-      <Toggle
-        label="Featured"
-        help="Ticked, the institution is pulled to the front of the institutions page."
-        checked={row.isFeatured}
-        onChange={(isFeatured) => set({ isFeatured })}
-      />
-      <Field
-        label="Order"
-        type="number"
-        help="Lower numbers come first on the institutions page."
-        value={String(row.sortOrder)}
-        onChange={(sortOrder) => set({ sortOrder: Number(sortOrder) || 0 })}
-      />
-      <Select
-        label="Status"
-        help="Only published institutions are on the site."
-        value={row.status}
-        onChange={(status) => set({ status })}
-        options={[
-          { value: "draft", label: "Draft" },
-          { value: "scheduled", label: "Scheduled", disabled: !canPublish },
-          { value: "published", label: "Published", disabled: !canPublish },
-          { value: "archived", label: "Archived" },
-        ]}
-      />
-
-      <SeoFields
-        value={row}
-        onChange={set}
-        path={path}
-        fallbackTitle={row.name}
-        fallbackDescription={row.city ? `${row.city}, ${row.country}` : row.country}
-        ogImage={pick(row.seoOgImageId)}
-        errors={errors}
-      />
-
-      <SaveBar
+      <EditorActionBar
+        dirty={dirty}
         busy={busy}
-        message={message}
-        problems={errors.publish}
-        viewHref={path}
-        onDelete={
-          canDelete && row.id
-            ? async () => {
-                if (!confirm(`Delete ${row.name}? This cannot be undone.`)) return;
-                setBusy(true);
-                const result = await deleteInstitution({ id: row.id });
-                setBusy(false);
-                if (result.ok) router.push("/admin/institutions");
-                else setMessage(result.error);
+        saveLabel={form.id ? "Save" : "Create institution"}
+        destructive={
+          canDelete && form.id ? (
+            <ConfirmDialog
+              trigger={
+                <Button type="button" variant="ghost" size="sm" className="text-destructive hover:bg-destructive/10 hover:text-destructive">
+                  <Trash2 />
+                  Delete
+                </Button>
               }
-            : undefined
+              title="Delete this institution?"
+              description="This cannot be undone."
+              confirmLabel="Delete institution"
+              onConfirm={remove}
+            />
+          ) : null
         }
       />
+
+      <ConfirmDialog
+        open={askPublish}
+        onOpenChange={setAskPublish}
+        title="Publish this institution?"
+        description="It will become visible on the public website."
+        confirmLabel="Publish"
+        destructive={false}
+        onConfirm={save}
+      />
     </form>
+  );
+}
+
+function WebAddress({
+  value,
+  error,
+  published,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  published: boolean;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <AdvancedSection open={Boolean(error)}>
+      <TextField
+        name="slug"
+        label="URL slug"
+        required
+        help={published ? "The old address keeps working and sends people to the new one." : undefined}
+        value={value}
+        onChange={onChange}
+        error={error}
+      />
+    </AdvancedSection>
   );
 }

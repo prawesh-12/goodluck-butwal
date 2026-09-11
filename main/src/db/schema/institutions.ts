@@ -1,5 +1,5 @@
 import { boolean, char, index, integer, numeric, pgTable, text, uuid } from "drizzle-orm/pg-core";
-import { base, mediaAssets, publishing, seo } from "./core";
+import { base, mediaAssets, publishing } from "./core";
 import { qualificationLevel } from "./enums";
 import { destinations } from "./destinations";
 
@@ -8,7 +8,6 @@ export const institutions = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
     logoId: uuid("logo_id").references(() => mediaAssets.id),
@@ -47,7 +46,6 @@ export const courses = pgTable(
   {
     ...base,
     ...publishing,
-    ...seo,
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
     institutionId: uuid("institution_id")

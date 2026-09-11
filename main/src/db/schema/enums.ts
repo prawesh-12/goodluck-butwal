@@ -1,11 +1,6 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 
-export const contentStatus = pgEnum("content_status", [
-  "draft",
-  "scheduled",
-  "published",
-  "archived",
-]);
+export const contentStatus = pgEnum("content_status", ["draft", "published", "archived"]);
 
 export const userRole = pgEnum("user_role", [
   "super_admin",
@@ -60,10 +55,6 @@ export const eventType = pgEnum("event_type", [
 
 export const regStatus = pgEnum("reg_status", ["registered", "attended", "cancelled"]);
 
-export const testimonialType = pgEnum("testimonial_type", ["text", "image", "video"]);
-
-export const videoProvider = pgEnum("video_provider", ["youtube", "vimeo", "local"]);
-
 export const contactMethod = pgEnum("contact_method", ["email", "phone", "whatsapp"]);
 
 export const consultationStatus = pgEnum("consultation_status", [
@@ -81,15 +72,4 @@ export const enquiryStatus = pgEnum("enquiry_status", [
   "converted",
   "closed",
   "spam",
-]);
-
-export const auditAction = pgEnum("audit_action", [
-  "create",
-  "update",
-  "delete",
-  "publish",
-  "unpublish",
-  "login",
-  "login_failed",
-  "export",
 ]);

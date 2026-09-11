@@ -1,106 +1,220 @@
-import { and, count, desc, eq, ilike, isNull, or, sql, type SQL } from "drizzle-orm";
+import { and, count, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "@db/client";
 import {
-  destinations,
+  courses,
+  events,
+  institutionImages,
+  institutions,
   mediaAssets,
-  offices,
-  pages,
+  partners,
   posts,
-  services,
   teamMembers,
-  testimonials,
+  testPrepCourses,
 } from "@db/schema";
+import { assetId } from "@/lib/utils/media-url";
+import {
+  imageUrl,
+  searchAssets,
+  videoPosterUrl,
+  videoStreamUrl,
+  type CloudinaryAsset,
+  type ResourceType,
+} from "@/lib/integrations/cloudinary";
 
-export const PAGE_SIZE = 48;
+const PAGE_SIZE = 48;
 
-export type MediaFilters = {
-  q?: string;
-  folder?: string;
-  type?: string;
-  kind?: string;
-  missing_alt?: string;
-  page?: number;
+// The reference row a CMS section points at. Everything else about the asset comes from
+// Cloudinary, so this carries only what the picker and the publish checks need.
+export type ReferenceRow = {
+  id: string;
+  kind: "static" | "cloudinary";
+  altText: string | null;
+  caption: string | null;
 };
 
-function where(f: MediaFilters) {
-  const parts: (SQL | undefined)[] = [];
-  if (f.q) {
-    const like = `%${f.q}%`;
-    parts.push(or(ilike(mediaAssets.filename, like), ilike(mediaAssets.altText, like)));
-  }
-  if (f.folder) parts.push(eq(mediaAssets.folder, f.folder));
-  if (f.type) parts.push(eq(mediaAssets.type, f.type));
-  if (f.kind) parts.push(eq(mediaAssets.kind, f.kind as "static"));
-  // Null means nobody has described it yet. An empty string is a deliberate decorative image.
-  if (f.missing_alt === "1") {
-    parts.push(and(eq(mediaAssets.type, "image"), isNull(mediaAssets.altText)));
-  }
-  const defined = parts.filter(Boolean) as SQL[];
-  return defined.length ? and(...defined) : undefined;
+// The delivery URLs are built here so the browsing UI never imports the module that holds the
+// Cloudinary credentials.
+export type LibraryAsset = CloudinaryAsset & {
+  reference: ReferenceRow | null;
+  thumbUrl: string;
+  viewUrl: string;
+};
+
+// A static row mirrors a file in public/ and is keyed by path. assetId turns that path into the
+// public id Cloudinary serves it under, which is where the two sides meet.
+function keyOf(row: { staticPath: string | null; cloudinaryPublicId: string | null }) {
+  return row.cloudinaryPublicId ?? (row.staticPath ? assetId(row.staticPath) : null);
 }
 
-export async function listMedia(f: MediaFilters) {
-  const clause = where(f);
-  const page = Math.max(1, f.page ?? 1);
+// Cloudinary folders the asset under goodluck/<folder>/<name>. The row keeps the short name.
+export function folderOf(publicId: string) {
+  const parts = publicId.split("/");
+  return parts.length > 1 ? parts[parts.length - 2] : "general";
+}
 
-  const [rows, [total], [missing], folders] = await Promise.all([
-    db
-      .select()
-      .from(mediaAssets)
-      .where(clause)
-      .orderBy(desc(mediaAssets.createdAt))
-      .limit(PAGE_SIZE)
-      .offset((page - 1) * PAGE_SIZE),
-    db.select({ n: count() }).from(mediaAssets).where(clause),
-    db
-      .select({ n: count() })
-      .from(mediaAssets)
-      .where(and(eq(mediaAssets.type, "image"), isNull(mediaAssets.altText))),
-    db
-      .selectDistinct({ folder: mediaAssets.folder })
-      .from(mediaAssets)
-      .orderBy(mediaAssets.folder),
+async function referenceRows(resourceType: ResourceType) {
+  const rows = await db
+    .select({
+      id: mediaAssets.id,
+      kind: mediaAssets.kind,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
+      altText: mediaAssets.altText,
+      caption: mediaAssets.caption,
+    })
+    .from(mediaAssets)
+    .where(eq(mediaAssets.type, resourceType));
+
+  const byPublicId = new Map<string, ReferenceRow>();
+  for (const row of rows) {
+    const key = keyOf(row);
+    if (key) byPublicId.set(key, { id: row.id, kind: row.kind, altText: row.altText, caption: row.caption });
+  }
+  return byPublicId;
+}
+
+// Cloudinary is the source of truth for what exists. Postgres is asked only for the reference
+// rows, so browsing never scans a table for the asset list itself.
+export async function listLibrary(opts: { resourceType: ResourceType; q?: string; cursor?: string }) {
+  const [page, references] = await Promise.all([
+    searchAssets({ ...opts, limit: PAGE_SIZE }),
+    referenceRows(opts.resourceType),
   ]);
 
-  return { rows, total: total.n, missingAlt: missing.n, page, folders: folders.map((f) => f.folder) };
+  const video = opts.resourceType === "video";
+  const assets: LibraryAsset[] = page.assets.map((asset) => ({
+    ...asset,
+    reference: references.get(asset.publicId) ?? null,
+    thumbUrl: video ? videoPosterUrl(asset.publicId) : imageUrl(asset.publicId, 320),
+    viewUrl: video ? videoStreamUrl(asset.publicId) : imageUrl(asset.publicId, 1280),
+  }));
+  return { assets, total: page.total, cursor: page.cursor };
 }
 
-// Every column that points at media_assets, with the label an admin would recognise.
-const REFERENCES = [
-  { table: offices, column: offices.heroImageId, label: offices.name, kind: "Office" },
-  { table: teamMembers, column: teamMembers.photoId, label: teamMembers.fullName, kind: "Team member" },
-  { table: pages, column: pages.heroImageId, label: pages.title, kind: "Page" },
-  { table: destinations, column: destinations.heroImageId, label: destinations.name, kind: "Destination hero" },
-  { table: destinations, column: destinations.cardImageId, label: destinations.name, kind: "Destination card" },
-  { table: destinations, column: destinations.flagImageId, label: destinations.name, kind: "Destination flag" },
-  { table: services, column: services.artworkId, label: services.name, kind: "Service artwork" },
-  { table: services, column: services.reelId, label: services.name, kind: "Service reel" },
-  { table: posts, column: posts.bannerImageId, label: posts.title, kind: "Post banner" },
-  { table: testimonials, column: testimonials.imageId, label: testimonials.displayName, kind: "Testimonial" },
-  { table: testimonials, column: testimonials.authorPhotoId, label: testimonials.displayName, kind: "Testimonial photo" },
-] as const;
+export type AssetRow = {
+  id: string;
+  kind: "static" | "cloudinary";
+  officeId: string | null;
+  staticPath: string | null;
+  cloudinaryPublicId: string | null;
+};
+
+// Cloudinary knows an asset by public id, the CMS knows it by a media_assets uuid. A static row
+// is matched on the path it was seeded from, which no index can express, so SQL narrows the set
+// on the filename and the exact match is made here.
+export async function assetByPublicId(publicId: string, resourceType: ResourceType): Promise<AssetRow | null> {
+  const tail = publicId.split("/").pop() ?? publicId;
+  const rows = await db
+    .select({
+      id: mediaAssets.id,
+      kind: mediaAssets.kind,
+      officeId: mediaAssets.officeId,
+      staticPath: mediaAssets.staticPath,
+      cloudinaryPublicId: mediaAssets.cloudinaryPublicId,
+    })
+    .from(mediaAssets)
+    .where(
+      and(
+        eq(mediaAssets.type, resourceType),
+        or(eq(mediaAssets.cloudinaryPublicId, publicId), ilike(mediaAssets.staticPath, `%${tail}%`)),
+      ),
+    );
+
+  return rows.find((row) => keyOf(row) === publicId) ?? null;
+}
+
+// Every column in the seven CMS sections that points at media_assets, with the label an admin
+// would recognise.
+// Each reference is one column somewhere that points at a media row. `find` names what is using
+// one asset; `findMany` answers the same question for a page of them in a single query.
+// Each reference is one column somewhere that points at a media row. `findMany` answers
+// "what is using these" for a whole page of assets in one query per reference.
+const REFERENCES: {
+  kind: string;
+  findMany: (ids: string[]) => Promise<{ id: string | null; label: string | null }[]>;
+}[] = [
+  {
+    kind: "Team member",
+    findMany: (ids) =>
+      db.select({ id: teamMembers.photoId, label: teamMembers.fullName }).from(teamMembers).where(inArray(teamMembers.photoId, ids)),
+  },
+  {
+    kind: "Partner logo",
+    findMany: (ids) =>
+      db.select({ id: partners.logoId, label: partners.name }).from(partners).where(inArray(partners.logoId, ids)),
+  },
+  {
+    kind: "News banner",
+    findMany: (ids) =>
+      db.select({ id: posts.bannerImageId, label: posts.title }).from(posts).where(inArray(posts.bannerImageId, ids)),
+  },
+  {
+    kind: "Event cover",
+    findMany: (ids) =>
+      db.select({ id: events.coverImageId, label: events.title }).from(events).where(inArray(events.coverImageId, ids)),
+  },
+  {
+    kind: "Institution logo",
+    findMany: (ids) =>
+      db.select({ id: institutions.logoId, label: institutions.name }).from(institutions).where(inArray(institutions.logoId, ids)),
+  },
+  {
+    kind: "Test preparation hero",
+    findMany: (ids) =>
+      db
+        .select({ id: testPrepCourses.heroImageId, label: testPrepCourses.name })
+        .from(testPrepCourses)
+        .where(inArray(testPrepCourses.heroImageId, ids)),
+  },
+  {
+    kind: "Institution gallery",
+    findMany: (ids) =>
+      db
+        .select({ id: institutionImages.mediaId, label: institutions.name })
+        .from(institutionImages)
+        .innerJoin(institutions, eq(institutionImages.institutionId, institutions.id))
+        .where(inArray(institutionImages.mediaId, ids)),
+  },
+];
+
+// Rich text embeds an asset by URL, and every one of those URLs carries the public id.
+const RICH_TEXT: ((like: string) => Promise<{ n: number }[]>)[] = [
+  (like) => db.select({ n: count() }).from(posts).where(sql`${posts.bodyHtml} like ${like}`),
+  (like) => db.select({ n: count() }).from(events).where(sql`${events.descriptionHtml} like ${like}`),
+  (like) => db.select({ n: count() }).from(institutions).where(sql`${institutions.descriptionHtml} like ${like}`),
+  (like) => db.select({ n: count() }).from(courses).where(sql`${courses.descriptionHtml} like ${like}`),
+  (like) => db.select({ n: count() }).from(courses).where(sql`${courses.entryRequirementsHtml} like ${like}`),
+];
 
 export type Usage = { kind: string; label: string };
 
-// Delete is blocked while an asset is in use, and the answer names what is using it.
-export async function findUsage(id: string): Promise<Usage[]> {
-  const found: Usage[] = [];
+// What is using these assets, for a whole page at once: one query per reference rather than one
+// per card. The library needs it for every card, and the delete guard needs it for one.
+export async function usageFor(ids: string[]): Promise<Map<string, Usage[]>> {
+  const found = new Map<string, Usage[]>();
+  if (ids.length === 0) return found;
+
   for (const ref of REFERENCES) {
-    const rows = await db
-      .select({ label: ref.label })
-      .from(ref.table)
-      .where(eq(ref.column, id))
-      .limit(5);
-    for (const row of rows) found.push({ kind: ref.kind, label: row.label ?? "Untitled" });
+    for (const row of await ref.findMany(ids)) {
+      if (!row.id) continue;
+      const list = found.get(row.id) ?? [];
+      list.push({ kind: ref.kind, label: row.label ?? "Untitled" });
+      found.set(row.id, list);
+    }
   }
   return found;
 }
 
-// Rich text embeds an image by URL rather than by id, so those are found by searching the html.
-export async function findInRichText(path: string) {
-  const [row] = await db
-    .select({ n: count() })
-    .from(posts)
-    .where(sql`${posts.bodyHtml} like ${`%${path}%`}`);
-  return row.n;
+// Delete is blocked while an asset is in use, and the answer names what is using it.
+export async function findUsage(id: string): Promise<Usage[]> {
+  return (await usageFor([id])).get(id) ?? [];
+}
+
+export async function findInRichText(publicId: string) {
+  let total = 0;
+  for (const body of RICH_TEXT) {
+    const [row] = await body(`%${publicId}%`);
+    total += row.n;
+  }
+  return total;
 }

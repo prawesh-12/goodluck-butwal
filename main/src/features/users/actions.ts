@@ -8,7 +8,6 @@ import { users } from "@db/schema";
 import { auth } from "@/lib/auth";
 import { requireActor } from "@/lib/auth/session";
 import { requirePermission } from "@/lib/auth/rbac";
-import { writeAudit } from "@/lib/security/audit";
 import { refusalReason } from "@/lib/auth/user-rules";
 import { createUserSchema, updateUserSchema } from "@/features/users/validators";
 
@@ -54,14 +53,6 @@ export async function createUser(input: unknown): Promise<Result<{ id: string }>
     .set({ role: data.role, officeId: data.officeId, updatedAt: new Date() })
     .where(eq(users.id, created.user.id));
 
-  await writeAudit({
-    userId: actor.id,
-    action: "create",
-    entityType: "users",
-    entityId: created.user.id,
-    summary: `created ${data.email} as ${data.role}`,
-  });
-
   revalidatePath("/admin/users");
   return { ok: true, data: { id: created.user.id } };
 }
@@ -77,7 +68,7 @@ export async function updateUser(input: unknown): Promise<Result<{ id: string }>
   const data = parsed.data;
 
   const [existing] = await db
-    .select({ id: users.id, role: users.role, isActive: users.isActive, email: users.email })
+    .select({ id: users.id, role: users.role, isActive: users.isActive })
     .from(users)
     .where(eq(users.id, data.id));
   if (!existing) return { ok: false, error: "That account no longer exists." };
@@ -99,14 +90,6 @@ export async function updateUser(input: unknown): Promise<Result<{ id: string }>
     .update(users)
     .set({ name: data.name, role: data.role, officeId: data.officeId, isActive: data.isActive, updatedAt: new Date() })
     .where(eq(users.id, data.id));
-
-  await writeAudit({
-    userId: actor.id,
-    action: "update",
-    entityType: "users",
-    entityId: data.id,
-    summary: `${existing.email} is now ${data.role}${data.isActive ? "" : ", deactivated"}`,
-  });
 
   revalidatePath("/admin/users");
   return { ok: true, data: { id: data.id } };

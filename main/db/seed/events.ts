@@ -1,4 +1,4 @@
-import { asc } from "drizzle-orm";
+import { asc, ne } from "drizzle-orm";
 import { db } from "@db/client";
 import { events, mediaAssets, offices } from "@db/schema";
 
@@ -57,10 +57,11 @@ export async function seedEvents() {
   const officeRows = await db.select({ id: offices.id, code: offices.code }).from(offices);
   const officeId = new Map(officeRows.map((row) => [row.code, row.id]));
 
-  // Any picture with alt text will do: these rows are thrown away when the real events arrive.
+  // Any described picture will do: these rows are thrown away when the real events arrive.
   const [cover] = await db
     .select({ id: mediaAssets.id })
     .from(mediaAssets)
+    .where(ne(mediaAssets.altText, ""))
     .orderBy(asc(mediaAssets.createdAt))
     .limit(1);
 

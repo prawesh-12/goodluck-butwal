@@ -2,10 +2,24 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2, Plus, Tags, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/admin/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/admin/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
+import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
+import { TextField } from "@/components/shared/admin/fields";
+import { DataCard, Muted, ViewSiteLink } from "@/components/shared/admin/list-ui";
+import { EmptyState } from "@/components/shared/admin/states";
+import { useAction } from "@/components/shared/admin/use-action";
 import {
   createCourseCategory,
   deleteCourseCategory,
-  reorderCourseCategories,
   updateCourseCategory,
 } from "@/features/courses/category-actions";
 
@@ -16,6 +30,8 @@ export type CourseCategoryRow = {
   sortOrder: number;
   courses: number;
 };
+
+type Draft = { id?: string; name: string; sortOrder: number };
 
 export function CourseCategoryManager({
   rows,
@@ -29,157 +45,160 @@ export function CourseCategoryManager({
   canDelete: boolean;
 }) {
   const router = useRouter();
-  const [order, setOrder] = useState(rows);
-  const [name, setName] = useState("");
-  const [dragging, setDragging] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const { busy, errors, setErrors, run } = useAction();
+  const [draft, setDraft] = useState<Draft | null>(null);
 
-  const moved = order.some((row, i) => row.id !== rows[i]?.id);
-
-  const dropOn = (targetId: string) => {
-    if (!dragging || dragging === targetId) return;
-    setOrder((current) => {
-      const next = [...current];
-      const from = next.findIndex((row) => row.id === dragging);
-      const to = next.findIndex((row) => row.id === targetId);
-      next.splice(to, 0, next.splice(from, 1)[0]);
-      return next;
-    });
+  const open = (next: Draft) => {
+    setErrors({});
+    setDraft(next);
   };
 
-  const run = async (work: () => Promise<{ ok: boolean; error?: string }>, done: string) => {
-    setBusy(true);
-    const result = await work();
-    setBusy(false);
-    setMessage(result.ok ? done : (result.error ?? "That did not work."));
-    if (result.ok) router.refresh();
-    return result.ok;
+  const save = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!draft) return;
+    const id = draft.id;
+    // The web address is left alone: empty keeps the stored one and makes a new one from the name.
+    const payload = { name: draft.name, slug: "", sortOrder: draft.sortOrder };
+    const saved = await run(() => (id ? updateCourseCategory({ ...payload, id }) : createCourseCategory(payload)), {
+      success: id ? "Subject area saved" : "Subject area added",
+      failure: id ? "Couldn't save the subject area." : "Couldn't add the subject area.",
+    });
+    if (!saved) return;
+    setDraft(null);
+    router.refresh();
+  };
+
+  const remove = async (row: CourseCategoryRow) => {
+    const gone = await run(() => deleteCourseCategory({ id: row.id }), {
+      success: "Subject area deleted",
+      failure: "Couldn't delete the subject area.",
+    });
+    if (gone) router.refresh();
   };
 
   return (
-    <>
+    <div className="space-y-6">
       {canCreate ? (
-        <form
-          className="admin-editor"
-          onSubmit={async (event) => {
-            event.preventDefault();
-            const ok = await run(
-              () => createCourseCategory({ name, slug: "", sortOrder: order.length }),
-              "Added.",
-            );
-            if (ok) setName("");
-          }}
-        >
-          <label className="admin-field">
-            <span className="t-small">Add a subject area</span>
-            <input value={name} onChange={(event) => setName(event.target.value)} />
-            <span className="t-small admin-help">
-              The label on a course card and one of the choices in the course filters. The web
-              address is made from the name.
-            </span>
-          </label>
-          <div className="admin-actions">
-            <button type="submit" className="admin-btn admin-btn-primary" disabled={busy || !name.trim()}>
-              {busy ? "Adding" : "Add"}
-            </button>
-          </div>
-        </form>
-      ) : null}
-
-      {order.length === 0 ? (
-        <p className="t-body admin-empty">
-          No subject areas yet. Add the first one above, then courses can be filed under it.
-        </p>
-      ) : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Address</th>
-              <th>Courses</th>
-              <th>On the site</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.map((row) => (
-              <tr
-                key={row.id}
-                draggable={canEdit}
-                onDragStart={() => setDragging(row.id)}
-                onDragOver={(event) => event.preventDefault()}
-                onDrop={() => dropOn(row.id)}
-                onDragEnd={() => setDragging(null)}
-              >
-                <td>
-                  {canEdit ? (
-                    <input
-                      defaultValue={row.name}
-                      aria-label={`Name of ${row.name}`}
-                      onBlur={async (event) => {
-                        const next = event.target.value.trim();
-                        if (!next || next === row.name) return;
-                        await run(
-                          () => updateCourseCategory({ id: row.id, name: next, slug: "", sortOrder: row.sortOrder }),
-                          "Saved.",
-                        );
-                      }}
-                    />
-                  ) : (
-                    row.name
-                  )}
-                </td>
-                <td>/courses?category={row.slug}</td>
-                <td>{row.courses}</td>
-                <td>
-                  <a href={`/courses?category=${row.slug}`} target="_blank" rel="noreferrer">
-                    View on site
-                  </a>
-                </td>
-                <td>
-                  {canDelete ? (
-                    <button
-                      type="button"
-                      className="admin-btn admin-btn-danger"
-                      disabled={busy}
-                      onClick={async () => {
-                        if (!window.confirm(`Delete the ${row.name} subject area?`)) return;
-                        await run(() => deleteCourseCategory({ id: row.id }), "Deleted.");
-                      }}
-                    >
-                      Delete
-                    </button>
-                  ) : null}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {canEdit ? (
-        <div className="admin-actions">
-          <span className="t-small admin-help">
-            Drag a row to change the order the subject areas appear in the course filters. Edit a
-            name in place, it saves when you click away.
-          </span>
-          {moved ? (
-            <button
-              type="button"
-              className="admin-btn"
-              disabled={busy}
-              onClick={() =>
-                run(() => reorderCourseCategories({ ids: order.map((row) => row.id) }), "Order saved.")
-              }
-            >
-              {busy ? "Saving" : "Save order"}
-            </button>
-          ) : null}
+        <div className="flex justify-end">
+          <Button type="button" onClick={() => open({ name: "", sortOrder: rows.length })}>
+            <Plus />
+            New subject area
+          </Button>
         </div>
       ) : null}
 
-      {message ? <p className="t-small">{message}</p> : null}
-    </>
+      {rows.length === 0 ? (
+        <EmptyState
+          icon={Tags}
+          title="No subject areas yet"
+          description="Add the first one so courses can be grouped and filtered by subject."
+          action={
+            canCreate ? (
+              <Button type="button" onClick={() => open({ name: "", sortOrder: 0 })}>
+                <Plus />
+                New subject area
+              </Button>
+            ) : null
+          }
+        />
+      ) : (
+        <DataCard>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead className="hidden sm:table-cell">Courses</TableHead>
+                <TableHead className="hidden sm:table-cell">Display order</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="font-medium">{row.name}</TableCell>
+                  <TableCell className="hidden sm:table-cell">
+                    {row.courses === 0 ? <Muted>None</Muted> : row.courses}
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">{row.sortOrder}</TableCell>
+                  <TableCell>
+                    <span className="flex items-center justify-end gap-1">
+                      <ViewSiteLink href={`/courses?category=${row.slug}`} />
+                      {canEdit ? (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => open({ id: row.id, name: row.name, sortOrder: row.sortOrder })}
+                        >
+                          Edit
+                        </Button>
+                      ) : null}
+                      {canDelete ? (
+                        <ConfirmDialog
+                          trigger={
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon-sm"
+                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            >
+                              <Trash2 />
+                              <span className="sr-only">Delete {row.name}</span>
+                            </Button>
+                          }
+                          title={`Delete ${row.name}?`}
+                          description="This cannot be undone."
+                          confirmLabel="Delete subject area"
+                          onConfirm={() => remove(row)}
+                        />
+                      ) : null}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </DataCard>
+      )}
+
+      <Dialog open={draft !== null} onOpenChange={(next) => (next ? null : setDraft(null))}>
+        <DialogContent>
+          <form onSubmit={save} className="space-y-5">
+            <DialogHeader>
+              <DialogTitle>{draft?.id ? "Edit subject area" : "New subject area"}</DialogTitle>
+            </DialogHeader>
+
+            <TextField
+              name="name"
+              label="Name"
+              required
+              value={draft?.name ?? ""}
+              onChange={(name) => setDraft((current) => (current ? { ...current, name } : current))}
+              error={errors.name?.[0]}
+            />
+            <TextField
+              name="sortOrder"
+              label="Display order"
+              type="number"
+              help="Lower numbers appear first."
+              value={String(draft?.sortOrder ?? 0)}
+              onChange={(sortOrder) =>
+                setDraft((current) => (current ? { ...current, sortOrder: Number(sortOrder) || 0 } : current))
+              }
+            />
+
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setDraft(null)} disabled={busy}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={busy || !draft?.name.trim()}>
+                {busy ? <Loader2 className="animate-spin" /> : null}
+                {busy ? "Saving..." : draft?.id ? "Save" : "Add subject area"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }

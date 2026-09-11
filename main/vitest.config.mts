@@ -8,9 +8,8 @@ export default defineConfig({
       "@db": fileURLToPath(new URL("./src/db", import.meta.url)),
     },
   },
-  envDir: ".",
   test: {
-    env: { DATABASE_URL: process.env.DATABASE_URL ?? "" },
     include: ["tests/**/*.test.{ts,tsx,mts,mjs}"],
+    setupFiles: ["tests/setup.ts"],
   },
 });

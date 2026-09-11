@@ -2,62 +2,88 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateEnquiry } from "@/features/leads/actions";
-import { Select } from "@/components/shared/admin/repeater";
+import { SelectField, TextAreaField } from "@/components/shared/admin/fields";
+import { SectionCard } from "@/components/shared/admin/editor-shell";
+import { statusLabel } from "@/components/shared/admin/list-ui";
+import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
+import { useAction } from "@/components/shared/admin/use-action";
 import { Button } from "@/components/ui/admin/button";
-import { Label } from "@/components/ui/admin/label";
-import { Textarea } from "@/components/ui/admin/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/admin/card";
+import { updateEnquiry } from "@/features/leads/actions";
 
 const STATUSES = ["new", "in_progress", "contacted", "converted", "closed", "spam"];
 
 export function EnquiryEditor({ id, status, notes }: { id: string; status: string; notes: string }) {
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const { busy, run } = useAction();
+  const [current, setCurrent] = useState(status);
+  const [text, setText] = useState(notes);
+  const [dirty, setDirty] = useState(false);
+
+  // The update carries both fields every time, because sending one on its own clears the other.
+  // It answers with no payload, so the call is wrapped in the shape useAction expects.
+  const save = (nextStatus: string, nextNotes: string, copy: { success: string; failure: string }) =>
+    run(async () => {
+      const result = await updateEnquiry({ id, status: nextStatus, internalNotes: nextNotes });
+      return result.ok ? { ok: true as const, data: true as const } : result;
+    }, copy);
+
+  const changeStatus = async (next: string) => {
+    setCurrent(next);
+    const saved = await save(next, text, {
+      success: "Enquiry status updated",
+      failure: "Couldn't update the enquiry.",
+    });
+    if (saved) {
+      setDirty(false);
+      router.refresh();
+    } else {
+      setCurrent(current);
+    }
+  };
+
+  const saveNotes = async () => {
+    const saved = await save(current, text, {
+      success: "Notes saved",
+      failure: "Couldn't update the enquiry.",
+    });
+    if (saved) {
+      setDirty(false);
+      router.refresh();
+    }
+  };
 
   return (
-    <Card className="max-w-2xl">
-      <CardHeader>
-        <CardTitle className="text-base">Handling</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form
-          className="space-y-4"
-          onSubmit={async (event) => {
-            event.preventDefault();
-            setBusy(true);
-            const form = new FormData(event.currentTarget);
-            const result = await updateEnquiry({
-              id,
-              status: form.get("status"),
-              internalNotes: form.get("internalNotes"),
-            });
-            setBusy(false);
-            setMessage(result.ok ? "Saved." : result.error);
-            if (result.ok) router.refresh();
-          }}
-        >
-          <Select
-            label="Status"
-            name="status"
-            defaultValue={status}
-            options={STATUSES.map((s) => ({ value: s, label: s.replace(/_/g, " ") }))}
-          />
+    <SectionCard title="Status">
+      <UnsavedGuard dirty={dirty} />
 
-          <div className="space-y-1.5">
-            <Label htmlFor="enquiry-notes">Internal notes</Label>
-            <Textarea id="enquiry-notes" name="internalNotes" defaultValue={notes} rows={4} />
-          </div>
+      <SelectField
+        name="status"
+        label="Status"
+        value={current}
+        disabled={busy}
+        options={STATUSES.map((option) => ({ value: option, label: statusLabel(option) }))}
+        onChange={changeStatus}
+      />
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Button type="submit" disabled={busy}>
-              {busy ? "Saving" : "Save"}
-            </Button>
-            {message ? <span className="text-sm text-muted-foreground">{message}</span> : null}
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+      <TextAreaField
+        name="internalNotes"
+        label="Internal notes"
+        value={text}
+        rows={5}
+        onChange={(next) => {
+          setText(next);
+          setDirty(true);
+        }}
+      />
+
+      <div className="flex items-center gap-3">
+        <Button type="button" disabled={busy || !dirty} onClick={saveNotes}>
+          {busy ? "Saving..." : "Save notes"}
+        </Button>
+        <span aria-live="polite" className="text-xs text-muted-foreground">
+          {dirty ? "Unsaved changes" : null}
+        </span>
+      </div>
+    </SectionCard>
   );
 }

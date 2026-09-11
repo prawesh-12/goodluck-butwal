@@ -1,7 +1,17 @@
 import type { NextConfig } from "next";
 
-const immutableCache = [
-  { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+// Names under /images and /brand are stable and the files behind them get replaced in place, so
+// "immutable" pinned the old bytes in every browser that had already loaded one. Revalidation
+// keeps the bandwidth saving, because a 304 carries no body, and a replacement shows up within
+// the hour instead of the year.
+const assetCache = [
+  {
+    key: "Cache-Control",
+    value:
+      process.env.NODE_ENV === "production"
+        ? "public, max-age=3600, must-revalidate"
+        : "no-store",
+  },
 ];
 
 // React refresh compiles with eval in development. Production never needs it.
@@ -23,9 +33,9 @@ const csp = [
   `script-src ${scriptSrc.join(" ")}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://res.cloudinary.com https://www.googletagmanager.com https://www.google-analytics.com",
-  "media-src 'self' https://res.cloudinary.com",
+  "media-src 'self' blob: https://res.cloudinary.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://*.analytics.google.com",
+  "connect-src 'self' https://res.cloudinary.com https://api.cloudinary.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com https://*.google-analytics.com https://*.analytics.google.com",
   "frame-src 'self' https://challenges.cloudflare.com https://www.google.com https://maps.google.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
   "worker-src 'self' blob:",
   "upgrade-insecure-requests",
@@ -45,8 +55,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/images/:path*", headers: immutableCache },
-      { source: "/brand/:path*", headers: immutableCache },
+      { source: "/images/:path*", headers: assetCache },
+      { source: "/brand/:path*", headers: assetCache },
       {
         source: "/:path*",
         headers: [

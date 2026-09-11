@@ -1,6 +1,7 @@
 import { Badge, Ticker } from "@/components/ui/bits";
 
 import { loadText } from "@/features/site-text/queries";
+import { Img } from "@/components/ui/img";
 
 export async function Partners({ logos, tone = "default", className = "" }: { logos: string[]; tone?: "default" | "dark" | "gray"; className?: string }) {
   const t = await loadText();
@@ -22,7 +23,7 @@ export async function Partners({ logos, tone = "default", className = "" }: { lo
           </div>
           <Ticker gap={50} speed={120} className="w-full [--gap-override:30px] md:[--gap-override:50px]">
             {logos.map((src) => (
-              <img key={src} src={src} alt={t("home.partners.logo_alt", "Partner logo")} className="h-9 w-auto max-w-[120px] shrink-0 object-contain" loading="lazy" decoding="async" />
+              <Img key={src} src={src} alt={t("home.partners.logo_alt", "Partner logo")} w={120} widths={[120, 240]} sizes="120px" className="h-9 w-auto max-w-[120px] shrink-0 object-contain" loading="lazy" decoding="async" />
             ))}
           </Ticker>
           <div aria-hidden className={`${line} absolute inset-x-0 bottom-0 h-px`} />

@@ -20,12 +20,6 @@ const base = {
   registrationEnabled: true,
   registrationDeadline: "",
   status: "draft" as const,
-  publishedAt: "",
-  seoTitle: "",
-  seoDescription: "",
-  seoOgImageId: "",
-  seoNoindex: false,
-  canonicalUrl: "",
 };
 
 const errorsOn = (input: Record<string, unknown>) => {
