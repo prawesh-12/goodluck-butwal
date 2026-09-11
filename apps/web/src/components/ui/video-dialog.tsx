@@ -25,11 +25,13 @@ export function VideoDialog({ src, poster, title, inline, prefetch, bare, classN
   }, [inline, mounted]);
 
   // Safari plays HLS natively; everyone else needs the library, so it is fetched on open only.
+  // Chrome answers "maybe" to canPlayType for HLS and then fails the load, so MediaSource decides
+  // instead: iPhone Safari is the one without it and takes the stream direct.
   useEffect(() => {
     const v = player.current;
     if (!open || !v) return;
     const stream = videoStreamUrl(src);
-    if (v.canPlayType("application/vnd.apple.mpegurl")) {
+    if (typeof MediaSource === "undefined") {
       v.src = stream;
       return;
     }
