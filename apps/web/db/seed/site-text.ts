@@ -134,8 +134,6 @@ const innerPageRows: StringRow[] = [
   { key: "services.detail.list.cta", value: "Book a consultation", group: "services", label: "Button under the service list panel", help: "Button in the grey panel that lists what a service covers." },
   { key: "services.detail.faq.title", value: "Common questions", group: "services", label: "Service page FAQ heading", help: "Heading above the questions on a single service page." },
   { key: "services.detail.faq.lead", value: "Answers from the Goodluck team.", group: "services", label: "Service page FAQ intro", help: "The line under the FAQ heading on a single service page." },
-  { key: "services.detail.others.badge", value: "More services", group: "services", label: "Other services badge", help: "The small pill above the other service cards at the foot of a service page." },
-  { key: "services.detail.others.title", value: "Other ways we can help", group: "services", label: "Other services heading", help: "Heading above the other service cards at the foot of a service page." },
   { key: "study.hero.badge", value: "Study abroad", group: "study", label: "Study abroad page badge", help: "The small pill above the heading at the top of the Study abroad page." },
   { key: "study.hero.title", value: "Countries we help you study in", group: "study", label: "Study abroad page heading", help: "The main heading at the top of the Study abroad page." },
   { key: "study.hero.lead", value: "Study in Australia, the United Kingdom and New Zealand with us.", group: "study", label: "Study abroad page intro", help: "The line under the heading on the Study abroad page." },

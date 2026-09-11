@@ -9,7 +9,7 @@ import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Chip } from "@/components/ui/bits";
 import { InfoCard, InnerHero, SectionHead } from "@/components/shared/inner";
-import { Artwork, ServiceCard } from "@/features/services/components/services";
+import { Artwork } from "@/features/services/components/services";
 import { Accordion, FaqCta } from "@/components/shared/faqs";
 import { listTeam } from "@/features/team/queries";
 import { loadText } from "@/features/site-text/queries";
@@ -34,7 +34,6 @@ export default async function ServicePage({ params }: Props) {
   const s = await getService(slug);
   if (!s) notFound();
   const related = await listServiceFaqs(s.slug === "visa-guidance" ? "visa-guidance" : "education-counselling");
-  const others = (await listServices()).filter((o) => o.slug !== s.slug);
 
   return (
     <>
@@ -103,21 +102,6 @@ export default async function ServicePage({ params }: Props) {
             <Appear delay={0.1} className="order-2 w-full flex-1 md:order-none">
               <Accordion items={related} />
             </Appear>
-          </div>
-        </div>
-      </section>
-
-      <section className="pt-section flex w-full flex-col items-center pb-[30px] md:pb-[60px] lg:pb-[100px]">
-        <div className="container-x">
-          <div className="flex flex-col items-start gap-[30px] md:gap-10 lg:gap-[50px]">
-            <SectionHead align="left" badge={t("services.detail.others.badge", "More services")} title={t("services.detail.others.title", "Other ways we can help")} />
-            <div className="grid w-full gap-5 md:grid-cols-3 md:gap-[30px]">
-              {others.map((o, i) => (
-                <Appear key={o.slug} delay={0.1 * i} className="h-[300px]">
-                  <ServiceCard service={o} slug={o.slug} label={o.label} title={o.title} line={o.line} image={o.image} imageAlt={o.imageAlt} />
-                </Appear>
-              ))}
-            </div>
           </div>
         </div>
       </section>
