@@ -10,7 +10,8 @@ Written for two readers at once. Every idea is explained in plain English first,
 the exact paths in the repository. If you are not a programmer, read the prose and skip the paths.
 If you are an agent, the paths are the point.
 
-All paths below are relative to `main/` unless they start with a slash or say otherwise.
+All paths below are relative to `apps/web/` unless they start with `packages/`, start with a slash,
+or say otherwise.
 
 ---
 
@@ -89,7 +90,7 @@ Code: `src/lib/email/`.
 **Neon** is the database. The application talks to it over the Neon HTTP driver, which sends one
 HTTP request per query and holds no persistent connection. That matters because it lets Neon's
 compute go to sleep when the site is quiet.
-Code: `src/db/client.ts`.
+Code: `packages/db/src/client.ts`.
 
 Two smaller services:
 
@@ -113,14 +114,14 @@ goodluck/
 ├── .github/workflows/   CI, database migrations, backups
 ├── designs/             design references
 ├── extras/              briefs, source assets, notes. Not part of the build.
-└── main/                the application. Everything that ships is here.
+├── apps/web/            the Next.js application, workspace package `web`
+└── packages/db/         `@goodluck/db`: schema, client, migrations, local database
 ```
 
-Inside `main/`:
+Inside `apps/web/`:
 
 ```text
-main/
-├── db/migrations/   generated SQL that changes the database structure
+apps/web/
 ├── db/seed/         scripts that fill an empty database with starting content
 ├── docs/            handover notes for staff and for whoever runs the site
 ├── public/          static files served as-is (about 30 MB of images, video, fonts, icons)
@@ -128,11 +129,22 @@ main/
 ├── src/assets/      files imported by code rather than served directly (the Inter Display fonts)
 ├── src/components/  UI shared across features
 ├── src/config/      constants: company details, asset paths, labels, admin menu
-├── src/db/          database schema and client
+├── src/db/          the two key/value table readers
 ├── src/features/    one folder per business area
 ├── src/lib/         cross-cutting code: auth, email, security, SEO, utilities, integrations
 ├── src/styles/      global CSS and font declarations
 └── tests/           the test suite, mirroring the structure of src
+```
+
+Inside `packages/db/`:
+
+```text
+packages/db/
+├── src/client.ts      the Drizzle client over the Neon HTTP driver
+├── src/schema/        every table in TypeScript
+├── migrations/        generated SQL that changes the database structure
+├── drizzle.config.ts  Drizzle Kit configuration
+└── docker-compose.yml local Postgres plus the Neon HTTP proxy
 ```
 
 ### `src/app/`
@@ -197,13 +209,15 @@ Code used across features.
 | `lib/integrations/` | Cloudinary, analytics |
 | `lib/validators/` | validation pieces shared by several features |
 
-### `src/db/`
+### `packages/db/` and `src/db/`
 
-`src/db/schema/` describes every table in TypeScript. `src/db/client.ts` opens the connection.
-`src/db/settings.ts` and `src/db/ui-strings.ts` read the two key/value tables.
+`packages/db/src/schema/` describes every table in TypeScript and `packages/db/src/client.ts` opens
+the connection. The app imports them as `@goodluck/db/schema` and `@goodluck/db`.
+`src/db/settings.ts` and `src/db/ui-strings.ts` read the two key/value tables and stay in the app
+because they go through the Next data cache.
 
-The SQL migrations and the seed scripts are one level up, in `main/db/`, because they are build
-tooling rather than application code.
+The SQL migrations live in `packages/db/migrations/`. The seed scripts are in `db/seed/` in the app,
+because they read the site config.
 
 ### `src/config/`
 
@@ -211,7 +225,7 @@ Values with no database row behind them: the company name and addresses (`site.t
 static images (`assets.ts`), display labels for enum values (`content-meta.ts`, `course-meta.ts`),
 and the admin menu (`admin-nav.ts`).
 
-### `main/docs/`
+### `docs/`
 
 Handover documents: `admin-guide.md` for staff, `qa-matrix.md`, `recovery.md`, and
 `technical-handover.md`. Useful background, but `technical-handover.md` predates some changes: it
@@ -405,7 +419,7 @@ table and is still read directly by `/about` and by the team grid's office tabs.
 
 The database stores the information the CMS manages. It is PostgreSQL, hosted by Neon.
 
-The structure is declared in TypeScript rather than SQL, in `src/db/schema/`. Each file groups
+The structure is declared in TypeScript rather than SQL, in `packages/db/src/schema/`. Each file groups
 related tables:
 
 | File | Tables |
@@ -451,12 +465,12 @@ Two tables are simple key/value stores rather than content:
 - `ui_strings` holds one row per piece of interface text. Developers add keys, admins edit values.
   Read through `src/db/ui-strings.ts`.
 
-**Client**: `src/db/client.ts` creates the Drizzle client over the Neon HTTP driver. Every query
+**Client**: `packages/db/src/client.ts` creates the Drizzle client over the Neon HTTP driver. Every query
 in the app goes through the `db` export from this file.
 
 **Migrations**: a migration is a versioned change to the database structure, checked into the
 repository so every copy of the database can be brought to the same shape. They are generated from
-the schema by Drizzle Kit and live in `db/migrations/`. Configuration: `drizzle.config.ts`.
+the schema by Drizzle Kit and live in `packages/db/migrations/`. Configuration: `packages/db/drizzle.config.ts`.
 
 **Seeds**: scripts that fill an empty database with the starting content: offices, services,
 destinations, site text, the media rows for everything in `public/`. In `db/seed/`, entry point
@@ -468,7 +482,7 @@ nothing.
 HTTP protocol in front of it, on port 4444. This exists so local development and production run
 the same driver and the same client code with no branching.
 
-**Production database**: Neon itself. `src/db/client.ts` applies the proxy settings only when
+**Production database**: Neon itself. `packages/db/src/client.ts` applies the proxy settings only when
 `DATABASE_URL` points at `localtest.me`.
 
 ---
@@ -850,7 +864,7 @@ background textures, arrows, icons, flags, the brand logo. They are referenced f
 `src/config/assets.ts` and served from `public/`, cached for an hour and then revalidated.
 
 **Before adding another image mechanism**, read `src/lib/utils/media-url.ts`, the `media_assets`
-part of `src/db/schema/core.ts`, and `src/lib/integrations/cloudinary.ts`. There is one path from
+part of `packages/db/src/schema/core.ts`, and `src/lib/integrations/cloudinary.ts`. There is one path from
 a stored image to a rendered URL and it already handles both kinds, both a fixed width and the
 format negotiation. Note also that the Content Security Policy in `next.config.ts` only permits
 images from the site itself, `res.cloudinary.com` and the analytics hosts. A fourth image host
@@ -914,7 +928,7 @@ there is no `ph_admin` role. Cebu records are managed by a super admin.
 | Enquiries and consultations | `src/features/leads/` |
 | Offices | `src/features/offices/` |
 | Email sending, wording or routing | `src/lib/email/` |
-| Database structure | `src/db/schema/`, then `db/migrations/` |
+| Database structure | `packages/db/src/schema/`, then `packages/db/migrations/` |
 | Shared UI | `src/components/ui/`, `src/components/shared/` |
 | Nav or footer | `src/components/layout/` |
 | Form validation | the feature's `validators.ts`, or `src/lib/validators/` for shared pieces |
@@ -927,8 +941,8 @@ there is no `ph_admin` role. Cebu records are managed by a super admin.
 
 ### The usual path for each kind of change
 
-**Add a CMS field to existing content**: add the column in `src/db/schema/<file>.ts`, generate a
-migration with Drizzle Kit into `db/migrations/`, add the field to the feature's `validators.ts`,
+**Add a CMS field to existing content**: add the column in `packages/db/src/schema/<file>.ts`, generate a
+migration with Drizzle Kit into `packages/db/migrations/`, add the field to the feature's `validators.ts`,
 handle it in `actions.ts`, add the input to the feature's editor component, then select it in
 `queries.ts` and render it. Six files, in that order.
 
@@ -967,7 +981,7 @@ or setting `force-dynamic`, removes that page from ISR and puts a database query
 This is why office selection is resolved in the browser.
 
 **Do not bypass the database layer.** Every query goes through the `db` client in
-`src/db/client.ts` and lives in a feature's `queries.ts` or `admin-queries.ts`.
+`packages/db/src/client.ts` and lives in a feature's `queries.ts` or `admin-queries.ts`.
 
 **Do not put business logic in shared UI components.** `src/components/` must not know what a
 service or an enquiry is. Pass what it needs as props.
@@ -1031,7 +1045,7 @@ arbitrarily ordered and the per-group cut-off would drop the wrong rows.
 Instead: leave it. The slug breaks ties.
 
 **Three tables must stay in one schema module**
-What can go wrong: splitting `users`, `offices` and `media_assets` out of `src/db/schema/core.ts`.
+What can go wrong: splitting `users`, `offices` and `media_assets` out of `packages/db/src/schema/core.ts`.
 Why: they reference each other, and TypeScript cannot infer a table type across a file cycle.
 Instead: keep them together. The comment at the top of the file says so.
 
@@ -1085,7 +1099,7 @@ Cloudflare  → Turnstile bot checks
 Google Tag Manager → analytics
 ```
 
-**Deployment.** Vercel builds and deploys from the repository. `main/vercel.json` registers one
+**Deployment.** Vercel builds and deploys from the repository. `apps/web/vercel.json` registers one
 scheduled job: `/api/cron/publish-scheduled` every fifteen minutes.
 
 **Database.** Neon Postgres. Schema changes are applied by GitHub Actions, not by Vercel:
@@ -1097,10 +1111,10 @@ builds the app from the same push.
 **Backups.** `.github/workflows/backup.yml` runs three jobs: a daily database dump to Cloudflare
 R2 with 30-day retention, a weekly copy of the Cloudinary originals to R2, and a Monday freshness
 check that opens an issue if either backup has gone stale. Restore steps are in
-`main/docs/recovery.md`.
+`docs/recovery.md`.
 
 **Environment variables**, by purpose. Values live in the hosting project's settings, never in a
-file in the repository. `main/.env.example` is the annotated list.
+file in the repository. `.env.example` is the annotated list.
 
 | Variable | Purpose |
 | --- | --- |
@@ -1153,11 +1167,11 @@ pnpm build       # produce the production build, including prerendered pages
 pnpm db:seed:dev # fill the local database with starting content
 ```
 
-All of these run from `main/`.
+All of these run from the repository root and delegate to the right package.
 
-The local database comes from `docker compose up -d` in `main/`: PostgreSQL plus the Neon HTTP
+The local database comes from `docker compose up -d` in `packages/db/`: PostgreSQL plus the Neon HTTP
 proxy on port 4444. `DATABASE_URL` then points at `db.localtest.me`, which
-`src/db/client.ts` recognises.
+`packages/db/src/client.ts` recognises.
 
 **Before considering a change complete**, run `pnpm typecheck`, `pnpm lint` and `pnpm test`. These
 are the three CI runs on every pull request, so a failure here is a failure there. `pnpm build` is

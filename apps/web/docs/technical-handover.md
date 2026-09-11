@@ -4,24 +4,22 @@ What this site is, where it runs, and what to do when something breaks.
 
 ## What it is
 
-One Next.js application. Despite the folder being called `main/`, it holds the whole thing: the
-public site, the admin panel, the API routes and the database schema. There is no separate
-backend service and nothing else to deploy.
+One Next.js application: the public site, the admin panel, the API routes and the database
+schema. There is no separate backend service and nothing else to deploy. The repository is a pnpm
+workspace with two packages: the app in `apps/web` and the database layer in `packages/db`.
 
 ```
 goodluck/                     git repository root
 ├── .github/workflows/        CI, deploy and backups. GitHub only reads these from the root.
-├── DECISIONS.md              binding answers from the client
-├── PROGRESS.md               an append-only build log
-├── QUESTIONS.md              open questions, each with the fallback currently in use
-└── main/                     the application
-    ├── db/                   schema, migrations, seeds
-    ├── docs/                 this file and its neighbours
-    ├── public/               about 180 static assets, served from the CDN, not by the app
-    ├── src/app/              routes: public pages, /admin, /api
-    ├── src/components/       UI. The public components are approved and frozen.
-    ├── src/lib/              auth, permissions, sanitising, dates, email, uploads
-    └── src/features/         per area: public queries, admin queries, server actions, components.
+├── apps/web/                 the Next.js application, published as `web`
+│   ├── db/seed/              seed scripts
+│   ├── docs/                 this file and its neighbours
+│   ├── public/               about 180 static assets, served from the CDN, not by the app
+│   ├── src/app/              routes: public pages, /admin, /api
+│   ├── src/components/       UI. The public components are approved and frozen.
+│   ├── src/lib/              auth, permissions, sanitising, dates, email, uploads
+│   └── src/features/         per area: public queries, admin queries, server actions, components.
+└── packages/db/              `@goodluck/db`: schema, Neon client, migrations, local Postgres
 ```
 
 ## The stack, and why each piece
@@ -60,11 +58,11 @@ anywhere else.** Several route chunks of nearly identical size is the tell.
 
 ## Environment variables
 
-Names and where each one lives are in `main/.env.example`. In short:
+Names and where each one lives are in `apps/web/.env.example`. In short:
 
 - **Everything** is an environment variable on the Vercel project, public and secret alike.
 - Never in a file, never in git.
-- Locally they all come from `main/.env.local`, which git ignores.
+- Locally they all come from `apps/web/.env.local`, which git ignores.
 
 Notification addresses, social links and analytics ids live in the `settings` table, not here.
 Nothing in the admin edits them: a developer changes a row when the client asks.
@@ -83,10 +81,9 @@ ordinary Google Maps addresses and never needed a key either.
 ## Running it locally
 
 ```bash
-cd main
 pnpm install
-docker compose up -d          # Postgres, plus a proxy that speaks Neon's protocol
-cp .env.example .env.local    # then fill it in
+docker compose -f packages/db/docker-compose.yml up -d   # Postgres, plus a proxy that speaks Neon's protocol
+cp apps/web/.env.example apps/web/.env.local             # then fill it in
 pnpm db:migrate:dev           # apply the migrations to the fresh database
 pnpm db:seed:dev              # content, plus placeholder catalogue rows
 pnpm dev
@@ -98,7 +95,7 @@ client code, which means a query that works locally works deployed.
 
 `drizzle-kit migrate` is the one tool that cannot use the proxy, because it wants a WebSocket.
 That is why the two migrate commands do not match: `pnpm db:migrate:dev` pipes every file in
-`db/migrations/` through `psql` in the container, in order. It has no journal, so it applies the
+`packages/db/migrations/` through `psql` in the container, in order. It has no journal, so it applies the
 whole set every time and belongs to a fresh database, not one already migrated.
 
 Production migrations run through `drizzle-kit migrate` in the deploy workflow, which is the path
