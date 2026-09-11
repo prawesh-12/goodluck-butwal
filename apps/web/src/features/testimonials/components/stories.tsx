@@ -25,7 +25,6 @@ function StoryCard({ s, tilt }: { s: SuccessStory; tilt: number }) {
 
 export async function Stories({ googleRating }: { googleRating: GoogleRating }) {
   const t = await loadText();
-  const rows = [successStories.slice(0, 6), successStories.slice(6)];
   return (
     <section id="success-stories" className="flex w-full flex-col items-center">
       <div className="pb-section relative w-full overflow-clip bg-white pt-[60px] md:pt-[100px]">
@@ -46,14 +45,12 @@ export async function Stories({ googleRating }: { googleRating: GoogleRating }) 
             </div>
           </Appear>
 
-          <Appear delay={0.1} className="flex w-full flex-col gap-5 md:gap-[30px]">
-            {rows.map((row, r) => (
-              <Ticker key={r} gap={24} speed={r ? 150 : 120} reverse={r === 1} className="w-full py-4">
-                {row.map((s, i) => (
-                  <StoryCard key={s.image} s={s} tilt={(i + r) % 2 ? 2.5 : -2.5} />
-                ))}
-              </Ticker>
-            ))}
+          <Appear delay={0.1} className="w-full">
+            <Ticker gap={40} speed={220} className="w-full py-4">
+              {successStories.map((s, i) => (
+                <StoryCard key={s.image} s={s} tilt={i % 2 ? 2.5 : -2.5} />
+              ))}
+            </Ticker>
           </Appear>
 
           <Appear delay={0.2}>
