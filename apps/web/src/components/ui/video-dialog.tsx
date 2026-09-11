@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Play, X } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m } from "framer-motion";
 import { assetUrl, videoStreamUrl, videoUrl } from "@/lib/utils/media-url";
 import { CARD_SIZES, Img } from "@/components/ui/img";
 
@@ -100,7 +100,7 @@ export function VideoDialog({ src, poster, title, inline, prefetch, bare, classN
         createPortal(
           <AnimatePresence>
             {open && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -110,7 +110,7 @@ export function VideoDialog({ src, poster, title, inline, prefetch, bare, classN
                 }}
                 className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4 backdrop-blur-md"
               >
-                <motion.div
+                <m.div
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.5, opacity: 0 }}
@@ -132,8 +132,8 @@ export function VideoDialog({ src, poster, title, inline, prefetch, bare, classN
                   <div className="overflow-hidden rounded-2xl border-2 border-white bg-black">
                     <video ref={player} title={title} controls autoPlay playsInline className="block h-[min(85vh,760px)] w-auto max-w-[92vw]" />
                   </div>
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             )}
           </AnimatePresence>,
           document.body,

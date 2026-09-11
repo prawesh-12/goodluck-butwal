@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m } from "framer-motion";
 import { gl } from "@/config/assets";
 import { nav } from "@/config/site";
 import { PillButton } from "@/components/ui/button";
@@ -70,7 +70,7 @@ export function Nav({ text }: { text: NavText }) {
           </div>
           <AnimatePresence>
             {open && (
-              <motion.nav initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="mt-[10px] flex flex-col gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:hidden" aria-label="Mobile">
+              <m.nav initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="mt-[10px] flex flex-col gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:hidden" aria-label="Mobile">
                 {nav.map((l) => (
                   <Link key={l.href} href={l.href} className="rounded-full px-4 py-2 text-[16px] font-semibold leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
                     {l.label}
@@ -83,13 +83,13 @@ export function Nav({ text }: { text: NavText }) {
                     </PillButton>
                   </div>
                 )}
-              </motion.nav>
+              </m.nav>
             )}
           </AnimatePresence>
         </div>
       </div>
       <AnimatePresence>
-        {open && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} className="fixed inset-0 z-[7] bg-black/30 backdrop-blur-[10px] lg:hidden" />}
+        {open && <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} className="fixed inset-0 z-[7] bg-black/30 backdrop-blur-[10px] lg:hidden" />}
       </AnimatePresence>
     </>
   );

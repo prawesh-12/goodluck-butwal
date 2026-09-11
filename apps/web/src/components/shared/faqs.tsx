@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, m } from "framer-motion";
 
 import type { PublicMember } from "@/features/team/queries";
 import { Appear } from "@/components/ui/appear";
@@ -31,16 +31,16 @@ export function Accordion({ items, defaultOpen = 0, variant = "surface" }: { ite
               <span className="flex min-h-[30px] flex-1 items-center">
                 <span className="text-[18px] font-medium leading-[23.4px] text-ink md:text-[20px] md:leading-[26px]">{q}</span>
               </span>
-              <motion.span animate={{ rotate: isOpen ? 90 : 0, backgroundColor: isOpen ? "#1d1d1d" : variant === "white" ? "#ffffff" : "#edf1f4" }} transition={{ duration: 0.3 }} className="relative flex size-[26px] shrink-0 items-center justify-center rounded-full md:size-[30px]">
-                <motion.span animate={{ opacity: isOpen ? 0 : 1, backgroundColor: isOpen ? "#ffffff" : "#1d1d1d" }} className="absolute h-[2px] w-4 rounded-full" />
-                <motion.span animate={{ backgroundColor: isOpen ? "#ffffff" : "#1d1d1d" }} className="absolute h-4 w-[2px] rounded-full" />
-              </motion.span>
+              <m.span animate={{ rotate: isOpen ? 90 : 0, backgroundColor: isOpen ? "#1d1d1d" : variant === "white" ? "#ffffff" : "#edf1f4" }} transition={{ duration: 0.3 }} className="relative flex size-[26px] shrink-0 items-center justify-center rounded-full md:size-[30px]">
+                <m.span animate={{ opacity: isOpen ? 0 : 1, backgroundColor: isOpen ? "#ffffff" : "#1d1d1d" }} className="absolute h-[2px] w-4 rounded-full" />
+                <m.span animate={{ backgroundColor: isOpen ? "#ffffff" : "#1d1d1d" }} className="absolute h-4 w-[2px] rounded-full" />
+              </m.span>
             </button>
             <AnimatePresence initial={false}>
               {isOpen && (
-                <motion.div key="a" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ type: "spring", bounce: 0, duration: 0.5 }} className="overflow-hidden">
+                <m.div key="a" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ type: "spring", bounce: 0, duration: 0.5 }} className="overflow-hidden">
                   <p className="t-base pb-5 pl-5 pr-[60px] text-muted">{a}</p>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>

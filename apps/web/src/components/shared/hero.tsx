@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { easeInOut, motion, useScroll, useTransform } from "motion/react";
+import { easeInOut, m, useScroll, useTransform } from "framer-motion";
 import { gl, img } from "@/config/assets";
 import type { GoogleRating } from "@/features/settings/queries";
 import { Appear } from "@/components/ui/appear";
@@ -117,18 +117,18 @@ export function Hero({
         <picture><source media="(min-width: 768px)" srcSet={assetSrcSet(img.cloud3)} sizes="584px" /><Img src={BLANK} alt="" className="w-full" /></picture>
       </div>
 
-      <motion.div aria-hidden style={{ opacity: grass }} className="pointer-events-none absolute inset-0 z-[2] hidden flex-col items-center overflow-clip lg:flex">
+      <m.div aria-hidden style={{ opacity: grass }} className="pointer-events-none absolute inset-0 z-[2] hidden flex-col items-center overflow-clip lg:flex">
         <Appear y={260} delay={0.5} duration={1.6} className="flex h-[98%] w-full items-end justify-center overflow-clip pb-[680px]">
-          <motion.div style={{ scale: grassScale, y: grassY }} className="relative w-full min-w-[1200px] max-w-none shrink-0">
+          <m.div style={{ scale: grassScale, y: grassY }} className="relative w-full min-w-[1200px] max-w-none shrink-0">
             <picture>
               <source media="(min-width: 1200px)" srcSet={assetSrcSet(gl.heroMeadow)} sizes="100vw" />
               <Img src={BLANK} alt="" width={2172} height={698} fetchPriority="high" decoding="async" className="w-full max-w-none" />
             </picture>
             {/* Cloud band over the cutout's lower edge so it dissolves into mist instead of showing the sky behind it. */}
             <div aria-hidden className="absolute inset-x-0 -bottom-[220px] h-[62%] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.85)_42%,rgba(255,255,255,0.85)_62%,rgba(255,255,255,0)_100%)]" />
-          </motion.div>
+          </m.div>
         </Appear>
-      </motion.div>
+      </m.div>
       <div aria-hidden className="pointer-events-none absolute -bottom-px -left-[10px] -right-[10px] z-[2] h-[100px] bg-[linear-gradient(180deg,rgba(255,255,255,0)_0%,rgba(255,255,255,0.7)_25%,#fff_50%)] md:h-[160px] lg:h-[200px]" />
     </section>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "motion/react";
+import { LazyMotion, domMax, m } from "framer-motion";
 import { Badge } from "@/components/ui/bits";
 import { formatDate } from "@/lib/utils/datetime";
 import { seatLabel, type BatchStatus } from "@/features/test-prep/seats";
@@ -52,7 +52,7 @@ function Tabs({
             className="relative h-[38px] overflow-clip rounded-full bg-surface px-5 text-[14px] font-medium leading-[18.2px]"
           >
             {on && (
-              <motion.span
+              <m.span
                 layoutId={id}
                 className="absolute inset-0 bg-[#100F12]"
                 transition={{ type: "spring", bounce: 0, duration: 0.5 }}
@@ -90,50 +90,52 @@ export function BatchTable({ batches, empty, filters = false }: { batches: Batch
   );
 
   return (
-    <div className="flex w-full flex-col items-center gap-[30px] md:gap-10">
-      {filters ? (
-        <div className="flex flex-col items-center gap-[10px]">
-          <Tabs id="batch-test" label="Filter by test" options={TESTS} value={test} onChange={setTest} />
-          <Tabs id="batch-mode" label="Filter by mode" options={MODES} value={mode} onChange={setMode} />
-        </div>
-      ) : null}
+    <LazyMotion features={domMax}>
+      <div className="flex w-full flex-col items-center gap-[30px] md:gap-10">
+        {filters ? (
+          <div className="flex flex-col items-center gap-[10px]">
+            <Tabs id="batch-test" label="Filter by test" options={TESTS} value={test} onChange={setTest} />
+            <Tabs id="batch-mode" label="Filter by mode" options={MODES} value={mode} onChange={setMode} />
+          </div>
+        ) : null}
 
-      {shown.length === 0 ? (
-        <p className="t-body text-muted">{empty}</p>
-      ) : (
-        <div className="article article-scroll w-full">
-          <table>
-            <thead>
-              <tr>
-                <th>Course</th>
-                <th>Batch</th>
-                <th>Starts</th>
-                <th>Days</th>
-                <th>Time</th>
-                <th>Mode</th>
-                <th>Trainer</th>
-                <th>Seats</th>
-              </tr>
-            </thead>
-            <tbody>
-              {shown.map((batch) => (
-                <tr key={batch.id}>
-                  <td>{TEST_LABEL[batch.testType] ?? batch.courseName}</td>
-                  <td>{batch.batchName}</td>
-                  <td>{formatDate(batch.startDate)}</td>
-                  <td>{scheduleDays(batch.scheduleDays)}</td>
-                  <td>{classTime(batch.startTime, batch.endTime, batch.timezone)}</td>
-                  <td>{MODE_LABEL[batch.mode]}</td>
-                  <td>{batch.trainer ?? "To be confirmed"}</td>
-                  <td>
-                    <Badge>{seatLabel({ ...batch, status: batch.status as BatchStatus })}</Badge>
-                  </td>
+        {shown.length === 0 ? (
+          <p className="t-body text-muted">{empty}</p>
+        ) : (
+          <div className="article article-scroll w-full">
+            <table>
+              <thead>
+                <tr>
+                  <th>Course</th>
+                  <th>Batch</th>
+                  <th>Starts</th>
+                  <th>Days</th>
+                  <th>Time</th>
+                  <th>Mode</th>
+                  <th>Trainer</th>
+                  <th>Seats</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+              </thead>
+              <tbody>
+                {shown.map((batch) => (
+                  <tr key={batch.id}>
+                    <td>{TEST_LABEL[batch.testType] ?? batch.courseName}</td>
+                    <td>{batch.batchName}</td>
+                    <td>{formatDate(batch.startDate)}</td>
+                    <td>{scheduleDays(batch.scheduleDays)}</td>
+                    <td>{classTime(batch.startTime, batch.endTime, batch.timezone)}</td>
+                    <td>{MODE_LABEL[batch.mode]}</td>
+                    <td>{batch.trainer ?? "To be confirmed"}</td>
+                    <td>
+                      <Badge>{seatLabel({ ...batch, status: batch.status as BatchStatus })}</Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </LazyMotion>
   );
 }

@@ -5,6 +5,7 @@ import { company } from "@/config/site";
 import { Nav } from "@/components/layout/nav";
 import { Footer } from "@/components/layout/footer";
 import { SmoothScroll } from "@/components/layout/smooth-scroll";
+import { MotionProvider } from "@/components/layout/motion-provider";
 import { OfficeProvider } from "@/features/offices/components/office";
 import { Analytics } from "@/components/shared/analytics";
 import { listOffices } from "@/features/offices/queries";
@@ -38,26 +39,28 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${interDisplay.variable} ${bricolage.variable}`}>
       <body className="overflow-x-clip">
-        <OfficeProvider offices={offices}>
-          <SmoothScroll />
-          <Nav
-            text={{
-              bookCta: t("nav.book_cta", "Book a consultation"),
-              menuOpen: t("nav.menu_open", "Open menu"),
-              menuClose: t("nav.menu_close", "Close menu"),
-            }}
-          />
-          <main className="flex flex-col items-start">{children}</main>
-          <Footer
-            columns={columns}
-            socials={socials}
-            text={{
-              tagline: t("footer.tagline", "Ready to create your luck?"),
-              officesHeading: t("footer.offices.title", "Offices"),
-              copyright: t("footer.copyright", "© {year} {name}. All rights reserved."),
-            }}
-          />
-        </OfficeProvider>
+        <MotionProvider>
+          <OfficeProvider offices={offices}>
+            <SmoothScroll />
+            <Nav
+              text={{
+                bookCta: t("nav.book_cta", "Book a consultation"),
+                menuOpen: t("nav.menu_open", "Open menu"),
+                menuClose: t("nav.menu_close", "Close menu"),
+              }}
+            />
+            <main className="flex flex-col items-start">{children}</main>
+            <Footer
+              columns={columns}
+              socials={socials}
+              text={{
+                tagline: t("footer.tagline", "Ready to create your luck?"),
+                officesHeading: t("footer.offices.title", "Offices"),
+                copyright: t("footer.copyright", "© {year} {name}. All rights reserved."),
+              }}
+            />
+          </OfficeProvider>
+        </MotionProvider>
         <Analytics />
       </body>
     </html>

@@ -1,21 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
+import { m } from "framer-motion";
 import type { ReactNode } from "react";
-import type { Variants } from "motion/react";
+import type { Variants } from "framer-motion";
 import { img } from "@/config/assets";
 import { Img } from "@/components/ui/img";
 
 const spring = { type: "spring", stiffness: 380, damping: 32 } as const;
 const cx = (...c: (string | false | undefined)[]) => c.filter(Boolean).join(" ");
-// Hoisted, because motion.create(Link) inside the body would be a new component type on every
+// Hoisted, because m.create(Link) inside the body would be a new component type on every
 // render and React would remount the link instead of updating it.
-const MotionLink = motion.create(Link);
+const MotionLink = m.create(Link);
 
 function ArrowChip({ side, lg, flip, variants }: { side: "left" | "right"; lg: boolean; flip: boolean; variants: Variants }) {
   return (
-    <motion.span
+    <m.span
       aria-hidden
       variants={variants}
       transition={spring}
@@ -26,7 +26,7 @@ function ArrowChip({ side, lg, flip, variants }: { side: "left" | "right"; lg: b
       )}
     >
       <Img src={flip ? img.arrowLeft : img.arrow} alt="" w={24} className="h-2 w-3" loading="lazy" decoding="async" />
-    </motion.span>
+    </m.span>
   );
 }
 
@@ -60,7 +60,7 @@ export function PillButton({
         right: { rest: { x: 0, rotate: 0, scale: 1 }, hover: { x: shift, rotate: 45, scale: big } },
       };
   const external = href.startsWith("http") || href.startsWith("mailto:");
-  const A = external ? motion.a : MotionLink;
+  const A = external ? m.a : MotionLink;
   return (
     <A
       href={href}
@@ -78,13 +78,13 @@ export function PillButton({
         )}
       >
         <ArrowChip side="left" lg={lg} flip={flip} variants={chipVariants.left} />
-        <motion.span
+        <m.span
           variants={{ rest: { x: 0 }, hover: { x: (flip ? -1 : 1) * (lg ? 24 : 16) } }}
           transition={spring}
           className={cx("font-semibold text-white", lg ? "text-[16px] leading-[20.8px] md:text-[18px] md:leading-[23.4px]" : "text-[14px] leading-[18.2px]")}
         >
           {children}
-        </motion.span>
+        </m.span>
         <ArrowChip side="right" lg={lg} flip={flip} variants={chipVariants.right} />
       </span>
     </A>
