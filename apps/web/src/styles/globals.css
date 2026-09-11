@@ -213,3 +213,6 @@
 @media (prefers-reduced-motion: reduce) {
   [data-appear] { transition: none; opacity: 1; transform: rotate(var(--appear-rotate)); }
 }
+
+/* Editor placeholder, on the empty block the caret is in. */
+.article .is-empty::before { content: attr(data-placeholder); color: var(--color-gray-text); float: left; height: 0; pointer-events: none; }

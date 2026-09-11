@@ -2,23 +2,14 @@
 
 import { useState } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
+import { BubbleMenu } from "@tiptap/react/menus";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import { TableKit } from "@tiptap/extension-table";
-import {
-  Bold,
-  Heading2,
-  Heading3,
-  ImagePlus,
-  Italic,
-  Link2,
-  List,
-  ListOrdered,
-  Minus,
-  Quote,
-  Table,
-} from "lucide-react";
+import { Placeholder } from "@tiptap/extensions";
+import { Bold, Italic, Link2 } from "lucide-react";
 import { toast } from "sonner";
+import { matchSlash, SlashCommand, slashItems } from "@/components/shared/admin/editor-slash-menu";
 import { MediaPicker } from "@/features/media/components/media-picker";
 import { mediaUrl } from "@/lib/utils/media-url";
 import { findBodyImage } from "@/features/posts/actions";
@@ -33,7 +24,6 @@ import {
 } from "@/components/ui/admin/dialog";
 import { Input } from "@/components/ui/admin/input";
 import { Label } from "@/components/ui/admin/label";
-import { Separator } from "@/components/ui/admin/separator";
 import { Skeleton } from "@/components/ui/admin/skeleton";
 import { Toggle } from "@/components/ui/admin/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/admin/tooltip";
@@ -119,9 +109,7 @@ function LinkDialog({ editor }: { editor: Editor }) {
   );
 }
 
-function ImageDialog({ editor }: { editor: Editor }) {
-  const [open, setOpen] = useState(false);
-
+function ImageDialog({ editor, open, onOpenChange }: { editor: Editor; open: boolean; onOpenChange: (open: boolean) => void }) {
   const insert = async (id: string | null) => {
     if (!id) return;
     const found = await findBodyImage({ id });
@@ -139,22 +127,19 @@ function ImageDialog({ editor }: { editor: Editor }) {
       .focus()
       .setImage({ src: mediaUrl(found.data, 960), alt: found.data.altText ?? "" })
       .run();
-    setOpen(false);
+    onOpenChange(false);
   };
 
   return (
-    <>
-      <ToolButton label="Picture" icon={ImagePlus} onClick={() => setOpen(true)} />
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Add a picture</DialogTitle>
-            <DialogDescription>Pictures come from the image library so each one has a description.</DialogDescription>
-          </DialogHeader>
-          <MediaPicker label="Picture" name="bodyImage" onChange={insert} />
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Add a picture</DialogTitle>
+          <DialogDescription>Pictures come from the image library so each one has a description.</DialogDescription>
+        </DialogHeader>
+        <MediaPicker label="Picture" name="bodyImage" onChange={insert} />
+      </DialogContent>
+    </Dialog>
   );
 }
 
@@ -173,6 +158,7 @@ export default function RichText({
   onChange: (html: string) => void;
   minHeight?: string;
 }) {
+  const [imageOpen, setImageOpen] = useState(false);
   const editor = useEditor({
     immediatelyRender: false,
     content: value,
@@ -188,6 +174,8 @@ export default function RichText({
       }),
       Image,
       TableKit.configure({ table: { resizable: false } }),
+      Placeholder.configure({ placeholder: "Write, or type / to add a heading, list, picture or table" }),
+      SlashCommand.configure({ items: (query) => matchSlash(slashItems(() => setImageOpen(true)), query) }),
     ],
     editorProps: {
       attributes: {
@@ -210,8 +198,12 @@ export default function RichText({
     <div className="space-y-2">
       {label ? <Label>{label}</Label> : null}
 
-      <div className="overflow-hidden rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring">
-        <div className="flex flex-wrap items-center gap-0.5 border-b border-border bg-secondary/50 p-1.5">
+      <div className="rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring">
+        <BubbleMenu
+          editor={editor}
+          shouldShow={({ editor: current, state }) => !state.selection.empty && !current.isActive("image")}
+          className="flex items-center gap-0.5 rounded-md border border-border bg-popover p-1 shadow-md"
+        >
           <ToolButton
             label="Bold"
             icon={Bold}
@@ -224,60 +216,11 @@ export default function RichText({
             active={editor.isActive("italic")}
             onClick={() => editor.chain().focus().toggleItalic().run()}
           />
-
-          <Separator orientation="vertical" className="mx-1 h-5" />
-
-          <ToolButton
-            label="Heading"
-            icon={Heading2}
-            active={editor.isActive("heading", { level: 2 })}
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          />
-          <ToolButton
-            label="Subheading"
-            icon={Heading3}
-            active={editor.isActive("heading", { level: 3 })}
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-          />
-
-          <Separator orientation="vertical" className="mx-1 h-5" />
-
-          <ToolButton
-            label="Bullets"
-            icon={List}
-            active={editor.isActive("bulletList")}
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-          />
-          <ToolButton
-            label="Numbered list"
-            icon={ListOrdered}
-            active={editor.isActive("orderedList")}
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          />
-          <ToolButton
-            label="Quote"
-            icon={Quote}
-            active={editor.isActive("blockquote")}
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          />
-
-          <Separator orientation="vertical" className="mx-1 h-5" />
-
           <LinkDialog editor={editor} />
-          <ToolButton
-            label="Divider"
-            icon={Minus}
-            onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          />
-          <ToolButton
-            label="Table"
-            icon={Table}
-            onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-          />
-          <ImageDialog editor={editor} />
-        </div>
+        </BubbleMenu>
 
         <EditorContent editor={editor} />
+        <ImageDialog editor={editor} open={imageOpen} onOpenChange={setImageOpen} />
       </div>
 
       {help ? <p className="text-xs text-muted-foreground">{help}</p> : null}
