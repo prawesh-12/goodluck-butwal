@@ -198,3 +198,18 @@
   background-clip: content-box;
 }
 .admin-sidebar-nav::-webkit-scrollbar-thumb:hover { background: var(--color-muted-foreground); border: 3px solid transparent; background-clip: content-box; }
+
+/* Scroll reveal. Content is only hidden where scripts run, so a browser without JavaScript
+   still shows the page. */
+[data-appear] {
+  transition:
+    opacity var(--appear-duration) cubic-bezier(0.22, 1, 0.36, 1) var(--appear-delay),
+    transform var(--appear-duration) cubic-bezier(0.22, 1, 0.36, 1) var(--appear-delay);
+}
+@media (scripting: enabled) {
+  [data-appear="hidden"] { opacity: 0.001; transform: translateY(var(--appear-y)); }
+}
+[data-appear="shown"] { opacity: 1; transform: rotate(var(--appear-rotate)); }
+@media (prefers-reduced-motion: reduce) {
+  [data-appear] { transition: none; opacity: 1; transform: rotate(var(--appear-rotate)); }
+}

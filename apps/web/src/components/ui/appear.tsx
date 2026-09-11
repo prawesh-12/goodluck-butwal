@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
+// The reveal itself is a CSS transition (see globals.css), so it keeps running when a JS frame
+// loop stalls, which is what iOS Low Power Mode does to a Motion spring.
 export function Appear({
   children,
   y = 20,
@@ -22,17 +23,37 @@ export function Appear({
   style?: CSSProperties;
   once?: boolean;
 }) {
-  const reduced = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShown(true);
+          if (once) observer.disconnect();
+        } else if (!once) {
+          setShown(false);
+        }
+      },
+      { threshold: 0.05 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [once]);
+
+  const vars = {
+    "--appear-y": `${y}px`,
+    "--appear-rotate": `${rotate}deg`,
+    "--appear-duration": `${duration}s`,
+    "--appear-delay": `${delay}s`,
+  } as CSSProperties;
+
   return (
-    <motion.div
-      className={className}
-      style={style}
-      initial={reduced ? false : { opacity: 0.001, y, rotate: 0 }}
-      whileInView={{ opacity: 1, y: 0, rotate }}
-      viewport={{ once, amount: 0.05 }}
-      transition={{ type: "spring", bounce: 0, duration, delay }}
-    >
+    <div ref={ref} data-appear={shown ? "shown" : "hidden"} className={className} style={{ ...style, ...vars }}>
       {children}
-    </motion.div>
+    </div>
   );
 }
