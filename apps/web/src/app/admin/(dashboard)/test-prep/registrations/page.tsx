@@ -46,12 +46,10 @@ export default async function RegistrationsPage({
         description="IELTS and PTE courses, their classes, and who has signed up."
         actions={
           can(actor, "registrations", "export") ? (
-            <Button variant="outline" asChild>
-              <a href={`/admin/test-prep/registrations/export?${query}`}>
+            <Button variant="outline" render={<a href={`/admin/test-prep/registrations/export?${query}`} />}>
                 <Download />
                 Download CSV
-              </a>
-            </Button>
+              </Button>
           ) : null
         }
       />
@@ -110,9 +108,7 @@ export default async function RegistrationsPage({
                       </TableCell>
                       <TableCell>{row.courseName}</TableCell>
                       <TableCell>
-                        <Button variant="link" size="sm" asChild className="h-auto px-0">
-                          <Link href={`/admin/test-prep/batches/${row.batchId}`}>{row.batchName}</Link>
-                        </Button>
+                        <Button variant="link" size="sm" className="h-auto px-0" render={<Link href={`/admin/test-prep/batches/${row.batchId}`} />}>{row.batchName}</Button>
                       </TableCell>
                       <TableCell className="whitespace-nowrap">
                         {formatInOfficeTz(row.createdAt, row.timezone ?? "Asia/Kathmandu")}

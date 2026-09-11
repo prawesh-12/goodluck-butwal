@@ -185,12 +185,10 @@ export default async function CoursesPage({
         actions={
           canCreate ? (
             <>
-              <Button variant="outline" asChild>
-                <Link href="/admin/courses/import">
+              <Button variant="outline" render={<Link href="/admin/courses/import" />}>
                   <Upload />
                   Import
-                </Link>
-              </Button>
+                </Button>
               <NewButton href="/admin/courses/new">New course</NewButton>
             </>
           ) : null
@@ -200,12 +198,8 @@ export default async function CoursesPage({
       {canReadCategories ? (
         <Tabs value={tab} className="gap-6">
           <TabsList>
-            <TabsTrigger value="courses" asChild>
-              <Link href="/admin/courses">Courses</Link>
-            </TabsTrigger>
-            <TabsTrigger value="categories" asChild>
-              <Link href="/admin/courses?tab=categories">Categories</Link>
-            </TabsTrigger>
+            <TabsTrigger value="courses" render={<Link href="/admin/courses" />}>Courses</TabsTrigger>
+            <TabsTrigger value="categories" render={<Link href="/admin/courses?tab=categories" />}>Categories</TabsTrigger>
           </TabsList>
           <TabsContent value="courses">{courseList}</TabsContent>
           <TabsContent value="categories">{categoryList}</TabsContent>

@@ -41,29 +41,23 @@ export function CourseCard({ course, batches, actor }: { course: CourseCardRow; 
         <div className="flex flex-wrap items-center gap-2">
           {batches === 0 ? (
             can(actor, "batches", "create") ? (
-              <Button size="sm" asChild>
-                <Link href={`/admin/test-prep/batches/new?course=${course.id}`}>
+              <Button size="sm" render={<Link href={`/admin/test-prep/batches/new?course=${course.id}`} />}>
                   <CalendarDays />
                   Add a batch
-                </Link>
-              </Button>
+                </Button>
             ) : null
           ) : can(actor, "batches", "read") ? (
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/admin/test-prep/batches?course=${course.id}`}>
+            <Button variant="outline" size="sm" render={<Link href={`/admin/test-prep/batches?course=${course.id}`} />}>
                 <CalendarDays />
                 Manage batches
-              </Link>
-            </Button>
+              </Button>
           ) : null}
 
           {can(actor, "registrations", "read") ? (
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/admin/test-prep/registrations?course=${course.id}`}>
+            <Button variant="outline" size="sm" render={<Link href={`/admin/test-prep/registrations?course=${course.id}`} />}>
                 <Users />
                 Registrations
-              </Link>
-            </Button>
+              </Button>
           ) : null}
 
           {can(actor, "testPrep", "update") ? <EditLink href={`/admin/test-prep/${course.id}`} /> : null}

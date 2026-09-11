@@ -96,7 +96,7 @@ export function UploadDialog({
   trigger,
 }: {
   resourceType: ResourceType;
-  trigger: React.ReactNode;
+  trigger: React.ReactElement;
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -163,7 +163,7 @@ export function UploadDialog({
 
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger render={trigger} />
       <DialogContent className="max-h-[85vh] gap-4 overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Upload {noun}s</DialogTitle>

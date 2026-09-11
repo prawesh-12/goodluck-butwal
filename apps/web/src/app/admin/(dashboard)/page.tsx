@@ -76,9 +76,7 @@ export default async function Dashboard() {
           <h2 className="text-sm font-medium text-muted-foreground">Quick actions</h2>
           <div className="flex flex-wrap gap-2">
             {quickActions.map((action) => (
-              <Button key={action.href} variant="outline" asChild>
-                <Link href={action.href}>{action.label}</Link>
-              </Button>
+              <Button key={action.href} variant="outline" render={<Link href={action.href} />}>{action.label}</Button>
             ))}
           </div>
         </section>

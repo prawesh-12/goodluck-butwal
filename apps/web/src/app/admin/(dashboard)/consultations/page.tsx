@@ -45,12 +45,10 @@ export default async function ConsultationsPage({
   ).toString();
 
   const exportCsv = (
-    <Button variant="outline" asChild>
-      <a href={`/api/admin/export/consultations${query ? `?${query}` : ""}`}>
+    <Button variant="outline" render={<a href={`/api/admin/export/consultations${query ? `?${query}` : ""}`} />}>
         <Download />
         Export CSV
-      </a>
-    </Button>
+      </Button>
   );
 
   return (

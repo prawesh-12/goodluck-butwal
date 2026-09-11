@@ -29,7 +29,7 @@ export function ConfirmDialog({
 }: {
   // Omit the trigger and drive `open` yourself when the confirmation has to fire from somewhere
   // else, such as a form submit whose button lives in the action bar.
-  trigger?: React.ReactNode;
+  trigger?: React.ReactElement;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   title: string;
@@ -51,12 +51,12 @@ export function ConfirmDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={change}>
-      {trigger ? <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger> : null}
+      {trigger ? <AlertDialogTrigger render={trigger} /> : null}
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription asChild>
-            <div className="space-y-2 text-sm text-muted-foreground">{description}</div>
+          <AlertDialogDescription render={<div className="space-y-2 text-sm text-muted-foreground" />}>
+            {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

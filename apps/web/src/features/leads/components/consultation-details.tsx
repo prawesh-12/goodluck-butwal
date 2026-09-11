@@ -87,11 +87,9 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
 export function ConsultationDetails({ row }: { row: Consultation }) {
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="sm">
+      <SheetTrigger render={<Button variant="outline" size="sm" />}>
           View
-        </Button>
-      </SheetTrigger>
+        </SheetTrigger>
       <SheetContent className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader>
           <SheetTitle>{row.fullName}</SheetTitle>

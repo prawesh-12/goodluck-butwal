@@ -239,9 +239,10 @@ export function SelectField({
         {label}
       </FieldLabel>
       <SelectRoot
-        value={value === "" ? NONE : value}
+        value={value === "" ? (emptyLabel ? NONE : null) : value}
         disabled={disabled}
-        onValueChange={(next) => onChange(next === NONE ? "" : next)}
+        onValueChange={(next) => onChange(!next || next === NONE ? "" : next)}
+        items={[...(emptyLabel ? [{ value: NONE, label: emptyLabel }] : []), ...options.map((option) => ({ value: option.value, label: option.label }))]}
       >
         <SelectTrigger
           id={id}
@@ -406,15 +407,13 @@ export function MultiSelectField({
   return (
     <FieldShell name={name} label={label} help={help} error={error} required={required}>
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
+        <PopoverTrigger render={<Button
             type="button"
             variant="outline"
             role="combobox"
             aria-expanded={open}
             aria-required={required || undefined}
-            className="h-auto min-h-9 w-full justify-between px-3"
-          >
+            className="h-auto min-h-9 w-full justify-between px-3" />}>
             <span className="flex flex-wrap items-center gap-1 py-0.5">
               {chosen.length === 0 ? (
                 <span className="text-muted-foreground">{placeholder}</span>
@@ -427,8 +426,7 @@ export function MultiSelectField({
               )}
             </span>
             <ChevronsUpDown className="shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
+          </PopoverTrigger>
         <PopoverContent align="start" className="w-(--radix-popover-trigger-width) p-0">
           <Command>
             <CommandInput placeholder={searchPlaceholder} />
@@ -486,8 +484,7 @@ export function ComboboxField({
   return (
     <FieldShell name={name} label={label} help={help} error={error} required={required} className={className}>
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
+        <PopoverTrigger render={<Button
             type="button"
             variant="outline"
             role="combobox"
@@ -495,14 +492,12 @@ export function ComboboxField({
             disabled={disabled}
             aria-required={required || undefined}
             aria-invalid={Boolean(error) || undefined}
-            className="w-full justify-between px-3 font-medium"
-          >
+            className="w-full justify-between px-3 font-medium" />}>
             <span className={cn("truncate", !chosen && "text-muted-foreground")}>
               {chosen ? chosen.label : placeholder}
             </span>
             <ChevronsUpDown className="shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
+          </PopoverTrigger>
         <PopoverContent align="start" className="w-(--radix-popover-trigger-width) p-0">
           <Command>
             <CommandInput placeholder={searchPlaceholder} />

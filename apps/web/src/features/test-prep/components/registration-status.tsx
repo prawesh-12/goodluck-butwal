@@ -22,7 +22,9 @@ export function RegistrationStatus({ id, status }: { id: string; status: string 
     <Select
       value={status}
       disabled={busy}
+      items={Object.fromEntries(STATUSES.map((option) => [option, statusLabel(option)]))}
       onValueChange={async (next) => {
+        if (!next) return;
         const saved = await run(() => updateRegistration({ id, status: next }), {
           success: "Registration updated",
           failure: "Couldn't update the registration.",

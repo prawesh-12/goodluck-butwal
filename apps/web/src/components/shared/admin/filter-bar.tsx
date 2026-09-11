@@ -37,7 +37,11 @@ function FilterSelect({
   return (
     <div className="space-y-1.5">
       <Label className="text-xs text-muted-foreground">{filter.label}</Label>
-      <Select value={value === "" ? ANY : value} onValueChange={(next) => onChange(next === ANY ? "" : next)}>
+      <Select
+        value={value === "" ? ANY : value}
+        onValueChange={(next) => onChange(!next || next === ANY ? "" : next)}
+        items={[{ value: ANY, label: filter.anyLabel ?? `All ${filter.label.toLowerCase()}` }, ...filter.options]}
+      >
         <SelectTrigger className="w-full">
           <SelectValue />
         </SelectTrigger>
@@ -127,13 +131,11 @@ export function FilterBar({
             </div>
 
             <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="lg:hidden">
+              <SheetTrigger render={<Button variant="outline" className="lg:hidden" />}>
                   <SlidersHorizontal />
                   Filters
                   {active.length > 0 ? <Badge variant="secondary">{active.length}</Badge> : null}
-                </Button>
-              </SheetTrigger>
+                </SheetTrigger>
               <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
                 <SheetHeader>
                   <SheetTitle>Filters</SheetTitle>

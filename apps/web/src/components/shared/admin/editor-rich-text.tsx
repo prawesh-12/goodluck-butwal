@@ -41,17 +41,14 @@ function ToolButton({
 }) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <Toggle
+      <TooltipTrigger render={<Toggle
           size="sm"
           pressed={Boolean(active)}
           aria-label={label}
           onPressedChange={onClick}
-          onMouseDown={(event) => event.preventDefault()}
-        >
+          onMouseDown={(event) => event.preventDefault()} />}>
           <Icon />
-        </Toggle>
-      </TooltipTrigger>
+        </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>
     </Tooltip>
   );

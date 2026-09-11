@@ -267,12 +267,10 @@ function ManageSheet({
               Play
             </Button>
           ) : (
-            <Button variant="outline" size="sm" asChild>
-              <a href={asset.viewUrl} target="_blank" rel="noreferrer">
+            <Button variant="outline" size="sm" render={<a href={asset.viewUrl} target="_blank" rel="noreferrer" />}>
                 <ExternalLink />
                 Open
-              </a>
-            </Button>
+              </Button>
           )}
 
           {canUpdate ? (
@@ -385,25 +383,21 @@ function AssetCard({
               Play
             </Button>
           ) : (
-            <Button variant="outline" size="sm" asChild>
-              <a href={asset.viewUrl} target="_blank" rel="noreferrer">
+            <Button variant="outline" size="sm" render={<a href={asset.viewUrl} target="_blank" rel="noreferrer" />}>
                 <ExternalLink />
                 Open
-              </a>
-            </Button>
+              </Button>
           )}
 
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <RowActionsTrigger label={`Actions for ${asset.filename}`} />
-            </DropdownMenuTrigger>
+            <DropdownMenuTrigger render={<RowActionsTrigger label={`Actions for ${asset.filename}`} />} />
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onSelect={() => setManage(true)}>
+              <DropdownMenuItem onClick={() => setManage(true)}>
                 <Settings2 />
                 Manage
               </DropdownMenuItem>
               {canUpdate ? (
-                <DropdownMenuItem disabled={replacing !== null} onSelect={() => picker.current?.click()}>
+                <DropdownMenuItem disabled={replacing !== null} onClick={() => picker.current?.click()}>
                   <Upload />
                   Replace
                 </DropdownMenuItem>
@@ -411,7 +405,7 @@ function AssetCard({
               {canDelete ? (
                 <>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive" onSelect={() => setConfirming(true)}>
+                  <DropdownMenuItem variant="destructive" onClick={() => setConfirming(true)}>
                     <Trash2 />
                     Delete
                   </DropdownMenuItem>
@@ -515,9 +509,7 @@ export function AssetGrid({
         title={`No ${many} match your search`}
         description="Try a different word, or clear the search to see everything."
         action={
-          <Button variant="outline" asChild>
-            <Link href={path}>Clear the search</Link>
-          </Button>
+          <Button variant="outline" render={<Link href={path} />}>Clear the search</Button>
         }
       />
     ) : (
@@ -562,16 +554,12 @@ export function AssetGrid({
         {onFirstPage ? <ResultCount shown={assets.length} total={total} noun={many} /> : <span />}
         <div className="flex items-center gap-2">
           {onFirstPage ? null : (
-            <Button variant="ghost" size="sm" asChild>
-              <Link href={q ? `${path}?q=${encodeURIComponent(q)}` : path}>Back to the newest</Link>
-            </Button>
+            <Button variant="ghost" size="sm" render={<Link href={q ? `${path}?q=${encodeURIComponent(q)}` : path} />}>Back to the newest</Button>
           )}
           {cursor ? (
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`${path}?${q ? `q=${encodeURIComponent(q)}&` : ""}page=${encodeURIComponent(cursor)}`}>
+            <Button variant="outline" size="sm" render={<Link href={`${path}?${q ? `q=${encodeURIComponent(q)}&` : ""}page=${encodeURIComponent(cursor)}`} />}>
                 Next page
-              </Link>
-            </Button>
+              </Button>
           ) : null}
         </div>
       </div>

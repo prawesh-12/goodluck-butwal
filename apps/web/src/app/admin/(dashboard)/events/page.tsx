@@ -124,12 +124,10 @@ export default async function EventsPage({
                   <TableCell>{row.office ?? <Muted>Not set</Muted>}</TableCell>
                   <TableCell className="whitespace-nowrap">
                     {row.registrationEnabled ? (
-                      <Button variant="link" size="sm" asChild className="h-auto px-0">
-                        <Link href={`/admin/events/${row.id}/registrations`}>
+                      <Button variant="link" size="sm" className="h-auto px-0" render={<Link href={`/admin/events/${row.id}/registrations`} />}>
                           {row.seatsTaken}
                           {row.capacity === null ? " registered" : ` of ${row.capacity} seats`}
-                        </Link>
-                      </Button>
+                        </Button>
                     ) : (
                       <Muted>Not open</Muted>
                     )}

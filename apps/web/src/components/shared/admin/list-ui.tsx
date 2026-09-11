@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ExternalLink, MoreHorizontal, Pencil } from "lucide-react";
-import { Badge, type AdminBadgeProps } from "@/components/ui/admin/badge";
+import { Badge } from "@/components/ui/admin/badge";
 import { Button } from "@/components/ui/admin/button";
 import { Card } from "@/components/ui/admin/card";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/admin/pagination";
 import { cn } from "@/components/ui/admin/cn";
 
-type BadgeVariant = AdminBadgeProps["variant"];
+type BadgeVariant = React.ComponentProps<typeof Badge>["variant"];
 
 const STATUS_VARIANT: Record<string, BadgeVariant> = {
   published: "success",
@@ -99,31 +99,25 @@ export function Muted({ children }: { children: React.ReactNode }) {
 
 export function NewButton({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Button asChild>
-      <Link href={href}>{children}</Link>
-    </Button>
+    <Button render={<Link href={href} />}>{children}</Button>
   );
 }
 
 export function ViewSiteLink({ href, label = "View" }: { href: string; label?: string }) {
   return (
-    <Button variant="ghost" size="icon-sm" asChild title={`${label} on the website`}>
-      <a href={href} target="_blank" rel="noreferrer">
+    <Button variant="ghost" size="icon-sm" title={`${label} on the website`} render={<a href={href} target="_blank" rel="noreferrer" />}>
         <ExternalLink />
         <span className="sr-only">{label} on the website</span>
-      </a>
-    </Button>
+      </Button>
   );
 }
 
 export function EditLink({ href, label = "Edit" }: { href: string; label?: string }) {
   return (
-    <Button variant="outline" size="sm" asChild>
-      <Link href={href}>
+    <Button variant="outline" size="sm" render={<Link href={href} />}>
         <Pencil />
         {label}
-      </Link>
-    </Button>
+      </Button>
   );
 }
 

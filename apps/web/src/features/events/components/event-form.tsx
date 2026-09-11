@@ -350,12 +350,10 @@ export function EventForm({
               </div>
 
               {id ? (
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/admin/events/${id}/registrations`}>
+                <Button variant="outline" size="sm" render={<Link href={`/admin/events/${id}/registrations`} />}>
                     <Users />
                     View registrations
-                  </Link>
-                </Button>
+                  </Button>
               ) : null}
             </>
           ) : null}
