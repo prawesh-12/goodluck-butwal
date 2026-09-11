@@ -49,10 +49,10 @@ export function Hero({
   const grassY = useTransform(scrollY, (v) => 1398 * v * rate);
   // The meadow hangs 680px above 98% of the section height, so on a short screen 175vh would lift it over the copy.
   // The min-height keeps its skyline 568px from the top, low enough that it stays clear of the copy above it:
-  // (680 + 568 + meadow height) / 0.98, the meadow being max(1640px, 112vw) wide at a 698/2172 aspect.
+  // (680 + 568 + meadow height) / 0.98, the meadow being max(1200px, 100vw) wide at a 698/2172 aspect.
 
   return (
-    <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1640px,112vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
+    <section ref={section} className="relative flex w-full flex-col items-center overflow-clip bg-white pb-[100px] pt-[128px] md:pb-[160px] md:pt-[158px] lg:h-[175vh] lg:min-h-[calc((1016px+max(1200px,100vw)*0.3214)/0.98)] lg:pb-0 lg:pt-[194px]">
       <div aria-hidden className="absolute inset-0 z-0 flex items-center justify-center overflow-clip">
         <Img src={sky} alt="" sizes="100vw" w={1920} widths={WIDE_IMAGE_WIDTHS} quality="good" fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover" style={{ objectPosition: "50% 100%" }} />
       </div>
@@ -119,9 +119,9 @@ export function Hero({
 
       <motion.div aria-hidden style={{ opacity: grass }} className="pointer-events-none absolute inset-0 z-[2] hidden flex-col items-center overflow-clip lg:flex">
         <Appear y={260} delay={0.5} duration={1.6} className="flex h-[98%] w-full items-end justify-center overflow-clip pb-[680px]">
-          <motion.div style={{ scale: grassScale, y: grassY }} className="relative w-[112%] min-w-[1640px] max-w-none shrink-0">
+          <motion.div style={{ scale: grassScale, y: grassY }} className="relative w-full min-w-[1200px] max-w-none shrink-0">
             <picture>
-              <source media="(min-width: 1200px)" srcSet={assetSrcSet(gl.heroMeadow)} sizes="112vw" />
+              <source media="(min-width: 1200px)" srcSet={assetSrcSet(gl.heroMeadow)} sizes="100vw" />
               <Img src={BLANK} alt="" width={2172} height={698} fetchPriority="high" decoding="async" className="w-full max-w-none" />
             </picture>
             {/* Cloud band over the cutout's lower edge so it dissolves into mist instead of showing the sky behind it. */}
