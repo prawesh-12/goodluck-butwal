@@ -24,8 +24,19 @@ export function SmoothScroll() {
       if (cancelled) return;
       lenis = new LenisClass({ lerp: 0.08, smoothWheel: true, wheelMultiplier: 1 });
       lenisRef.current = lenis;
-      const loop = (t: number) => { lenis?.raf(t); raf = requestAnimationFrame(loop); };
-      raf = requestAnimationFrame(loop);
+      // Lenis expects a permanent rAF loop, but an always-on rAF makes Chrome re-tick every CSS loop
+      // animation on the main thread each frame while nothing scrolls, so the loop runs only while
+      // Lenis is easing. Its clock is reset first, else the first frame's delta is the idle gap.
+      const loop = (t: number) => {
+        lenis?.raf(t);
+        raf = lenis?.isScrolling === "smooth" ? requestAnimationFrame(loop) : 0;
+      };
+      const wake = () => {
+        if (raf || !lenis) return;
+        lenis.time = 0;
+        raf = requestAnimationFrame(loop);
+      };
+      lenis.on("virtual-scroll", wake);
       // Hash links go through Lenis so anchors ease too.
       onClick = (e: MouseEvent) => {
         const a = (e.target as HTMLElement).closest("a[href*='#']") as HTMLAnchorElement | null;
@@ -35,6 +46,7 @@ export function SmoothScroll() {
         const el = document.querySelector(url.hash);
         if (!el) return;
         e.preventDefault();
+        wake();
         lenis?.scrollTo(el as HTMLElement, { offset: -100 });
         history.pushState(null, "", url.hash);
       };
