@@ -19,7 +19,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { can, type Actor } from "@/lib/auth/rbac";
-import { NAV } from "@/config/admin-nav";
+import { NAV } from "@/components/layout/admin/admin-nav";
 import { cn } from "@/components/ui/admin/cn";
 
 const ICONS: Record<string, LucideIcon> = {

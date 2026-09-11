@@ -1,6 +1,6 @@
 import { img } from "@/config/assets";
 import type { GoogleRating } from "@/features/settings/queries";
-import { reviews, type Review } from "@/config/testimonials";
+import { reviews, type Review } from "@/features/testimonials/testimonials";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
 import { Badge, SectionBg } from "@/components/ui/bits";

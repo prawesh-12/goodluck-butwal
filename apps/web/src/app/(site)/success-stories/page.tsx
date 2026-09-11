@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { buildMetadata } from "@/lib/seo";
 import { img } from "@/config/assets";
 import { getGoogleRating } from "@/features/settings/queries";
-import { reviews, successStories } from "@/config/testimonials";
+import { reviews, successStories } from "@/features/testimonials/testimonials";
 import { loadText } from "@/features/site-text/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";

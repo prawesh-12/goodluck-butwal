@@ -127,7 +127,7 @@ apps/web/
 ├── src/app/         every URL the site answers
 ├── src/assets/      files imported by code rather than served directly (the Inter Display fonts)
 ├── src/components/  UI shared across features
-├── src/config/      constants: company details, asset paths, labels, admin menu
+├── src/config/      constants shared across features: company details, asset paths, labels
 ├── src/db/          the two key/value table readers
 ├── src/features/    one folder per business area
 ├── src/lib/         cross-cutting code: auth, email, security, SEO, utilities, integrations
@@ -218,9 +218,9 @@ The SQL migrations live in `packages/db/migrations/`.
 
 ### `src/config/`
 
-Values with no database row behind them: the company name and addresses (`site.ts`), paths to
-static images (`assets.ts`), display labels for enum values (`content-meta.ts`, `course-meta.ts`),
-and the admin menu (`admin-nav.ts`).
+Values with no database row behind them, shared by many files: the company name and addresses
+(`site.ts`), paths to static images (`assets.ts`), display labels for enum values
+(`content-meta.ts`, `course-meta.ts`). Anything read by one place lives next to that place.
 
 ### `docs/`
 
@@ -297,7 +297,7 @@ Data: `events`, `event_registrations`
 page.
 Route: `src/app/(site)/success-stories/page.tsx`
 Feature: `src/features/testimonials/components/` for the two sections
-Data: `src/config/testimonials.ts`, checked in rather than a table, because the graphics and the
+Data: `src/features/testimonials/testimonials.ts`, checked in rather than a table, because the graphics and the
 Google quotes only change when a developer adds files to `public/`
 
 **Contact**: office cards, the general enquiry form, and FAQs.
@@ -327,7 +327,7 @@ checking their work. These routes are always rendered fresh and are marked no-in
 Sign in at `/admin/login` with an email and a password of at least twelve characters. Five wrong
 attempts in fifteen minutes and it stops accepting tries for a while.
 
-The menu is defined in `src/config/admin-nav.ts` and each row appears only if your role is allowed
+The menu is defined in `src/components/layout/admin/admin-nav.ts` and each row appears only if your role is allowed
 to read that kind of record.
 
 | Section | What you manage | Screens |
@@ -341,7 +341,7 @@ to read that kind of record.
 Homepage content is not one screen. It is assembled from the features it shows: change a service
 in Services, a partner logo in Partners, the hero image and Google rating in Settings, and the
 headings in Site text. Success stories and the client quotes are not in the admin at all: they
-live in `src/config/testimonials.ts`.
+live in `src/features/testimonials/testimonials.ts`.
 
 ### What happens when you save
 
@@ -506,7 +506,7 @@ browser: forms, the FAQ accordion, the office context, the animation wrappers.
 none of them depends on another. Each is a feature query, for example `listServices()` from
 `src/features/services/queries.ts`. Each returns rows already shaped for the components. The page
 then passes those objects straight into `<Hero>`, `<Services>` and the rest. `<Reviews>` and
-`<Stories>` take no rows: they read `src/config/testimonials.ts` themselves.
+`<Stories>` take no rows: they read `src/features/testimonials/testimonials.ts` themselves.
 
 ### Example: a service page
 
@@ -936,7 +936,7 @@ handle it in `actions.ts`, add the input to the feature's editor component, then
 `queries.ts` and render it. Six files, in that order.
 
 **Add a new admin screen**: add the page under `src/app/admin/(dashboard)/`, add its entity to the
-matrix in `src/lib/auth/rbac.ts`, add a row to `src/config/admin-nav.ts`, and write the reads in
+matrix in `src/lib/auth/rbac.ts`, add a row to `src/components/layout/admin/admin-nav.ts`, and write the reads in
 `admin-queries.ts` and the writes in `actions.ts`.
 
 **Change a public page**: the page file under `src/app/(site)/`. If the change needs different
@@ -1057,7 +1057,7 @@ Instead: know that this is the current behaviour before writing code that depend
 outcome.
 
 **`admin/redirects` is in the menu but has no page**
-What can go wrong: assuming the screen exists because `src/config/admin-nav.ts` links to it.
+What can go wrong: assuming the screen exists because `src/components/layout/admin/admin-nav.ts` links to it.
 Why: the entity and the permissions exist, and `src/lib/seo/redirects.ts` serves redirects from
 the table, but there is no page under `src/app/admin/(dashboard)/redirects/`.
 Instead: rows go in by hand, or the page needs building.

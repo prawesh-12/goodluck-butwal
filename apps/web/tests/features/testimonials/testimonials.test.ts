@@ -1,6 +1,6 @@
 import { test, expect } from "vitest";
 import { existsSync, readdirSync } from "node:fs";
-import { reviews, successStories } from "@/config/testimonials";
+import { reviews, successStories } from "@/features/testimonials/testimonials";
 
 const DIR = "public/images/success-stories";
 

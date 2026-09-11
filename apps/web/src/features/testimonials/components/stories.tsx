@@ -1,5 +1,5 @@
 import { img } from "@/config/assets";
-import { successStories, type SuccessStory } from "@/config/testimonials";
+import { successStories, type SuccessStory } from "@/features/testimonials/testimonials";
 import type { GoogleRating } from "@/features/settings/queries";
 import { Appear } from "@/components/ui/appear";
 import { PillButton } from "@/components/ui/button";
