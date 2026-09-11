@@ -94,10 +94,10 @@ export function BatchEditor({
       <EditorLayout
         aside={
           <>
-            <SectionCard title="On the site">
+            <SectionCard title="Availability">
               <SelectField
                 name="status"
-                label="Availability"
+                label="Registration status"
                 value={row.status}
                 onChange={(status) => set({ status })}
                 options={STATUSES}
@@ -121,10 +121,11 @@ export function BatchEditor({
           </>
         }
       >
-        <SectionCard title="Class details">
+        <SectionCard title="Batch details">
           <SelectField
             name="courseId"
             label="Course"
+            required
             value={row.courseId}
             error={errors.courseId?.[0]}
             onChange={(courseId) => set({ courseId })}
@@ -135,6 +136,7 @@ export function BatchEditor({
           <TextField
             name="batchName"
             label="Batch name"
+            required
             help="What staff and students call this run, like Morning batch."
             value={row.batchName}
             error={errors.batchName?.[0]}
@@ -161,11 +163,14 @@ export function BatchEditor({
               { value: "hybrid", label: "Hybrid" },
             ]}
           />
+        </SectionCard>
 
+        <SectionCard title="Schedule">
           <div className="grid gap-5 sm:grid-cols-2">
             <TextField
               name="startDate"
               label="First class"
+              required
               type="date"
               value={row.startDate}
               error={errors.startDate?.[0]}
@@ -212,11 +217,12 @@ export function BatchEditor({
           </div>
         </SectionCard>
 
-        <SectionCard title="Places">
+        <SectionCard title="Seats">
           <div className="grid gap-5 sm:grid-cols-2">
             <TextField
               name="totalSeats"
               label="Total seats"
+              required
               type="number"
               value={String(row.totalSeats)}
               error={errors.totalSeats?.[0]}
@@ -234,7 +240,7 @@ export function BatchEditor({
           </div>
         </SectionCard>
 
-        <SectionCard title="Fee" description="Charged instead of the course fee. Leave it empty to use the course fee.">
+        <SectionCard title="Fee" description="Leave it empty to charge the course fee.">
           <TextField
             name="fee"
             label="Fee"

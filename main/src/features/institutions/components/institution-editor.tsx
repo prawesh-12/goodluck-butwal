@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/admin/alert";
 import { Button } from "@/components/ui/admin/button";
 import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
-import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { AdvancedSection, EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
 import { SelectField, SwitchField, TextField } from "@/components/shared/admin/fields";
+import { PreviewButton, ViewOnSiteButton } from "@/components/shared/admin/page-header";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
 import { institutionPath } from "@/config/course-meta";
+import { slugify } from "@/lib/utils/slug";
 import { createInstitution, deleteInstitution, updateInstitution } from "@/features/institutions/actions";
 
 const RichText = dynamic(() => import("@/components/shared/admin/editor-rich-text"), { ssr: false });
@@ -39,6 +41,7 @@ export function InstitutionEditor({
   media,
   destinations,
   courses,
+  gallery,
   canDelete,
   canPublish,
 }: {
@@ -46,6 +49,7 @@ export function InstitutionEditor({
   media: Record<string, PickedMedia>;
   destinations: { id: string; name: string }[];
   courses?: number;
+  gallery?: ReactNode;
   canDelete: boolean;
   canPublish: boolean;
 }) {
@@ -54,6 +58,7 @@ export function InstitutionEditor({
   const [form, setForm] = useState<InstitutionValue>(value);
   const [dirty, setDirty] = useState(false);
   const [askPublish, setAskPublish] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(Boolean(value.id));
 
   useEffect(() => {
     focusFirstError(errors);
@@ -64,9 +69,16 @@ export function InstitutionEditor({
     setDirty(true);
   };
 
-  const path = institutionPath(form.slug);
+  const setName = (name: string) => {
+    setForm((current) => ({ ...current, name, slug: slugTouched ? current.slug : slugify(name) }));
+    setDirty(true);
+  };
+
+  // The saved address, not the one being typed: only what is stored has a page.
+  const path = institutionPath(value.slug);
   const goingLive = form.status === "published" && value.status !== "published";
   const publishProblems = errors.publish ?? [];
+  const slugProblem = errors.slug?.[0];
 
   const save = async () => {
     const id = form.id;
@@ -133,12 +145,13 @@ export function InstitutionEditor({
 
             {value.id ? (
               <div className="space-y-3">
-                <Button variant="outline" size="sm" asChild className="w-full">
-                  <a href={path} target="_blank" rel="noreferrer">
-                    <ExternalLink />
-                    View on site
-                  </a>
-                </Button>
+                <div className="*:w-full">
+                  {value.status === "published" ? (
+                    <ViewOnSiteButton href={path} />
+                  ) : (
+                    <PreviewButton href={`/preview/institution/${value.slug}`} />
+                  )}
+                </div>
                 {courses !== undefined ? (
                   <p className="text-xs text-muted-foreground">
                     {courses === 0 ? (
@@ -159,24 +172,27 @@ export function InstitutionEditor({
                 ) : null}
               </div>
             ) : null}
+
+            <WebAddress
+              value={form.slug}
+              error={slugProblem}
+              published={value.status === "published"}
+              onChange={(slug) => {
+                setSlugTouched(true);
+                set("slug", slug);
+              }}
+            />
           </SectionCard>
         }
       >
         <SectionCard title="Basic information">
           <TextField
             name="name"
-            label="Name"
+            label="Institution name"
+            required
             value={form.name}
-            onChange={(name) => set("name", name)}
+            onChange={setName}
             error={errors.name?.[0]}
-          />
-          <TextField
-            name="slug"
-            label="URL slug"
-            help="Used in the page address."
-            value={form.slug}
-            onChange={(slug) => set("slug", slug)}
-            error={errors.slug?.[0]}
           />
           <div className="grid gap-5 sm:grid-cols-2">
             <SelectField
@@ -214,7 +230,7 @@ export function InstitutionEditor({
           </div>
         </SectionCard>
 
-        <SectionCard title="Institution profile">
+        <SectionCard title="Profile">
           <RichText
             label="Description"
             value={form.descriptionHtml}
@@ -229,6 +245,12 @@ export function InstitutionEditor({
             value={form.logoId ? (media[form.logoId] ?? null) : null}
             onChange={(logoId) => set("logoId", logoId)}
           />
+          {gallery}
+          {value.id ? null : (
+            <p className="border-t border-border pt-5 text-xs text-muted-foreground">
+              The gallery opens once this institution is saved.
+            </p>
+          )}
         </SectionCard>
 
         <SectionCard title="Features">
@@ -288,5 +310,31 @@ export function InstitutionEditor({
         onConfirm={save}
       />
     </form>
+  );
+}
+
+function WebAddress({
+  value,
+  error,
+  published,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  published: boolean;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <AdvancedSection open={Boolean(error)}>
+      <TextField
+        name="slug"
+        label="URL slug"
+        required
+        help={published ? "The old address keeps working and sends people to the new one." : undefined}
+        value={value}
+        onChange={onChange}
+        error={error}
+      />
+    </AdvancedSection>
   );
 }

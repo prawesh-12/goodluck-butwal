@@ -224,7 +224,10 @@ export function UploadDialog({
                 <p className="min-w-0 flex-1 truncate text-sm font-medium" title={row.file.name}>
                   {row.file.name}
                 </p>
-                <span className="shrink-0 text-xs text-muted-foreground">{fileSize(row.file.size)}</span>
+                <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">{fileSize(row.file.size)}</span>
+                <span className="w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                  {row.state === "uploaded" ? "100%" : row.state === "uploading" ? `${row.percent}%` : "—"}
+                </span>
                 <span className="shrink-0 text-xs font-medium">{LABEL[row.state]}</span>
                 {row.state === "failed" ? (
                   <Button type="button" size="xs" variant="outline" disabled={busy} onClick={() => start([row])}>

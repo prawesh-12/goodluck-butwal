@@ -4,7 +4,7 @@ import { allow, allowOwn } from "@/lib/auth/guard";
 import { formatInOfficeTz } from "@/lib/utils/datetime";
 import { EditorHeader } from "@/components/shared/admin/page-header";
 import { EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
-import { StatusBadge } from "@/components/shared/admin/list-ui";
+import { Muted, StatusBadge } from "@/components/shared/admin/list-ui";
 import { EnquiryEditor } from "@/features/leads/components/enquiry-editor";
 import { getEnquiry } from "@/features/leads/queries";
 
@@ -27,9 +27,8 @@ export default async function EnquiryDetail({ params }: { params: Promise<{ id: 
   if (!row) notFound();
   allowOwn(actor, row);
 
-  const interest = [row.destination, row.service].filter(Boolean).join(" · ");
   const campaign = [row.utmCampaign, row.utmSource, row.utmMedium].filter(Boolean).join(" · ");
-  const hasSource = Boolean(row.sourcePage || row.referrer || campaign);
+  const submitted = formatInOfficeTz(row.createdAt, "Australia/Melbourne");
 
   return (
     <>
@@ -40,7 +39,7 @@ export default async function EnquiryDetail({ params }: { params: Promise<{ id: 
         meta={
           <>
             <StatusBadge status={row.status} />
-            <span className="text-sm text-muted-foreground">Reference {row.reference}</span>
+            <span className="text-sm text-muted-foreground">Received {submitted}</span>
           </>
         }
       />
@@ -48,25 +47,30 @@ export default async function EnquiryDetail({ params }: { params: Promise<{ id: 
       <EditorLayout
         aside={<EnquiryEditor id={row.id} status={row.status} notes={row.internalNotes ?? ""} />}
       >
-        <SectionCard title="Lead" contentClassName="space-y-4">
+        <SectionCard title="Contact">
           <dl className="space-y-4">
-            <Fact label="Contact">
+            <Fact label="Email">
               <a className="underline underline-offset-4" href={`mailto:${row.email}`}>
                 {row.email}
               </a>
-              {row.phone ? (
-                <>
-                  <span className="mx-2 text-muted-foreground">·</span>
-                  <a className="underline underline-offset-4" href={`tel:${row.phone.replace(/\s+/g, "")}`}>
-                    {row.phone}
-                  </a>
-                </>
-              ) : null}
             </Fact>
-            <Fact label="Interest">{interest || <span className="text-muted-foreground">Not given</span>}</Fact>
+            <Fact label="Phone">
+              {row.phone ? (
+                <a className="underline underline-offset-4" href={`tel:${row.phone.replace(/\s+/g, "")}`}>
+                  {row.phone}
+                </a>
+              ) : (
+                <Muted>Not given</Muted>
+              )}
+            </Fact>
             {row.location ? <Fact label="Living in">{row.location}</Fact> : null}
-            {row.office ? <Fact label="Office">{row.office}</Fact> : null}
-            <Fact label="Submitted">{formatInOfficeTz(row.createdAt, "Australia/Melbourne")}</Fact>
+          </dl>
+        </SectionCard>
+
+        <SectionCard title="Interest">
+          <dl className="space-y-4">
+            <Fact label="Destination">{row.destination ?? <Muted>Not given</Muted>}</Fact>
+            <Fact label="Service">{row.service ?? <Muted>Not given</Muted>}</Fact>
           </dl>
         </SectionCard>
 
@@ -78,15 +82,16 @@ export default async function EnquiryDetail({ params }: { params: Promise<{ id: 
           )}
         </SectionCard>
 
-        {hasSource ? (
-          <SectionCard title="Where this came from" contentClassName="space-y-4">
-            <dl className="space-y-4">
-              {row.sourcePage ? <Fact label="Page used">{row.sourcePage}</Fact> : null}
-              {row.referrer ? <Fact label="Arrived from">{row.referrer}</Fact> : null}
-              {campaign ? <Fact label="Campaign">{campaign}</Fact> : null}
-            </dl>
-          </SectionCard>
-        ) : null}
+        <SectionCard title="Submission details">
+          <dl className="space-y-4">
+            <Fact label="Reference">{row.reference}</Fact>
+            <Fact label="Received">{submitted}</Fact>
+            <Fact label="Office">{row.office ?? <Muted>Not set</Muted>}</Fact>
+            {row.sourcePage ? <Fact label="Page used">{row.sourcePage}</Fact> : null}
+            {row.referrer ? <Fact label="Arrived from">{row.referrer}</Fact> : null}
+            {campaign ? <Fact label="Campaign">{campaign}</Fact> : null}
+          </dl>
+        </SectionCard>
       </EditorLayout>
     </>
   );

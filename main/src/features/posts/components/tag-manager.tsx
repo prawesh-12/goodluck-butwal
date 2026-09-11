@@ -146,6 +146,7 @@ export function TagManager({
             <TextField
               name="name"
               label="Name"
+              required
               value={draft?.name ?? ""}
               onChange={(value) => set("name", value)}
               error={errors.name?.[0]}

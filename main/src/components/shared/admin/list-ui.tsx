@@ -19,6 +19,8 @@ const STATUS_VARIANT: Record<string, BadgeVariant> = {
   published: "success",
   draft: "secondary",
   archived: "outline",
+  active: "success",
+  deactivated: "outline",
   new: "default",
   pending: "warning",
   open: "success",

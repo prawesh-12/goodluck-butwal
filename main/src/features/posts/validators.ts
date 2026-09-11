@@ -8,7 +8,7 @@ const slugOrBlank = z.union([z.literal(""), slugField]).default("");
 const optionalId = z.union([z.literal(""), z.uuid("Choose one from the list.")]).default("");
 
 const fields = {
-  title: z.string().trim().min(1, "Give the post a title."),
+  title: z.string().trim().min(1, "Give the article a title."),
   slug: slugOrBlank,
   excerpt: z
     .string()
@@ -54,13 +54,14 @@ export function bodyImagesMissingAlt(html: string): string[] {
 
 export function postPublishProblems(data: PostInput, alt: PostAltText): string[] {
   const missing: string[] = [];
-  if (!data.excerpt) missing.push("Excerpt");
+  // These names are read by the person fixing the article, so they match the editor's own labels.
+  if (!data.excerpt) missing.push("Summary");
   if (!data.bodyHtml.trim()) missing.push("Body");
   if (!data.categoryId) missing.push("Category");
-  if (!data.bannerImageId) missing.push("Banner image");
-  if (data.bannerImageId && !alt.banner) missing.push("Alt text on the banner image");
+  if (!data.bannerImageId) missing.push("Image");
+  if (data.bannerImageId && !alt.banner) missing.push("A description for the image");
   for (const name of bodyImagesMissingAlt(data.bodyHtml)) {
-    missing.push(`Alt text on ${name} in the body`);
+    missing.push(`A description for ${name} in the body`);
   }
   return missing;
 }

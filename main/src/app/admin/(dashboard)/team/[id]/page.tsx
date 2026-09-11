@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
-import { EditorHeader } from "@/components/shared/admin/page-header";
-import { StatusBadge, ViewSiteLink } from "@/components/shared/admin/list-ui";
+import { EditorHeader, ViewOnSiteButton } from "@/components/shared/admin/page-header";
+import { StatusBadge } from "@/components/shared/admin/list-ui";
 import { getAdminTeamMember } from "@/features/team/admin-queries";
 import { officeOptions } from "@/features/offices/queries";
 import { pickedMedia } from "@/features/media/admin-queries";
@@ -28,7 +28,7 @@ export default async function TeamMemberPage({ params }: { params: Promise<{ id:
         backLabel="Team"
         title={row.fullName}
         meta={<StatusBadge status={row.status} />}
-        actions={<ViewSiteLink href="/about/team" label="View the team page" />}
+        actions={row.status === "published" ? <ViewOnSiteButton href={`/team/${row.slug}`} /> : null}
       />
 
       <TeamEditor

@@ -13,6 +13,7 @@ import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { ErrorState } from "@/components/shared/admin/states";
 import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
+import { PreviewButton, ViewOnSiteButton } from "@/components/shared/admin/page-header";
 import { Button } from "@/components/ui/admin/button";
 import {
   createTestPrepCourse,
@@ -124,13 +125,24 @@ export function TestPrepCourseEditor({
             {errors.publish?.length ? (
               <ErrorState title="This cannot go live yet" description={errors.publish.join(" ")} />
             ) : null}
+
+            {value.id ? (
+              <div className="flex">
+                {value.status === "published" ? (
+                  <ViewOnSiteButton href={`/test-preparation/${value.slug}`} />
+                ) : (
+                  <PreviewButton href={`/preview/test-prep/${value.slug}`} />
+                )}
+              </div>
+            ) : null}
           </SectionCard>
         }
       >
-        <SectionCard title="Course details">
+        <SectionCard title="Course information">
           <TextField
             name="name"
             label="Course name"
+            required
             value={row.name}
             error={errors.name?.[0]}
             onChange={(name) => {
@@ -141,6 +153,7 @@ export function TestPrepCourseEditor({
           <TextField
             name="slug"
             label="URL slug"
+            required
             help="Used in the page address."
             value={row.slug}
             error={errors.slug?.[0]}
@@ -153,6 +166,7 @@ export function TestPrepCourseEditor({
           <SelectField
             name="testType"
             label="Test"
+            required
             value={row.testType}
             error={errors.testType?.[0]}
             onChange={(testType) => set({ testType })}
@@ -172,12 +186,11 @@ export function TestPrepCourseEditor({
           />
         </SectionCard>
 
-        <SectionCard title="Course content">
-          <RichText label="Description" value={value.descriptionHtml} onChange={(descriptionHtml) => set({ descriptionHtml })} />
+        <SectionCard title="Description">
+          <RichText value={value.descriptionHtml} onChange={(descriptionHtml) => set({ descriptionHtml })} />
 
           <Repeater<SyllabusItem>
             label="Syllabus"
-            help="What the course covers, section by section."
             items={row.syllabus}
             blank={() => ({ title: "", body: "" })}
             onChange={(syllabus) => set({ syllabus })}
@@ -186,9 +199,10 @@ export function TestPrepCourseEditor({
           >
             {(item, update) => (
               <>
-                <TextField label="Heading" value={item.title} onChange={(title) => update({ title })} />
+                <TextField label="Heading" required value={item.title} onChange={(title) => update({ title })} />
                 <TextAreaField
                   label="What it covers"
+                  required
                   rows={3}
                   value={item.body}
                   onChange={(body) => update({ body })}
@@ -198,9 +212,9 @@ export function TestPrepCourseEditor({
           </Repeater>
         </SectionCard>
 
-        <SectionCard title="Media">
+        <SectionCard title="Course image">
           <MediaPicker
-            label="Course picture"
+            label="Image"
             name="heroImageId"
             value={row.heroImageId ? (media[row.heroImageId] ?? null) : null}
             onChange={(heroImageId) => set({ heroImageId })}
@@ -219,6 +233,7 @@ export function TestPrepCourseEditor({
             <TextField
               name="feeCurrency"
               label="Currency"
+              required
               help="Three letters, like NPR."
               value={row.feeCurrency}
               error={errors.feeCurrency?.[0]}

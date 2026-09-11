@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState, type ReactNode } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import { Badge } from "@/components/ui/admin/badge";
 import { Button } from "@/components/ui/admin/button";
 import {
@@ -29,12 +29,34 @@ import { cn } from "@/components/ui/admin/cn";
 
 export type Option = { value: string; label: string; disabled?: boolean };
 
+export function FieldLabel({
+  htmlFor,
+  required,
+  children,
+}: {
+  htmlFor?: string;
+  required?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <Label htmlFor={htmlFor}>
+      {children}
+      {required ? (
+        <span aria-hidden className="ml-0.5 font-semibold text-destructive">
+          *
+        </span>
+      ) : null}
+    </Label>
+  );
+}
+
 export function FieldShell({
   name,
   label,
   help,
   error,
   hint,
+  required,
   children,
   className,
 }: {
@@ -43,6 +65,7 @@ export function FieldShell({
   help?: ReactNode;
   error?: string;
   hint?: ReactNode;
+  required?: boolean;
   children: ReactNode;
   className?: string;
 }) {
@@ -50,7 +73,7 @@ export function FieldShell({
     <div data-field={name} className={cn("space-y-2", className)}>
       {label ? (
         <div className="flex items-baseline justify-between gap-2">
-          <Label>{label}</Label>
+          <FieldLabel required={required}>{label}</FieldLabel>
           {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
         </div>
       ) : null}
@@ -77,6 +100,7 @@ export function TextField({
   type = "text",
   autoComplete,
   disabled,
+  required,
   className,
 }: {
   name?: string;
@@ -90,13 +114,16 @@ export function TextField({
   type?: string;
   autoComplete?: string;
   disabled?: boolean;
+  required?: boolean;
   className?: string;
 }) {
   const id = useId();
   return (
     <div data-field={name} className={cn("space-y-2", className)}>
       <div className="flex items-baseline justify-between gap-2">
-        <Label htmlFor={id}>{label}</Label>
+        <FieldLabel htmlFor={id} required={required}>
+          {label}
+        </FieldLabel>
         {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
       </div>
       <Input
@@ -106,6 +133,7 @@ export function TextField({
         placeholder={placeholder}
         autoComplete={autoComplete}
         disabled={disabled}
+        aria-required={required || undefined}
         aria-invalid={Boolean(error) || undefined}
         aria-describedby={error ? `${id}-error` : undefined}
         onChange={(event) => onChange(event.target.value)}
@@ -130,6 +158,7 @@ export function TextAreaField({
   onChange,
   rows = 4,
   placeholder,
+  required,
   className,
 }: {
   name?: string;
@@ -141,13 +170,16 @@ export function TextAreaField({
   onChange: (value: string) => void;
   rows?: number;
   placeholder?: string;
+  required?: boolean;
   className?: string;
 }) {
   const id = useId();
   return (
     <div data-field={name} className={cn("space-y-2", className)}>
       <div className="flex items-baseline justify-between gap-2">
-        <Label htmlFor={id}>{label}</Label>
+        <FieldLabel htmlFor={id} required={required}>
+          {label}
+        </FieldLabel>
         {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
       </div>
       <Textarea
@@ -155,6 +187,7 @@ export function TextAreaField({
         value={value}
         rows={rows}
         placeholder={placeholder}
+        aria-required={required || undefined}
         aria-invalid={Boolean(error) || undefined}
         onChange={(event) => onChange(event.target.value)}
       />
@@ -183,6 +216,7 @@ export function SelectField({
   placeholder = "Select",
   emptyLabel,
   disabled,
+  required,
   className,
 }: {
   name?: string;
@@ -195,18 +229,26 @@ export function SelectField({
   placeholder?: string;
   emptyLabel?: string;
   disabled?: boolean;
+  required?: boolean;
   className?: string;
 }) {
   const id = useId();
   return (
     <div data-field={name} className={cn("space-y-2", className)}>
-      <Label htmlFor={id}>{label}</Label>
+      <FieldLabel htmlFor={id} required={required}>
+        {label}
+      </FieldLabel>
       <SelectRoot
         value={value === "" ? NONE : value}
         disabled={disabled}
         onValueChange={(next) => onChange(next === NONE ? "" : next)}
       >
-        <SelectTrigger id={id} className="w-full" aria-invalid={Boolean(error) || undefined}>
+        <SelectTrigger
+          id={id}
+          className="w-full"
+          aria-required={required || undefined}
+          aria-invalid={Boolean(error) || undefined}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -291,6 +333,7 @@ export function CheckboxGroup({
   selected,
   onChange,
   columns = 3,
+  required,
 }: {
   name?: string;
   label: string;
@@ -300,12 +343,13 @@ export function CheckboxGroup({
   selected: string[];
   onChange: (values: string[]) => void;
   columns?: 2 | 3 | 4;
+  required?: boolean;
 }) {
   const toggle = (value: string) =>
     onChange(selected.includes(value) ? selected.filter((item) => item !== value) : [...selected, value]);
 
   return (
-    <FieldShell name={name} label={label} help={help} error={error}>
+    <FieldShell name={name} label={label} help={help} error={error} required={required}>
       <div
         className={cn(
           "grid gap-x-4 gap-y-3 sm:grid-cols-2",
@@ -339,6 +383,7 @@ export function MultiSelectField({
   placeholder = "Choose",
   searchPlaceholder = "Search",
   emptyMessage = "Nothing found.",
+  required,
 }: {
   name?: string;
   label: string;
@@ -350,6 +395,7 @@ export function MultiSelectField({
   placeholder?: string;
   searchPlaceholder?: string;
   emptyMessage?: string;
+  required?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const chosen = options.filter((option) => selected.includes(option.value));
@@ -358,7 +404,7 @@ export function MultiSelectField({
     onChange(selected.includes(value) ? selected.filter((item) => item !== value) : [...selected, value]);
 
   return (
-    <FieldShell name={name} label={label} help={help} error={error}>
+    <FieldShell name={name} label={label} help={help} error={error} required={required}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -366,6 +412,7 @@ export function MultiSelectField({
             variant="outline"
             role="combobox"
             aria-expanded={open}
+            aria-required={required || undefined}
             className="h-auto min-h-9 w-full justify-between px-3"
           >
             <span className="flex flex-wrap items-center gap-1 py-0.5">
@@ -399,6 +446,161 @@ export function MultiSelectField({
           </Command>
         </PopoverContent>
       </Popover>
+    </FieldShell>
+  );
+}
+
+// A single-choice field with a search box, for lists too long to scan in a plain select.
+export function ComboboxField({
+  name,
+  label,
+  help,
+  error,
+  value,
+  onChange,
+  options,
+  placeholder = "Choose",
+  searchPlaceholder = "Search",
+  emptyMessage = "Nothing found.",
+  disabled,
+  required,
+  className,
+}: {
+  name?: string;
+  label: string;
+  help?: ReactNode;
+  error?: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: Option[];
+  placeholder?: string;
+  searchPlaceholder?: string;
+  emptyMessage?: string;
+  disabled?: boolean;
+  required?: boolean;
+  className?: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const chosen = options.find((option) => option.value === value);
+
+  return (
+    <FieldShell name={name} label={label} help={help} error={error} required={required} className={className}>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            disabled={disabled}
+            aria-required={required || undefined}
+            aria-invalid={Boolean(error) || undefined}
+            className="w-full justify-between px-3 font-medium"
+          >
+            <span className={cn("truncate", !chosen && "text-muted-foreground")}>
+              {chosen ? chosen.label : placeholder}
+            </span>
+            <ChevronsUpDown className="shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-(--radix-popover-trigger-width) p-0">
+          <Command>
+            <CommandInput placeholder={searchPlaceholder} />
+            <CommandList>
+              <CommandEmpty>{emptyMessage}</CommandEmpty>
+              <CommandGroup>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.label}
+                    disabled={option.disabled}
+                    onSelect={() => {
+                      onChange(option.value === value ? "" : option.value);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check className={cn("mr-2 size-4", option.value === value ? "opacity-100" : "opacity-0")} />
+                    {option.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </FieldShell>
+  );
+}
+
+// A list the user builds a word at a time: qualifications, areas of expertise. The Add button is
+// there so nobody has to guess that Enter is what commits an entry.
+export function ChipField({
+  name,
+  label,
+  help,
+  error,
+  placeholder,
+  values,
+  onChange,
+  required,
+}: {
+  name?: string;
+  label: string;
+  help?: ReactNode;
+  error?: string;
+  placeholder?: string;
+  values: string[];
+  onChange: (values: string[]) => void;
+  required?: boolean;
+}) {
+  const [draft, setDraft] = useState("");
+
+  const add = () => {
+    const value = draft.trim();
+    setDraft("");
+    if (!value || values.includes(value)) return;
+    onChange([...values, value]);
+  };
+
+  return (
+    <FieldShell name={name} label={label} help={help} error={error} required={required}>
+      <div className="space-y-2">
+        {values.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {values.map((value) => (
+              <Badge key={value} variant="secondary" className="gap-1 py-1">
+                {value}
+                <button
+                  type="button"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => onChange(values.filter((item) => item !== value))}
+                >
+                  <X className="size-3" />
+                  <span className="sr-only">Remove {value}</span>
+                </button>
+              </Badge>
+            ))}
+          </div>
+        ) : null}
+
+        <div className="flex gap-2">
+          <Input
+            value={draft}
+            placeholder={placeholder}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== ",") return;
+              // Enter inside a form would submit it, and a comma is how people type lists.
+              event.preventDefault();
+              add();
+            }}
+          />
+          <Button type="button" variant="outline" onClick={add} disabled={draft.trim() === ""}>
+            <Plus />
+            Add
+          </Button>
+        </div>
+      </div>
     </FieldShell>
   );
 }

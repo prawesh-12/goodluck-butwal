@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Archive, ExternalLink, Users } from "lucide-react";
+import { Archive, Users } from "lucide-react";
 import { slugify } from "@/lib/utils/slug";
 import { eventTypeLabels, eventTypes, type EventType } from "@/config/content-meta";
 import { archiveEvent, createEvent, updateEvent } from "@/features/events/actions";
@@ -17,6 +17,7 @@ import {
   TextField,
 } from "@/components/shared/admin/fields";
 import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { PreviewButton, ViewOnSiteButton } from "@/components/shared/admin/page-header";
 import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
@@ -154,22 +155,22 @@ export function EventForm({
               help={canPublish ? undefined : "You can save drafts. An admin puts the event live."}
             />
 
-            {id ? (
-              <Button variant="outline" size="sm" asChild className="w-full">
-                <a href={`/events/${values.slug}`} target="_blank" rel="noreferrer">
-                  <ExternalLink />
-                  View on site
-                </a>
-              </Button>
+            {id && values.slug ? (
+              values.status === "published" ? (
+                <ViewOnSiteButton href={`/events/${values.slug}`} />
+              ) : (
+                <PreviewButton href={`/preview/event/${values.slug}`} />
+              )
             ) : null}
           </SectionCard>
         }
       >
-        <SectionCard title="Event details">
+        <SectionCard title="Event information" description={clock}>
           <TextField
             name="title"
             label="Title"
             value={form.title}
+            required
             error={errors.title?.[0]}
             onChange={(title) => set(slugTouched ? { title } : { title, slug: slugify(title) })}
           />
@@ -200,7 +201,6 @@ export function EventForm({
               label="Office"
               value={form.officeId}
               emptyLabel="Not set"
-              help="Whose event it is. Every time below is read in that office's time zone."
               onChange={(officeId) => set({ officeId })}
               options={offices.map((office) => ({ value: office.id, label: office.name }))}
             />
@@ -220,14 +220,13 @@ export function EventForm({
             value={values.descriptionHtml}
             onChange={(descriptionHtml) => set({ descriptionHtml })}
           />
-        </SectionCard>
 
-        <SectionCard title="When and where" description={clock}>
           <div className="grid gap-5 sm:grid-cols-2">
             <TextField
               name="startsAt"
               label="Starts"
               type="datetime-local"
+              required
               value={form.startsAt}
               error={errors.startsAt?.[0]}
               onChange={(startsAt) => set({ startsAt })}
@@ -242,10 +241,11 @@ export function EventForm({
               onChange={(endsAt) => set({ endsAt })}
             />
           </div>
+        </SectionCard>
 
+        <SectionCard title="Attendance">
           <SwitchField
-            label="This event is online"
-            help="An online event shows the joining link instead of an address and a map."
+            label="Online event"
             checked={form.isOnline}
             onChange={(isOnline) => set({ isOnline })}
           />
@@ -254,6 +254,7 @@ export function EventForm({
             <TextField
               name="onlineUrl"
               label="Joining link"
+              required
               help="Shown on the page and sent in the confirmation email."
               value={form.onlineUrl}
               error={errors.onlineUrl?.[0]}
@@ -264,6 +265,7 @@ export function EventForm({
               <TextField
                 name="venueName"
                 label="Venue"
+                required
                 value={form.venueName}
                 error={errors.venueName?.[0]}
                 onChange={(venueName) => set({ venueName })}
@@ -281,7 +283,7 @@ export function EventForm({
               <TextField
                 name="mapsEmbedUrl"
                 label="Map"
-                help="In Google Maps choose Share, then Embed a map, then copy the address inside src."
+                help="In Google Maps choose Share, then Embed a map, and copy the address it gives you."
                 value={form.mapsEmbedUrl}
                 error={errors.mapsEmbedUrl?.[0]}
                 onChange={(mapsEmbedUrl) => set({ mapsEmbedUrl })}
@@ -314,45 +316,48 @@ export function EventForm({
 
         <SectionCard title="Registration">
           <SwitchField
-            label="Take registrations"
-            help="Off hides the form on the event page."
+            label="Accept registrations"
             checked={form.registrationEnabled}
             onChange={(registrationEnabled) => set({ registrationEnabled })}
           />
 
-          <div className="grid gap-5 sm:grid-cols-2">
-            <TextField
-              name="capacity"
-              label="Seats"
-              type="number"
-              value={form.capacity}
-              error={errors.capacity?.[0]}
-              onChange={(capacity) => set({ capacity })}
-              help={
-                seatsLeft === null
-                  ? `${seatsTaken} registered so far. Leave it empty for no limit.`
-                  : `${seatsTaken} registered so far, ${seatsLeft} of ${form.capacity} left.`
-              }
-            />
+          {form.registrationEnabled ? (
+            <>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <TextField
+                  name="capacity"
+                  label="Seats"
+                  type="number"
+                  value={form.capacity}
+                  error={errors.capacity?.[0]}
+                  onChange={(capacity) => set({ capacity })}
+                  help={
+                    seatsLeft === null
+                      ? `${seatsTaken} registered so far. Leave it empty for no limit.`
+                      : `${seatsTaken} registered so far, ${seatsLeft} of ${form.capacity} left.`
+                  }
+                />
 
-            <TextField
-              name="registrationDeadline"
-              label="Registration closes"
-              type="datetime-local"
-              help="Left empty, registration closes when the event starts."
-              value={form.registrationDeadline}
-              error={errors.registrationDeadline?.[0]}
-              onChange={(registrationDeadline) => set({ registrationDeadline })}
-            />
-          </div>
+                <TextField
+                  name="registrationDeadline"
+                  label="Registration closes"
+                  type="datetime-local"
+                  help="Left empty, registration closes when the event starts."
+                  value={form.registrationDeadline}
+                  error={errors.registrationDeadline?.[0]}
+                  onChange={(registrationDeadline) => set({ registrationDeadline })}
+                />
+              </div>
 
-          {id ? (
-            <Button variant="outline" size="sm" asChild>
-              <Link href={`/admin/events/${id}/registrations`}>
-                <Users />
-                See who has registered
-              </Link>
-            </Button>
+              {id ? (
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/admin/events/${id}/registrations`}>
+                    <Users />
+                    View registrations
+                  </Link>
+                </Button>
+              ) : null}
+            </>
           ) : null}
         </SectionCard>
       </EditorLayout>

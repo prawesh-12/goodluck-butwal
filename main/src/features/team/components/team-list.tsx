@@ -19,6 +19,7 @@ import { cn } from "@/components/ui/admin/cn";
 
 export type TeamRow = {
   id: string;
+  slug: string;
   fullName: string;
   position: string | null;
   office: string | null;
@@ -102,7 +103,7 @@ export function TeamList({
                 </TableCell>
                 <TableCell>
                   <span className="flex items-center justify-end gap-1">
-                    <ViewSiteLink href="/about/team" />
+                    {row.status === "published" ? <ViewSiteLink href={`/team/${row.slug}`} /> : null}
                     <EditLink href={`/admin/team/${row.id}`} />
                   </span>
                 </TableCell>

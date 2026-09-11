@@ -5,7 +5,7 @@ import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { EditorHeader } from "@/components/shared/admin/page-header";
-import { FlatBadge, StatusBadge, ViewSiteLink } from "@/components/shared/admin/list-ui";
+import { FlatBadge, StatusBadge } from "@/components/shared/admin/list-ui";
 import { TestPrepCourseEditor } from "@/features/test-prep/components/course-editor";
 import { TEST_LABEL } from "@/features/test-prep/schedule";
 import { pickedMedia } from "@/features/media/admin-queries";
@@ -37,15 +37,14 @@ export default async function EditTestPrepCoursePage({ params }: { params: Promi
           </>
         }
         actions={
-          <>
+          can(actor, "batches", "read") ? (
             <Button variant="outline" asChild>
               <Link href={`/admin/test-prep/batches?course=${row.id}`}>
                 <CalendarDays />
-                Batches
+                Manage batches
               </Link>
             </Button>
-            <ViewSiteLink href={`/test-preparation/${row.slug}`} />
-          </>
+          ) : null
         }
       />
 

@@ -87,6 +87,7 @@ export function UserEditor({
         <TextField
           name="name"
           label="Name"
+          required
           value={form.name}
           onChange={(value) => set("name", value)}
           error={errors.name?.[0]}
@@ -97,6 +98,7 @@ export function UserEditor({
             <TextField
               name="email"
               label="Email"
+              required
               type="email"
               help="They sign in with this and it cannot be changed afterwards."
               value={form.email}
@@ -106,6 +108,7 @@ export function UserEditor({
             <TextField
               name="password"
               label="Password"
+              required
               type="password"
               help="At least 12 characters. Tell them to change it once they are in."
               value={form.password}
@@ -122,6 +125,7 @@ export function UserEditor({
         <SelectField
           name="role"
           label="Role"
+          required
           help="An office admin only sees their own office's enquiries and content."
           value={form.role || "content_editor"}
           onChange={(value) => set("role", value)}

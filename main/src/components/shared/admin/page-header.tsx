@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, ExternalLink, Eye } from "lucide-react";
 import { Button } from "@/components/ui/admin/button";
 import { Separator } from "@/components/ui/admin/separator";
 
@@ -59,5 +59,40 @@ export function EditorHeader({
       </div>
       <Separator />
     </div>
+  );
+}
+
+// §28: the public page opens in a new tab, and the address itself never appears as prose.
+export function ViewOnSiteButton({
+  href,
+  label = "View on site",
+  variant = "outline",
+  className,
+}: {
+  href: string;
+  label?: string;
+  variant?: "outline" | "ghost" | "secondary";
+  className?: string;
+}) {
+  return (
+    <Button variant={variant} size="sm" asChild className={className}>
+      <a href={href} target="_blank" rel="noreferrer">
+        <ExternalLink />
+        {label}
+      </a>
+    </Button>
+  );
+}
+
+// A draft has no public page yet, so previewing it goes through the signed preview route the
+// project already has.
+export function PreviewButton({ href, className }: { href: string; className?: string }) {
+  return (
+    <Button variant="outline" size="sm" asChild className={className}>
+      <a href={href} target="_blank" rel="noreferrer">
+        <Eye />
+        Preview
+      </a>
+    </Button>
   );
 }

@@ -1,4 +1,4 @@
-import { and, count, eq, ilike, or, sql } from "drizzle-orm";
+import { and, count, eq, ilike, inArray, or, sql } from "drizzle-orm";
 import { db } from "@db/client";
 import {
   courses,
@@ -125,22 +125,55 @@ export async function assetByPublicId(publicId: string, resourceType: ResourceTy
 
 // Every column in the seven CMS sections that points at media_assets, with the label an admin
 // would recognise.
-const REFERENCES: { kind: string; find: (id: string) => Promise<{ label: string | null }[]> }[] = [
-  { kind: "Team member", find: (id) => db.select({ label: teamMembers.fullName }).from(teamMembers).where(eq(teamMembers.photoId, id)).limit(5) },
-  { kind: "Partner logo", find: (id) => db.select({ label: partners.name }).from(partners).where(eq(partners.logoId, id)).limit(5) },
-  { kind: "News banner", find: (id) => db.select({ label: posts.title }).from(posts).where(eq(posts.bannerImageId, id)).limit(5) },
-  { kind: "Event cover", find: (id) => db.select({ label: events.title }).from(events).where(eq(events.coverImageId, id)).limit(5) },
-  { kind: "Institution logo", find: (id) => db.select({ label: institutions.name }).from(institutions).where(eq(institutions.logoId, id)).limit(5) },
-  { kind: "Test preparation hero", find: (id) => db.select({ label: testPrepCourses.name }).from(testPrepCourses).where(eq(testPrepCourses.heroImageId, id)).limit(5) },
+// Each reference is one column somewhere that points at a media row. `find` names what is using
+// one asset; `findMany` answers the same question for a page of them in a single query.
+// Each reference is one column somewhere that points at a media row. `findMany` answers
+// "what is using these" for a whole page of assets in one query per reference.
+const REFERENCES: {
+  kind: string;
+  findMany: (ids: string[]) => Promise<{ id: string | null; label: string | null }[]>;
+}[] = [
+  {
+    kind: "Team member",
+    findMany: (ids) =>
+      db.select({ id: teamMembers.photoId, label: teamMembers.fullName }).from(teamMembers).where(inArray(teamMembers.photoId, ids)),
+  },
+  {
+    kind: "Partner logo",
+    findMany: (ids) =>
+      db.select({ id: partners.logoId, label: partners.name }).from(partners).where(inArray(partners.logoId, ids)),
+  },
+  {
+    kind: "News banner",
+    findMany: (ids) =>
+      db.select({ id: posts.bannerImageId, label: posts.title }).from(posts).where(inArray(posts.bannerImageId, ids)),
+  },
+  {
+    kind: "Event cover",
+    findMany: (ids) =>
+      db.select({ id: events.coverImageId, label: events.title }).from(events).where(inArray(events.coverImageId, ids)),
+  },
+  {
+    kind: "Institution logo",
+    findMany: (ids) =>
+      db.select({ id: institutions.logoId, label: institutions.name }).from(institutions).where(inArray(institutions.logoId, ids)),
+  },
+  {
+    kind: "Test preparation hero",
+    findMany: (ids) =>
+      db
+        .select({ id: testPrepCourses.heroImageId, label: testPrepCourses.name })
+        .from(testPrepCourses)
+        .where(inArray(testPrepCourses.heroImageId, ids)),
+  },
   {
     kind: "Institution gallery",
-    find: (id) =>
+    findMany: (ids) =>
       db
-        .select({ label: institutions.name })
+        .select({ id: institutionImages.mediaId, label: institutions.name })
         .from(institutionImages)
         .innerJoin(institutions, eq(institutionImages.institutionId, institutions.id))
-        .where(eq(institutionImages.mediaId, id))
-        .limit(5),
+        .where(inArray(institutionImages.mediaId, ids)),
   },
 ];
 
@@ -155,13 +188,26 @@ const RICH_TEXT: ((like: string) => Promise<{ n: number }[]>)[] = [
 
 export type Usage = { kind: string; label: string };
 
-// Delete is blocked while an asset is in use, and the answer names what is using it.
-export async function findUsage(id: string): Promise<Usage[]> {
-  const found: Usage[] = [];
+// What is using these assets, for a whole page at once: one query per reference rather than one
+// per card. The library needs it for every card, and the delete guard needs it for one.
+export async function usageFor(ids: string[]): Promise<Map<string, Usage[]>> {
+  const found = new Map<string, Usage[]>();
+  if (ids.length === 0) return found;
+
   for (const ref of REFERENCES) {
-    for (const row of await ref.find(id)) found.push({ kind: ref.kind, label: row.label ?? "Untitled" });
+    for (const row of await ref.findMany(ids)) {
+      if (!row.id) continue;
+      const list = found.get(row.id) ?? [];
+      list.push({ kind: ref.kind, label: row.label ?? "Untitled" });
+      found.set(row.id, list);
+    }
   }
   return found;
+}
+
+// Delete is blocked while an asset is in use, and the answer names what is using it.
+export async function findUsage(id: string): Promise<Usage[]> {
+  return (await usageFor([id])).get(id) ?? [];
 }
 
 export async function findInRichText(publicId: string) {

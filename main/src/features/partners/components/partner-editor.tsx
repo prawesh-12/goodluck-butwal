@@ -89,60 +89,63 @@ export function PartnerEditor({
     <form onSubmit={save} className="space-y-6">
       <UnsavedGuard dirty={dirty} />
 
-      <SectionCard title="Partner">
-        <TextField
-          name="name"
-          label="Partner name"
-          value={form.name}
-          onChange={(value) => set("name", value)}
-          error={errors.name?.[0]}
-        />
-        <TextField
-          name="websiteUrl"
-          label="Website"
-          help="Where the logo links to."
-          value={form.websiteUrl}
-          onChange={(value) => set("websiteUrl", value)}
-          placeholder="https://"
-          error={errors.websiteUrl?.[0]}
-        />
-        <MediaPicker
-          label="Logo"
-          name="logoId"
-          value={logo}
-          type="image"
-          onChange={(id) => set("logoId", id ?? "")}
-        />
-      </SectionCard>
-
-      <SectionCard title="Visibility">
-        {canPublish ? (
-          <SelectField
-            name="status"
-            label="Status"
-            value={form.status || "draft"}
-            onChange={(value) => set("status", value)}
-            options={STATUSES}
-            error={errors.status?.[0]}
+      <div className="w-full max-w-2xl space-y-6">
+        <SectionCard title="Partner">
+          <TextField
+            name="name"
+            label="Partner name"
+            required
+            value={form.name}
+            onChange={(value) => set("name", value)}
+            error={errors.name?.[0]}
           />
-        ) : (
-          <FieldShell label="Status">
-            <div className="space-y-2">
-              <StatusBadge status={form.status || "draft"} />
-              <p className="text-xs text-muted-foreground">
-                Your role can save this partner but not publish it.
-              </p>
-            </div>
-          </FieldShell>
-        )}
+          <TextField
+            name="websiteUrl"
+            label="Website"
+            help="Where the logo links to."
+            value={form.websiteUrl}
+            onChange={(value) => set("websiteUrl", value)}
+            placeholder="https://"
+            error={errors.websiteUrl?.[0]}
+          />
+          <MediaPicker
+            label="Logo"
+            name="logoId"
+            value={logo}
+            type="image"
+            onChange={(id) => set("logoId", id ?? "")}
+          />
+        </SectionCard>
 
-        <SwitchField
-          label="Featured"
-          help="Featured partners are shown first."
-          checked={form.isFeatured}
-          onChange={(checked) => set("isFeatured", checked)}
-        />
-      </SectionCard>
+        <SectionCard title="Visibility">
+          {canPublish ? (
+            <SelectField
+              name="status"
+              label="Status"
+              value={form.status || "draft"}
+              onChange={(value) => set("status", value)}
+              options={STATUSES}
+              error={errors.status?.[0]}
+            />
+          ) : (
+            <FieldShell label="Status">
+              <div className="space-y-2">
+                <StatusBadge status={form.status || "draft"} />
+                <p className="text-xs text-muted-foreground">
+                  Your role can save this partner but not publish it.
+                </p>
+              </div>
+            </FieldShell>
+          )}
+
+          <SwitchField
+            label="Featured"
+            help="Featured partners are shown first."
+            checked={form.isFeatured}
+            onChange={(checked) => set("isFeatured", checked)}
+          />
+        </SectionCard>
+      </div>
 
       <EditorActionBar
         dirty={dirty}

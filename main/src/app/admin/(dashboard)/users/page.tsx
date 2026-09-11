@@ -76,48 +76,73 @@ export default async function UsersPage({
           />
         )
       ) : (
-        <DataCard>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
-                  <span className="sr-only">Photo</span>
-                </TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead className="hidden md:table-cell">Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead className="hidden md:table-cell">Office</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>
+        <>
+          <ul className="space-y-3 sm:hidden">
+            {rows.map((row) => (
+              <li key={row.id} className="rounded-lg border bg-card p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     <RowAvatar name={row.name} />
-                  </TableCell>
-                  <TableCell className="font-medium">{row.name}</TableCell>
-                  <TableCell className="hidden md:table-cell">{row.email}</TableCell>
-                  <TableCell>
-                    <FlatBadge>{roleLabel(row.role)}</FlatBadge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell">
-                    <FlatBadge>{row.office ?? "All offices"}</FlatBadge>
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge status={row.isActive ? "active" : "deactivated"} />
-                  </TableCell>
-                  <TableCell>
-                    <span className="flex items-center justify-end gap-1">
-                      <EditLink href={`/admin/users/${row.id}`} />
-                    </span>
-                  </TableCell>
+                    <div className="min-w-0">
+                      <p className="font-medium">{row.name}</p>
+                      <p className="truncate text-sm text-muted-foreground">{row.email}</p>
+                    </div>
+                  </div>
+                  <StatusBadge status={row.isActive ? "active" : "deactivated"} />
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <FlatBadge>{roleLabel(row.role)}</FlatBadge>
+                  <FlatBadge>{row.office ?? "All offices"}</FlatBadge>
+                </div>
+                <div className="mt-3">
+                  <EditLink href={`/admin/users/${row.id}`} />
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <DataCard className="hidden sm:block">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead className="hidden md:table-cell">Email</TableHead>
+                  <TableHead>Role</TableHead>
+                  <TableHead className="hidden md:table-cell">Office</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </DataCard>
+              </TableHeader>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell>
+                      <span className="flex items-center gap-3 font-medium">
+                        <RowAvatar name={row.name} />
+                        {row.name}
+                      </span>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">{row.email}</TableCell>
+                    <TableCell>
+                      <FlatBadge>{roleLabel(row.role)}</FlatBadge>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      <FlatBadge>{row.office ?? "All offices"}</FlatBadge>
+                    </TableCell>
+                    <TableCell>
+                      <StatusBadge status={row.isActive ? "active" : "deactivated"} />
+                    </TableCell>
+                    <TableCell>
+                      <span className="flex items-center justify-end gap-1">
+                        <EditLink href={`/admin/users/${row.id}`} />
+                      </span>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </DataCard>
+        </>
       )}
 
       <ResultCount shown={rows.length} total={all.length} noun="accounts" />

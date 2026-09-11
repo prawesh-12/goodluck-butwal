@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { ExternalLink, Trash2 } from "lucide-react";
+import { Check, Trash2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/admin/alert";
 import { Button } from "@/components/ui/admin/button";
+import { Label } from "@/components/ui/admin/label";
+import { cn } from "@/components/ui/admin/cn";
 import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
-import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
-import { CheckboxGroup, SelectField, TextField } from "@/components/shared/admin/fields";
+import { AdvancedSection, EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { ComboboxField, SelectField, TextField } from "@/components/shared/admin/fields";
+import { PreviewButton, ViewOnSiteButton } from "@/components/shared/admin/page-header";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
 import {
@@ -17,6 +20,7 @@ import {
   coursePath,
   qualificationLevels,
 } from "@/config/course-meta";
+import { slugify } from "@/lib/utils/slug";
 import { createCourse, deleteCourse, updateCourse } from "@/features/courses/actions";
 
 const RichText = dynamic(() => import("@/components/shared/admin/editor-rich-text"), { ssr: false });
@@ -64,6 +68,7 @@ export function CourseEditor({
   const [form, setForm] = useState<CourseValue>(value);
   const [dirty, setDirty] = useState(false);
   const [askPublish, setAskPublish] = useState(false);
+  const [slugTouched, setSlugTouched] = useState(Boolean(value.id));
 
   useEffect(() => {
     focusFirstError(errors);
@@ -74,7 +79,13 @@ export function CourseEditor({
     setDirty(true);
   };
 
-  const path = coursePath(form.slug);
+  const setName = (name: string) => {
+    setForm((current) => ({ ...current, name, slug: slugTouched ? current.slug : slugify(name) }));
+    setDirty(true);
+  };
+
+  // The saved address, not the one being typed: only what is stored has a page.
+  const path = coursePath(value.slug);
   const goingLive = form.status === "published" && value.status !== "published";
   const publishProblems = errors.publish ?? [];
 
@@ -116,14 +127,6 @@ export function CourseEditor({
       <EditorLayout
         aside={
           <SectionCard title="Publishing">
-            <TextField
-              name="sortOrder"
-              label="Display order"
-              type="number"
-              help="Lower numbers appear first."
-              value={String(form.sortOrder)}
-              onChange={(sortOrder) => set("sortOrder", Number(sortOrder) || 0)}
-            />
             <SelectField
               name="status"
               label="Status"
@@ -134,6 +137,14 @@ export function CourseEditor({
                 { value: "published", label: "Published", disabled: !canPublish },
                 { value: "archived", label: "Archived" },
               ]}
+            />
+            <TextField
+              name="sortOrder"
+              label="Display order"
+              type="number"
+              help="Lower numbers appear first."
+              value={String(form.sortOrder)}
+              onChange={(sortOrder) => set("sortOrder", Number(sortOrder) || 0)}
             />
 
             {publishProblems.length > 0 ? (
@@ -150,36 +161,43 @@ export function CourseEditor({
             ) : null}
 
             {value.id ? (
-              <Button variant="outline" size="sm" asChild className="w-full">
-                <a href={path} target="_blank" rel="noreferrer">
-                  <ExternalLink />
-                  View on site
-                </a>
-              </Button>
+              <div className="*:w-full">
+                {value.status === "published" ? (
+                  <ViewOnSiteButton href={path} />
+                ) : (
+                  <PreviewButton href={`/preview/course/${value.slug}`} />
+                )}
+              </div>
             ) : null}
+
+            <WebAddress
+              value={form.slug}
+              error={errors.slug?.[0]}
+              published={value.status === "published"}
+              onChange={(slug) => {
+                setSlugTouched(true);
+                set("slug", slug);
+              }}
+            />
           </SectionCard>
         }
       >
         <SectionCard title="Course details">
           <TextField
             name="name"
-            label="Name"
+            label="Course name"
+            required
             value={form.name}
-            onChange={(name) => set("name", name)}
+            onChange={setName}
             error={errors.name?.[0]}
           />
-          <TextField
-            name="slug"
-            label="URL slug"
-            help="Used in the page address."
-            value={form.slug}
-            onChange={(slug) => set("slug", slug)}
-            error={errors.slug?.[0]}
-          />
-          <SelectField
+          <ComboboxField
             name="institutionId"
             label="Institution"
+            required
             placeholder="Choose an institution"
+            searchPlaceholder="Search institutions"
+            emptyMessage="No institution by that name."
             value={form.institutionId}
             onChange={(institutionId) => set("institutionId", institutionId)}
             options={institutions.map((option) => ({ value: option.id, label: option.name }))}
@@ -239,15 +257,10 @@ export function CourseEditor({
         </SectionCard>
 
         <SectionCard title="Intake">
-          <CheckboxGroup
-            name="intakes"
-            label="Intake months"
-            help="The months a student can start this course."
-            options={INTAKE_MONTHS.map((month) => ({ value: month, label: month }))}
+          <IntakeMonths
             selected={form.intakes}
-            onChange={(next) => set("intakes", INTAKE_MONTHS.filter((month) => next.includes(month)))}
-            columns={4}
             error={errors.intakes?.[0]}
+            onChange={(next) => set("intakes", next)}
           />
         </SectionCard>
 
@@ -265,7 +278,7 @@ export function CourseEditor({
         </SectionCard>
 
         <SectionCard title="Fees" description="Yearly tuition. Leave both empty to show no fee.">
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-3">
             <TextField
               name="tuitionFeeMin"
               label="Fee from"
@@ -324,5 +337,104 @@ export function CourseEditor({
         onConfirm={save}
       />
     </form>
+  );
+}
+
+// Laid out three to a row in calendar order, so the year reads as a grid rather than a list of
+// twelve unrelated tickboxes.
+function IntakeMonths({
+  selected,
+  error,
+  onChange,
+}: {
+  selected: string[];
+  error?: string;
+  onChange: (months: string[]) => void;
+}) {
+  const id = useId();
+  const toggle = (month: string) =>
+    onChange(
+      INTAKE_MONTHS.filter((each) =>
+        each === month ? !selected.includes(month) : selected.includes(each),
+      ),
+    );
+
+  return (
+    <div role="group" aria-labelledby={id} data-field="intakes" className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <Label id={id}>Intake months</Label>
+        <div className="flex items-center gap-1">
+          <Button
+            type="button"
+            variant="ghost"
+            size="xs"
+            disabled={selected.length === INTAKE_MONTHS.length}
+            onClick={() => onChange([...INTAKE_MONTHS])}
+          >
+            Select all
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="xs"
+            disabled={selected.length === 0}
+            onClick={() => onChange([])}
+          >
+            Clear
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        {INTAKE_MONTHS.map((month) => {
+          const on = selected.includes(month);
+          return (
+            <Button
+              key={month}
+              type="button"
+              aria-pressed={on}
+              variant={on ? "default" : "outline"}
+              className="justify-start"
+              onClick={() => toggle(month)}
+            >
+              <Check className={cn(on ? "opacity-100" : "opacity-0")} />
+              {month}
+            </Button>
+          );
+        })}
+      </div>
+
+      {error ? (
+        <p role="alert" className="text-xs font-medium text-destructive">
+          {error}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function WebAddress({
+  value,
+  error,
+  published,
+  onChange,
+}: {
+  value: string;
+  error?: string;
+  published: boolean;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <AdvancedSection open={Boolean(error)}>
+      <TextField
+        name="slug"
+        label="URL slug"
+        required
+        help={published ? "The old address keeps working and sends people to the new one." : undefined}
+        value={value}
+        onChange={onChange}
+        error={error}
+      />
+    </AdvancedSection>
   );
 }

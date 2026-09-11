@@ -64,6 +64,17 @@ export function ConfirmConsultation({ row, className }: { row: Consultation; cla
   );
 }
 
+// The date and time are what a person scans an appointment list for, so they get their own
+// block rather than a pair of ordinary rows.
+export function AppointmentSlot({ date, time }: { date: string | null; time: string | null }) {
+  return (
+    <span className="inline-flex flex-col rounded-md bg-secondary px-3 py-2 leading-tight">
+      <span className="text-sm font-semibold whitespace-nowrap">{dateLabel(date)}</span>
+      <span className="text-lg font-semibold whitespace-nowrap tabular-nums">{timeLabel(time)}</span>
+    </span>
+  );
+}
+
 function Fact({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid gap-1 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-4">
@@ -91,16 +102,18 @@ export function ConsultationDetails({ row }: { row: Consultation }) {
         </SheetHeader>
 
         <div className="space-y-6 px-4 pb-6">
+          <div className="space-y-2">
+            <AppointmentSlot date={row.preferredDate} time={row.preferredTime} />
+            {row.clashes ? (
+              <p>
+                <FlatBadge variant="warning">Another request wants this slot</FlatBadge>
+              </p>
+            ) : null}
+          </div>
+
           <dl className="space-y-4">
-            <Fact label="Preferred date">{dateLabel(row.preferredDate)}</Fact>
-            <Fact label="Preferred time">{timeLabel(row.preferredTime)}</Fact>
             <Fact label="Office">{row.office ?? "Not set"}</Fact>
             <Fact label="Service">{row.service ?? "Not set"}</Fact>
-          </dl>
-
-          {row.clashes ? <FlatBadge variant="warning">Another request wants this slot</FlatBadge> : null}
-
-          <dl className="space-y-4">
             <Fact label="Email">
               <a className="underline underline-offset-4" href={`mailto:${row.email}`}>
                 {row.email}

@@ -2,7 +2,7 @@ import { Handshake } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
-import { PageHeader } from "@/components/shared/admin/page-header";
+import { PageHeader, ViewOnSiteButton } from "@/components/shared/admin/page-header";
 import { FilterBar } from "@/components/shared/admin/filter-bar";
 import { NewButton, Pager, ResultCount } from "@/components/shared/admin/list-ui";
 import { EmptyState } from "@/components/shared/admin/states";
@@ -32,7 +32,12 @@ export default async function PartnersPage({
       <PageHeader
         title="Partners"
         description="The logos shown on the website."
-        actions={canCreate ? <NewButton href="/admin/partners/new">Add partner</NewButton> : null}
+        actions={
+          <>
+            <ViewOnSiteButton href="/" label="View the home page" />
+            {canCreate ? <NewButton href="/admin/partners/new">Add partner</NewButton> : null}
+          </>
+        }
       />
 
       <FilterBar

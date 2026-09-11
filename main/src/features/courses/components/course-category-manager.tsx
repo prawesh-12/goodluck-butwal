@@ -171,6 +171,7 @@ export function CourseCategoryManager({
             <TextField
               name="name"
               label="Name"
+              required
               value={draft?.name ?? ""}
               onChange={(name) => setDraft((current) => (current ? { ...current, name } : current))}
               error={errors.name?.[0]}

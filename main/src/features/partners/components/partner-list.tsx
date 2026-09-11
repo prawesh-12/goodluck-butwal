@@ -11,7 +11,6 @@ import {
   Muted,
   RowAvatar,
   StatusBadge,
-  ViewSiteLink,
 } from "@/components/shared/admin/list-ui";
 import { useAction } from "@/components/shared/admin/use-action";
 import { reorderPartners } from "@/features/partners/actions";
@@ -93,7 +92,6 @@ export function PartnerList({ rows, canReorder }: { rows: PartnerRow[]; canReord
                 </TableCell>
                 <TableCell>
                   <span className="flex items-center justify-end gap-1">
-                    <ViewSiteLink href="/" label="View the home page" />
                     <EditLink href={`/admin/partners/${row.id}`} />
                   </span>
                 </TableCell>

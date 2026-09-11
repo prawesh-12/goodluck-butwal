@@ -108,7 +108,7 @@ export function PostCategoryManager({
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead className="hidden sm:table-cell">Articles</TableHead>
+                <TableHead>Articles</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -121,7 +121,7 @@ export function PostCategoryManager({
                       <span className="block text-xs font-medium text-muted-foreground">{row.description}</span>
                     ) : null}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell">
+                  <TableCell className="whitespace-nowrap">
                     {row.posts > 0 ? row.posts : <Muted>None</Muted>}
                   </TableCell>
                   <TableCell>
@@ -183,6 +183,7 @@ export function PostCategoryManager({
             <TextField
               name="name"
               label="Name"
+              required
               value={draft?.name ?? ""}
               onChange={(value) => set("name", value)}
               error={errors.name?.[0]}

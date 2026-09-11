@@ -123,19 +123,23 @@ export default async function EventsPage({
                   </TableCell>
                   <TableCell>{row.office ?? <Muted>Not set</Muted>}</TableCell>
                   <TableCell className="whitespace-nowrap">
-                    <Button variant="link" size="sm" asChild className="h-auto px-0">
-                      <Link href={`/admin/events/${row.id}/registrations`}>
-                        {row.seatsTaken}
-                        {row.capacity === null ? " registered" : ` of ${row.capacity} seats`}
-                      </Link>
-                    </Button>
+                    {row.registrationEnabled ? (
+                      <Button variant="link" size="sm" asChild className="h-auto px-0">
+                        <Link href={`/admin/events/${row.id}/registrations`}>
+                          {row.seatsTaken}
+                          {row.capacity === null ? " registered" : ` of ${row.capacity} seats`}
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Muted>Not open</Muted>
+                    )}
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={row.status} />
                   </TableCell>
                   <TableCell>
                     <span className="flex items-center justify-end gap-1">
-                      <ViewSiteLink href={`/events/${row.slug}`} />
+                      {row.status === "published" ? <ViewSiteLink href={`/events/${row.slug}`} /> : null}
                       <EditLink href={`/admin/events/${row.id}`} />
                     </span>
                   </TableCell>

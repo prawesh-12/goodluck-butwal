@@ -12,7 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/admin/dialog";
 import { Input } from "@/components/ui/admin/input";
-import { Label } from "@/components/ui/admin/label";
+import { FieldLabel } from "@/components/shared/admin/fields";
 import { Skeleton } from "@/components/ui/admin/skeleton";
 
 export type PickedMedia = {
@@ -24,9 +24,19 @@ export type PickedMedia = {
   altText: string | null;
 };
 
-function Thumb({ item, type, className }: { item: PickedMedia; type?: "image" | "video"; className: string }) {
-  if (type === "video") return <video src={mediaUrl(item, 320)} className={className} muted playsInline />;
-  return <img src={mediaUrl(item, 320)} alt={item.altText ?? ""} className={className} />;
+function Thumb({
+  item,
+  type,
+  className,
+  width = 320,
+}: {
+  item: PickedMedia;
+  type?: "image" | "video";
+  className: string;
+  width?: number;
+}) {
+  if (type === "video") return <video src={mediaUrl(item, width)} className={className} muted playsInline />;
+  return <img src={mediaUrl(item, width)} alt={item.altText ?? ""} className={className} />;
 }
 
 // The only way to choose an image in the admin. No form has a file input, so every image is a
@@ -37,6 +47,7 @@ export function MediaPicker({
   value,
   help,
   type,
+  required,
   onChange,
 }: {
   label: string;
@@ -44,6 +55,7 @@ export function MediaPicker({
   value?: PickedMedia | null;
   help?: string;
   type?: "image" | "video";
+  required?: boolean;
   onChange?: (id: string | null) => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -82,41 +94,50 @@ export function MediaPicker({
 
   return (
     <div data-field={name} className="space-y-2">
-      <Label>{label}</Label>
+      <FieldLabel required={required}>{label}</FieldLabel>
       <input type="hidden" name={name} value={picked?.id ?? ""} readOnly />
 
-      <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3">
+      <div className="overflow-hidden rounded-lg border border-border bg-card">
         {picked ? (
-          <Thumb item={picked} type={type} className="size-16 shrink-0 rounded-md bg-secondary object-cover" />
-        ) : (
-          <span className="flex size-16 shrink-0 items-center justify-center rounded-md bg-secondary text-muted-foreground">
-            <Placeholder className="size-5" />
-          </span>
-        )}
+          <div className="flex justify-center border-b border-border bg-secondary p-3">
+            <Thumb item={picked} type={type} width={960} className="max-h-64 w-auto rounded object-contain" />
+          </div>
+        ) : null}
 
-        <div className="min-w-0 flex-1">
-          {picked ? (
-            <>
-              <p className="truncate text-sm font-medium">{picked.filename}</p>
-              {type === "video" || picked.altText ? null : (
-                <p className="text-xs font-medium text-destructive">This image has no description yet.</p>
-              )}
-            </>
-          ) : (
-            <p className="text-sm text-muted-foreground">Nothing chosen.</p>
+        <div className="flex items-center gap-3 p-3">
+          {picked ? null : (
+            <span className="flex size-16 shrink-0 items-center justify-center rounded-md bg-secondary text-muted-foreground">
+              <Placeholder className="size-5" />
+            </span>
           )}
-        </div>
 
-        <div className="flex shrink-0 items-center gap-1.5">
-          <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
-            {picked ? "Replace" : "Choose"}
-          </Button>
-          {picked ? (
-            <Button type="button" variant="ghost" size="icon-sm" onClick={() => choose(null)} title="Remove">
-              <Trash2 />
-              <span className="sr-only">Remove</span>
+          <div className="min-w-0 flex-1">
+            {picked ? (
+              <>
+                {/* What the picture shows is what the user recognises. The file name is a detail. */}
+                <p className="truncate text-sm font-medium">{picked.altText || picked.filename}</p>
+                {picked.altText ? (
+                  <p className="truncate text-xs text-muted-foreground">{picked.filename}</p>
+                ) : type === "video" ? null : (
+                  <p className="text-xs font-medium text-destructive">This image has no description yet.</p>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground">Nothing chosen.</p>
+            )}
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1.5">
+            <Button type="button" variant="outline" size="sm" onClick={() => setOpen(true)}>
+              {picked ? "Replace" : type === "video" ? "Choose video" : "Choose image"}
             </Button>
-          ) : null}
+            {picked ? (
+              <Button type="button" variant="ghost" size="icon-sm" onClick={() => choose(null)} title="Remove">
+                <Trash2 />
+                <span className="sr-only">Remove</span>
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
 

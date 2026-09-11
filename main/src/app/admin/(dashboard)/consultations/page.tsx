@@ -14,9 +14,12 @@ import {
 } from "@/components/shared/admin/list-ui";
 import { Button } from "@/components/ui/admin/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
-import { ConfirmConsultation, ConsultationDetails } from "@/features/leads/components/consultation-details";
+import {
+  AppointmentSlot,
+  ConfirmConsultation,
+  ConsultationDetails,
+} from "@/features/leads/components/consultation-details";
 import { LeadFilters } from "@/features/leads/components/lead-filters";
-import { dateLabel, timeLabel } from "@/features/leads/components/lead-format";
 import { listConsultations, PAGE_SIZE, type LeadFilters as Filters } from "@/features/leads/queries";
 
 export const dynamic = "force-dynamic";
@@ -91,15 +94,24 @@ export default async function ConsultationsPage({
             {rows.map((row) => (
               <li key={row.id} className="rounded-lg border bg-card p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <span className="font-medium">{row.fullName}</span>
+                  <AppointmentSlot date={row.preferredDate} time={row.preferredTime} />
                   <StatusBadge status={row.status} />
                 </div>
-                <p className="mt-1 text-sm">
-                  {dateLabel(row.preferredDate)} at {timeLabel(row.preferredTime)}
-                </p>
+                <p className="mt-3 font-medium">{row.fullName}</p>
                 <p className="text-sm text-muted-foreground">
                   {[row.office, row.service].filter(Boolean).join(" · ") || "Office not set"}
                 </p>
+                <a className="mt-1 block text-sm underline underline-offset-4" href={`mailto:${row.email}`}>
+                  {row.email}
+                </a>
+                {row.phone ? (
+                  <a
+                    className="block text-sm underline underline-offset-4"
+                    href={`tel:${row.phone.replace(/\s+/g, "")}`}
+                  >
+                    {row.phone}
+                  </a>
+                ) : null}
                 {row.clashes ? (
                   <p className="mt-2">
                     <FlatBadge variant="warning">Another request wants this slot</FlatBadge>
@@ -117,12 +129,10 @@ export default async function ConsultationsPage({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden lg:table-cell">Office</TableHead>
-                  <TableHead className="hidden lg:table-cell">Service</TableHead>
-                  <TableHead>Preferred date</TableHead>
-                  <TableHead>Preferred time</TableHead>
-                  <TableHead className="hidden xl:table-cell">Contact</TableHead>
+                  <TableHead>When</TableHead>
+                  <TableHead>Who</TableHead>
+                  <TableHead className="hidden md:table-cell">Office</TableHead>
+                  <TableHead className="hidden md:table-cell">Service</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -130,26 +140,32 @@ export default async function ConsultationsPage({
               <TableBody>
                 {rows.map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell className="font-medium">
-                      {row.fullName}
+                    <TableCell>
+                      <AppointmentSlot date={row.preferredDate} time={row.preferredTime} />
+                    </TableCell>
+                    <TableCell>
+                      <span className="block font-medium">{row.fullName}</span>
+                      <a className="block text-xs underline underline-offset-4" href={`mailto:${row.email}`}>
+                        {row.email}
+                      </a>
+                      {row.phone ? (
+                        <a
+                          className="block text-xs underline underline-offset-4"
+                          href={`tel:${row.phone.replace(/\s+/g, "")}`}
+                        >
+                          {row.phone}
+                        </a>
+                      ) : null}
                       {row.clashes ? (
                         <span className="mt-1 block">
                           <FlatBadge variant="warning">Another request wants this slot</FlatBadge>
                         </span>
                       ) : null}
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">
+                    <TableCell className="hidden md:table-cell">
                       {row.office ? <FlatBadge>{row.office}</FlatBadge> : <Muted>Not set</Muted>}
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">{row.service ?? <Muted>Not set</Muted>}</TableCell>
-                    <TableCell className="whitespace-nowrap">{dateLabel(row.preferredDate)}</TableCell>
-                    <TableCell className="whitespace-nowrap">{timeLabel(row.preferredTime)}</TableCell>
-                    <TableCell className="hidden xl:table-cell">
-                      <span className="block text-xs text-muted-foreground">{row.email}</span>
-                      {row.phone ? (
-                        <span className="block text-xs text-muted-foreground">{row.phone}</span>
-                      ) : null}
-                    </TableCell>
+                    <TableCell className="hidden md:table-cell">{row.service ?? <Muted>Not set</Muted>}</TableCell>
                     <TableCell>
                       <StatusBadge status={row.status} />
                     </TableCell>

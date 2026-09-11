@@ -6,7 +6,9 @@ import { Separator } from "@/components/ui/admin/separator";
 export function Sidebar({ actor }: { actor: Actor }) {
   return (
     <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col self-start overflow-hidden border-r border-border bg-sidebar text-sidebar-foreground lg:flex">
-      <div className="shrink-0 px-5 pb-4 pt-5">
+      {/* h-16 matches the topbar, or the separator below and the topbar border sit at
+          different heights across the seam. */}
+      <div className="flex h-16 shrink-0 items-center px-5">
         <Link href="/admin" aria-label="Goodluck admin dashboard">
           <img src="/brand/logo.png" alt="Goodluck" className="h-8 w-auto max-w-full object-contain object-left" />
         </Link>

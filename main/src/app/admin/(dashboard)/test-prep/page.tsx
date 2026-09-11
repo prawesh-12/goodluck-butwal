@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import { requireActor } from "@/lib/auth/session";
 import { allow } from "@/lib/auth/guard";
@@ -7,21 +6,9 @@ import { FilterBar } from "@/components/shared/admin/filter-bar";
 import { PageHeader } from "@/components/shared/admin/page-header";
 import { EmptyState } from "@/components/shared/admin/states";
 import { TestPrepTabs } from "@/features/test-prep/components/section-tabs";
-import { listAdminCourses, PAGE_SIZE } from "@/features/test-prep/admin-queries";
-import { TEST_LABEL } from "@/features/test-prep/schedule";
-import { Button } from "@/components/ui/admin/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/admin/table";
-import {
-  DataCard,
-  EditLink,
-  FlatBadge,
-  Muted,
-  NewButton,
-  Pager,
-  ResultCount,
-  StatusBadge,
-  ViewSiteLink,
-} from "@/components/shared/admin/list-ui";
+import { CourseCard } from "@/features/test-prep/components/course-card";
+import { batchesPerCourse, listAdminCourses, PAGE_SIZE } from "@/features/test-prep/admin-queries";
+import { NewButton, Pager, ResultCount } from "@/components/shared/admin/list-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +32,10 @@ export default async function TestPrepListPage({
   allow(actor, "testPrep", "read");
 
   const params = await searchParams;
-  const { rows, total, page } = await listAdminCourses(actor, { ...params, page: Number(params.page ?? 1) });
+  const [{ rows, total, page }, batches] = await Promise.all([
+    listAdminCourses(actor, { ...params, page: Number(params.page ?? 1) }),
+    batchesPerCourse(),
+  ]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const filtered = Boolean(params.q || params.status || params.testType);
 
@@ -87,48 +77,11 @@ export default async function TestPrepListPage({
               />
             )
           ) : (
-            <DataCard>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Course</TableHead>
-                    <TableHead>Classes</TableHead>
-                    <TableHead>Fee</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.id}>
-                      <TableCell>
-                        <span className="flex items-center gap-2">
-                          <span className="font-medium">{row.name}</span>
-                          <FlatBadge variant="outline">{TEST_LABEL[row.testType]}</FlatBadge>
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="link" size="sm" asChild className="h-auto px-0">
-                          <Link href={`/admin/test-prep/batches?course=${row.id}`}>See the batches</Link>
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        {row.fee ? `${row.feeCurrency} ${row.fee}` : <Muted>Not set</Muted>}
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge status={row.status} />
-                      </TableCell>
-                      <TableCell>
-                        <span className="flex items-center justify-end gap-1">
-                          <ViewSiteLink href={`/test-preparation/${row.slug}`} />
-                          <EditLink href={`/admin/test-prep/${row.id}`} />
-                        </span>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </DataCard>
+            <div className="space-y-3">
+              {rows.map((row) => (
+                <CourseCard key={row.id} course={row} batches={batches.get(row.id) ?? 0} actor={actor} />
+              ))}
+            </div>
           )}
 
           <div className="flex items-center justify-between gap-4">

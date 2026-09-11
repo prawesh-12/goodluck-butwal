@@ -5,6 +5,7 @@ import { requireActor } from "@/lib/auth/session";
 import { allow, allowOwn } from "@/lib/auth/guard";
 import { can } from "@/lib/auth/rbac";
 import { EditorHeader } from "@/components/shared/admin/page-header";
+import { formatDate } from "@/lib/utils/datetime";
 import { FlatBadge, StatusBadge, ViewSiteLink } from "@/components/shared/admin/list-ui";
 import { BatchEditor } from "@/features/test-prep/components/batch-editor";
 import { seatLabel } from "@/features/test-prep/seats";
@@ -34,16 +35,19 @@ export default async function EditBatchPage({ params }: { params: Promise<{ id: 
           <>
             <StatusBadge status={seatLabel(row).toLowerCase().replace(/ /g, "_")} />
             <FlatBadge variant="outline">{row.courseName}</FlatBadge>
+            <span className="text-sm text-muted-foreground">Starts {formatDate(row.startDate)}</span>
           </>
         }
         actions={
           <>
-            <Button variant="outline" asChild>
-              <Link href={`/admin/test-prep/registrations?batch=${row.id}`}>
-                <Users />
-                Registrations
-              </Link>
-            </Button>
+            {can(actor, "registrations", "read") ? (
+              <Button variant="outline" asChild>
+                <Link href={`/admin/test-prep/registrations?batch=${row.id}`}>
+                  <Users />
+                  Registrations
+                </Link>
+              </Button>
+            ) : null}
             <ViewSiteLink href={`/test-preparation/${row.courseSlug}`} />
           </>
         }

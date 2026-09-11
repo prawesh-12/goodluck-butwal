@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { SelectField, TextAreaField } from "@/components/shared/admin/fields";
 import { SectionCard } from "@/components/shared/admin/editor-shell";
 import { statusLabel } from "@/components/shared/admin/list-ui";
+import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { useAction } from "@/components/shared/admin/use-action";
 import { Button } from "@/components/ui/admin/button";
 import { updateEnquiry } from "@/features/leads/actions";
@@ -52,7 +53,9 @@ export function EnquiryEditor({ id, status, notes }: { id: string; status: strin
   };
 
   return (
-    <SectionCard title="Handling">
+    <SectionCard title="Status">
+      <UnsavedGuard dirty={dirty} />
+
       <SelectField
         name="status"
         label="Status"

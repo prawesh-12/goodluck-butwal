@@ -118,7 +118,7 @@ export default async function EnquiriesPage({
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Contact</TableHead>
-                  <TableHead className="hidden lg:table-cell">Destination</TableHead>
+                  <TableHead className="hidden md:table-cell">Destination</TableHead>
                   <TableHead className="hidden md:table-cell">Service</TableHead>
                   <TableHead>Submitted</TableHead>
                   <TableHead>Status</TableHead>
@@ -130,12 +130,19 @@ export default async function EnquiriesPage({
                   <TableRow key={row.id}>
                     <TableCell className="font-medium">{row.fullName}</TableCell>
                     <TableCell>
-                      <span className="block text-xs text-muted-foreground">{row.email}</span>
+                      <a className="block text-xs underline underline-offset-4" href={`mailto:${row.email}`}>
+                        {row.email}
+                      </a>
                       {row.phone ? (
-                        <span className="block text-xs text-muted-foreground">{row.phone}</span>
+                        <a
+                          className="block text-xs underline underline-offset-4"
+                          href={`tel:${row.phone.replace(/\s+/g, "")}`}
+                        >
+                          {row.phone}
+                        </a>
                       ) : null}
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">
+                    <TableCell className="hidden md:table-cell">
                       {row.destination ?? <Muted>Not given</Muted>}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">{row.service ?? <Muted>Not given</Muted>}</TableCell>

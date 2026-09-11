@@ -41,6 +41,18 @@ export default async function EditInstitutionPage({ params }: { params: Promise<
         media={media}
         destinations={destinations}
         courses={courses}
+        gallery={
+          <InstitutionGallery
+            institutionId={row.id}
+            canEdit={can(actor, "institutions", "update")}
+            rows={gallery.map((item) => ({
+              id: item.id,
+              mediaId: item.mediaId,
+              caption: item.caption ?? "",
+              media: item.media,
+            }))}
+          />
+        }
         value={{
           id: row.id,
           slug: row.slug,
@@ -56,17 +68,6 @@ export default async function EditInstitutionPage({ params }: { params: Promise<
           status: row.status,
           sortOrder: row.sortOrder,
         }}
-      />
-
-      <InstitutionGallery
-        institutionId={row.id}
-        canEdit={can(actor, "institutions", "update")}
-        rows={gallery.map((item) => ({
-          id: item.id,
-          mediaId: item.mediaId,
-          caption: item.caption ?? "",
-          media: item.media,
-        }))}
       />
     </div>
   );

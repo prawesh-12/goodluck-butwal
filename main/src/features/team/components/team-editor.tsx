@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { X } from "lucide-react";
 import { createTeamMember, deleteTeamMember, updateTeamMember } from "@/features/team/actions";
 import { MediaPicker, type PickedMedia } from "@/features/media/components/media-picker";
 import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
@@ -10,6 +9,7 @@ import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
 import { focusFirstError, useAction } from "@/components/shared/admin/use-action";
 import {
+  ChipField,
   FieldShell,
   SelectField,
   SwitchField,
@@ -18,9 +18,7 @@ import {
   type OfficeOption,
 } from "@/components/shared/admin/fields";
 import { StatusBadge } from "@/components/shared/admin/list-ui";
-import { Badge } from "@/components/ui/admin/badge";
 import { Button } from "@/components/ui/admin/button";
-import { Input } from "@/components/ui/admin/input";
 
 export type TeamValues = {
   id: string;
@@ -162,6 +160,7 @@ export function TeamEditor({
             name="fullName"
             label="Full name"
             value={form.fullName}
+            required
             onChange={(value) => set("fullName", value)}
             error={errors.fullName?.[0]}
           />
@@ -182,20 +181,20 @@ export function TeamEditor({
             options={offices.map((office) => ({ value: office.id, label: office.name }))}
             error={errors.officeId?.[0]}
           />
-          <TextField
-            name="slug"
-            label="URL slug"
-            help="Used in the page address. Leave it empty and it is made from the name."
-            value={form.slug}
-            onChange={(value) => set("slug", value)}
-            error={errors.slug?.[0]}
-          />
           <MediaPicker
             label="Photo"
             name="photoId"
             value={photo}
             type="image"
             onChange={(id) => set("photoId", id ?? "")}
+          />
+          <TextField
+            name="slug"
+            label="URL slug"
+            help="Leave it empty and the address is made from the name."
+            value={form.slug}
+            onChange={(value) => set("slug", value)}
+            error={errors.slug?.[0]}
           />
         </SectionCard>
 
@@ -208,14 +207,14 @@ export function TeamEditor({
             onChange={(value) => set("bioHtml", value)}
             error={errors.bioHtml?.[0]}
           />
-          <TagField
+          <ChipField
             name="qualifications"
             label="Qualifications"
             placeholder="MARA 1234567"
             values={form.qualifications}
             onChange={(next) => set("qualifications", next)}
           />
-          <TagField
+          <ChipField
             name="expertise"
             label="Areas of expertise"
             placeholder="Student visas"
@@ -278,64 +277,5 @@ export function TeamEditor({
         }
       />
     </form>
-  );
-}
-
-function TagField({
-  name,
-  label,
-  placeholder,
-  values,
-  onChange,
-}: {
-  name: string;
-  label: string;
-  placeholder: string;
-  values: string[];
-  onChange: (next: string[]) => void;
-}) {
-  const [draft, setDraft] = useState("");
-
-  const add = () => {
-    const value = draft.trim();
-    setDraft("");
-    if (!value || values.includes(value)) return;
-    onChange([...values, value]);
-  };
-
-  return (
-    <FieldShell name={name} label={label} help="Press Enter after each one.">
-      <div className="space-y-2">
-        <Input
-          value={draft}
-          placeholder={placeholder}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key !== "Enter" && event.key !== ",") return;
-            // Enter inside a form would submit it, and a comma is how people type lists.
-            event.preventDefault();
-            add();
-          }}
-          onBlur={add}
-        />
-        {values.length > 0 ? (
-          <div className="flex flex-wrap gap-1.5">
-            {values.map((value) => (
-              <Badge key={value} variant="secondary" className="gap-1">
-                {value}
-                <button
-                  type="button"
-                  className="text-muted-foreground hover:text-foreground"
-                  onClick={() => onChange(values.filter((item) => item !== value))}
-                >
-                  <X className="size-3" />
-                  <span className="sr-only">Remove {value}</span>
-                </button>
-              </Badge>
-            ))}
-          </div>
-        ) : null}
-      </div>
-    </FieldShell>
   );
 }

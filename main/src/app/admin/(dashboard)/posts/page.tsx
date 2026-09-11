@@ -161,7 +161,7 @@ export default async function PostsPage({
                       </TableCell>
                       <TableCell>
                         <span className="flex items-center justify-end gap-1">
-                          <ViewSiteLink href={`/news/${row.slug}`} />
+                          {row.status === "published" ? <ViewSiteLink href={`/news/${row.slug}`} /> : null}
                           <EditLink href={`/admin/posts/${row.id}`} />
                         </span>
                       </TableCell>

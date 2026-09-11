@@ -98,7 +98,7 @@ export function CourseImportForm({ columns, separator }: { columns: string; sepa
         <Alert variant="destructive">
           <AlertTitle>Nothing was imported</AlertTitle>
           <AlertDescription>
-            <p>One bad row stops the whole file. Fix these and check it again.</p>
+            <p>One bad line stops the whole file. Fix these and check it again.</p>
             <ul className="list-disc space-y-1 pl-4">
               {problems.map((problem) => (
                 <li key={`${problem.row}-${problem.message}`}>{problem.message}</li>
@@ -118,7 +118,7 @@ export function CourseImportForm({ columns, separator }: { columns: string; sepa
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Row</TableHead>
+                  <TableHead>Line</TableHead>
                   <TableHead>Course</TableHead>
                   <TableHead>Institution</TableHead>
                   <TableHead className="hidden md:table-cell">Qualification</TableHead>

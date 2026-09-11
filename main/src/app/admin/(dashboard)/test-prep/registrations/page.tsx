@@ -32,7 +32,7 @@ export default async function RegistrationsPage({
     batchOptions(),
   ]);
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const filtered = Boolean(params.q || params.batch || params.status || params.from || params.to);
+  const filtered = Boolean(params.q || params.course || params.batch || params.status || params.from || params.to);
 
   // The download runs the filters that are on screen, so it never reaches further than the list.
   const query = new URLSearchParams(

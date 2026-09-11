@@ -10,7 +10,7 @@ import { pickedMedia } from "@/features/media/admin-queries";
 import { getAdminEvent, officeZones } from "@/features/events/admin-queries";
 import { seatsTaken } from "@/features/events/queries";
 import { EditorHeader } from "@/components/shared/admin/page-header";
-import { FlatBadge, StatusBadge, ViewSiteLink } from "@/components/shared/admin/list-ui";
+import { FlatBadge, StatusBadge } from "@/components/shared/admin/list-ui";
 import { eventTypeLabels } from "@/config/content-meta";
 import { Button } from "@/components/ui/admin/button";
 
@@ -48,15 +48,12 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
           </>
         }
         actions={
-          <>
-            <Button variant="outline" asChild>
-              <Link href={`/admin/events/${event.id}/registrations`}>
-                <Users />
-                Registrations
-              </Link>
-            </Button>
-            <ViewSiteLink href={`/events/${event.slug}`} />
-          </>
+          <Button variant="outline" asChild>
+            <Link href={`/admin/events/${event.id}/registrations`}>
+              <Users />
+              View registrations
+            </Link>
+          </Button>
         }
       />
 

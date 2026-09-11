@@ -17,9 +17,14 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <Sidebar actor={actor} />
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar name={name ?? "Signed in"} actor={actor} />
-          <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          <main className="mx-auto w-full max-w-[1400px] flex-1 space-y-6 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
         </div>
-        <Toaster position="bottom-right" richColors closeButton />
+        {/* Below the topbar, so a toast never lands on View website or the account menu. */}
+        <Toaster
+          position="top-right"
+          offset={{ top: "84px", right: "24px" }}
+          mobileOffset={{ top: "72px", right: "16px", left: "16px" }}
+        />
       </div>
     </TooltipProvider>
   );

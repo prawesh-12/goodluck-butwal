@@ -66,8 +66,8 @@ export function Dropdown({
 
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
-  // Rows sit inside .admin-table, which clips its corners, so the list is positioned against the
-  // viewport instead of the trigger to escape that.
+  // A trigger can sit inside a container that clips its overflow, so the list is positioned
+  // against the viewport rather than the trigger to escape it.
   const [box, setBox] = useState({ top: 0, left: 0, width: 0 });
 
   const triggerRef = useRef<HTMLButtonElement>(null);

@@ -8,6 +8,7 @@ test("names every thing still using the file", () => {
     { kind: "News banner", label: "Visa Guide" },
   ]);
   expect(block.more).toBe(0);
+  expect(block.message).toBe("It is currently used by:");
 });
 
 test("keeps the count of the uses it was not told the names of", () => {

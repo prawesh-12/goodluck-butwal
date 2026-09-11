@@ -13,7 +13,7 @@ export const PAGE_SIZE = 25;
 
 export type CourseFilters = { q?: string; status?: string; testType?: string; page?: number };
 export type BatchFilters = { q?: string; course?: string; status?: string; mode?: string; page?: number };
-export type RegistrationFilters = { q?: string; batch?: string; status?: string; from?: string; to?: string; page?: number };
+export type RegistrationFilters = { q?: string; course?: string; batch?: string; status?: string; from?: string; to?: string; page?: number };
 
 function combine(parts: (SQL | undefined)[]) {
   const defined = parts.filter(Boolean) as SQL[];
@@ -52,6 +52,16 @@ export async function listAdminCourses(actor: Actor, f: CourseFilters) {
   ]);
 
   return { rows, total: total.n, page };
+}
+
+// The course list names how many classes each course runs, so one grouped count answers the whole
+// page rather than a query per row.
+export async function batchesPerCourse() {
+  const rows = await db
+    .select({ courseId: testPrepBatches.courseId, n: count() })
+    .from(testPrepBatches)
+    .groupBy(testPrepBatches.courseId);
+  return new Map(rows.map((row) => [row.courseId, row.n]));
 }
 
 export async function getAdminCourse(id: string) {
@@ -197,6 +207,9 @@ function registrationWhere(actor: Actor, f: RegistrationFilters) {
           ilike(testPrepRegistrations.phone, `%${f.q}%`),
         )
       : undefined,
+    // The course list offers Registrations per course, and a registration reaches its course
+    // through the batch this query already joins.
+    f.course ? eq(testPrepBatches.courseId, f.course) : undefined,
     f.batch ? eq(testPrepRegistrations.batchId, f.batch) : undefined,
     f.status ? eq(testPrepRegistrations.status, f.status as "registered") : undefined,
     f.from ? gte(testPrepRegistrations.createdAt, new Date(f.from)) : undefined,

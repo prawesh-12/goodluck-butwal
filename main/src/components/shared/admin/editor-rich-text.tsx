@@ -163,11 +163,15 @@ export default function RichText({
   help,
   value,
   onChange,
+  // A news body is the whole point of its page and wants room; entry requirements on a course
+  // do not. The caller knows which it is.
+  minHeight = "min-h-80",
 }: {
   label?: string;
   help?: string;
   value: string;
   onChange: (html: string) => void;
+  minHeight?: string;
 }) {
   const editor = useEditor({
     immediatelyRender: false,
@@ -187,7 +191,7 @@ export default function RichText({
     ],
     editorProps: {
       attributes: {
-        class: "article min-h-80 max-w-[70ch] px-4 py-3 focus:outline-none",
+        class: `article ${minHeight} max-w-[70ch] px-4 py-3 focus:outline-none`,
       },
     },
     onUpdate: ({ editor: current }) => onChange(current.getHTML()),

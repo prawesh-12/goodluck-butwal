@@ -42,11 +42,11 @@ test("publish validation names every missing field", () => {
     { ...ready, excerpt: "", bodyHtml: "", categoryId: "", bannerImageId: "" },
     {},
   );
-  expect(problems).toEqual(["Excerpt", "Body", "Category", "Banner image"]);
+  expect(problems).toEqual(["Summary", "Body", "Category", "Image"]);
 });
 
 test("publishing is blocked while the banner image has no alt text", () => {
-  expect(postPublishProblems(ready, { banner: null })).toEqual(["Alt text on the banner image"]);
+  expect(postPublishProblems(ready, { banner: null })).toEqual(["A description for the image"]);
 });
 
 test("an image in the body without alt text is named", () => {
@@ -54,7 +54,7 @@ test("an image in the body without alt text is named", () => {
     { ...ready, bodyHtml: '<p>Text</p><img src="/images/news/fair.jpg">' },
     { banner: "Students on campus" },
   );
-  expect(problems).toEqual(["Alt text on fair.jpg in the body"]);
+  expect(problems).toEqual(["A description for fair.jpg in the body"]);
 });
 
 test("an image in the body with alt text passes", () => {

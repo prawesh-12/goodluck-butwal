@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { ExternalLink } from "lucide-react";
 import { EXCERPT_MAX } from "@/config/content-meta";
 import { slugify } from "@/lib/utils/slug";
 import { archivePost, createPost, updatePost } from "@/features/posts/actions";
@@ -11,7 +10,7 @@ import { MediaPicker, type PickedMedia } from "@/features/media/components/media
 import type { EditorialOptions } from "@/features/posts/admin-queries";
 import { Button } from "@/components/ui/admin/button";
 import { ConfirmDialog } from "@/components/shared/admin/confirm-dialog";
-import { EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
+import { AdvancedSection, EditorActionBar, EditorLayout, SectionCard } from "@/components/shared/admin/editor-shell";
 import { MultiSelectField, SelectField, TextAreaField, TextField } from "@/components/shared/admin/fields";
 import { ErrorState } from "@/components/shared/admin/states";
 import { UnsavedGuard } from "@/components/shared/admin/unsaved-guard";
@@ -77,6 +76,7 @@ export function PostForm({
   };
 
   const goingLive = form.status === "published" && !live;
+  // A slug problem is unreachable while the section is shut, so an error opens it.
 
   const persist = async () => {
     const payload = {
@@ -127,6 +127,8 @@ export function PostForm({
     ? publishableStatuses
     : publishableStatuses.filter((status) => status.value !== "published");
 
+  const visibility = form.status === "published" ? "Visible on the website" : "Not visible on the website";
+
   return (
     <form
       className="space-y-6"
@@ -150,20 +152,11 @@ export function PostForm({
               onChange={(value) => set("status", value)}
               options={statuses}
               error={errors.status?.[0]}
-              help={canPublish ? undefined : "You can save drafts. An admin puts the article on the website."}
+              help={canPublish ? visibility : `${visibility}. An admin can publish it.`}
             />
 
             {errors.publish?.length ? (
               <ErrorState title="This cannot go live yet" description={errors.publish.join(" ")} />
-            ) : null}
-
-            {values.id && live ? (
-              <Button variant="outline" size="sm" asChild className="w-full">
-                <a href={`/news/${form.slug}`} target="_blank" rel="noreferrer">
-                  <ExternalLink />
-                  View on site
-                </a>
-              </Button>
             ) : null}
           </SectionCard>
         }
@@ -173,46 +166,40 @@ export function PostForm({
             name="title"
             label="Title"
             value={form.title}
+            required
             onChange={setTitle}
             error={errors.title?.[0]}
           />
 
-          <TextField
-            name="slug"
-            label="URL slug"
-            value={form.slug}
-            help="Used in the page address."
-            error={errors.slug?.[0]}
-            onChange={(value) => {
-              setSlugTouched(true);
-              set("slug", value);
-            }}
-          />
-
           <TextAreaField
             name="excerpt"
-            label="Excerpt"
+            label="Summary"
             rows={3}
             value={form.excerpt}
             hint={`${form.excerpt.length} / ${EXCERPT_MAX}`}
             error={errors.excerpt?.[0]}
             onChange={(value) => set("excerpt", value)}
           />
+        </SectionCard>
 
-          <RichText label="Body" value={values.bodyHtml} onChange={(value) => set("bodyHtml", value)} />
+        <SectionCard title="Body">
+          <RichText
+            value={values.bodyHtml}
+            onChange={(value) => set("bodyHtml", value)}
+            minHeight="min-h-[32rem]"
+          />
         </SectionCard>
 
         <SectionCard title="Media">
           <MediaPicker
-            label="Banner image"
+            label="Image"
             name="bannerImageId"
             value={banner}
-            help="The wide picture at the top of the article."
             onChange={(id) => set("bannerImageId", id ?? "")}
           />
         </SectionCard>
 
-        <SectionCard title="Classification">
+        <SectionCard title="Article details">
           <div className="grid gap-5 sm:grid-cols-2">
             <SelectField
               name="categoryId"
@@ -269,6 +256,20 @@ export function PostForm({
             options={options.tags.map((tag) => ({ value: tag.id, label: tag.name }))}
           />
         </SectionCard>
+
+        <AdvancedSection open={Boolean(errors.slug?.[0])}>
+          <TextField
+            name="slug"
+            label="URL slug"
+            value={form.slug}
+            help="Used in the page address."
+            error={errors.slug?.[0]}
+            onChange={(value) => {
+              setSlugTouched(true);
+              set("slug", value);
+            }}
+          />
+        </AdvancedSection>
       </EditorLayout>
 
       <EditorActionBar
