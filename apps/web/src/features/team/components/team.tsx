@@ -3,7 +3,7 @@ import { PillButton } from "@/components/ui/button";
 import { Badge } from "@/components/ui/bits";
 import { loadText } from "@/features/site-text/queries";
 import type { PublicMember } from "@/features/team/queries";
-import { TeamGrid } from "@/features/team/components/team-grid";
+import { OfficeTeam } from "@/features/team/components/office-team";
 
 export async function Team({ team }: { team: PublicMember[] }) {
   const t = await loadText();
@@ -22,7 +22,7 @@ export async function Team({ team }: { team: PublicMember[] }) {
               </PillButton>
             </Appear>
           </div>
-          <TeamGrid team={team} />
+          <OfficeTeam team={team} />
         </div>
       </div>
     </section>
