@@ -45,7 +45,7 @@ export function Nav({ text }: { text: NavText }) {
               <Img src={gl.logo} alt="Goodluck Education and Migration" w={320} className="h-full w-auto object-contain" />
             </Link>
             <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
-              {nav.map((l) => {
+              {nav.filter((l) => !l.menuOnly).map((l) => {
                 const active = path === l.href || path.startsWith(l.href + "/");
                 return (
                   <Link key={l.href} href={l.href} className={`whitespace-nowrap rounded-full px-3 py-2 text-[16px] font-semibold leading-[20.8px] transition-colors duration-200 hover:bg-surface hover:text-ink ${active ? "bg-surface text-ink" : "text-muted"}`}>

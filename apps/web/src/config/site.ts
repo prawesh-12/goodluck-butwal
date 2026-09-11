@@ -68,15 +68,16 @@ export const social = [
   { label: "Instagram", href: "#", icon: "/images/social/instagram.webp" },
 ];
 
+// menuOnly: listed in the mobile menu but kept out of the header bar so it stays readable.
 export const nav = [
   { label: "About", href: "/about" },
   { label: "Study abroad", href: "/study-abroad" },
-  { label: "Institutions", href: "/institutions" },
+  { label: "Institutions", href: "/institutions", menuOnly: true },
   { label: "Services", href: "/services" },
   { label: "News", href: "/news" },
-  { label: "Events", href: "/events" },
+  { label: "Events", href: "/events", menuOnly: true },
   { label: "Contact", href: "/contact" },
-  { label: "Search", href: "/search" },
+  { label: "Search", href: "/search", menuOnly: true },
 ];
 
 export const footerLinks = {
@@ -96,6 +97,7 @@ export const footerLinks = {
     { label: "Services", href: "/services" },
     { label: "Success stories", href: "/success-stories" },
     { label: "FAQ", href: "/faq" },
+    { label: "Search", href: "/search" },
     { label: "News", href: "/news" },
     { label: "Contact", href: "/contact" },
     { label: "Book a consultation", href: "/contact/book-consultation" },
