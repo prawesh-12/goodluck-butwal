@@ -50,6 +50,9 @@ const nextConfig: NextConfig = {
     // Turns on forbidden(), the only way a page can answer with a real 403 status.
     authInterrupts: true,
   },
+  async redirects() {
+    return [{ source: "/about/company-profile", destination: "/company-profile", permanent: true }];
+  },
   async headers() {
     return [
       { source: "/images/:path*", headers: assetCache },

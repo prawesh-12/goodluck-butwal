@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { db } from "@goodluck/db";
 import { pages } from "@goodluck/db/schema";
 import { csrArt } from "@/config/assets";
@@ -70,4 +70,25 @@ export const getAboutContent = cache(async (): Promise<AboutContent> => {
     careersValues: careers.values.map((v) => ({ title: v.title, line: v.body })),
     staffVoices: careers.voices,
   };
+});
+
+// Registered particulars are not in the repo, so they live on the page row like the other about
+// content. The seeded values are placeholders until the client sends the real ones.
+export type ProfileBlocks = {
+  type: string;
+  registration_authority: string;
+  registration_no: string;
+  vat_no: string;
+  bank: string;
+  strategies: string[];
+  facilities: string;
+  associations: string;
+};
+
+export const getCompanyProfile = cache(async () => {
+  const [row] = await db
+    .select({ intro: pages.intro, blocks: pages.blocks })
+    .from(pages)
+    .where(and(eq(pages.slug, "company-profile"), eq(pages.status, "published")));
+  return row ? { intro: row.intro, ...(row.blocks as ProfileBlocks) } : undefined;
 });

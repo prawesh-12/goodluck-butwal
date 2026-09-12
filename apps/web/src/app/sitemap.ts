@@ -29,6 +29,7 @@ const fixed = [
   "/about/message-from-co-founders",
   "/about/corporate-social-responsibility",
   "/about/careers",
+  "/company-profile",
   "/study-abroad",
   "/institutions",
   "/courses",
