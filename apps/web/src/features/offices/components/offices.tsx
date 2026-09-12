@@ -8,26 +8,26 @@ import { Img } from "@/components/ui/img";
 const flags = ["/images/flags/australia.svg", "/images/flags/new-zealand.svg", "/images/flags/united-kingdom.svg"];
 const pathways = ["Entering & leaving from country", "Visas", "Country citizenship", "Settling in country", "Help & support"];
 
-// Sixteen partner logos fill the whole ring, 22.5° apart, so the orbit never shows a gap.
-const angles = Array.from({ length: 16 }, (_, i) => i * 22.5 - 90);
-
 // A logo on its own filled plate fills the tile so the circle crops it round. Matched with or
 // without an extension: the same logo is served from public/ by path and Cloudinary by id.
 const filled = (src: string) => /partner-04(?:\.|$)/.test(src);
 
-function Orbit({ radius, icon, box, ring }: { radius: number; icon: number; box: number; ring: string[] }) {
+// Logos are spread evenly from the top so the ring never shows a gap. Sizes are in px inside a
+// fixed box, or in % of the parent when the ring has to follow a phone's width.
+function Orbit({ radius, icon, box, ring, unit = "px" }: { radius: number; icon: number; box: number; ring: string[]; unit?: "px" | "%" }) {
+  const u = (n: number) => `${n}${unit}`;
   return (
-    <div aria-hidden className="absolute left-1/2 top-0 -translate-x-1/2" style={{ width: box, height: box }}>
+    <div aria-hidden className={unit === "px" ? "absolute left-1/2 top-0 -translate-x-1/2" : "absolute inset-0"} style={unit === "px" ? { width: box, height: box } : undefined}>
       {/* Dashed track under the logos. */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-ink/15" style={{ width: radius * 2, height: radius * 2 }} />
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-ink/15" style={{ width: u(radius * 2), height: u(radius * 2) }} />
       <div className="animate-orbit size-full">
-        {angles.map((a, i) => {
-          const rad = (a * Math.PI) / 180;
+        {ring.map((src, i) => {
+          const rad = ((i * 360) / ring.length - 90) * (Math.PI / 180);
           const x = box / 2 + radius * Math.sin(rad) - icon / 2;
           const y = box / 2 - radius * Math.cos(rad) - icon / 2;
           return (
-            <span key={a} className={`animate-orbit-back absolute flex items-center justify-center overflow-clip rounded-full bg-white shadow-[0_8px_20px_-8px_rgba(29,29,29,0.25)] ring-1 ring-hairline ${filled(ring[i]) ? "" : "p-3"}`} style={{ left: x, top: y, width: icon, height: icon }}>
-              <Img src={ring[i]} alt="" w={160} className={`size-full ${filled(ring[i]) ? "object-cover" : "object-contain"}`} loading="lazy" decoding="async" />
+            <span key={src} className={`animate-orbit-back absolute flex items-center justify-center overflow-clip rounded-full bg-white shadow-[0_8px_20px_-8px_rgba(29,29,29,0.25)] ring-1 ring-hairline ${filled(src) || unit === "%" ? "" : "p-3"}`} style={{ left: u(x), top: u(y), width: u(icon), height: u(icon) }}>
+              <Img src={src} alt="" w={160} className={filled(src) ? "size-full object-cover" : unit === "px" ? "size-full object-contain" : "size-[64%] object-contain"} loading="lazy" decoding="async" />
             </span>
           );
         })}
@@ -68,20 +68,34 @@ export async function Offices({ logos }: { logos: string[] }) {
               <PillButton href="/contact/book-consultation">{t("home.offices.cta", "Book a consultation")}</PillButton>
             </div>
             <div className="relative flex flex-col items-center gap-4 md:items-end">
-              <Img src={gl.plane} alt="" w={640} className="animate-float w-full max-w-[520px] object-contain drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)]" loading="lazy" decoding="async" />
-              <p className="flex items-center gap-[10px] rounded-full bg-white/10 py-[6px] pl-[6px] pr-4 text-[14px] font-medium text-white/85 ring-1 ring-inset ring-white/15 backdrop-blur-[6px]">
-                <span className="flex items-center">
+              <Img src={gl.plane} alt="" w={640} className="animate-float w-[82%] max-w-[520px] object-contain md:w-full drop-shadow-[0_30px_40px_rgba(0,0,0,0.45)]" loading="lazy" decoding="async" />
+              <p className="flex max-w-full items-center gap-[10px] rounded-full bg-white/10 py-[6px] pl-[6px] pr-4 text-[14px] font-medium text-white/85 ring-1 ring-inset ring-white/15 backdrop-blur-[6px]">
+                <span className="flex shrink-0 items-center">
                   {flags.map((f, i) => (
                     <Img key={f} src={f} alt="" w={64} className={`size-[26px] rounded-full ring-2 ring-[#1a1a1a] ${i ? "-ml-2" : ""}`} loading="lazy" decoding="async" />
                   ))}
                 </span>
-                {t("home.offices.destinations", "Australia, New Zealand and the UK")}
+                <span className="min-w-0">{t("home.offices.destinations", "Australia, New Zealand and the UK")}</span>
               </p>
             </div>
           </div>
-          <div className="relative z-0 flex h-[350px] w-full max-w-[1000px] flex-col items-center justify-center overflow-clip py-[50px] md:h-[400px] md:py-[120px] lg:h-[505px]">
-            <div className="md:hidden"><Orbit radius={345} icon={60} box={750} ring={ring} /></div>
-            <div className="hidden md:block"><Orbit radius={430} icon={80} box={940} ring={ring} /></div>
+          <div className="relative z-0 flex w-full flex-col items-center gap-[30px] md:hidden">
+            {/* Eight logos on a ring that follows the phone's width, so none is cut at the sides. */}
+            <div className="relative aspect-square w-full max-w-[340px]">
+              <Orbit radius={40} icon={18} box={100} unit="%" ring={ring.filter((_, i) => i % 2 === 0)} />
+              <span className="absolute inset-0 m-auto flex size-20 items-center justify-center rounded-full bg-white shadow-[0_12px_30px_rgba(29,29,29,0.18)]">
+                <span aria-hidden className="absolute -inset-4 rounded-full ring-1 ring-ink/10" />
+                <span aria-hidden className="absolute -inset-8 rounded-full ring-1 ring-ink/[0.06]" />
+                <Img src={gl.mark} alt="" w={160} className="size-[55%] object-contain" loading="lazy" decoding="async" />
+              </span>
+            </div>
+            <h3 className="t-h4 max-w-[300px] text-center">
+              {t("home.offices.claim.before", "Official representative of")} <span className="text-blue-deep">{t("home.offices.claim.count", "100+")}</span> {t("home.offices.claim.after", "colleges, universities and TAFE facilities")}
+            </h3>
+          </div>
+          <Img aria-hidden src={gl.campus} alt="" sizes="100vw" className="pointer-events-none -mx-5 -mb-5 w-[calc(100%+40px)] max-w-none object-contain md:hidden" loading="lazy" decoding="async" />
+          <div className="relative z-0 hidden h-[350px] w-full max-w-[1000px] flex-col items-center justify-center overflow-clip py-[50px] md:flex md:h-[400px] md:py-[120px] lg:h-[505px]">
+            <Orbit radius={430} icon={80} box={940} ring={ring} />
             <div className="relative mt-[40px] flex max-w-[520px] flex-col items-center gap-[10px] md:mt-[110px] md:gap-5 lg:gap-[30px]">
               <span className="relative flex size-20 items-center justify-center rounded-full bg-white shadow-[0_12px_30px_rgba(29,29,29,0.18)] md:size-[100px] lg:size-[130px]">
                 <span aria-hidden className="absolute -inset-4 rounded-full ring-1 ring-ink/10 md:-inset-6" />
@@ -93,7 +107,7 @@ export async function Offices({ logos }: { logos: string[] }) {
               </h3>
             </div>
           </div>
-          <Img aria-hidden src={gl.campus} alt="" sizes="100vw" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-0 z-[1] w-[calc(100%+20px)] max-w-none object-contain object-bottom" loading="lazy" decoding="async" />
+          <Img aria-hidden src={gl.campus} alt="" sizes="100vw" className="pointer-events-none absolute -left-[10px] -right-[10px] bottom-0 z-[1] hidden w-[calc(100%+20px)] max-w-none object-contain object-bottom md:block" loading="lazy" decoding="async" />
         </Appear>
       </div>
     </section>
