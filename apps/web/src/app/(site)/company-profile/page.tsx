@@ -14,7 +14,7 @@ import { Appear } from "@/components/ui/appear";
 import { Link } from "@/components/ui/link";
 import { InnerHero, SectionHead } from "@/components/shared/inner";
 import { Img } from "@/components/ui/img";
-import { Briefcase, Building2, CalendarDays, Clock, FileText, Globe, Landmark, Link as LinkIcon, Mail, MapPin, Phone, Receipt, UserRound, Users, type LucideIcon } from "lucide-react";
+import { Banknote, Briefcase, BriefcaseBusiness, Building2, CalendarDays, Clock, FileText, Globe, Landmark, Link as LinkIcon, Mail, MapPin, Phone, Receipt, UserRound, Users, type LucideIcon } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
@@ -55,17 +55,17 @@ export default async function CompanyProfilePage() {
   const staff = [...team].sort((a, b) => officeRank(a.office) - officeRank(b.office));
   const headcount = offices.map((o) => `${o.city} ${team.filter((m) => m.office === o.id).length}`).join(", ");
 
-  type Row = { label: string; value: ReactNode; icon?: LucideIcon; strong?: boolean };
+  type Row = { label: string; value: ReactNode; icon: LucideIcon; strong?: boolean };
   const groups: { title: string; rows: Row[] }[] = [
     {
       title: t("about.profile.group_registration", "Registration"),
       rows: [
-        { label: t("about.profile.label_name", "Name of the company"), value: company.name, strong: true },
-        { label: t("about.profile.label_type", "Type"), value: profile?.type },
-        { label: t("about.profile.label_authority", "Registration authority"), value: profile?.registration_authority, icon: Building2 },
+        { label: t("about.profile.label_name", "Name of the company"), value: company.name, icon: Building2, strong: true },
+        { label: t("about.profile.label_type", "Type"), value: profile?.type, icon: BriefcaseBusiness },
+        { label: t("about.profile.label_authority", "Registration authority"), value: profile?.registration_authority, icon: Landmark },
         { label: t("about.profile.label_registration", "Company registration no."), value: profile?.registration_no, icon: FileText, strong: true },
         { label: t("about.profile.label_vat", "VAT no."), value: profile?.vat_no, icon: Receipt, strong: true },
-        { label: t("about.profile.label_bank", "Official bank"), value: profile?.bank, icon: Landmark },
+        { label: t("about.profile.label_bank", "Official bank"), value: profile?.bank, icon: Banknote },
         { label: t("about.profile.label_associations", "Associated with"), value: profile?.associations, icon: Users },
       ],
     },
@@ -137,7 +137,7 @@ export default async function CompanyProfilePage() {
                       {group.rows.map((row) => (
                         <div key={row.label} className="grid gap-1 py-4 first:pt-0 last:pb-0 md:grid-cols-[240px_1fr] md:gap-[30px] md:py-5">
                           <dt className="t-base flex items-start gap-2 text-muted">
-                            {row.icon ? <Icon icon={row.icon} className="mt-[2px]" /> : <span className="w-4 shrink-0" />}
+                            <Icon icon={row.icon} className="mt-[2px]" />
                             {row.label}
                           </dt>
                           <dd className={`t-body max-w-[640px] text-ink ${row.strong ? "font-semibold" : ""}`}>{row.value}</dd>
