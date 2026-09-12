@@ -78,8 +78,6 @@ export default async function CompanyProfilePage() {
     {
       title: t("about.profile.group_contact", "Contact"),
       rows: [
-        { label: t("about.profile.label_address", "Address"), value: <Lines items={offices.map((o) => `${o.label}: ${o.address}`)} /> },
-        { label: t("about.profile.label_phone", "Contact no."), value: <Lines items={offices.map((o) => `${o.city}: ${o.phone}`)} /> },
         { label: t("about.profile.label_email", "E-mail"), value: company.email },
         { label: t("about.profile.label_website", "Website"), value: <Lines items={[company.url, ...social.map((s) => s.href)].map(host)} /> },
       ],
