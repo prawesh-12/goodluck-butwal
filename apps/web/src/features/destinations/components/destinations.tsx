@@ -49,8 +49,8 @@ export function DestinationCard({ cards, slug, phone, className = "", cta = "Boo
         </div>
         <div className="mt-auto flex items-center justify-between gap-3">
           {d.fact ? (
-            <p className="t-small inline-flex h-9 items-center gap-[6px] rounded-full bg-surface px-4 text-muted">
-              <span className="font-semibold text-ink">{d.fact[0]}</span> {d.fact[1].toLowerCase()}
+            <p className="t-small inline-flex min-h-9 min-w-0 items-center gap-[6px] rounded-full bg-surface px-4 py-[6px] text-muted">
+              <span className="whitespace-nowrap font-semibold text-ink">{d.fact[0]}</span> {d.fact[1].toLowerCase()}
             </p>
           ) : (
             <p className="t-small inline-flex h-9 items-center rounded-full bg-surface px-4 font-semibold text-ink">{cta}</p>
