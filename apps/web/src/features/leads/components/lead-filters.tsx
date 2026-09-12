@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/admin/button";
 import { Input } from "@/components/ui/admin/input";
 import { Label } from "@/components/ui/admin/label";
 
-// FilterBar only carries a search box and dropdowns. Both lead lists also filter on a date
-// range, so the two date inputs are added here rather than in the shared bar.
+// Both lead lists also filter on a date range, so the two date inputs go into the shared bar's
+// row after its dropdowns.
 export function LeadFilters({
   searchPlaceholder,
   filters,
@@ -44,43 +44,39 @@ export function LeadFilters({
   };
 
   return (
-    <div className="space-y-3">
-      <FilterBar searchPlaceholder={searchPlaceholder} filters={filters} />
-
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="lead-from" className="text-xs text-muted-foreground">
-            {fromLabel}
-          </Label>
-          <Input
-            id="lead-from"
-            type="date"
-            className="w-44"
-            value={from}
-            onChange={(event) => set("from", event.target.value)}
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="lead-to" className="text-xs text-muted-foreground">
-            {toLabel}
-          </Label>
-          <Input
-            id="lead-to"
-            type="date"
-            className="w-44"
-            value={to}
-            onChange={(event) => set("to", event.target.value)}
-          />
-        </div>
-
-        {from || to ? (
-          <Button variant="ghost" size="sm" onClick={clearDates}>
-            <X />
-            Clear dates
-          </Button>
-        ) : null}
+    <FilterBar searchPlaceholder={searchPlaceholder} filters={filters}>
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="lead-from" className="text-xs text-muted-foreground">
+          {fromLabel}
+        </Label>
+        <Input
+          id="lead-from"
+          type="date"
+          className="w-44"
+          value={from}
+          onChange={(event) => set("from", event.target.value)}
+        />
       </div>
-    </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="lead-to" className="text-xs text-muted-foreground">
+          {toLabel}
+        </Label>
+        <Input
+          id="lead-to"
+          type="date"
+          className="w-44"
+          value={to}
+          onChange={(event) => set("to", event.target.value)}
+        />
+      </div>
+
+      {from || to ? (
+        <Button variant="ghost" size="sm" onClick={clearDates}>
+          <X />
+          Clear dates
+        </Button>
+      ) : null}
+    </FilterBar>
   );
 }

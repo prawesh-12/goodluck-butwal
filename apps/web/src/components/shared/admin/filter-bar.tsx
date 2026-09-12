@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Badge } from "@/components/ui/admin/badge";
@@ -34,8 +34,10 @@ function FilterSelect({
   value: string;
   onChange: (value: string) => void;
 }) {
+  // A flex gap, not space-y: the select renders an invisible fixed input as its last child, so
+  // space-y put its margin under the trigger and the trigger sat higher than the search box.
   return (
-    <div className="space-y-1.5">
+    <div className="flex flex-col gap-1.5">
       <Label className="text-xs text-muted-foreground">{filter.label}</Label>
       <Select
         value={value === "" ? ANY : value}
@@ -62,9 +64,11 @@ function FilterSelect({
 export function FilterBar({
   searchPlaceholder = "Search...",
   filters = [],
+  children,
 }: {
   searchPlaceholder?: string;
   filters?: Filter[];
+  children?: ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -157,6 +161,8 @@ export function FilterBar({
             </Sheet>
           </>
         ) : null}
+
+        {children}
 
         {anything ? (
           <Button variant="ghost" size="sm" onClick={clear} className="shrink-0">
