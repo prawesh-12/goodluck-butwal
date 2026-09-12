@@ -45,8 +45,8 @@ export async function Offices({ logos }: { logos: string[] }) {
         <Appear className="relative flex w-full flex-col items-center gap-[30px] overflow-clip rounded-[10px] bg-surface p-5 md:gap-[50px] md:rounded-[30px] md:p-[50px] lg:p-[100px]">
           <div className="icon-dark relative z-[2] grid w-full items-center gap-[30px] overflow-clip rounded-[10px] p-5 md:grid-cols-[1.1fr_1fr] md:rounded-[20px] md:p-10 lg:p-[60px]">
             <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.13)_1px,transparent_1px)] bg-[size:22px_22px] [mask-image:radial-gradient(ellipse_at_center,#000_30%,transparent_75%)]" />
-            <div aria-hidden className="pointer-events-none absolute -right-[6%] top-[10%] size-[560px] rounded-full bg-blue/40 blur-[140px]" />
-            <div aria-hidden className="pointer-events-none absolute -bottom-[40%] left-[10%] size-[420px] rounded-full bg-white/10 blur-[120px]" />
+            <div aria-hidden className="pointer-events-none absolute right-[calc(-6%-360px)] top-[calc(10%-360px)] size-[1280px] bg-[radial-gradient(closest-side,rgba(59,130,246,0.38),rgba(59,130,246,0.34)_22%,rgba(59,130,246,0.2)_44%,rgba(59,130,246,0.064)_66%,rgba(59,130,246,0.009)_88%,transparent)]" />
+            <div aria-hidden className="pointer-events-none absolute bottom-[calc(-40%-360px)] left-[calc(10%-360px)] size-[1140px] bg-[radial-gradient(closest-side,rgba(255,255,255,0.078),rgba(255,255,255,0.04)_37%,rgba(255,255,255,0.016)_58%,rgba(255,255,255,0.002)_79%,transparent)]" />
             <div className="relative flex flex-col items-start gap-5 md:gap-[30px]">
               <div className="flex flex-col items-start gap-[10px]">
                 <Badge tone="white" className="ring-1 ring-hairline">{t("home.offices.badge", "Migration")}</Badge>
