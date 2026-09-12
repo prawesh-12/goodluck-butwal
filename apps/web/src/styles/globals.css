@@ -78,6 +78,8 @@
   h1, h2, h3, h4, h5 { font-family: var(--font-display); font-weight: 600; color: var(--color-ink); }
   h1, h2, h3, h4, h5, p { text-wrap: balance; }
   p { margin: 0; }
+  /* Tailwind v4 preflight dropped this */
+  button:not(:disabled), [role="button"]:not(:disabled), [role="option"]:not([aria-disabled="true"]) { cursor: pointer; }
   img { display: block; max-width: 100%; }
   button { font: inherit; color: inherit; }
 }
