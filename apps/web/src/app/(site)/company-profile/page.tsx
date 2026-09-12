@@ -104,15 +104,15 @@ export default async function CompanyProfilePage() {
         <div className="container-x">
           <div className="flex flex-col items-center gap-[30px] md:gap-10 lg:gap-[50px]">
             <SectionHead align="left" title={t("about.profile.details_title", "Company details")} />
-            <div className="grid w-full gap-5 md:grid-cols-2 md:gap-[30px] lg:grid-cols-3">
+            <div className="flex w-full flex-col gap-5 md:gap-[30px]">
               {groups.map((group, i) => (
-                <Appear key={group.title} delay={0.05 * i} className="flex flex-col gap-5 rounded-[20px] bg-surface p-5 md:rounded-[24px] md:p-[30px]">
-                  <h3 className="t-h4">{group.title}</h3>
+                <Appear key={group.title} delay={0.05 * i} className="grid gap-5 rounded-[20px] bg-surface p-5 md:rounded-[24px] md:p-[30px] lg:grid-cols-[300px_1fr] lg:gap-[60px] lg:p-10">
+                  <h3 className="t-h3">{group.title}</h3>
                   <dl className="divide-y divide-hairline">
                     {group.rows.map((row) => (
-                      <div key={row.label} className="flex flex-col gap-1 py-3 first:pt-0 last:pb-0">
-                        <dt className="t-small text-muted">{row.label}</dt>
-                        <dd className="t-body font-semibold text-ink">{row.value}</dd>
+                      <div key={row.label} className="grid gap-1 py-4 first:pt-0 last:pb-0 md:grid-cols-[240px_1fr] md:gap-[30px] md:py-5">
+                        <dt className="t-base text-muted">{row.label}</dt>
+                        <dd className="t-body text-ink">{row.value}</dd>
                       </div>
                     ))}
                   </dl>
