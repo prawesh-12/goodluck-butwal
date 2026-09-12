@@ -94,7 +94,7 @@ export default function LoginPage() {
     <Shell>
       <CardHeader>
         <CardTitle>Sign in</CardTitle>
-        <CardDescription>Goodluck admin. Your session lasts 7 days.</CardDescription>
+        <CardDescription>Goodluck admin.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-4">
