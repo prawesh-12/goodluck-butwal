@@ -25,18 +25,16 @@ export function Appear({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(false);
+  const [inView, setInView] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setShown(true);
-          if (once) observer.disconnect();
-        } else if (!once) {
-          setShown(false);
-        }
+        setInView(entry.isIntersecting);
+        if (entry.isIntersecting) setShown(true);
+        else if (!once) setShown(false);
       },
       { threshold: 0.05 },
     );
@@ -52,7 +50,7 @@ export function Appear({
   } as CSSProperties;
 
   return (
-    <div ref={ref} data-appear={shown ? "shown" : "hidden"} className={className} style={{ ...style, ...vars }}>
+    <div ref={ref} data-appear={shown ? "shown" : "hidden"} data-offscreen={inView ? undefined : ""} className={className} style={{ ...style, ...vars }}>
       {children}
     </div>
   );
