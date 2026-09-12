@@ -79,9 +79,9 @@ export default async function CompanyProfilePage() {
           label: t("about.profile.label_countries", "We recruit students in"),
           icon: Globe,
           value: (
-            <span className="flex flex-wrap gap-x-5 gap-y-2">
+            <span className="flex flex-wrap gap-x-4 gap-y-2">
               {destinations.map((d) => (
-                <span key={d.slug} className="inline-flex items-center gap-2">
+                <span key={d.slug} className="inline-flex items-center gap-2 whitespace-nowrap">
                   <Img src={d.flag} alt="" w={48} className="size-5 rounded-full ring-2 ring-white" loading="lazy" decoding="async" />
                   {d.name}
                 </span>
@@ -135,7 +135,7 @@ export default async function CompanyProfilePage() {
                     <h3 className="t-h3">{group.title}</h3>
                     <dl className="divide-y divide-hairline">
                       {group.rows.map((row) => (
-                        <div key={row.label} className="grid gap-1 py-4 first:pt-0 last:pb-0 md:grid-cols-[240px_1fr] md:gap-[30px] md:py-5">
+                        <div key={row.label} className="grid gap-2 py-5 first:pt-0 last:pb-0 md:grid-cols-[240px_1fr] md:gap-[30px]">
                           <dt className="t-base flex items-start gap-2 text-muted">
                             <Icon icon={row.icon} className="mt-[2px]" />
                             {row.label}
@@ -182,32 +182,29 @@ export default async function CompanyProfilePage() {
             <div className="flex flex-col gap-[30px] md:gap-10">
               <SectionHead align="left" title={t("about.profile.staff_title", "Staff")} lead={`${team.length} ${t("about.profile.staff_lead", "team members: {offices}").replace("{offices}", headcount)}`} />
               <Appear className="w-full overflow-x-auto rounded-[20px] ring-1 ring-hairline md:rounded-[24px]">
-                <table className="w-full border-collapse text-left">
-                  <thead>
+                <table className="block w-full border-collapse text-left md:table">
+                  <thead className="hidden md:table-header-group">
                     <tr className="bg-surface">
-                      <th className="t-small px-4 py-3 font-medium text-muted md:px-6">{t("about.profile.col_name", "Name")}</th>
-                      <th className="t-small px-4 py-3 font-medium text-muted md:px-6">{t("about.profile.col_position", "Position")}</th>
-                      <th className="t-small hidden px-4 py-3 font-medium text-muted md:table-cell md:px-6">{t("about.profile.col_office", "Office")}</th>
+                      <th className="t-small px-6 py-3 font-medium text-muted">{t("about.profile.col_name", "Name")}</th>
+                      <th className="t-small px-6 py-3 font-medium text-muted">{t("about.profile.col_position", "Position")}</th>
+                      <th className="t-small px-6 py-3 font-medium text-muted">{t("about.profile.col_office", "Office")}</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-hairline">
+                  <tbody className="block divide-y divide-hairline md:table-row-group">
                     {staff.map((member) => {
                       const office = officeOf(member.office);
                       return (
-                        <tr key={member.slug}>
-                          <td className="px-4 py-3 align-middle md:px-6">
-                            <Link href={`/team/${member.slug}`} className="t-base flex items-center gap-3 whitespace-nowrap text-ink underline-offset-4 hover:underline">
+                        <tr key={member.slug} className="block py-3 md:table-row md:py-0">
+                          <td className="block px-4 md:table-cell md:px-6 md:py-3 md:align-middle">
+                            <Link href={`/team/${member.slug}`} className="t-base flex items-center gap-3 font-semibold text-ink underline-offset-4 hover:underline">
                               <Img src={member.photo} alt="" w={80} className="size-10 shrink-0 rounded-full object-cover object-top" loading="lazy" decoding="async" />
-                              <span className="flex flex-col">
-                                <span className="font-semibold">{member.name}</span>
-                                {office && <span className="t-small text-muted md:hidden">{office.city}, {office.country}</span>}
-                              </span>
+                              {member.name}
                             </Link>
                           </td>
-                          <td className="t-base px-4 py-3 align-middle text-muted md:px-6">{member.role}</td>
-                          <td className="t-base hidden px-4 py-3 align-middle text-muted md:table-cell md:px-6">
+                          <td className="t-base block pl-[68px] pr-4 pt-[2px] text-muted md:table-cell md:px-6 md:py-3 md:align-middle">{member.role}</td>
+                          <td className="t-base block pl-[68px] pr-4 pt-1 text-muted md:table-cell md:px-6 md:py-3 md:align-middle">
                             {office && (
-                              <Detail icon={MapPin} center className="whitespace-nowrap">
+                              <Detail icon={MapPin} center>
                                 {office.city}, {office.country}
                               </Detail>
                             )}
