@@ -2,6 +2,7 @@
 
 import { Link } from "@/components/ui/link";
 import { SocialLinks } from "@/components/ui/bits";
+import { PillButton } from "@/components/ui/button";
 import { gl, img } from "@/config/assets";
 import { company } from "@/config/site";
 import type { FooterColumn, SocialLink } from "@/features/settings/queries";
@@ -46,11 +47,15 @@ export function Footer({ columns, socials, text }: { columns: FooterColumn[]; so
               <div key={title} className="flex flex-col items-start gap-5 md:gap-6">
                 <p className={heading}>{title}</p>
                 <div className="flex flex-col items-start gap-4 md:gap-5">
-                  {links.map((l) => (
-                    <Link key={l.href} href={l.href} className="t-base text-ink/75 transition-colors hover:text-ink">
-                      {l.label}
-                    </Link>
-                  ))}
+                  {links.map((l) =>
+                    l.href === "/company-profile" ? (
+                      <PillButton key={l.href} href={l.href} tone="dark" size="sm">{l.label}</PillButton>
+                    ) : (
+                      <Link key={l.href} href={l.href} className="t-base text-ink/75 transition-colors hover:text-ink">
+                        {l.label}
+                      </Link>
+                    ),
+                  )}
                 </div>
               </div>
             ))}
