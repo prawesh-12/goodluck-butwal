@@ -69,16 +69,16 @@ export const social = [
 ];
 
 // menuOnly: listed in the mobile menu but kept out of the header bar so it stays readable.
-// children: a dropdown of icon tiles under the item in the header, an indented group in the mobile menu.
+// A group has no page of its own: in the header it is a dropdown of icon tiles, in the mobile
+// menu a heading over an indented list.
 export type NavIcon = "globe" | "building" | "book" | "pen";
 export type NavChild = { label: string; href: string; icon: NavIcon };
-export type NavItem = { label: string; href: string; menuOnly?: boolean; children?: NavChild[] };
+export type NavItem = { label: string; href: string; menuOnly?: boolean } | { label: string; children: NavChild[] };
 
 export const nav: NavItem[] = [
   { label: "About", href: "/about" },
   {
     label: "Study abroad",
-    href: "/study-abroad",
     children: [
       { label: "Destinations", href: "/study-abroad", icon: "globe" },
       { label: "Institutions", href: "/institutions", icon: "building" },

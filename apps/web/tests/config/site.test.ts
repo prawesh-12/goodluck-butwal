@@ -21,7 +21,7 @@ function hasPage(href: string) {
 }
 
 test("every nav link and dropdown child has a page behind it", () => {
-  const hrefs = nav.flatMap((item) => [item.href, ...(item.children ?? []).map((c) => c.href)]);
+  const hrefs = nav.flatMap((item) => ("children" in item ? item.children.map((c) => c.href) : [item.href]));
   const missing = hrefs.filter((href) => !hasPage(href));
   expect(missing).toEqual([]);
 });

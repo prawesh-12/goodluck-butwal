@@ -12,7 +12,7 @@ import { loadText } from "@/features/site-text/queries";
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
     path: "/study-abroad",
-    title: "Study abroad",
+    title: "Destinations",
     description: "Study in Australia, the United Kingdom and New Zealand with Goodluck.",
   });
 }
@@ -35,7 +35,7 @@ export default async function StudyAbroadPage() {
 
   return (
     <>
-      <InnerHero badge={t("study.hero.badge", "Study abroad")} title={t("study.hero.title", "Countries we help you study in")} lead={t("study.hero.lead", "Study in Australia, the United Kingdom and New Zealand with us.")} width={1260} after={
+      <InnerHero badge={t("study.hero.badge", "Destinations")} title={t("study.hero.title", "Countries we help you study in")} lead={t("study.hero.lead", "Study in Australia, the United Kingdom and New Zealand with us.")} width={1260} after={
         <div className="grid w-full gap-[10px] md:grid-cols-3 md:gap-[30px]">
           {cards.map((d, i) => (
             <div key={d.slug} id={d.slug}><Appear delay={0.1 * i}><DestinationCard cards={cards} slug={d.slug} /></Appear></div>

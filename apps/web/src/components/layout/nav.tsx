@@ -62,44 +62,42 @@ export function Nav({ text }: { text: NavText }) {
               <Img src={gl.logo} alt="Goodluck Education and Migration" w={320} className="h-full w-auto object-contain" />
             </Link>
             <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
-              {nav.filter((l) => !l.menuOnly).map((l) => {
-                if (!l.children) {
+              {nav.filter((l) => !("menuOnly" in l && l.menuOnly)).map((l) => {
+                if (!("children" in l)) {
                   return (
                     <Link key={l.href} href={l.href} className={`${item} ${tone(on(l.href))}`}>
                       {l.label}
                     </Link>
                   );
                 }
-                const shown = menu === l.href;
-                const active = on(l.href) || l.children.some((c) => on(c.href));
+                const shown = menu === l.label;
+                const active = l.children.some((c) => on(c.href));
                 return (
                   <div
-                    key={l.href}
+                    key={l.label}
                     className="relative"
-                    onMouseEnter={() => setMenu(l.href)}
+                    onMouseEnter={() => setMenu(l.label)}
                     onMouseLeave={() => setMenu(null)}
-                    onFocus={() => setMenu(l.href)}
+                    onFocus={() => setMenu(l.label)}
                     onBlur={(e) => {
                       if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setMenu(null);
                     }}
                     onKeyDown={(e) => e.key === "Escape" && setMenu(null)}
                   >
-                    <Link href={l.href} aria-expanded={shown} className={`${item} inline-flex items-center gap-1.5 ${tone(active)}`}>
+                    <button type="button" aria-haspopup="true" aria-expanded={shown} onClick={() => setMenu(shown ? null : l.label)} className={`${item} inline-flex items-center gap-1.5 ${tone(active)}`}>
                       {l.label}
                       <svg width="10" height="7" viewBox="0 0 12 8" aria-hidden="true" className={`transition-transform duration-200 ${shown ? "rotate-180" : ""}`}>
                         <path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
-                    </Link>
+                    </button>
                     <AnimatePresence>
                       {shown && (
                         <m.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }} className="absolute left-0 top-full pt-5">
                           <div className="grid w-[460px] grid-cols-2 gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)]">
                             {l.children.map((c) => {
                               const Icon = icons[c.icon];
-                              // The Destinations tile shares the parent's href, so it only reads as current on that page itself.
-                              const here = c.href === l.href ? path === c.href : on(c.href);
                               return (
-                                <Link key={c.href} href={c.href} className={`flex items-center gap-3 rounded-[18px] p-3 text-[16px] font-semibold leading-[20.8px] transition-colors duration-200 hover:bg-surface hover:text-ink ${tone(here)}`}>
+                                <Link key={c.href} href={c.href} className={`flex items-center gap-3 rounded-[18px] p-3 text-[16px] font-semibold leading-[20.8px] transition-colors duration-200 hover:bg-surface hover:text-ink ${tone(on(c.href))}`}>
                                   <span className="icon-dark flex size-10 shrink-0 items-center justify-center rounded-[10px] text-white ring-1 ring-inset ring-white/10">
                                     <Icon size={20} strokeWidth={1.8} aria-hidden />
                                   </span>
@@ -132,22 +130,26 @@ export function Nav({ text }: { text: NavText }) {
           <AnimatePresence>
             {open && (
               <m.nav initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="mt-[10px] flex flex-col gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:hidden" aria-label="Mobile">
-                {nav.map((l) => (
-                  <Fragment key={l.href}>
-                    <Link href={l.href} className="rounded-full px-4 py-2 text-[16px] font-semibold leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
+                {nav.map((l) =>
+                  "children" in l ? (
+                    <Fragment key={l.label}>
+                      <p className="px-4 pb-1 pt-2 text-[16px] font-semibold leading-[20.8px] text-ink">{l.label}</p>
+                      {l.children.map((c) => {
+                        const Icon = icons[c.icon];
+                        return (
+                          <Link key={c.href} href={c.href} className="flex items-center gap-3 rounded-full py-2 pl-6 pr-4 text-[15px] font-medium leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
+                            <Icon size={18} strokeWidth={1.8} aria-hidden />
+                            {c.label}
+                          </Link>
+                        );
+                      })}
+                    </Fragment>
+                  ) : (
+                    <Link key={l.href} href={l.href} className="rounded-full px-4 py-2 text-[16px] font-semibold leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
                       {l.label}
                     </Link>
-                    {l.children?.map((c) => {
-                      const Icon = icons[c.icon];
-                      return (
-                        <Link key={c.href} href={c.href} className="flex items-center gap-3 rounded-full py-2 pl-6 pr-4 text-[15px] font-medium leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
-                          <Icon size={18} strokeWidth={1.8} aria-hidden />
-                          {c.label}
-                        </Link>
-                      );
-                    })}
-                  </Fragment>
-                ))}
+                  ),
+                )}
                 {!onContact && (
                   <div className="mt-2 flex items-center justify-center border-t border-hairline px-2 pt-3 md:hidden">
                     <PillButton href="/contact/book-consultation" tone="dark" size="sm">
