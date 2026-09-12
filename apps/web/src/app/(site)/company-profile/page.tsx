@@ -8,7 +8,7 @@ import { getAboutContent, getCompanyProfile } from "@/features/pages/queries";
 import { listOffices, listServiceLinks } from "@/features/offices/queries";
 import { listDestinations } from "@/features/destinations/queries";
 import { listTeam } from "@/features/team/queries";
-import { getSocialLinks } from "@/features/settings/queries";
+import { getGoogleRating, getSocialLinks } from "@/features/settings/queries";
 import { loadText } from "@/features/site-text/queries";
 import { Appear } from "@/components/ui/appear";
 import { Link } from "@/components/ui/link";
@@ -42,18 +42,25 @@ const Bullets = ({ items }: { items: string[] }) => (
 );
 
 export default async function CompanyProfilePage() {
-  const [t, offices, services, destinations, team, social, about, profile] = await Promise.all([
+  const [t, offices, services, destinations, team, social, rating, about, profile] = await Promise.all([
     loadText(),
     listOffices(),
     listServiceLinks(),
     listDestinations(),
     listTeam(),
     getSocialLinks(),
+    getGoogleRating(),
     getAboutContent(),
     getCompanyProfile(),
   ]);
 
   const officeOf = (id: string | null) => offices.find((o) => o.id === id);
+  const officeRank = (id: string | null) => {
+    const i = offices.findIndex((o) => o.id === id);
+    return i < 0 ? offices.length : i;
+  };
+  const staff = [...team].sort((a, b) => officeRank(a.office) - officeRank(b.office));
+  const headcount = offices.map((o) => `${o.city} ${team.filter((m) => m.office === o.id).length}`).join(", ");
 
   const rows: { label: string; value: ReactNode }[] = [
     { label: t("about.profile.label_name", "Name of the company"), value: company.name },
@@ -78,6 +85,7 @@ export default async function CompanyProfilePage() {
     { label: t("about.profile.label_operated", "Operated and promoted by"), value: `${about.founders} (${t("about.founders.role", "Co-founders").toLowerCase()}) with a team of ${team.length}` },
     { label: t("about.profile.label_associations", "Associated with"), value: profile?.associations },
     { label: t("about.profile.label_countries", "We recruit students in"), value: destinations.map((d) => d.name).join(", ") },
+    { label: t("about.profile.label_rating", "Client feedback"), value: t("about.profile.rating_text", "{score} out of 5 on Google, from {count} client reviews").replace("{score}", rating.score).replace("{count}", String(rating.count)) },
   ];
 
   return (
@@ -124,7 +132,7 @@ export default async function CompanyProfilePage() {
               ))}
             </div>
 
-            <SectionHead align="left" title={t("about.profile.staff_title", "Staff")} lead={t("about.profile.staff_lead", "Every team member, with their position and office.")} />
+            <SectionHead align="left" title={t("about.profile.staff_title", "Staff")} lead={`${team.length} ${t("about.profile.staff_lead", "team members: {offices}").replace("{offices}", headcount)}`} />
             <Appear className="article article-scroll w-full">
               <table>
                 <thead>
@@ -135,11 +143,16 @@ export default async function CompanyProfilePage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {team.map((member) => {
+                  {staff.map((member) => {
                     const office = officeOf(member.office);
                     return (
                       <tr key={member.slug}>
-                        <td><Link href={`/team/${member.slug}`}>{member.name}</Link></td>
+                        <td>
+                          <Link href={`/team/${member.slug}`} className="flex items-center gap-3 whitespace-nowrap">
+                            <Img src={member.photo} alt="" w={80} className="m-0! size-10 shrink-0 rounded-full! object-cover object-top" loading="lazy" decoding="async" />
+                            {member.name}
+                          </Link>
+                        </td>
                         <td>{member.role}</td>
                         <td>{office ? `${office.city}, ${office.country}` : ""}</td>
                       </tr>
