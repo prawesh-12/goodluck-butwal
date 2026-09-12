@@ -48,3 +48,12 @@ test("each blur layer is clipped to its mask band plus the blur's reach", () => 
   expect(clips[2]).toBe("calc(25% - 5px) 0 calc(37.5% - 5px) 0");
   expect(clips[5]).toBe("0 0 calc(87.5% - 40px) 0");
 });
+
+// The Study abroad item holds the institution, course and test preparation pages. On one of
+// those pages the item has to read as the current section, or the site looks lost.
+test("a dropdown parent is highlighted while on one of its child pages", () => {
+  pathname.mockReturnValue("/courses");
+  const html = renderToStaticMarkup(createElement(Nav, { text }));
+  expect(html).toMatch(/<a href="\/study-abroad"[^>]*class="[^"]* bg-surface text-ink/);
+  expect(html).not.toMatch(/<a href="\/services"[^>]*class="[^"]* bg-surface text-ink/);
+});

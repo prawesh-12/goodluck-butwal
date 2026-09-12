@@ -2,7 +2,7 @@
 
 import { Link } from "@/components/ui/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { gl } from "@/config/assets";
 import { nav } from "@/config/site";
@@ -35,13 +35,18 @@ export type NavText = { bookCta: string; menuOpen: string; menuClose: string };
 
 export function Nav({ text }: { text: NavText }) {
   const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState<string | null>(null);
   const path = usePathname();
   const [lastPath, setLastPath] = useState(path);
   // Closing in an effect left the menu open over the new page for a frame.
   if (path !== lastPath) {
     setLastPath(path);
     setOpen(false);
+    setMenu(null);
   }
+  const on = (href: string) => path === href || path.startsWith(href + "/");
+  const item = "whitespace-nowrap rounded-full px-3 py-2 text-[16px] font-semibold leading-[20.8px] transition-colors duration-200 hover:bg-surface hover:text-ink";
+  const tone = (active: boolean) => (active ? "bg-surface text-ink" : "text-muted");
   // No point offering the booking CTA to someone already on the contact pages.
   const onContact = path === "/contact" || path.startsWith("/contact/");
   return (
@@ -49,17 +54,53 @@ export function Nav({ text }: { text: NavText }) {
       <BlurTop />
       <div className="fixed inset-x-0 top-0 z-[9] flex flex-col items-center py-4 md:py-5">
         <div className="w-full px-4 md:w-auto md:max-w-[860px] md:px-5 lg:max-w-[1280px] lg:px-6">
-          <div className="flex h-[52px] items-center gap-4 overflow-hidden rounded-full bg-white p-[10px] shadow-[0_0_0_2px_rgba(221,229,237,0.7)] md:h-[54px] md:shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:h-[58px] lg:gap-5">
+          <div className="flex h-[52px] items-center gap-4 rounded-full bg-white p-[10px] shadow-[0_0_0_2px_rgba(221,229,237,0.7)] md:h-[54px] md:shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:h-[58px] lg:gap-5">
             <Link href="/" prefetch={path === "/" ? false : undefined} aria-label="Goodluck Education and Migration, home" className="block h-7 shrink-0 md:h-8">
               <Img src={gl.logo} alt="Goodluck Education and Migration" w={320} className="h-full w-auto object-contain" />
             </Link>
             <nav className="hidden items-center gap-0.5 lg:flex" aria-label="Main">
               {nav.filter((l) => !l.menuOnly).map((l) => {
-                const active = path === l.href || path.startsWith(l.href + "/");
+                if (!l.children) {
+                  return (
+                    <Link key={l.href} href={l.href} className={`${item} ${tone(on(l.href))}`}>
+                      {l.label}
+                    </Link>
+                  );
+                }
+                const shown = menu === l.href;
+                const active = on(l.href) || l.children.some((c) => on(c.href));
                 return (
-                  <Link key={l.href} href={l.href} className={`whitespace-nowrap rounded-full px-3 py-2 text-[16px] font-semibold leading-[20.8px] transition-colors duration-200 hover:bg-surface hover:text-ink ${active ? "bg-surface text-ink" : "text-muted"}`}>
-                    {l.label}
-                  </Link>
+                  <div
+                    key={l.href}
+                    className="relative"
+                    onMouseEnter={() => setMenu(l.href)}
+                    onMouseLeave={() => setMenu(null)}
+                    onFocus={() => setMenu(l.href)}
+                    onBlur={(e) => {
+                      if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setMenu(null);
+                    }}
+                    onKeyDown={(e) => e.key === "Escape" && setMenu(null)}
+                  >
+                    <Link href={l.href} aria-expanded={shown} className={`${item} inline-flex items-center gap-1.5 ${tone(active)}`}>
+                      {l.label}
+                      <svg width="10" height="7" viewBox="0 0 12 8" aria-hidden="true" className={`transition-transform duration-200 ${shown ? "rotate-180" : ""}`}>
+                        <path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </Link>
+                    <AnimatePresence>
+                      {shown && (
+                        <m.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }} className="absolute left-0 top-full pt-5">
+                          <div className="flex min-w-[220px] flex-col gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)]">
+                            {l.children.map((c) => (
+                              <Link key={c.href} href={c.href} className={`${item} px-4 ${tone(on(c.href))}`}>
+                                {c.label}
+                              </Link>
+                            ))}
+                          </div>
+                        </m.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 );
               })}
             </nav>
@@ -81,9 +122,16 @@ export function Nav({ text }: { text: NavText }) {
             {open && (
               <m.nav initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="mt-[10px] flex flex-col gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)] lg:hidden" aria-label="Mobile">
                 {nav.map((l) => (
-                  <Link key={l.href} href={l.href} className="rounded-full px-4 py-2 text-[16px] font-semibold leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
-                    {l.label}
-                  </Link>
+                  <Fragment key={l.href}>
+                    <Link href={l.href} className="rounded-full px-4 py-2 text-[16px] font-semibold leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
+                      {l.label}
+                    </Link>
+                    {l.children?.map((c) => (
+                      <Link key={c.href} href={c.href} className="rounded-full px-8 py-2 text-[15px] font-medium leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
+                        {c.label}
+                      </Link>
+                    ))}
+                  </Fragment>
                 ))}
                 {!onContact && (
                   <div className="mt-2 flex items-center justify-center border-t border-hairline px-2 pt-3 md:hidden">

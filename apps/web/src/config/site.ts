@@ -69,10 +69,22 @@ export const social = [
 ];
 
 // menuOnly: listed in the mobile menu but kept out of the header bar so it stays readable.
-export const nav = [
+// children: a dropdown under the item in the header, an indented group in the mobile menu.
+export type NavItem = { label: string; href: string; menuOnly?: boolean; children?: { label: string; href: string }[] };
+
+export const nav: NavItem[] = [
   { label: "About", href: "/about" },
-  { label: "Study abroad", href: "/study-abroad" },
-  { label: "Institutions", href: "/institutions", menuOnly: true },
+  {
+    label: "Study abroad",
+    href: "/study-abroad",
+    children: [
+      { label: "Australia", href: "/study-abroad/australia" },
+      { label: "United Kingdom", href: "/study-abroad/united-kingdom" },
+      { label: "Institutions", href: "/institutions" },
+      { label: "Courses", href: "/courses" },
+      { label: "Test preparation", href: "/test-preparation" },
+    ],
+  },
   { label: "Services", href: "/services" },
   { label: "News", href: "/news" },
   { label: "Events", href: "/events", menuOnly: true },
