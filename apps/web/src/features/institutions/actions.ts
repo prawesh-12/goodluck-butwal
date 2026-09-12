@@ -70,7 +70,7 @@ function refresh(paths: string[]) {
   revalidatePath("/courses");
   for (const path of paths) revalidatePath(path);
   // Course pages carry the institution's name and logo and are gated on it staying published.
-  revalidatePath("/study-abroad/[destination]", "page");
+  revalidatePath("/destinations/[destination]", "page");
   revalidatePath("/courses/[slug]", "page");
 }
 

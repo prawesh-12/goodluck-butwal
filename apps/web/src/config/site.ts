@@ -80,7 +80,7 @@ export const nav: NavItem[] = [
   {
     label: "Study abroad",
     children: [
-      { label: "Destinations", href: "/study-abroad", icon: "globe" },
+      { label: "Destinations", href: "/destinations", icon: "globe" },
       { label: "Institutions", href: "/institutions", icon: "building" },
       { label: "Courses", href: "/courses", icon: "book" },
       { label: "Test preparation", href: "/test-preparation", icon: "pen" },
@@ -102,9 +102,9 @@ export const footerLinks = {
     { label: "Company profile", href: "/company-profile" },
   ],
   Countries: [
-    { label: "Australia", href: "/study-abroad/australia" },
-    { label: "New Zealand", href: "/study-abroad#new-zealand" },
-    { label: "United Kingdom", href: "/study-abroad/united-kingdom" },
+    { label: "Australia", href: "/destinations/australia" },
+    { label: "New Zealand", href: "/destinations#new-zealand" },
+    { label: "United Kingdom", href: "/destinations/united-kingdom" },
   ],
   Support: [
     { label: "Services", href: "/services" },

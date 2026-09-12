@@ -64,7 +64,7 @@ const href: Record<SearchKind, (slug: string) => string> = {
   courses: (slug) => `/courses/${slug}`,
   institutions: (slug) => `/institutions/${slug}`,
   posts: (slug) => `/news/${slug}`,
-  destinations: (slug) => `/study-abroad/${slug}`,
+  destinations: (slug) => `/destinations/${slug}`,
   services: (slug) => `/services/${slug}`,
   events: (slug) => `/events/${slug}`,
 };

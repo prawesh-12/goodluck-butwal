@@ -23,9 +23,9 @@ export const generateStaticParams = async () =>
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { destination } = await params;
   const d = await getDestination(destination);
-  if (!d) return buildMetadata({ path: "/study-abroad", title: "Destinations", noindex: true });
+  if (!d) return buildMetadata({ path: "/destinations", title: "Destinations", noindex: true });
   return buildMetadata({
-    path: `/study-abroad/${destination}`,
+    path: `/destinations/${destination}`,
     title: `Study in ${d.name}`,
     description: d.overview,
   });
@@ -55,7 +55,7 @@ export default async function DestinationPage({ params }: Props) {
 
   return (
     <>
-      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "Destinations", path: "/study-abroad" }, { name: d.name, path: `/study-abroad/${d.slug}` }])} />
+      <JsonLd data={breadcrumbs([{ name: "Home", path: "/" }, { name: "Destinations", path: "/destinations" }, { name: d.name, path: `/destinations/${d.slug}` }])} />
       <InnerHero bg="field" width={1260} gap="gap-5 md:gap-10 lg:gap-[50px]" title={`${t("study.destination.hero.title_prefix", "Study in")} ${d.name}`} lead={d.overview} badge={undefined} className="[&_h1]:order-2 [&_p]:order-3" after={
         <Appear delay={0.1} className="w-full">
           <div className="aspect-[16/9] w-full overflow-clip rounded-[10px] md:rounded-[30px]">

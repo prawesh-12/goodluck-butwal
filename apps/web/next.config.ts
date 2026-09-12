@@ -51,7 +51,11 @@ const nextConfig: NextConfig = {
     authInterrupts: true,
   },
   async redirects() {
-    return [{ source: "/about/company-profile", destination: "/company-profile", permanent: true }];
+    return [
+      { source: "/about/company-profile", destination: "/company-profile", permanent: true },
+      { source: "/study-abroad", destination: "/destinations", permanent: true },
+      { source: "/study-abroad/:slug", destination: "/destinations/:slug", permanent: true },
+    ];
   },
   async headers() {
     return [

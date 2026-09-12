@@ -20,7 +20,7 @@ const EXPECTED: Record<string, string[]> = {
     "/admin/institutions",
     "/institutions",
     "/courses",
-    "/study-abroad/[destination]",
+    "/destinations/[destination]",
     "/courses/[slug]",
   ],
   courses: ["/admin/courses", "/courses"],

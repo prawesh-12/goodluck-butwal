@@ -19,7 +19,7 @@ const facts: Record<string, [string, string]> = {
 
 const fromRow = (rows: PublicDestination[], slug: string): Card => {
   const d = rows.find((x) => x.slug === slug)!;
-  return { slug, name: d.name, line: d.overview, fact: facts[slug], bg: d.card, pos: focus[slug], flag: d.flag, href: `/study-abroad/${slug}` };
+  return { slug, name: d.name, line: d.overview, fact: facts[slug], bg: d.card, pos: focus[slug], flag: d.flag, href: `/destinations/${slug}` };
 };
 
 // New Zealand has no page of its own yet, so its card only invites an enquiry.

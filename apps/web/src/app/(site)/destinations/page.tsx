@@ -11,7 +11,7 @@ import { loadText } from "@/features/site-text/queries";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildMetadata({
-    path: "/study-abroad",
+    path: "/destinations",
     title: "Destinations",
     description: "Study in Australia, the United Kingdom and New Zealand with Goodluck.",
   });

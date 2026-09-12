@@ -30,7 +30,7 @@ const fixed = [
   "/about/corporate-social-responsibility",
   "/about/careers",
   "/company-profile",
-  "/study-abroad",
+  "/destinations",
   "/institutions",
   "/courses",
   "/services",
@@ -45,7 +45,7 @@ const fixed = [
 ];
 
 const sources = [
-  { table: destinations, prefix: "/study-abroad", frequency: "monthly" as Frequency, extra: eq(destinations.hasPage, true) },
+  { table: destinations, prefix: "/destinations", frequency: "monthly" as Frequency, extra: eq(destinations.hasPage, true) },
   { table: services, prefix: "/services", frequency: "monthly" as Frequency, extra: undefined },
   { table: posts, prefix: "/news", frequency: "yearly" as Frequency, extra: undefined },
   { table: institutions, prefix: "/institutions", frequency: "monthly" as Frequency, extra: undefined },
