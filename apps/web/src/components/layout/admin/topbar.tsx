@@ -37,7 +37,7 @@ export function TopBar({ name, actor }: { name: string; actor: Actor }) {
 
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-background">
-      <div className="mx-auto flex h-full w-full max-w-[1400px] items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="flex h-full w-full items-center justify-between gap-4 px-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-2">
           <SidebarTrigger className="-ml-1" />
 
