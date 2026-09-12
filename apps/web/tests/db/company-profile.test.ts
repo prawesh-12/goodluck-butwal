@@ -7,5 +7,5 @@ const hasDb = Boolean(process.env.DATABASE_URL);
 test.runIf(hasDb)("the company profile row carries its registered particulars", async () => {
   const profile = await getCompanyProfile();
   expect(profile?.registration_no).toBeTruthy();
-  expect(profile?.strategies.length).toBeGreaterThan(0);
+  expect(profile?.vat_no).toBeTruthy();
 });

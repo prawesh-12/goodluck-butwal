@@ -80,8 +80,6 @@ export type ProfileBlocks = {
   registration_no: string;
   vat_no: string;
   bank: string;
-  strategies: string[];
-  facilities: string;
   associations: string;
 };
 
