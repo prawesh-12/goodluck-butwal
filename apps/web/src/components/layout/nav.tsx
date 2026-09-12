@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import { Fragment, useState } from "react";
 import { AnimatePresence, m } from "framer-motion";
 import { gl } from "@/config/assets";
-import { nav } from "@/config/site";
+import { nav, type NavIcon } from "@/config/site";
+import { BookOpen, Building2, Globe, PenLine } from "lucide-react";
 import { PillButton } from "@/components/ui/button";
 import { Img } from "@/components/ui/img";
 
@@ -30,6 +31,8 @@ function BlurTop() {
     </div>
   );
 }
+
+const icons: Record<NavIcon, typeof Globe> = { globe: Globe, building: Building2, book: BookOpen, pen: PenLine };
 
 export type NavText = { bookCta: string; menuOpen: string; menuClose: string };
 
@@ -90,12 +93,20 @@ export function Nav({ text }: { text: NavText }) {
                     <AnimatePresence>
                       {shown && (
                         <m.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.2 }} className="absolute left-0 top-full pt-5">
-                          <div className="flex min-w-[220px] flex-col gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)]">
-                            {l.children.map((c) => (
-                              <Link key={c.href} href={c.href} className={`${item} px-4 ${tone(on(c.href))}`}>
-                                {c.label}
-                              </Link>
-                            ))}
+                          <div className="grid w-[460px] grid-cols-2 gap-1 rounded-[26px] bg-white p-[10px] shadow-[0_0_0_4px_rgba(221,229,237,0.7)]">
+                            {l.children.map((c) => {
+                              const Icon = icons[c.icon];
+                              // The Destinations tile shares the parent's href, so it only reads as current on that page itself.
+                              const here = c.href === l.href ? path === c.href : on(c.href);
+                              return (
+                                <Link key={c.href} href={c.href} className={`flex items-center gap-3 rounded-[18px] p-3 text-[16px] font-semibold leading-[20.8px] transition-colors duration-200 hover:bg-surface hover:text-ink ${tone(here)}`}>
+                                  <span className="icon-dark flex size-10 shrink-0 items-center justify-center rounded-[10px] text-white ring-1 ring-inset ring-white/10">
+                                    <Icon size={20} strokeWidth={1.8} aria-hidden />
+                                  </span>
+                                  {c.label}
+                                </Link>
+                              );
+                            })}
                           </div>
                         </m.div>
                       )}
@@ -126,11 +137,15 @@ export function Nav({ text }: { text: NavText }) {
                     <Link href={l.href} className="rounded-full px-4 py-2 text-[16px] font-semibold leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
                       {l.label}
                     </Link>
-                    {l.children?.map((c) => (
-                      <Link key={c.href} href={c.href} className="rounded-full px-8 py-2 text-[15px] font-medium leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
-                        {c.label}
-                      </Link>
-                    ))}
+                    {l.children?.map((c) => {
+                      const Icon = icons[c.icon];
+                      return (
+                        <Link key={c.href} href={c.href} className="flex items-center gap-3 rounded-full py-2 pl-6 pr-4 text-[15px] font-medium leading-[20.8px] text-muted hover:bg-surface hover:text-ink">
+                          <Icon size={18} strokeWidth={1.8} aria-hidden />
+                          {c.label}
+                        </Link>
+                      );
+                    })}
                   </Fragment>
                 ))}
                 {!onContact && (

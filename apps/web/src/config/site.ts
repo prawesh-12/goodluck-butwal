@@ -69,8 +69,10 @@ export const social = [
 ];
 
 // menuOnly: listed in the mobile menu but kept out of the header bar so it stays readable.
-// children: a dropdown under the item in the header, an indented group in the mobile menu.
-export type NavItem = { label: string; href: string; menuOnly?: boolean; children?: { label: string; href: string }[] };
+// children: a dropdown of icon tiles under the item in the header, an indented group in the mobile menu.
+export type NavIcon = "globe" | "building" | "book" | "pen";
+export type NavChild = { label: string; href: string; icon: NavIcon };
+export type NavItem = { label: string; href: string; menuOnly?: boolean; children?: NavChild[] };
 
 export const nav: NavItem[] = [
   { label: "About", href: "/about" },
@@ -78,11 +80,10 @@ export const nav: NavItem[] = [
     label: "Study abroad",
     href: "/study-abroad",
     children: [
-      { label: "Australia", href: "/study-abroad/australia" },
-      { label: "United Kingdom", href: "/study-abroad/united-kingdom" },
-      { label: "Institutions", href: "/institutions" },
-      { label: "Courses", href: "/courses" },
-      { label: "Test preparation", href: "/test-preparation" },
+      { label: "Destinations", href: "/study-abroad", icon: "globe" },
+      { label: "Institutions", href: "/institutions", icon: "building" },
+      { label: "Courses", href: "/courses", icon: "book" },
+      { label: "Test preparation", href: "/test-preparation", icon: "pen" },
     ],
   },
   { label: "Services", href: "/services" },
