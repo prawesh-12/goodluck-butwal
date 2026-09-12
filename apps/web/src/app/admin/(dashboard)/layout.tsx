@@ -17,9 +17,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <TooltipProvider delay={300}>
       <SidebarProvider defaultOpen={sidebarOpen} className="admin bg-secondary/40">
-        <AdminSidebar actor={actor} />
+        <AdminSidebar actor={actor} name={name ?? "Signed in"} />
         <SidebarInset className="min-w-0 bg-transparent">
-          <TopBar name={name ?? "Signed in"} actor={actor} />
+          <TopBar />
           <main className="mx-auto w-full max-w-[1400px] flex-1 space-y-6 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
         </SidebarInset>
         {/* Below the topbar, so a toast never lands on View website or the account menu. */}
